@@ -8,12 +8,20 @@
  * InputHandler class for reading the input file providing a stream of LocatedChars.
  */
 class InputHandler {
-  public:
+public:
     InputHandler(std::string file_name);
+
+    bool HasNext();
+
     LocatedChar Next();
     LocatedChar Peek();
 
-  private:
+    LocatedChar GetNextNonwhitespaceChar();
+
+private:
+    void PrepareNextLine();
+
+    std::string input_file_name;
     std::ifstream input_file;
     std::string current_line;
     unsigned int current_line_number;
