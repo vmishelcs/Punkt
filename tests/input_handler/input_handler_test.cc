@@ -10,8 +10,8 @@ protected:
 	std::string test_file_directory = INPUT_HANDLER_TEST_FILE_DIRECTORY;
 };
 
-TEST_F(InputHandlerTest, Init) {
-	InputHandler input_handler(test_file_directory + "Init.punkt");
+TEST_F(InputHandlerTest, TestInit) {
+	InputHandler input_handler(test_file_directory + "TestInit.punkt");
 }
 
 TEST_F(InputHandlerTest, TestNext) {
@@ -35,9 +35,28 @@ TEST_F(InputHandlerTest, TestNextManyLines) {
 		"Good-bye cruel world!"
 	};
 
-	for (auto line : lines) {
+	for (const auto& line : lines) {
 		for (char c : line) {
 			EXPECT_EQ(input_handler.Next().character, c);
 		}
+	}
+}
+
+TEST_F(InputHandlerTest, TestNextEmptyLines) {
+	InputHandler input_handler(test_file_directory + "TestNextEmptyLines.punkt");
+	std::string test_string = "This file has some empty lines.";
+	for (char c : test_string) {
+		EXPECT_EQ(input_handler.Next().character, c);
+	}
+
+	for (int i = 0; i < 8; ++i) {
+		ASSERT_EQ(input_handler.Next(), FLAG_END_OF_INPUT);
+	}
+}
+
+TEST_F(InputHandlerTest, TestEmptyFile) {
+	InputHandler input_handler(test_file_directory + "TestEmptyFile.punkt");
+	for (int i = 0; i < 16; ++i) {
+		ASSERT_EQ(input_handler.Next(), FLAG_END_OF_INPUT);
 	}
 }
