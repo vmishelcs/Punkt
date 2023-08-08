@@ -18,7 +18,6 @@ TEST_F(InputHandlerTest, TestNext) {
 	InputHandler input_handler(test_file_directory + "TestNext.punkt");
 	std::string test_string = "Hello World!";
 	for (char c : test_string) {
-		ASSERT_TRUE(input_handler.HasNext());
 		LocatedChar lc = input_handler.Next();
 		EXPECT_EQ(lc.character, c);
 	}
@@ -38,7 +37,6 @@ TEST_F(InputHandlerTest, TestNextManyLines) {
 
 	for (auto line : lines) {
 		for (char c : line) {
-			ASSERT_TRUE(input_handler.HasNext());
 			EXPECT_EQ(input_handler.Next().character, c);
 		}
 	}

@@ -1,51 +1,57 @@
-#include <input_handler/input_handler.h>
 
-InputHandler::InputHandler(std::string file_name) {
-    if (file_name.length() == 0) {
-        throw std::runtime_error("Input file name length must be greater than 0");
-    }
-    this->input_file_name = file_name;
+#include "input_handler.h"
+
+InputHandler::InputHandler(std::string input_file_name) {
+    this->input_file_name = input_file_name;
     this->input_file = std::ifstream(this->input_file_name, std::ios::in);
     if (!this->input_file.is_open()) {
-        throw std::runtime_error("Failed to open input file " + file_name);          
+        throw std::runtime_error("Failed to open input file " + this->input_file_name);
     }
-    
-    this->current_line_number = 0;
-    PrepareNextLine();
-}
 
-bool InputHandler::HasNext() {
-    if (this->current_column_number > this->current_line.length()
-        && this->input_file.eof()) {
-        return false;
+    this->current_line = "";
+    this->line_num = 0;
+    this->column_num = 1;
+
+    while (!LineHasMoreChars() && FileHasMoreLines()) {
+        PreloadNextLine();
     }
-    return true;
 }
 
 LocatedChar InputHandler::Next() {
-    if (current_column_number > this->current_line.length()) {
-        PrepareNextLine();
+    while (!LineHasMoreChars() && FileHasMoreLines()) {
+        PreloadNextLine();
     }
-
-    char c = this->current_line[this->current_column_number - 1];
-    return LocatedChar(c, this->current_line_number, this->current_column_number++);
+    if (LineHasMoreChars()) {
+        char c = this->current_line[this->column_num - 1];
+        return LocatedChar(
+            c,
+            this->input_file_name,
+            this->line_num,
+            this->column_num++
+        );
+    }
+    return FLAG_END_OF_INPUT;
 }
 
-//LocatedChar InputHandler::Peek() {
-//
-//}
+bool InputHandler::LineHasMoreChars() {
+    return this->column_num <= this->current_line.length();
+}
 
-void InputHandler::PrepareNextLine() {
+bool InputHandler::FileHasMoreLines() {
+    return !this->input_file.eof();
+}
+
+void InputHandler::PreloadNextLine() {
     std::getline(this->input_file, this->current_line);
     if (this->input_file.fail()
         && this->current_line.length() == 0
         && !this->input_file.eof()) {
         throw std::runtime_error("Failed to read line "
-            + std::to_string(this->current_line_number)
+            + std::to_string(this->line_num)
             + " from " + this->input_file_name);
     }
-    current_column_number = 1;
-    ++current_line_number;
+    this->column_num = 1;
+    this->line_num += 1;
 }
 
 
