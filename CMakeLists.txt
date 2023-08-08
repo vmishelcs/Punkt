@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-set(CMAKE_C_COMPILER "C:/MinGW/bin/gcc.exe")
-set(CMAKE_CXX_COMPILER "C:/MinGW/bin/g++.exe")
+set(CMAKE_C_COMPILER "/usr/bin/gcc")
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 set(CMAKE_CXX_STANDARD 11)
-cmake_policy(SET CMP0135 NEW) # Removes developer warning
 project(Punkt)
 
 # No in-source build
