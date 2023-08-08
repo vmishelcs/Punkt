@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "InputHandler Test",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/tests/input_handler/input_handler_test",

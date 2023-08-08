@@ -17,6 +17,10 @@ InputHandler::InputHandler(std::string input_file_name) {
     }
 }
 
+InputHandler::~InputHandler() {
+    this->input_file.close();
+}
+
 LocatedChar InputHandler::Next() {
     while (!LineHasMoreChars() && FileHasMoreLines()) {
         PreloadNextLine();
@@ -53,5 +57,3 @@ void InputHandler::PreloadNextLine() {
     this->column_num = 1;
     this->line_num += 1;
 }
-
-

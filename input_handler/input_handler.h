@@ -13,6 +13,7 @@
 class InputHandler {
 public:
     InputHandler(std::string input_file_name);
+    ~InputHandler();
 
     LocatedChar Next();
 
