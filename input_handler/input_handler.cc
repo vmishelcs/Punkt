@@ -1,11 +1,15 @@
+#include <glog/logging.h>
 
 #include "input_handler.h"
 
 InputHandler::InputHandler(std::string input_file_name) {
+    if (input_file_name.length() == 0) {
+        LOG(FATAL) << "File name length must be greater than 0";
+    }
     this->input_file_name = input_file_name;
     this->input_file = std::ifstream(this->input_file_name, std::ios::in);
     if (!this->input_file.is_open()) {
-        throw std::runtime_error("Failed to open input file " + this->input_file_name);
+        LOG(FATAL) << "Failed to open input file " << this->input_file_name;
     }
 
     this->current_line = "";

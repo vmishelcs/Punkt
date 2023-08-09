@@ -7,7 +7,7 @@
 
 class LocatedCharStream {
 public:
-	static LocatedCharStream *FromFileName(std::string file_name);
+	LocatedCharStream(InputHandler *input_handler);
 	~LocatedCharStream();
 
 	LocatedChar Next();
@@ -15,8 +15,6 @@ public:
 	LocatedChar Peek();
 
 private:
-	LocatedCharStream(InputHandler *input_handler);
-
 	InputHandler *input_handler;
 	LocatedChar next_char;
 };

@@ -10,12 +10,6 @@ LocatedCharStream::~LocatedCharStream() {
     delete this->input_handler;
 }
 
-LocatedCharStream *LocatedCharStream::FromFileName(std::string file_name) {
-    auto *input_handler = new InputHandler(file_name);
-    auto *located_char_stream = new LocatedCharStream(input_handler);
-    return located_char_stream;
-}
-
 LocatedChar LocatedCharStream::Next() {
     LocatedChar result = this->next_char;
     this->next_char = this->input_handler->Next();
