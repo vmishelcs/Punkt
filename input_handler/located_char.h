@@ -22,7 +22,7 @@ struct LocatedChar {
         , location(lc.location)
     {}
 
-    bool IsWhitespace() const { return std::isspace(character); }
+    bool IsWhitespace() const { return isspace(character); }
     bool IsEndOfInput() const {
         return this->character == 0
             && this->location.file_name == "null"
@@ -30,16 +30,15 @@ struct LocatedChar {
             && this->location.column == 0;
     }
     bool IsIdentifierStart() const {
-        return ('A' <= character && character <= 'Z')
-            || ('a' <= character && character <= 'z')
-            || (character == '_');
+        return isalpha(character)|| (character == '_');
     }
     bool IsIdentifierChar() const {
-        return ('A' <= character && character <= 'Z')
-            || ('a' <= character && character <= 'z')
-            || ('0' <= character && character <= '9')
-            || (character == '_');
+        return isalnum(character) || (character == '_');
     }
+    bool IsNumberStart() const {
+        return isdigit(character) || character == '+' || character == '-';
+    }
+    bool IsDigit() const { return isdigit(character); }
 
     char character;
     TextLocation location;
