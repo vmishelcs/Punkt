@@ -3,21 +3,11 @@
 
 #include "scanner.h"
 
-Scanner::Scanner(LocatedCharStream *input_stream) {
-    this->input_stream = input_stream;
+Scanner::Scanner(std::string input_file_name) {
+    this->input_stream = std::make_unique<LocatedCharStream>(input_file_name);
 }
 
-Scanner::~Scanner() {
-    delete this->input_stream;
-}
-
-Scanner *Scanner::MakeFromFileName(std::string file_name) {
-    InputHandler *input_handler = new InputHandler(file_name);
-    LocatedCharStream *input_stream = new LocatedCharStream(input_handler);
-    return new Scanner(input_stream);
-}
-
-Token *Scanner::GetNextToken() {
+std::shared_ptr<Token> Scanner::GetNextToken() {
     LocatedChar ch = this->input_stream->NextNonwhitespaceChar();
 
     if (ch.IsIdentifierStart()) {
@@ -28,7 +18,7 @@ Token *Scanner::GetNextToken() {
     }
 }
 
-Token *Scanner::ScanIdentifier(LocatedChar first_char) {
+std::shared_ptr<Token> Scanner::ScanIdentifier(LocatedChar first_char) {
     std::string buffer;
     buffer.push_back(first_char.character);
     LocatedChar ch = input_stream->Next();
@@ -36,5 +26,5 @@ Token *Scanner::ScanIdentifier(LocatedChar first_char) {
         buffer.push_back(ch.character);
         ch = input_stream->Next();
     }
-    return new IdentifierToken(buffer, first_char.location);
+    return std::make_shared<IdentifierToken>(buffer, first_char.location);
 }

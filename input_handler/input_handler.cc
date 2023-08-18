@@ -58,6 +58,7 @@ void InputHandler::PreloadNextLine() {
             + std::to_string(this->line_num)
             + " from " + this->input_file_name);
     }
+    this->current_line.push_back('\n');
     this->column_num = 1;
     this->line_num += 1;
 }

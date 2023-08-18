@@ -1,16 +1,24 @@
 #ifndef TOKEN_H_
 #define TOKEN_H_
 
+#include <unordered_map>
+
 #include <input_handler/text_location.h>
+
+enum class TokenType {
+    IDENTIFIER,
+};
 
 class Token {
 public:
-    Token(std::string lexeme, TextLocation location)
+    Token(std::string lexeme, TextLocation location, TokenType token_type)
         : lexeme(lexeme)
         , location(location)
+        , token_type(token_type)
     {}
 
-    std::string GetLexeme() const { return lexeme; };
+    std::string GetLexeme() const { return lexeme; }
+    TokenType GetTokenType() const { return token_type; }
     virtual std::string GetTokenString() const = 0;
 
     friend std::ostream& operator<<(std::ostream& os, const Token& t) {
@@ -21,6 +29,7 @@ public:
 private:
     std::string lexeme;
     TextLocation location;
+    TokenType token_type;
 };
 
 #endif // TOKEN_H_

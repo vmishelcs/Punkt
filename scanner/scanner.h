@@ -1,6 +1,7 @@
 #ifndef SCANNER_H_
 #define SCANNER_H_
 
+#include <memory>
 #include <string>
 
 #include <input_handler/located_char_stream.h>
@@ -8,17 +9,14 @@
 
 class Scanner {
 public:
-    static Scanner *MakeFromFileName(std::string file_name);
-    ~Scanner();
+    Scanner(std::string input_file_name);
 
-    Token *GetNextToken();
+    std::shared_ptr<Token> GetNextToken();
 
 private:
-    Scanner(LocatedCharStream *input_stream);
+    std::shared_ptr<Token> ScanIdentifier(LocatedChar first_char);
 
-    Token *ScanIdentifier(LocatedChar first_char);
-
-    LocatedCharStream *input_stream;
+    std::unique_ptr<LocatedCharStream> input_stream;
 };
 
 #endif // SCANNER_H_
