@@ -11,13 +11,14 @@ static void LogPrefix(std::ostream &s, const google::LogMessageInfo &l, void *) 
 
 PunktLogger::PunktLogger() {
     ::google::InitGoogleLogging("", LogPrefix);
-    for (int i = LogType::LOG_TYPE_BEGIN; i < LogType::LOG_TYPE_END; ++i) {
-        LogType type = static_cast<LogType>(i);
-        this->loggers[type] = std::make_unique<PunktLogger::Logger>(type);
-    }
+    loggers[LogType::SCANNER] = std::make_unique<PunktLogger::Logger>(LogType::SCANNER);
+    loggers[LogType::PARSER] = std::make_unique<PunktLogger::Logger>(LogType::PARSER);
 }
 
 void PunktLogger::Log(LogType log_type, std::string message) {
+    if (loggers.count(log_type) == 0) {
+        std::runtime_error("Logger type not stored in logger map");
+    }
     loggers[log_type]->LogMessage(message);
 }
 
@@ -36,9 +37,9 @@ const char *PunktLogger::Logger::LoggerTypeToString() {
 void PunktLogger::Logger::LogMessage(std::string message) {
     int msg_index = messages.size();
     messages.push_back(message);
-    PrintMessage(msg_index);
+    PrintStoredMessage(msg_index);
 }
 
-void PunktLogger::Logger::PrintMessage(int msg_index) {
+void PunktLogger::Logger::PrintStoredMessage(int msg_index) {
     LOG(ERROR) << '(' << LoggerTypeToString() << ')' << ' ' << messages[msg_index];
 }

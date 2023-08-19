@@ -8,13 +8,9 @@
 #include <vector>
 
 // TODO: Change this to an enum class and adjust PunktLogger implementation accordingly.
-enum LogType {
-    LOG_TYPE_BEGIN,
-
-    SCANNER = LOG_TYPE_BEGIN,
+enum class LogType {
+    SCANNER,
     PARSER,
-
-    LOG_TYPE_END
 };
 
 class PunktLogger {
@@ -32,13 +28,13 @@ public:
 private:
     class Logger {
         friend PunktLogger;
-        friend std::unique_ptr<Logger> std::make_unique<Logger>(LogType&);
+        friend std::unique_ptr<Logger> std::make_unique<Logger>(LogType&&);
 
         Logger(LogType type) : logger_type(type) {}
         
         const char *LoggerTypeToString();
         void LogMessage(std::string message);
-        void PrintMessage(int msg_index);
+        void PrintStoredMessage(int msg_index);
 
         LogType logger_type;
         std::vector<std::string> messages;
