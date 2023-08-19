@@ -8,15 +8,20 @@
 #include <vector>
 
 enum LogType {
-    SCANNER,
-    LOG_TYPE_BEGIN = SCANNER,
+    LOG_TYPE_BEGIN,
+
+    SCANNER = LOG_TYPE_BEGIN,
+    PARSER,
 
     LOG_TYPE_END
 };
 
 class PunktLogger {
 public:
-    static PunktLogger& GetInstance() { return instance; }
+    static PunktLogger& GetInstance() {
+        static PunktLogger instance;
+        return instance;
+    }
 
     PunktLogger(const PunktLogger&) = delete;
     void operator=(const PunktLogger&) = delete;
@@ -25,8 +30,16 @@ public:
 
 private:
     class Logger {
-        Logger();
-        friend std::unique_ptr<Logger> std::make_unique<Logger>();
+        friend PunktLogger;
+        friend std::unique_ptr<Logger> std::make_unique<Logger>(LogType&);
+
+        Logger(LogType type) : logger_type(type) {}
+        
+        const char *LoggerTypeToString();
+        void LogMessage(std::string message);
+        void PrintMessage(int msg_index);
+
+        LogType logger_type;
         std::vector<std::string> messages;
     };
 

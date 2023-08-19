@@ -16,6 +16,11 @@ struct TextLocation {
 		, column(tl.column)
 	{}
 
+	std::string GetString() const {
+		std::string result = file_name + ':' + std::to_string(line) + ':' + std::to_string(column);
+		return result;
+	}
+
 	std::string file_name;
 	unsigned int line;
 	unsigned int column;

@@ -17,6 +17,8 @@ private:
     std::shared_ptr<Token> ScanIdentifier(LocatedChar first_char);
     std::shared_ptr<Token> ScanNumber(LocatedChar first_char);
 
+    void LexicalErrorUnexpectedCharacter(LocatedChar ch);
+
     std::unique_ptr<LocatedCharStream> input_stream;
 };
 

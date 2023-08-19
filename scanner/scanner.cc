@@ -1,5 +1,6 @@
 #include <token/identifier_token.h>
 #include <token/integer_literal_token.h>
+#include <logging/punkt_logger.h>
 
 #include "scanner.h"
 
@@ -21,7 +22,7 @@ std::shared_ptr<Token> Scanner::GetNextToken() {
         return nullptr;
     }
     else {
-        // TODO: Issue a lexical error here
+        LexicalErrorUnexpectedCharacter(ch);
         return GetNextToken();
     }
 }
@@ -47,4 +48,12 @@ std::shared_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
     }
     int value = std::stoi(buffer);
     return std::make_shared<IntegerLiteralToken>(buffer, value, first_char.location);
+}
+
+void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {
+    auto& logger = PunktLogger::GetInstance();
+    std::string message = "Unexpected character `";
+    message.push_back(ch.character);
+    message.append("` at ").append(ch.GetLocationString());
+    logger.Log(LogType::SCANNER, message);
 }
