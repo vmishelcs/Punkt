@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <vector>
 
 #include <glog/logging.h>
@@ -58,6 +59,7 @@ TEST_F(ScannerTest, TestScanIntegerLiterals) {
 }
 
 int main(int argc, char **argv) {
+	FLAGS_logtostdout = true;
 	::google::InitGoogleLogging(argv[0]);
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

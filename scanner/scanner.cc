@@ -1,4 +1,3 @@
-
 #include <token/identifier_token.h>
 #include <token/integer_literal_token.h>
 
