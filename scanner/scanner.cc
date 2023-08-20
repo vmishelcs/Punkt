@@ -1,8 +1,10 @@
 #include <token/identifier_token.h>
 #include <token/integer_literal_token.h>
+#include <token/keyword_token.h>
 #include <logging/punkt_logger.h>
 
 #include "scanner.h"
+#include "keyword.h"
 
 Scanner::Scanner(std::string input_file_name) {
     this->input_stream = std::make_unique<LocatedCharStream>(input_file_name);
@@ -35,6 +37,12 @@ std::shared_ptr<Token> Scanner::ScanIdentifier(LocatedChar first_char) {
         buffer.push_back(ch.character);
         ch = input_stream->Next();
     }
+
+    if (Keyword::IsKeyword(buffer)) {
+        Keyword keyword(buffer);
+        return std::make_shared<KeywordToken>(buffer, first_char.location, std::move(keyword));
+    }
+
     return std::make_shared<IdentifierToken>(buffer, first_char.location);
 }
 
@@ -47,7 +55,7 @@ std::shared_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
         ch = input_stream->Next();
     }
     int value = std::stoi(buffer);
-    return std::make_shared<IntegerLiteralToken>(buffer, value, first_char.location);
+    return std::make_shared<IntegerLiteralToken>(buffer, first_char.location, value);
 }
 
 void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {

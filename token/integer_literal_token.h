@@ -5,9 +5,20 @@
 
 class IntegerLiteralToken : public Token {
 public:
-    IntegerLiteralToken(std::string lexeme, int value, TextLocation text_location);
-    virtual std::string GetTokenString() const;
+    IntegerLiteralToken(std::string lexeme, TextLocation location, int value)
+        : Token(lexeme, location, TokenType::INTEGER_LITERAL)
+        , value(value)
+    {}
+
+    virtual std::string GetTokenString() const {
+        std::string result = "INTEGER_LITERAL, "
+            + this->GetLexeme()
+            + ", value = " + std::to_string(this->value);
+        return result;
+    }
+    
     int GetValue() const { return value; }
+    
 private:
     int value;
 };

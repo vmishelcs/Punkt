@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <scanner/scanner.h>
+#include <scanner/keyword.h>
 #include <token/integer_literal_token.h>
 
 class ScannerTest : public ::testing::Test {
@@ -53,6 +54,49 @@ TEST_F(ScannerTest, TestScanIntegerLiterals) {
 		ASSERT_EQ(token->GetTokenType(), TokenType::INTEGER_LITERAL);
 		auto integer_literal_token = std::dynamic_pointer_cast<IntegerLiteralToken>(token);
 		ASSERT_EQ(integer_literal_token->GetValue(), values[i]);
+	}
+}
+
+TEST_F(ScannerTest, TestScanKeywords) {
+	std::string file_name = test_file_directory + "TestScanKeywords.punkt";
+	std::ifstream file(file_name);
+	std::string word;
+	std::vector<std::string> strings;
+	while (file >> word) {
+		strings.push_back(word);
+	}
+	file.close();
+
+	Scanner scanner(file_name);
+	int n = strings.size();
+	for (int i = 0; i < n; ++i) {
+		auto token = scanner.GetNextToken();
+		ASSERT_EQ(token->GetLexeme(), strings[i]);
+		ASSERT_EQ(token->GetTokenType(), TokenType::KEYWORD);
+	}
+}
+
+TEST_F(ScannerTest, TestScanKeywordsAndIdentifiers) {
+	std::string file_name = test_file_directory + "TestScanKeywordsAndIdentifiers.punkt";
+	std::ifstream file(file_name);
+	std::string word;
+	std::vector<std::string> strings;
+	while (file >> word) {
+		strings.push_back(word);
+	}
+	file.close();
+
+	Scanner scanner(file_name);
+	int n = strings.size();
+	for (int i = 0; i < n; ++i) {
+		auto token = scanner.GetNextToken();
+		ASSERT_EQ(token->GetLexeme(), strings[i]);
+		if (Keyword::IsKeyword(strings[i])) {
+			ASSERT_EQ(token->GetTokenType(), TokenType::KEYWORD);
+		}
+		else {
+			ASSERT_EQ(token->GetTokenType(), TokenType::IDENTIFIER);
+		}
 	}
 }
 
