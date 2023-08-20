@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv) {
 	if (argc != 2) {
-		std::cerr << "Token printer application requires an input file argument" << std::endl;
+		std::cerr << "Token printer application requires an input file argument\n";
 		return 0;
 	}
 }
