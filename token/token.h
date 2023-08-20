@@ -1,8 +1,6 @@
 #ifndef TOKEN_H_
 #define TOKEN_H_
 
-#include <unordered_map>
-
 #include <input_handler/text_location.h>
 
 enum class TokenType {

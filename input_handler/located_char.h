@@ -38,7 +38,7 @@ struct LocatedChar {
         return isalnum(character) || (character == '_');
     }
     bool IsNumberStart() const {
-        return isdigit(character) || character == '+' || character == '-';
+        return isdigit(character);
     }
     bool IsDigit() const { return isdigit(character); }
 

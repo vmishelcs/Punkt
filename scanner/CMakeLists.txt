@@ -1,3 +1,8 @@
 add_library(scanner scanner.cc)
 add_library(keyword keyword.cc)
-target_link_libraries(scanner located_char_stream keyword logger)
+target_link_libraries(scanner
+    located_char_stream
+    token
+    keyword
+    logger
+)
