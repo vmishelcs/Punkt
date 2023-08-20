@@ -41,7 +41,7 @@ struct LocatedChar {
         return isdigit(character);
     }
     bool IsDigit() const { return isdigit(character); }
-
+    
     char character;
     TextLocation location;
 };

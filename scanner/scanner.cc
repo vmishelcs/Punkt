@@ -19,6 +19,7 @@ std::shared_ptr<Token> Scanner::GetNextToken() {
     else if (ch.IsNumberStart()) {
         return ScanNumber(ch);
     }
+    
     else if (ch.IsEndOfInput()) {
         // TODO: Create an EOF token here
         return nullptr;

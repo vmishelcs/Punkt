@@ -7,6 +7,7 @@ enum class TokenType {
     IDENTIFIER,
     KEYWORD,
     INTEGER_LITERAL,
+    PUNCTUATOR,
 };
 
 class Token {
