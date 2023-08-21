@@ -63,26 +63,26 @@ std::shared_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
 }
 
 std::shared_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
-    std::string buffer;
-    buffer.push_back(first_char.character);
+    // std::string buffer;
+    // buffer.push_back(first_char.character);
 
-    int num_matching_punctuators = Punctuator::PunctuatorsWithPrefix(buffer);
+    // int num_matching_punctuators = Punctuator::PunctuatorsWithPrefix(buffer);
 
-    LocatedChar ch = input_stream->Next();
-    while (num_matching_punctuators > 1 && input_stream->HasNext()) {
-        buffer.push_back(ch.character);
-        ch = input_stream->Next();
-        num_matching_punctuators = Punctuator::PunctuatorsWithPrefix(buffer);
-    }
+    // LocatedChar ch = input_stream->Next();
+    // while (num_matching_punctuators > 1 && input_stream->HasNext()) {
+    //     buffer.push_back(ch.character);
+    //     ch = input_stream->Next();
+    //     num_matching_punctuators = Punctuator::PunctuatorsWithPrefix(buffer);
+    // }
 
-    if (num_matching_punctuators == 1 && Punctuator::IsPunctuator(buffer)) {
-        Punctuator punctuator(buffer);
-        return std::make_shared<PunctuatorToken>(
-            buffer,
-            first_char.location,
-            std::move(punctuator)
-        );
-    }
+    // if (num_matching_punctuators == 1 && Punctuator::IsPunctuator(buffer)) {
+    //     Punctuator punctuator(buffer);
+    //     return std::make_shared<PunctuatorToken>(
+    //         buffer,
+    //         first_char.location,
+    //         std::move(punctuator)
+    //     );
+    // }
 
     return nullptr;
 }
