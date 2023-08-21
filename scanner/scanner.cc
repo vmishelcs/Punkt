@@ -1,6 +1,7 @@
 #include <token/identifier_token.h>
 #include <token/integer_literal_token.h>
 #include <token/keyword_token.h>
+#include <token/punctuator_token.h>
 #include <logging/punkt_logger.h>
 
 #include "scanner.h"
@@ -19,7 +20,9 @@ std::shared_ptr<Token> Scanner::GetNextToken() {
     else if (ch.IsNumberStart()) {
         return ScanNumber(ch);
     }
-    
+    else if (ch.IsPunctuatorStart()) {
+        return ScanPunctuator(ch);
+    }
     else if (ch.IsEndOfInput()) {
         // TODO: Create an EOF token here
         return nullptr;
@@ -57,6 +60,31 @@ std::shared_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
     }
     int value = std::stoi(buffer);
     return std::make_shared<IntegerLiteralToken>(buffer, first_char.location, value);
+}
+
+std::shared_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
+    std::string buffer;
+    buffer.push_back(first_char.character);
+
+    int num_matching_punctuators = Punctuator::PunctuatorsWithPrefix(buffer);
+
+    LocatedChar ch = input_stream->Next();
+    while (num_matching_punctuators > 1 && input_stream->HasNext()) {
+        buffer.push_back(ch.character);
+        ch = input_stream->Next();
+        num_matching_punctuators = Punctuator::PunctuatorsWithPrefix(buffer);
+    }
+
+    if (num_matching_punctuators == 1 && Punctuator::IsPunctuator(buffer)) {
+        Punctuator punctuator(buffer);
+        return std::make_shared<PunctuatorToken>(
+            buffer,
+            first_char.location,
+            std::move(punctuator)
+        );
+    }
+
+    return nullptr;
 }
 
 void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {

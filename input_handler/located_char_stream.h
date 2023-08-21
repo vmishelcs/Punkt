@@ -2,6 +2,7 @@
 #define LOCATED_CHAR_STREAM_H_
 
 #include <fstream>
+#include <memory>
 
 #include "input_handler.h"
 
@@ -11,7 +12,9 @@ public:
 
 	LocatedChar Next();
 	LocatedChar NextNonwhitespaceChar();
-	LocatedChar Peek();
+	LocatedChar Peek() const;
+
+	bool HasNext() const;
 
 private:
 	std::unique_ptr<InputHandler> input_handler;

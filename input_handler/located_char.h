@@ -3,7 +3,8 @@
 
 #include <cctype>
 #include <iostream>
-#include <locale>
+
+#include <scanner/punctuator.h>
 
 #include "text_location.h"
 
@@ -24,7 +25,9 @@ struct LocatedChar {
 
     std::string GetLocationString() const { return location.GetString(); }
 
-    bool IsWhitespace() const { return isspace(character); }
+    bool IsWhitespace() const {
+        return isspace(character);
+    }
     bool IsEndOfInput() const {
         return this->character == 0
             && this->location.file_name == "null"
@@ -40,7 +43,12 @@ struct LocatedChar {
     bool IsNumberStart() const {
         return isdigit(character);
     }
-    bool IsDigit() const { return isdigit(character); }
+    bool IsDigit() const {
+        return isdigit(character);
+    }
+    bool IsPunctuatorStart() const {
+        return Punctuator::PunctuatorsWithPrefix(std::string(1, character)) > 0;
+    }
     
     char character;
     TextLocation location;

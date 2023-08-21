@@ -21,6 +21,10 @@ LocatedChar LocatedCharStream::NextNonwhitespaceChar() {
     return result;
 }
 
-LocatedChar LocatedCharStream::Peek() {
+LocatedChar LocatedCharStream::Peek() const {
     return this->next_char;
+}
+
+bool LocatedCharStream::HasNext() const {
+    return this->next_char != FLAG_END_OF_INPUT;
 }

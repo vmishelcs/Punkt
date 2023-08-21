@@ -1,8 +1,6 @@
 #ifndef IDENTIFIER_TOKEN_H_
 #define IDENTIFIER_TOKEN_H_
 
-#include <string>
-
 #include "token.h"
 
 class IdentifierToken : public Token {

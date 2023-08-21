@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <string>
+#include <vector>
 
 #include "reserved_component.h"
 
@@ -29,8 +29,11 @@ public:
     static PunctuatorEnum ForLexeme(std::string buffer);
 
 private:
+    static std::vector<std::string> GetAllPrefixesForPunctuator(std::string punctuator_lexeme);
+
     PunctuatorEnum punctuator_enum;
     static std::unordered_map<std::string, PunctuatorEnum> dictionary;
+    static std::unordered_map<std::string, int> num_punctuators_with_prefix;
 };
 
 #endif // PUNCTUATOR_H_

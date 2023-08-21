@@ -100,6 +100,10 @@ TEST_F(ScannerTest, TestScanKeywordsAndIdentifiers) {
 	}
 }
 
+TEST_F(ScannerTest, TestScanPunctuators) {
+	std::string file_name = test_file_directory + "TestScanPunctuators.punkt";
+}
+
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
