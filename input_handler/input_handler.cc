@@ -1,10 +1,9 @@
 #include "input_handler.h"
 
-InputHandler::InputHandler(std::string input_file_name) {
+InputHandler::InputHandler(std::string input_file_name) : input_file_name(input_file_name) {
     if (input_file_name.length() == 0) {
         throw new std::runtime_error("File name length must be greater than 0");
     }
-    input_file_name = input_file_name;
     input_file = std::ifstream(input_file_name, std::ios::in);
     if (!input_file.is_open()) {
         std::string message = "Failed to open input file ";
@@ -28,12 +27,15 @@ LocatedChar InputHandler::Next() {
         PreloadNextLine();
     }
     if (LineHasMoreChars()) {
-        char c = char_stream.front();
+        LocatedChar lc = char_stream.front();
         char_stream.pop_front();
-        return LocatedChar(c, input_file_name, line_num, column_num);
-        ++column_num;
+        return lc;
     }
     return FLAG_END_OF_INPUT;
+}
+
+void InputHandler::PutBack(LocatedChar ch) {
+    char_stream.push_front(ch);
 }
 
 bool InputHandler::LineHasMoreChars() const {
@@ -46,12 +48,14 @@ bool InputHandler::FileHasMoreLines() const {
 
 void InputHandler::PreloadNextLine() {
     char c = 0;
+    column_num = 1;
+    line_num += 1;
     while (input_file >> std::noskipws >> c && c != '\n') {
-        char_stream.push_back(c);
+        char_stream.push_back(LocatedChar(c, input_file_name, line_num, column_num));
+        ++column_num;
     }
     if (!input_file.eof()) {
-        char_stream.push_back('\n');
-        column_num = 1;
-        line_num += 1;
+        char_stream.push_back(LocatedChar('\n', input_file_name, line_num, column_num));
+        ++column_num;
     }
 }

@@ -16,6 +16,7 @@ public:
     ~InputHandler();
 
     LocatedChar Next();
+    void PutBack(LocatedChar ch);
 
 private:
     bool LineHasMoreChars() const;
@@ -24,8 +25,7 @@ private:
 
     std::string input_file_name;
     std::ifstream input_file;
-    std::deque<char> char_stream;
-    std::string current_line;
+    std::deque<LocatedChar> char_stream;
     unsigned int line_num;
     unsigned int column_num;
 };

@@ -13,6 +13,7 @@ public:
 	LocatedChar Next();
 	LocatedChar NextNonwhitespaceChar();
 	LocatedChar Peek() const;
+	LocatedChar PutBack(LocatedChar ch);
 
 	bool HasNext() const;
 
