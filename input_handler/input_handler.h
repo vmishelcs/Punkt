@@ -1,7 +1,7 @@
 #ifndef INPUT_HANDLER_H_
 #define INPUT_HANDLER_H_
 
-
+#include <deque>
 #include <fstream>
 #include <string>
 
@@ -18,12 +18,13 @@ public:
     LocatedChar Next();
 
 private:
-    bool LineHasMoreChars();
-    bool FileHasMoreLines();
+    bool LineHasMoreChars() const;
+    bool FileHasMoreLines() const;
     void PreloadNextLine();
 
     std::string input_file_name;
     std::ifstream input_file;
+    std::deque<char> char_stream;
     std::string current_line;
     unsigned int line_num;
     unsigned int column_num;

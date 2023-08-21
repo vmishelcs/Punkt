@@ -1,4 +1,3 @@
-#include <glog/logging.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
@@ -16,40 +15,52 @@ TEST_F(InputHandlerTest, TestInit) {
 }
 
 TEST_F(InputHandlerTest, TestNext) {
-	InputHandler input_handler(test_file_directory + "TestNext.punkt");
-	std::string test_string = "Hello World!";
+	std::string test_file_name = test_file_directory + "TestNext.punkt";
+	std::ifstream test_file(test_file_name);
+	std::string test_string;
+	char c = 0;
+    while (test_file >> std::noskipws >> c) {
+        test_string.push_back(c);
+    }
+	test_file.close();
+
+	InputHandler input_handler(test_file_name);
 	for (char c : test_string) {
 		LocatedChar lc = input_handler.Next();
-		EXPECT_EQ(lc.character, c);
+		ASSERT_EQ(lc.character, c);
 	}
 }
 
 TEST_F(InputHandlerTest, TestNextManyLines) {
-	InputHandler input_handler(test_file_directory + "TestNextManyLines.punkt");
-	std::vector<std::string> lines = {
-		"Hello World!",
-		"This is a file with many lines...",
-		" ",
-		"It also has lines with just a single whitespace character?",
-		"	",
-		"	Indented lines too!!!",
-		"Good-bye cruel world!"
-	};
+	std::string test_file_name = test_file_directory + "TestNextManyLines.punkt";
+	std::ifstream test_file(test_file_name);
+	std::string test_string;
+	char c = 0;
+    while (test_file >> std::noskipws >> c) {
+        test_string.push_back(c);
+    }
+	test_file.close();
 
-	for (const auto& line : lines) {
-		for (char c : line) {
-			EXPECT_EQ(input_handler.Next().character, c);
-		}
+	InputHandler input_handler(test_file_name);
+	for (char c : test_string) {
+		ASSERT_EQ(input_handler.Next().character, c);
 	}
 }
 
 TEST_F(InputHandlerTest, TestNextEmptyLines) {
-	InputHandler input_handler(test_file_directory + "TestNextEmptyLines.punkt");
-	std::string test_string = "This file has some empty lines.";
-	for (char c : test_string) {
-		EXPECT_EQ(input_handler.Next().character, c);
-	}
+	std::string test_file_name = test_file_directory + "TestNextEmptyLines.punkt";
+	std::ifstream test_file(test_file_name);
+	std::string test_string;
+	char c = 0;
+    while (test_file >> std::noskipws >> c) {
+        test_string.push_back(c);
+    }
+	test_file.close();
 
+	InputHandler input_handler(test_file_name);
+	for (char c : test_string) {
+		ASSERT_EQ(input_handler.Next().character, c);
+	}
 	for (int i = 0; i < 8; ++i) {
 		ASSERT_EQ(input_handler.Next(), FLAG_END_OF_INPUT);
 	}
@@ -63,7 +74,6 @@ TEST_F(InputHandlerTest, TestEmptyFile) {
 }
 
 int main(int argc, char **argv) {
-	::google::InitGoogleLogging(argv[0]);
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
