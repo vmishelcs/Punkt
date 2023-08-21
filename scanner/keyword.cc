@@ -18,5 +18,5 @@ KeywordEnum Keyword::ForLexeme(std::string lexeme) {
 }
 
 bool Keyword::IsKeyword(std::string buffer) {
-    return dictionary.count(buffer);
+    return dictionary.contains(buffer);
 }

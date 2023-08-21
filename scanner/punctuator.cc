@@ -4,10 +4,11 @@ std::unordered_map<std::string, PunctuatorEnum> Punctuator::dictionary = {
     { "{", PunctuatorEnum::OPEN_BRACE },
     { "}", PunctuatorEnum::CLOSE_BRACE },
     { ".", PunctuatorEnum::TERMINATOR },
+    { "=", PunctuatorEnum::EQUAL },
     { "+", PunctuatorEnum::PLUS },
     { "-", PunctuatorEnum::MINUS },
     { "*", PunctuatorEnum::MULTIPLY },
-    { "/", PunctuatorEnum::DIVIDE }  
+    { "/", PunctuatorEnum::DIVIDE }
 };
 
 Punctuator::Punctuator(std::string lexeme) : ReservedComponent(lexeme) {
@@ -18,10 +19,20 @@ Punctuator::Punctuator(Punctuator&& punctuator) : ReservedComponent(std::move(pu
     this->punctuator_enum = std::move(punctuator.punctuator_enum);
 }
 
-PunctuatorEnum Punctuator::ForLexeme(std::string lexeme) {
-    return dictionary.at(lexeme);
+bool Punctuator::IsPunctuator(std::string buffer) {
+    return dictionary.contains(buffer);
 }
 
-bool Punctuator::IsPunctuator(std::string buffer) {
-    return dictionary.count(buffer);
+int Punctuator::PunctuatorsWithPrefix(std::string prefix) {
+    int result = 0;
+    for (const auto& entry : dictionary) {
+        if (entry.first.starts_with(prefix)) {
+            ++result;
+        }
+    }
+    return result;
+}
+
+PunctuatorEnum Punctuator::ForLexeme(std::string lexeme) {
+    return dictionary.at(lexeme);
 }

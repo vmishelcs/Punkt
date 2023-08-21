@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 set(CMAKE_C_COMPILER "/usr/bin/gcc")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 project(Punkt)
 
 # No in-source build
@@ -10,6 +10,7 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
 add_compile_options(
+	-std=c++20
 	-g
 	-Wall
 	-Wextra

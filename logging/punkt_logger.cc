@@ -16,7 +16,7 @@ PunktLogger::PunktLogger() {
 }
 
 void PunktLogger::Log(LogType log_type, std::string message) {
-    if (loggers.count(log_type) == 0) {
+    if (!loggers.contains(log_type)) {
         std::runtime_error("Logger type not stored in logger map");
     }
     loggers[log_type]->LogMessage(message);
