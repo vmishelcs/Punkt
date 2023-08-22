@@ -57,14 +57,14 @@ TEST_F(InputHandlerTest, TestNextEmptyLines) {
 		ASSERT_EQ(input_handler.Next().character, c);
 	}
 	for (int i = 0; i < 8; ++i) {
-		ASSERT_EQ(input_handler.Next(), FLAG_END_OF_INPUT);
+		ASSERT_EQ(input_handler.Next(), LocatedChar::EOF_LOCATED_CHAR);
 	}
 }
 
 TEST_F(InputHandlerTest, TestEmptyFile) {
 	InputHandler input_handler(test_file_directory + "TestEmptyFile.punkt");
 	for (int i = 0; i < 16; ++i) {
-		ASSERT_EQ(input_handler.Next(), FLAG_END_OF_INPUT);
+		ASSERT_EQ(input_handler.Next(), LocatedChar::EOF_LOCATED_CHAR);
 	}
 }
 

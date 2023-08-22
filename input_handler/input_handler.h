@@ -30,6 +30,4 @@ private:
     unsigned int column_num;
 };
 
-static const LocatedChar FLAG_END_OF_INPUT(0, "null", 0, 0);
-
 #endif // INPUT_HANDLER_H_

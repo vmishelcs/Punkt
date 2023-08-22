@@ -1,0 +1,4 @@
+var x = 5.
+var y=-2.
+var z =x *y / 15.
+var a=1337.

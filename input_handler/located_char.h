@@ -28,12 +28,6 @@ struct LocatedChar {
     bool IsWhitespace() const {
         return isspace(character);
     }
-    bool IsEndOfInput() const {
-        return this->character == 0
-            && this->location.file_name == "null"
-            && this->location.line == 0
-            && this->location.column == 0;
-    }
     bool IsIdentifierStart() const {
         return isalpha(character)|| (character == '_');
     }
@@ -46,12 +40,13 @@ struct LocatedChar {
     bool IsDigit() const {
         return isdigit(character);
     }
-    bool IsPunctuatorStart() const {
-        return Punctuator::PunctuatorsWithPrefix(std::string(1, character)) > 0;
+    bool IsPunctuatorChar() const {
+        return Punctuator::IsPunctuatorChar(character);
     }
     
     char character;
     TextLocation location;
+    static const LocatedChar EOF_LOCATED_CHAR;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const LocatedChar& lc) {

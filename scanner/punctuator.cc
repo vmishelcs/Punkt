@@ -13,6 +13,16 @@ std::unordered_map<std::string, PunctuatorEnum> Punctuator::dictionary = {
     { "/", PunctuatorEnum::DIVIDE }
 };
 
+std::unordered_set<char> Punctuator::punctuator_chars = [] {
+    std::unordered_set<char> result;
+    for (const auto& entry: dictionary) {
+        for (char c : entry.first) {
+            result.insert(c);
+        }
+    }
+    return result;
+}();
+
 std::unordered_map<std::string, int> Punctuator::num_punctuators_with_prefix = [] {
     /**
      * Calculates the number of punctuators for each possible prefix.
@@ -49,6 +59,10 @@ Punctuator::Punctuator(Punctuator&& punctuator) : ReservedComponent(std::move(pu
 
 bool Punctuator::IsPunctuator(std::string buffer) {
     return dictionary.contains(buffer);
+}
+
+bool Punctuator::IsPunctuatorChar(char c) {
+    return punctuator_chars.contains(c);
 }
 
 int Punctuator::PunctuatorsWithPrefix(std::string prefix) {

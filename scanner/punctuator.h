@@ -1,7 +1,6 @@
 #ifndef PUNCTUATOR_H_
 #define PUNCTUATOR_H_
 
-#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -25,6 +24,7 @@ public:
     Punctuator(Punctuator&& punctuator);
 
     static bool IsPunctuator(std::string buffer);
+    static bool IsPunctuatorChar(char c);
     static int PunctuatorsWithPrefix(std::string prefix);
     static PunctuatorEnum ForLexeme(std::string buffer);
 
@@ -33,6 +33,7 @@ private:
 
     PunctuatorEnum punctuator_enum;
     static std::unordered_map<std::string, PunctuatorEnum> dictionary;
+    static std::unordered_set<char> punctuator_chars;
     static std::unordered_map<std::string, int> num_punctuators_with_prefix;
 };
 

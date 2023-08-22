@@ -1,5 +1,7 @@
 #include "input_handler.h"
 
+const LocatedChar LocatedChar::EOF_LOCATED_CHAR(0, "null", -1, -1);
+
 InputHandler::InputHandler(std::string input_file_name) : input_file_name(input_file_name) {
     if (input_file_name.length() == 0) {
         throw new std::runtime_error("File name length must be greater than 0");
@@ -31,7 +33,7 @@ LocatedChar InputHandler::Next() {
         char_stream.pop_front();
         return lc;
     }
-    return FLAG_END_OF_INPUT;
+    return LocatedChar::EOF_LOCATED_CHAR;
 }
 
 void InputHandler::PutBack(LocatedChar ch) {

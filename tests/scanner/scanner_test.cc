@@ -27,7 +27,7 @@ TEST_F(ScannerTest, TestScanIdentifiers) {
 
 	Scanner scanner(file_name);
 	for (auto str : strings) {
-		auto token = scanner.GetNextToken();
+		auto token = scanner.Next();
 		ASSERT_EQ(token->GetLexeme(), str);
 		ASSERT_EQ(token->GetTokenType(), TokenType::IDENTIFIER);
 	}
@@ -49,7 +49,7 @@ TEST_F(ScannerTest, TestScanIntegerLiterals) {
 	Scanner scanner(file_name);
 	int n = strings.size();
 	for (int i = 0; i < n; ++i) {
-		auto token = scanner.GetNextToken();
+		auto token = scanner.Next();
 		ASSERT_EQ(token->GetLexeme(), strings[i]);
 		ASSERT_EQ(token->GetTokenType(), TokenType::INTEGER_LITERAL);
 		auto integer_literal_token = std::dynamic_pointer_cast<IntegerLiteralToken>(token);
@@ -70,7 +70,7 @@ TEST_F(ScannerTest, TestScanKeywords) {
 	Scanner scanner(file_name);
 	int n = strings.size();
 	for (int i = 0; i < n; ++i) {
-		auto token = scanner.GetNextToken();
+		auto token = scanner.Next();
 		ASSERT_EQ(token->GetLexeme(), strings[i]);
 		ASSERT_EQ(token->GetTokenType(), TokenType::KEYWORD);
 	}
@@ -89,7 +89,7 @@ TEST_F(ScannerTest, TestScanKeywordsAndIdentifiers) {
 	Scanner scanner(file_name);
 	int n = strings.size();
 	for (int i = 0; i < n; ++i) {
-		auto token = scanner.GetNextToken();
+		auto token = scanner.Next();
 		ASSERT_EQ(token->GetLexeme(), strings[i]);
 		if (Keyword::IsKeyword(strings[i])) {
 			ASSERT_EQ(token->GetTokenType(), TokenType::KEYWORD);
