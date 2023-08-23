@@ -87,7 +87,8 @@ std::shared_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
 
 void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {
     auto& logger = PunktLogger::GetInstance();
-    std::string message = "Unexpected character `" + ch.character;
-    message += "` at " + ch.GetLocationString();
+    std::string message = "Unexpected character \'";
+    message.push_back(ch.character);
+    message.append("\' at ").append(ch.GetLocationString());
     logger.Log(LogType::SCANNER, message);
 }

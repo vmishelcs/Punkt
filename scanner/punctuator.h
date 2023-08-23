@@ -10,6 +10,8 @@
 enum class PunctuatorEnum {
     OPEN_BRACE,
     CLOSE_BRACE,
+    OPEN_PARENTHESIS,
+    CLOSE_PARENTHESIS,
     TERMINATOR,
     EQUAL,
     PLUS,

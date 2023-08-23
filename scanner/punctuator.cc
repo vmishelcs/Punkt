@@ -5,6 +5,8 @@
 std::unordered_map<std::string, PunctuatorEnum> Punctuator::dictionary = {
     { "{", PunctuatorEnum::OPEN_BRACE },
     { "}", PunctuatorEnum::CLOSE_BRACE },
+    { "(", PunctuatorEnum::OPEN_PARENTHESIS },
+    { ")", PunctuatorEnum::CLOSE_PARENTHESIS },
     { ".", PunctuatorEnum::TERMINATOR },
     { "=", PunctuatorEnum::EQUAL },
     { "+", PunctuatorEnum::PLUS },

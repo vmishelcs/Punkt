@@ -3,10 +3,7 @@
 #include "punkt_logger.h"
 
 static void LogPrefix(std::ostream &s, const google::LogMessageInfo &l, void *) {
-   s << l.severity << ' '
-   << std::setw(2) << l.time.hour() << ':'
-   << std::setw(2) << l.time.min()  << ':'
-   << std::setw(2) << l.time.sec();
+   s << l.severity;
 }
 
 PunktLogger::PunktLogger() {
@@ -41,5 +38,5 @@ void PunktLogger::Logger::LogMessage(std::string message) {
 }
 
 void PunktLogger::Logger::PrintStoredMessage(int msg_index) {
-    LOG(ERROR) << '(' << LoggerTypeToString() << ')' << ' ' << messages[msg_index];
+    LOG(ERROR) << "- " << LoggerTypeToString() << ": " << messages[msg_index] << std::endl;
 }

@@ -1,4 +1,8 @@
-var x = 5.
-var y=-2.
-var z =x *y / 15.
-var a=1337.
+main {
+    var x = 128.
+    var y = 256.
+    var z = x * y / (2 * 2 * 2 * 2 * 2 * 2 * 2).
+    var a=128.
+    var b=256.
+    var c=x*y/(2*2*2*2*2*2*2).
+}
