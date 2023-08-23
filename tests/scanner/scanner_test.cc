@@ -1,6 +1,3 @@
-#include <iomanip>
-#include <vector>
-
 #include <gtest/gtest.h>
 #include <scanner/scanner.h>
 #include <scanner/keyword.h>
@@ -100,7 +97,7 @@ TEST_F(ScannerTest, TestScanPunctuatorsSimple) {
 	std::string file_name = test_file_directory + "TestScanPunctuatorsSimple.punkt";
 	std::vector<std::string> strings;
 	ReadWordsIntoVector(file_name, strings);
-	ASSERT_EQ(strings.size(), 10);
+	ASSERT_EQ(strings.size(), 11);
 
 	Scanner scanner(file_name);
 	std::shared_ptr<Token> token = nullptr;
@@ -162,6 +159,66 @@ TEST_F(ScannerTest, TestScanPunctuatorsSimple) {
 
 	token = scanner.Next();
 	ASSERT_EQ(token->GetLexeme(), strings[9]);
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::DIVIDE);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][0]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::OPEN_BRACE);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][1]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::CLOSE_BRACE);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][2]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::OPEN_PARENTHESIS);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][3]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::CLOSE_PARENTHESIS);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][4]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::TERMINATOR);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][5]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::EQUAL);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][6]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::PLUS);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][7]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::MINUS);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][8]));
+	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
+	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
+	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::MULTIPLY);
+
+	token = scanner.Next();
+	ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][9]));
 	ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
 	punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
 	ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), PunctuatorEnum::DIVIDE);
