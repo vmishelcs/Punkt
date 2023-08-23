@@ -16,6 +16,10 @@ public:
         std::string result = "PUNCTUATOR, " + this->GetLexeme();
         return result;
     }
+
+    PunctuatorEnum GetPunctuatorEnum() const {
+        return punctuator.GetPunctuatorEnum();
+    }
     
 private:
     Punctuator punctuator;

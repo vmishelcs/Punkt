@@ -59,6 +59,10 @@ Punctuator::Punctuator(Punctuator&& punctuator) : ReservedComponent(std::move(pu
     this->punctuator_enum = std::move(punctuator.punctuator_enum);
 }
 
+PunctuatorEnum Punctuator::GetPunctuatorEnum() const {
+    return punctuator_enum;
+}
+
 bool Punctuator::IsPunctuator(std::string buffer) {
     return dictionary.contains(buffer);
 }

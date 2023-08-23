@@ -25,6 +25,8 @@ public:
     Punctuator(std::string lexeme);
     Punctuator(Punctuator&& punctuator);
 
+    PunctuatorEnum GetPunctuatorEnum() const;
+
     static bool IsPunctuator(std::string buffer);
     static bool IsPunctuatorChar(char c);
     static int PunctuatorsWithPrefix(std::string prefix);
