@@ -37,7 +37,6 @@ std::shared_ptr<Token> Scanner::GetNextToken() {
         return ScanPunctuator(ch);
     }
     else if (IsEndOfInput(ch)) {
-        // TODO: Create an EOF token here
         return std::make_shared<EOFToken>();
     }
     else {
