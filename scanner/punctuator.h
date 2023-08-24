@@ -35,10 +35,11 @@ public:
 private:
     static std::vector<std::string> GetAllPrefixesForPunctuator(std::string punctuator_lexeme);
 
-    PunctuatorEnum punctuator_enum;
     static std::unordered_map<std::string, PunctuatorEnum> dictionary;
     static std::unordered_set<char> punctuator_chars;
     static std::unordered_map<std::string, int> num_punctuators_with_prefix;
+    
+    PunctuatorEnum punctuator_enum;
 };
 
 #endif // PUNCTUATOR_H_
