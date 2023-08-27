@@ -5,10 +5,13 @@
 
 class Parser {
 public:
-    Parser(Scanner& scanner);
+    Parser(std::unique_ptr<Scanner> scanner);
 
 private:
-    Scanner& scanner;
+    void ReadToken();
+
+    std::unique_ptr<Scanner> scanner;
+    std::unique_ptr<Token> now_reading;
 };
 
 #endif // PARSER_H_

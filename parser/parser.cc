@@ -1,5 +1,9 @@
 #include "parser.h"
 
-Parser::Parser(Scanner& scanner) : scanner(scanner) {
+Parser::Parser(std::unique_ptr<Scanner> scanner) : scanner(std::move(scanner)) {
 
+}
+
+void Parser::ReadToken() {
+    
 }

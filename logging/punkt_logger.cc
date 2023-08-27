@@ -16,11 +16,10 @@ void PunktLogger::Log(LogType log_type, std::string message) {
     if (!loggers.contains(log_type)) {
         std::runtime_error("Logger type not stored in logger map");
     }
-    loggers[log_type]->LogMessage(message);
+    loggers.at(log_type)->LogMessage(message);
 }
 
 const char *PunktLogger::Logger::LoggerTypeToString() {
-    std::string result;
     switch (logger_type) {
         case LogType::SCANNER:
             return "SCANNER";

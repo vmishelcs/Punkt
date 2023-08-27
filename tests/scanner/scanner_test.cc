@@ -55,7 +55,8 @@ TEST_F(ScannerTest, TestScanIntegerLiterals) {
 		auto token = scanner.Next();
 		ASSERT_EQ(token->GetLexeme(), strings[i]);
 		ASSERT_EQ(token->GetTokenType(), TokenType::INTEGER_LITERAL);
-		auto integer_literal_token = std::dynamic_pointer_cast<IntegerLiteralToken>(token);
+		IntegerLiteralToken *integer_literal_token = 
+			dynamic_cast<IntegerLiteralToken *>(token.get());
 		ASSERT_EQ(integer_literal_token->GetValue(), values[i]);
 	}
 }

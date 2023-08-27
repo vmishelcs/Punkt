@@ -11,7 +11,7 @@
 
 class PunctuatorScanner {
 public:
-    static std::shared_ptr<PunctuatorToken> Scan(
+    static std::unique_ptr<PunctuatorToken> Scan(
         LocatedChar first_char,
         std::unique_ptr<LocatedCharStream>& input_stream
     );
@@ -22,7 +22,7 @@ private:
         , input_stream(input_stream)
     {}
 
-    std::shared_ptr<PunctuatorToken> ScanPunctuator();
+    std::unique_ptr<PunctuatorToken> ScanPunctuator();
     void FindLatestValidPunctuator();
     
     PunctuatorBuffer scanned;
