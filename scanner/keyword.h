@@ -17,6 +17,8 @@ public:
     Keyword(std::string lexeme);
     Keyword(Keyword&& keyword);
 
+    KeywordEnum GetKeywordEnum() const;
+
     static bool IsKeyword(std::string buffer);
     static KeywordEnum ForLexeme(std::string buffer);
 

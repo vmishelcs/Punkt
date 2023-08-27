@@ -4,6 +4,7 @@
 #include <input_handler/text_location.h>
 
 enum class TokenType {
+    PROGRAM_TOKEN,
     IDENTIFIER,
     KEYWORD,
     INTEGER_LITERAL,

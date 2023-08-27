@@ -1,16 +1,29 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
-#include "scanner/scanner.h"
+#include <memory>
+
+#include <scanner/scanner.h>
+#include <parse_node/parse_node.h>
 
 class Parser {
 public:
-    Parser(std::unique_ptr<Scanner> scanner);
+    static std::unique_ptr<ParseNode> Parse(Scanner& scanner);
 
 private:
+    Parser(Scanner& scanner);
+
     void ReadToken();
 
-    std::unique_ptr<Scanner> scanner;
+    bool StartsProgram(Token& token);
+    std::unique_ptr<ParseNode> ParseProgram();
+
+    bool StartsMain(Token& token);
+    std::unique_ptr<ParseNode> ParseMain();
+
+    std::unique_ptr<ParseNode> GetSyntaxErrorNode(std::string expected);
+
+    Scanner& scanner;
     std::unique_ptr<Token> now_reading;
 };
 

@@ -13,6 +13,10 @@ Keyword::Keyword(Keyword&& keyword) : ReservedComponent(std::move(keyword)) {
     this->keyword_enum = std::move(keyword.keyword_enum);
 }
 
+KeywordEnum Keyword::GetKeywordEnum() const {
+    return keyword_enum;
+}
+
 KeywordEnum Keyword::ForLexeme(std::string lexeme) {
     return dictionary.at(lexeme);
 }

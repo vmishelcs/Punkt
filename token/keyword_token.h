@@ -17,6 +17,10 @@ public:
         return result;
     }
 
+    KeywordEnum GetKeywordEnum() const {
+        return keyword.GetKeywordEnum();
+    }
+
 private:
     Keyword keyword;
 };

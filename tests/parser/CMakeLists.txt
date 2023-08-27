@@ -1,5 +1,5 @@
 add_executable(parser_test parser_test.cc)
-target_link_libraries(parser_test scanner parser GTest::gtest)
+target_link_libraries(parser_test parser GTest::gtest)
 gtest_discover_tests(parser_test)
 
 target_compile_definitions(
