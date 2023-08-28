@@ -1,1 +1,3 @@
-main {}
+main {
+    var a = +-1.
+}

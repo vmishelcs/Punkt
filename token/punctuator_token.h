@@ -20,6 +20,20 @@ public:
     PunctuatorEnum GetPunctuatorEnum() const {
         return punctuator.GetPunctuatorEnum();
     }
+
+    static bool IsTokenPunctuator(Token& token, std::initializer_list<PunctuatorEnum> punctuators) {
+        if (token.GetTokenType() != TokenType::PUNCTUATOR) {
+            return false;
+        }
+
+        PunctuatorToken& punctuator_token = dynamic_cast<PunctuatorToken&>(token);
+        for (auto punctuator : punctuators) {
+            if (punctuator_token.GetPunctuatorEnum() == punctuator) {
+                return true;
+            }
+        }
+        return false;
+    }
     
 private:
     Punctuator punctuator;

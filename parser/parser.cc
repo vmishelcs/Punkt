@@ -170,7 +170,7 @@ std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
 }
 
 bool Parser::StartsExpression(Token& token) {
-    return false;
+    return StartsAdditiveExpression(token);
 }
 
 std::unique_ptr<ParseNode> Parser::ParseExpression() {
@@ -178,7 +178,144 @@ std::unique_ptr<ParseNode> Parser::ParseExpression() {
         return SyntaxErrorUnexpectedToken("expression");
     }
 
-    return nullptr;
+    return ParseAdditiveExpression();
+}
+
+bool Parser::StartsAdditiveExpression(Token& token) {
+    return StartsMultiplicativeExpression(token);
+}
+
+std::unique_ptr<ParseNode> Parser::ParseAdditiveExpression() {
+    if (!StartsAdditiveExpression(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("additive expression");
+    }
+
+    std::unique_ptr<ParseNode> left = ParseMultiplicativeExpression();
+
+    while (PunctuatorToken::IsTokenPunctuator(*now_reading,
+        {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
+        std::unique_ptr<ParseNode> additive_operator =
+            std::make_unique<OperatorNode>(std::move(now_reading));
+        
+        ReadToken();
+
+        std::unique_ptr<ParseNode> right = ParseMultiplicativeExpression();
+
+        additive_operator->AppendChild(std::move(left));
+        additive_operator->AppendChild(std::move(right));
+        left = std::move(additive_operator);
+    }
+
+    return left;
+}
+
+bool Parser::StartsMultiplicativeExpression(Token& token) {
+    return StartsUnaryExpression(token);
+}
+
+std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
+    if (!StartsMultiplicativeExpression(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("multiplicative expression");
+    }
+
+    std::unique_ptr<ParseNode> left = ParseUnaryExpression();
+
+    while (PunctuatorToken::IsTokenPunctuator(*now_reading,
+        {PunctuatorEnum::MULTIPLY, PunctuatorEnum::DIVIDE})) {
+        std::unique_ptr<ParseNode> multiplicative_operator =
+            std::make_unique<OperatorNode>(std::move(now_reading));
+        
+        ReadToken();
+
+        std::unique_ptr<ParseNode> right = ParseUnaryExpression();
+
+        multiplicative_operator->AppendChild(std::move(left));
+        multiplicative_operator->AppendChild(std::move(right));
+        left = std::move(multiplicative_operator);
+    }
+
+    return left;
+}
+
+bool Parser::StartsUnaryExpression(Token& token) {
+    return PunctuatorToken::IsTokenPunctuator(token, {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})
+        || StartsAtomicExpression(token);
+}
+
+std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
+    if (!StartsUnaryExpression(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("unary expression");
+    }
+
+    // TODO: This code should be able to parse an indefinite number of unary operators
+    if (PunctuatorToken::IsTokenPunctuator(*now_reading,
+        {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
+        std::unique_ptr<ParseNode> unary_operator =
+            std::make_unique<OperatorNode>(std::move(now_reading));
+        
+        ReadToken();
+
+        std::unique_ptr<ParseNode> operand = ParseAtomicExpression();
+
+        unary_operator->AppendChild(std::move(operand));
+
+        return unary_operator;
+    }
+    else {
+        return ParseAtomicExpression();
+    }
+}
+
+bool Parser::StartsAtomicExpression(Token& token) {
+    return StartsParenthesizedExpression(token)
+        || StartsIntegerLiteral(token)
+        || StartsIdentifier(token);
+}
+
+std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
+    if (StartsParenthesizedExpression(*now_reading)) {
+        return ParseParenthesizedExpression();
+    }
+    if (StartsIntegerLiteral(*now_reading)) {
+        return ParseIntegerLiteral();
+    }
+    if (StartsIdentifier(*now_reading)) {
+        return ParseIdentifier();
+    }
+    return SyntaxErrorUnexpectedToken("atomic expression");
+}
+
+bool Parser::StartsParenthesizedExpression(Token& token) {
+    return PunctuatorToken::IsTokenPunctuator(token, {PunctuatorEnum::OPEN_PARENTHESIS});
+}
+
+std::unique_ptr<ParseNode> Parser::ParseParenthesizedExpression() {
+    if (!StartsParenthesizedExpression(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("parenthesized expression");
+    }
+
+    Expect(PunctuatorEnum::OPEN_PARENTHESIS);
+
+    std::unique_ptr<ParseNode> expression = ParseExpression();
+
+    Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+
+    return expression;
+}
+
+bool Parser::StartsIntegerLiteral(Token& token) {
+    return token.GetTokenType() == TokenType::INTEGER_LITERAL;
+}
+
+std::unique_ptr<ParseNode> Parser::ParseIntegerLiteral() {
+    if (!StartsIntegerLiteral(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("integer literal");
+    }
+
+    std::unique_ptr<ParseNode> integer_literal =
+        std::make_unique<IntegerLiteralNode>(std::move(now_reading));
+    ReadToken();
+    return integer_literal;
 }
 
 std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expected) {

@@ -50,6 +50,12 @@ private:
     bool StartsAtomicExpression(Token& token);
     std::unique_ptr<ParseNode> ParseAtomicExpression();
 
+    bool StartsParenthesizedExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseParenthesizedExpression();
+
+    bool StartsIntegerLiteral(Token& token);
+    std::unique_ptr<ParseNode> ParseIntegerLiteral();
+
     std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
     std::unique_ptr<ParseNode> GetSyntaxErrorNode();
 
