@@ -40,8 +40,8 @@ struct LocatedChar {
     bool IsDigit() const {
         return isdigit(character);
     }
-    bool IsPunctuatorChar() const {
-        return Punctuator::IsPunctuatorChar(character);
+    bool IsPunctuatorStart() const {
+        return Punctuator::PunctuatorsWithPrefix(std::string(1, character)) > 0;
     }
     
     char character;

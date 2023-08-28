@@ -1,8 +1,4 @@
-#include <token/identifier_token.h>
-#include <token/integer_literal_token.h>
-#include <token/keyword_token.h>
-#include <token/punctuator_token.h>
-#include <token/eof_token.h>
+#include <token/all_tokens.h>
 #include <logging/punkt_logger.h>
 
 #include "scanner.h"
@@ -33,11 +29,11 @@ std::unique_ptr<Token> Scanner::GetNextToken() {
     else if (ch.IsNumberStart()) {
         return ScanNumber(ch);
     }
-    else if (ch.IsPunctuatorChar()) {
+    else if (ch.IsPunctuatorStart()) {
         return ScanPunctuator(ch);
     }
     else if (IsEndOfInput(ch)) {
-        return std::unique_ptr<EOFToken>();
+        return std::make_unique<EOFToken>();
     }
     else {
         LexicalErrorUnexpectedCharacter(ch);

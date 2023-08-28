@@ -21,10 +21,12 @@ public:
 
     static bool IsKeyword(std::string buffer);
     static KeywordEnum ForLexeme(std::string buffer);
+    static std::string ForKeywordEnum(KeywordEnum keyword_enum);
 
 private:
     KeywordEnum keyword_enum;
     static std::unordered_map<std::string, KeywordEnum> dictionary;
+    static std::unordered_map<KeywordEnum, std::string> reverse_dictionary;
 };
 
 #endif // KEYWORD_H_

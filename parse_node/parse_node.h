@@ -2,13 +2,17 @@
 #define PARSE_NODE_H_
 
 #include <memory>
-#include <experimental/memory>
+#include <vector>
 
 #include <token/token.h>
 
 class ParseNode {
 public:
     ParseNode(std::unique_ptr<Token> token) : token(std::move(token)), parent{nullptr} {}
+
+    const std::vector<std::unique_ptr<ParseNode>>& GetChildren() const {
+        return children;
+    }
 
     void AppendChild(std::unique_ptr<ParseNode> node) {
         node->parent = this;

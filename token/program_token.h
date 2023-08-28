@@ -10,7 +10,7 @@ public:
     {}
 
     virtual std::string GetTokenString() const {
-        std::string result = "PROGRAM_TOKEN, " + this->GetLexeme();
+        std::string result = "PROGRAM, " + this->GetLexeme();
         return result;
     }
 };

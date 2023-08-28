@@ -15,12 +15,10 @@ std::unordered_map<std::string, PunctuatorEnum> Punctuator::dictionary = {
     { "/", PunctuatorEnum::DIVIDE }
 };
 
-std::unordered_set<char> Punctuator::punctuator_chars = [] {
-    std::unordered_set<char> result;
-    for (const auto& entry: dictionary) {
-        for (char c : entry.first) {
-            result.insert(c);
-        }
+std::unordered_map<PunctuatorEnum, std::string> Punctuator::reverse_dictionary = [] {
+    std::unordered_map<PunctuatorEnum, std::string> result;
+    for (const auto& [key, value] : dictionary) {
+        result[value] = key;
     }
     return result;
 }();
@@ -67,10 +65,6 @@ bool Punctuator::IsPunctuator(std::string buffer) {
     return dictionary.contains(buffer);
 }
 
-bool Punctuator::IsPunctuatorChar(char c) {
-    return punctuator_chars.contains(c);
-}
-
 int Punctuator::PunctuatorsWithPrefix(std::string prefix) {
     if (num_punctuators_with_prefix.contains(prefix)) {
         return num_punctuators_with_prefix.at(prefix);
@@ -80,6 +74,10 @@ int Punctuator::PunctuatorsWithPrefix(std::string prefix) {
 
 PunctuatorEnum Punctuator::ForLexeme(std::string lexeme) {
     return dictionary.at(lexeme);
+}
+
+std::string Punctuator::ForPunctuatorEnum(PunctuatorEnum punctuator_enum) {
+    return reverse_dictionary.at(punctuator_enum);
 }
 
 std::vector<std::string> Punctuator::GetAllPrefixesForPunctuator(std::string punctuator_lexeme) {

@@ -31,12 +31,13 @@ public:
     static bool IsPunctuatorChar(char c);
     static int PunctuatorsWithPrefix(std::string prefix);
     static PunctuatorEnum ForLexeme(std::string buffer);
+    static std::string ForPunctuatorEnum(PunctuatorEnum punctuator_enum);
 
 private:
     static std::vector<std::string> GetAllPrefixesForPunctuator(std::string punctuator_lexeme);
 
     static std::unordered_map<std::string, PunctuatorEnum> dictionary;
-    static std::unordered_set<char> punctuator_chars;
+    static std::unordered_map<PunctuatorEnum, std::string> reverse_dictionary;
     static std::unordered_map<std::string, int> num_punctuators_with_prefix;
     
     PunctuatorEnum punctuator_enum;

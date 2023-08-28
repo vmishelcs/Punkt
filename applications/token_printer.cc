@@ -13,7 +13,7 @@ void ScanFile(std::string file_name) {
 int main(int argc, char **argv) {
 	if (argc != 2) {
 		std::cerr << "Token printer application requires an input file argument\n";
-		return 0;
+		return 1;
 	}
 
 	std::string input_file_directory = INPUT_FILE_DIRECTORY;
