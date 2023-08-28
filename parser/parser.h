@@ -26,6 +26,30 @@ private:
     bool StartsMain(Token& token);
     std::unique_ptr<ParseNode> ParseMain();
 
+    bool StartsStatement(Token& token);
+    std::unique_ptr<ParseNode> ParseStatement();
+
+    bool StartsDeclaration(Token& token);
+    std::unique_ptr<ParseNode> ParseDeclaration();
+
+    bool StartsIdentifier(Token& token);
+    std::unique_ptr<ParseNode> ParseIdentifier();
+
+    bool StartsExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseExpression();
+
+    bool StartsAdditiveExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseAdditiveExpression();
+
+    bool StartsMultiplicativeExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseMultiplicativeExpression();
+
+    bool StartsUnaryExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseUnaryExpression();
+
+    bool StartsAtomicExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseAtomicExpression();
+
     std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
     std::unique_ptr<ParseNode> GetSyntaxErrorNode();
 

@@ -19,7 +19,7 @@ public:
         children.push_back(std::move(node));
     }
 
-    virtual std::string GetNodeString() { return "PARSE NODE: " + token->GetTokenString(); }
+    virtual std::string GetNodeString() = 0;
 
 protected:
     std::unique_ptr<Token> token;

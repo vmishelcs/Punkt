@@ -98,9 +98,87 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
 
     Expect(PunctuatorEnum::OPEN_BRACE);
 
+    while (StartsStatement(*now_reading)) {
+        std::unique_ptr<ParseNode> statement = ParseStatement();
+        main->AppendChild(std::move(statement));
+    }
+
     Expect(PunctuatorEnum::CLOSE_BRACE);
 
     return main;
+}
+
+bool Parser::StartsStatement(Token& token) {
+    return StartsDeclaration(token);
+}
+
+std::unique_ptr<ParseNode> Parser::ParseStatement() {
+    if (StartsDeclaration(*now_reading)) {
+        return ParseDeclaration();
+    }
+    else {
+        return SyntaxErrorUnexpectedToken("start of statement");
+    }
+}
+
+bool Parser::StartsDeclaration(Token& token) {
+    if (token.GetTokenType() != TokenType::KEYWORD) {
+        return false;
+    }
+
+    KeywordToken& keyword_token = dynamic_cast<KeywordToken&>(token);
+    return keyword_token.GetKeywordEnum() == KeywordEnum::VAR;
+}
+
+std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
+    if (!StartsDeclaration(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("start of statement");
+    }
+
+    std::unique_ptr<ParseNode> declaration =
+        std::make_unique<DeclarationNode>(std::move(now_reading));
+    ReadToken();
+
+    std::unique_ptr<ParseNode> identifier = ParseIdentifier();
+
+    Expect(PunctuatorEnum::EQUAL);
+
+    std::unique_ptr<ParseNode> initializer = ParseExpression();
+
+    Expect(PunctuatorEnum::TERMINATOR);
+
+    declaration->AppendChild(std::move(identifier));
+    declaration->AppendChild(std::move(initializer));
+
+    return declaration;
+}
+
+bool Parser::StartsIdentifier(Token& token) {
+    return token.GetTokenType() == TokenType::IDENTIFIER;
+}
+
+std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
+    if (!StartsIdentifier(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("identifier");
+    }
+
+    std::unique_ptr<ParseNode> identifier =
+        std::make_unique<IdentifierNode>(std::move(now_reading));
+    ReadToken();
+
+    return identifier;
+}
+
+bool Parser::StartsExpression(Token& token) {
+    return false;
+}
+
+std::unique_ptr<ParseNode> Parser::ParseExpression() {
+    if (!StartsExpression(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("expression");
+    }
+
+    return nullptr;
 }
 
 std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expected) {
