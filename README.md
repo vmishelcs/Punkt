@@ -1,5 +1,7 @@
 # Punkt
 
+Punkt (pronounced P&upsilon;&eta;kt) means dot, point or period in German.
+
 ## Tokens
 
 |Token Type|REGEX|
