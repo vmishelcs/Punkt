@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-// TODO: Change this to an enum class and adjust PunktLogger implementation accordingly.
 enum class LogType {
     SCANNER,
     PARSER,
