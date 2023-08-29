@@ -6,7 +6,7 @@
 class IntegerLiteralNode : public ParseNode {
 public:
     IntegerLiteralNode(std::unique_ptr<Token> token) : ParseNode(std::move(token)) {}
-    virtual std::string GetNodeString() {
+    virtual std::string GetNodeString() override {
         return "INTEGER LITERAL NODE: " + token->GetTokenString();
     }
 };

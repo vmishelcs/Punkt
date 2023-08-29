@@ -95,28 +95,27 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
         return SyntaxErrorUnexpectedToken("main");
     }
 
-    std::unique_ptr<MainNode> main = std::make_unique<MainNode>(std::move(now_reading));
+    std::unique_ptr<ParseNode> main = std::make_unique<MainNode>(std::move(now_reading));
 
     ReadToken();
 
-    Expect(PunctuatorEnum::OPEN_BRACE);
+    std::unique_ptr<ParseNode> main_block = ParseCodeBlock();
 
-    while (StartsStatement(*now_reading)) {
-        std::unique_ptr<ParseNode> statement = ParseStatement();
-        main->AppendChild(std::move(statement));
-    }
-
-    Expect(PunctuatorEnum::CLOSE_BRACE);
+    main->AppendChild(std::move(main_block));
 
     return main;
 }
 
 bool Parser::StartsStatement(Token& token) {
-    return StartsDeclaration(token)
+    return StartsCodeBlock(token)
+        || StartsDeclaration(token)
         || StartsPrintStatement(token);
 }
 
 std::unique_ptr<ParseNode> Parser::ParseStatement() {
+    if (StartsCodeBlock(*now_reading)) {
+        return ParseCodeBlock();
+    }
     if (StartsDeclaration(*now_reading)) {
         return ParseDeclaration();
     }
@@ -126,6 +125,29 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
     else {
         return SyntaxErrorUnexpectedToken("start of statement");
     }
+}
+
+bool Parser::StartsCodeBlock(Token& token) {
+    return PunctuatorToken::IsTokenPunctuator(token, {PunctuatorEnum::OPEN_BRACE});
+}
+
+std::unique_ptr<ParseNode> Parser::ParseCodeBlock() {
+    if (!StartsCodeBlock(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("code block");
+    }
+
+    std::unique_ptr<ParseNode> code_block = std::make_unique<CodeBlockNode>(std::move(now_reading));
+
+    ReadToken();
+
+    while (StartsStatement(*now_reading)) {
+        std::unique_ptr<ParseNode> statement = ParseStatement();
+        code_block->AppendChild(std::move(statement));
+    }
+
+    Expect(PunctuatorEnum::CLOSE_BRACE);
+
+    return code_block;
 }
 
 bool Parser::StartsDeclaration(Token& token) {

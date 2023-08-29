@@ -29,6 +29,9 @@ private:
     bool StartsStatement(Token& token);
     std::unique_ptr<ParseNode> ParseStatement();
 
+    bool StartsCodeBlock(Token& token);
+    std::unique_ptr<ParseNode> ParseCodeBlock();
+
     bool StartsDeclaration(Token& token);
     std::unique_ptr<ParseNode> ParseDeclaration();
 

@@ -1,6 +1,7 @@
 #ifndef ALL_NODES_H_
 #define ALL_NODES_H_
 
+#include "code_block_node.h"
 #include "declaration_statement_node.h"
 #include "error_node.h"
 #include "identifier_node.h"

@@ -6,7 +6,9 @@
 class IdentifierNode : public ParseNode {
 public:
     IdentifierNode(std::unique_ptr<Token> token) : ParseNode(std::move(token)) {}
-    virtual std::string GetNodeString() { return "IDENTIFIER NODE: " + token->GetTokenString(); }
+    virtual std::string GetNodeString() override {
+        return "IDENTIFIER NODE: " + token->GetTokenString();
+    }
 };
 
 #endif // IDENTIFIER_NODE_H_

@@ -6,7 +6,7 @@
 class DeclarationStatementNode : public ParseNode {
 public:
     DeclarationStatementNode(std::unique_ptr<Token> token) : ParseNode(std::move(token)) {}
-    virtual std::string GetNodeString() {
+    virtual std::string GetNodeString() override {
         return "DECLARATION STATEMENT NODE: " + token->GetTokenString();
     }
 };

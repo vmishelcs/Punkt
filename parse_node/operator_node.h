@@ -12,7 +12,9 @@ public:
         PunctuatorToken& punctuator_token = dynamic_cast<PunctuatorToken&>(*(this->token));
         punctuator_enum = punctuator_token.GetPunctuatorEnum();
     }
-    virtual std::string GetNodeString() { return "OPERATOR NODE: " + token->GetTokenString(); }
+    virtual std::string GetNodeString() override {
+        return "OPERATOR NODE: " + token->GetTokenString();
+    }
 
 private:
     PunctuatorEnum punctuator_enum;

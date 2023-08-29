@@ -6,7 +6,9 @@
 class MainNode : public ParseNode {
 public:
     MainNode(std::unique_ptr<Token> token) : ParseNode(std::move(token)) {}
-    virtual std::string GetNodeString() { return "MAIN NODE: " + token->GetTokenString(); }
+    virtual std::string GetNodeString() override {
+        return "MAIN NODE: " + token->GetTokenString();
+    }
 };
 
 #endif // MAIN_NODE_H_
