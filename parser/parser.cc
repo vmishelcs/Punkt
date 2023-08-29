@@ -1,3 +1,5 @@
+#include <experimental/memory>
+
 #include <token/all_tokens.h>
 #include <parse_node/all_nodes.h>
 #include <logging/punkt_logger.h>
@@ -247,7 +249,6 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
         return SyntaxErrorUnexpectedToken("unary expression");
     }
 
-    // TODO: This code should be able to parse an indefinite number of unary operators
     if (PunctuatorToken::IsTokenPunctuator(*now_reading,
         {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
         std::unique_ptr<ParseNode> unary_operator =
@@ -255,7 +256,7 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
         
         ReadToken();
 
-        std::unique_ptr<ParseNode> operand = ParseAtomicExpression();
+        std::unique_ptr<ParseNode> operand = ParseUnaryExpression();
 
         unary_operator->AppendChild(std::move(operand));
 

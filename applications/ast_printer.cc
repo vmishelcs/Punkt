@@ -4,7 +4,7 @@
 void PrintAST(const std::unique_ptr<ParseNode>& node, int depth = 0) {
     if (node) {
         for (int i = 0; i < depth; ++i) {
-            std::cout << '\t';
+            std::cout << "    ";
         }
         std::cout << node->GetNodeString() << std::endl;
         for (const auto& child : node->GetChildren()) {
