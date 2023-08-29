@@ -11,7 +11,7 @@ public:
         : Token("End of File", LocatedChar::EOF_LOCATED_CHAR.location, TokenType::EOF_TOKEN)
     {}
 
-    virtual std::string GetTokenString() const {
+    virtual std::string GetTokenString() const override {
         return "EOF TOKEN";
     }
 };
