@@ -3,16 +3,17 @@
 #include "punctuator.h"
 
 std::unordered_map<std::string, PunctuatorEnum> Punctuator::dictionary = {
-    { "{", PunctuatorEnum::OPEN_BRACE },
-    { "}", PunctuatorEnum::CLOSE_BRACE },
-    { "(", PunctuatorEnum::OPEN_PARENTHESIS },
+    { "{", PunctuatorEnum::OPEN_BRACE        },
+    { "}", PunctuatorEnum::CLOSE_BRACE       },
+    { "(", PunctuatorEnum::OPEN_PARENTHESIS  },
     { ")", PunctuatorEnum::CLOSE_PARENTHESIS },
-    { ".", PunctuatorEnum::TERMINATOR },
-    { "=", PunctuatorEnum::EQUAL },
-    { "+", PunctuatorEnum::PLUS },
-    { "-", PunctuatorEnum::MINUS },
-    { "*", PunctuatorEnum::MULTIPLY },
-    { "/", PunctuatorEnum::DIVIDE }
+    { ",", PunctuatorEnum::SEPARATOR         },
+    { ".", PunctuatorEnum::TERMINATOR        },
+    { "=", PunctuatorEnum::EQUAL             },
+    { "+", PunctuatorEnum::PLUS              },
+    { "-", PunctuatorEnum::MINUS             },
+    { "*", PunctuatorEnum::MULTIPLY          },
+    { "/", PunctuatorEnum::DIVIDE            }
 };
 
 std::unordered_map<PunctuatorEnum, std::string> Punctuator::reverse_dictionary = [] {

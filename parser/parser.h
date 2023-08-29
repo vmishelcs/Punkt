@@ -32,8 +32,11 @@ private:
     bool StartsDeclaration(Token& token);
     std::unique_ptr<ParseNode> ParseDeclaration();
 
-    bool StartsIdentifier(Token& token);
-    std::unique_ptr<ParseNode> ParseIdentifier();
+    bool StartsPrintStatement(Token& token);
+    std::unique_ptr<ParseNode> ParsePrintStatement();
+
+    bool StartsPrintExpressionList(Token& token);
+    std::unique_ptr<ParseNode> ParsePrintExpressionList(std::unique_ptr<ParseNode> print_statement);
 
     bool StartsExpression(Token& token);
     std::unique_ptr<ParseNode> ParseExpression();
@@ -52,6 +55,9 @@ private:
 
     bool StartsParenthesizedExpression(Token& token);
     std::unique_ptr<ParseNode> ParseParenthesizedExpression();
+
+    bool StartsIdentifier(Token& token);
+    std::unique_ptr<ParseNode> ParseIdentifier();
 
     bool StartsIntegerLiteral(Token& token);
     std::unique_ptr<ParseNode> ParseIntegerLiteral();

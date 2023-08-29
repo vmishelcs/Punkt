@@ -27,7 +27,7 @@ public:
         }
 
         PunctuatorToken& punctuator_token = dynamic_cast<PunctuatorToken&>(token);
-        for (auto punctuator : punctuators) {
+        for (const auto& punctuator : punctuators) {
             if (punctuator_token.GetPunctuatorEnum() == punctuator) {
                 return true;
             }

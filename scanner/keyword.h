@@ -9,7 +9,8 @@
 
 enum class KeywordEnum {
     MAIN,
-    VAR
+    VAR,
+    PRINT
 };
 
 class Keyword : public ReservedComponent {

@@ -96,6 +96,7 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
     }
 
     std::unique_ptr<MainNode> main = std::make_unique<MainNode>(std::move(now_reading));
+
     ReadToken();
 
     Expect(PunctuatorEnum::OPEN_BRACE);
@@ -111,12 +112,16 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
 }
 
 bool Parser::StartsStatement(Token& token) {
-    return StartsDeclaration(token);
+    return StartsDeclaration(token)
+        || StartsPrintStatement(token);
 }
 
 std::unique_ptr<ParseNode> Parser::ParseStatement() {
     if (StartsDeclaration(*now_reading)) {
         return ParseDeclaration();
+    }
+    if (StartsPrintStatement(*now_reading)) {
+        return ParsePrintStatement();
     }
     else {
         return SyntaxErrorUnexpectedToken("start of statement");
@@ -134,11 +139,12 @@ bool Parser::StartsDeclaration(Token& token) {
 
 std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
     if (!StartsDeclaration(*now_reading)) {
-        return SyntaxErrorUnexpectedToken("start of statement");
+        return SyntaxErrorUnexpectedToken("declaration statement");
     }
 
     std::unique_ptr<ParseNode> declaration =
-        std::make_unique<DeclarationNode>(std::move(now_reading));
+        std::make_unique<DeclarationStatementNode>(std::move(now_reading));
+
     ReadToken();
 
     std::unique_ptr<ParseNode> identifier = ParseIdentifier();
@@ -155,20 +161,47 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
     return declaration;
 }
 
-bool Parser::StartsIdentifier(Token& token) {
-    return token.GetTokenType() == TokenType::IDENTIFIER;
+bool Parser::StartsPrintStatement(Token& token) {
+    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::PRINT});
 }
 
-std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
-    if (!StartsIdentifier(*now_reading)) {
-        return SyntaxErrorUnexpectedToken("identifier");
+std::unique_ptr<ParseNode> Parser::ParsePrintStatement() {
+    if (!StartsPrintStatement(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("print statement");
     }
 
-    std::unique_ptr<ParseNode> identifier =
-        std::make_unique<IdentifierNode>(std::move(now_reading));
+    std::unique_ptr<ParseNode> print_statement =
+        std::make_unique<PrintStatementNode>(std::move(now_reading));
+
     ReadToken();
 
-    return identifier;
+    print_statement = ParsePrintExpressionList(std::move(print_statement));
+
+    Expect(PunctuatorEnum::TERMINATOR);
+
+    return print_statement;
+}
+
+bool Parser::StartsPrintExpressionList(Token& token) {
+    return StartsExpression(token);
+}
+
+std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(std::unique_ptr<ParseNode> print_statement) {
+    if (StartsExpression(*now_reading)) {
+        std::unique_ptr<ParseNode> expression = ParseExpression();
+        print_statement->AppendChild(std::move(expression));
+    }
+    else {
+        return SyntaxErrorUnexpectedToken("printable expression");
+    }
+
+    while (!PunctuatorToken::IsTokenPunctuator(*now_reading, {PunctuatorEnum::TERMINATOR})) {
+        Expect(PunctuatorEnum::SEPARATOR);
+        std::unique_ptr<ParseNode> expression = ParseExpression();
+        print_statement->AppendChild(std::move(expression));
+    }
+
+    return print_statement;
 }
 
 bool Parser::StartsExpression(Token& token) {
@@ -304,6 +337,23 @@ std::unique_ptr<ParseNode> Parser::ParseParenthesizedExpression() {
     return expression;
 }
 
+bool Parser::StartsIdentifier(Token& token) {
+    return token.GetTokenType() == TokenType::IDENTIFIER;
+}
+
+std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
+    if (!StartsIdentifier(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("identifier");
+    }
+
+    std::unique_ptr<ParseNode> identifier =
+        std::make_unique<IdentifierNode>(std::move(now_reading));
+
+    ReadToken();
+
+    return identifier;
+}
+
 bool Parser::StartsIntegerLiteral(Token& token) {
     return token.GetTokenType() == TokenType::INTEGER_LITERAL;
 }
@@ -321,10 +371,12 @@ std::unique_ptr<ParseNode> Parser::ParseIntegerLiteral() {
 
 std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expected) {
     auto& logger = PunktLogger::GetInstance();
-    std::string message = "Unexpected token "
+    std::string message = "Unexpected token \'"
         + now_reading->GetLexeme()
-        + ", expected "
-        + expected;
+        + "\', expected "
+        + expected
+        + " at "
+        + now_reading->GetLocation().GetString();
     logger.Log(LogType::PARSER, message);
     return GetSyntaxErrorNode();
 }
