@@ -1,6 +1,6 @@
 # Punkt
 
-Punkt (pronounced P&upsilon;&eta;kt) means dot, point or period in German.
+Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 
 ## Tokens
 
