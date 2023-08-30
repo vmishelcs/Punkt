@@ -8,7 +8,7 @@
 class EOFToken : public Token {
 public:
     EOFToken()
-        : Token("End of File", LocatedChar::EOF_LOCATED_CHAR.location, TokenType::EOF_TOKEN)
+        : Token("EOF", LocatedChar::EOF_LOCATED_CHAR.location, TokenType::EOF_TOKEN)
     {}
 
     virtual std::string GetTokenString() const override {

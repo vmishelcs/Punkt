@@ -20,6 +20,7 @@ public:
         , token_type(token_type)
     {}
 
+    bool IsEOF() const { return token_type == TokenType::EOF_TOKEN; }
     std::string GetLexeme() const { return lexeme; }
     TokenType GetTokenType() const { return token_type; }
     TextLocation GetLocation() const { return location; }

@@ -25,14 +25,14 @@ void Parser::ReadToken() {
 
 void Parser::Expect(KeywordEnum keyword) {
     if (now_reading->GetTokenType() != TokenType::KEYWORD) {
-        SyntaxErrorUnexpectedToken(Keyword::ForKeywordEnum(keyword));
+        SyntaxErrorUnexpectedToken("\'" + Keyword::ForKeywordEnum(keyword) + "\'");
         ReadToken();
         return;
     }
 
     KeywordToken& keyword_token = dynamic_cast<KeywordToken&>(*now_reading);
     if (keyword_token.GetKeywordEnum() != keyword) {
-        SyntaxErrorUnexpectedToken(Keyword::ForKeywordEnum(keyword));
+        SyntaxErrorUnexpectedToken("\'" + Keyword::ForKeywordEnum(keyword) + "\'");
         ReadToken();
         return;
     }
@@ -42,14 +42,14 @@ void Parser::Expect(KeywordEnum keyword) {
 
 void Parser::Expect(PunctuatorEnum punctuator) {
     if (now_reading->GetTokenType() != TokenType::PUNCTUATOR) {
-        SyntaxErrorUnexpectedToken(Punctuator::ForPunctuatorEnum(punctuator));
+        SyntaxErrorUnexpectedToken("\'" + Punctuator::ForPunctuatorEnum(punctuator) + "\'");
         ReadToken();
         return;
     }
 
     PunctuatorToken& punctuator_token = dynamic_cast<PunctuatorToken&>(*now_reading);
     if (punctuator_token.GetPunctuatorEnum() != punctuator) {
-        SyntaxErrorUnexpectedToken(Punctuator::ForPunctuatorEnum(punctuator));
+        SyntaxErrorUnexpectedToken("\'" + Punctuator::ForPunctuatorEnum(punctuator) + "\'");
         ReadToken();
         return;
     }
@@ -217,7 +217,8 @@ std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(std::unique_ptr<Pars
         return SyntaxErrorUnexpectedToken("printable expression");
     }
 
-    while (!PunctuatorToken::IsTokenPunctuator(*now_reading, {PunctuatorEnum::TERMINATOR})) {
+    while (!PunctuatorToken::IsTokenPunctuator(*now_reading, {PunctuatorEnum::TERMINATOR})
+        && !now_reading->IsEOF()) {
         Expect(PunctuatorEnum::SEPARATOR);
         std::unique_ptr<ParseNode> expression = ParseExpression();
         print_statement->AppendChild(std::move(expression));
@@ -404,5 +405,7 @@ std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expect
 }
 
 std::unique_ptr<ParseNode> Parser::GetSyntaxErrorNode() {
-    return std::make_unique<ErrorNode>(std::move(now_reading));
+    std::unique_ptr<ParseNode> error = std::make_unique<ErrorNode>(std::move(now_reading));
+    ReadToken();
+    return error;
 }
