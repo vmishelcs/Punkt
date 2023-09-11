@@ -28,9 +28,6 @@ public:
     virtual void Visit(ErrorNode& node) override;
     virtual void Visit(IdentifierNode& node) override;
     virtual void Visit(IntegerLiteralNode& node) override;
-
-private:
-    std::unique_ptr<ParseNode> ast;
 };
 
 #endif // SEMANTIC_ANALYSIS_VISITOR_H_

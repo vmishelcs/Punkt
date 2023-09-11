@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <token/token.h>
+#include <semantic_analyzer/type.h>
 
 // Forward-declare ParseNodeVisitor to avoid circular dependencies
 class ParseNodeVisitor;

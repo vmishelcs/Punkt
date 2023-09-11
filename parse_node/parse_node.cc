@@ -1,3 +1,5 @@
+#include <semantic_analyzer/primitive_type.h>
+
 #include "parse_node.h"
 #include "parse_node_visitor.h"
 

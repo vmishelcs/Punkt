@@ -12,4 +12,5 @@ target_link_libraries(parse_node
     operator_node
     print_statement_node
     program_node
+    primitive_type
 )

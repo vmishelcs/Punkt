@@ -1,8 +1,6 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
-#include <memory>
-
 #include <scanner/scanner.h>
 #include <scanner/keyword.h>
 #include <scanner/punctuator.h>
