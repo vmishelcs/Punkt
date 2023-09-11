@@ -14,13 +14,16 @@ class ParseNode {
 public:
     ParseNode(std::unique_ptr<Token> token);
 
-    const std::vector<std::unique_ptr<ParseNode>>& GetChildren() const;
+    std::vector<std::unique_ptr<ParseNode>>& GetChildren();
 
     void AppendChild(std::unique_ptr<ParseNode> node);
 
     virtual std::string GetNodeString() = 0;
 
     virtual void Accept(ParseNodeVisitor& visitor) = 0;
+
+    void SetType(Type&& type);
+    Type& GetType();
 
 protected:
     void VisitChildren(ParseNodeVisitor& visitor);
@@ -30,6 +33,7 @@ protected:
 private:
     ParseNode *parent;
     std::vector<std::unique_ptr<ParseNode>> children;
+    Type type;
 };
 
 #endif // PARSE_NODE_H_
