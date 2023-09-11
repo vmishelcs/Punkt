@@ -1,7 +1,7 @@
 #ifndef PARSE_NODE_VISITOR_H_
 #define PARSE_NODE_VISITOR_H_
 
-#include "all_nodes.h"
+#include "parse_nodes/all_nodes.h"
 
 class ParseNodeVisitor {
 public:

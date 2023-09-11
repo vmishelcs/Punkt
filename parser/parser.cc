@@ -1,7 +1,7 @@
 #include <experimental/memory>
 
 #include <token/all_tokens.h>
-#include <parse_node/all_nodes.h>
+#include <parse_node/parse_nodes/all_nodes.h>
 #include <logging/punkt_logger.h>
 
 #include "parser.h"

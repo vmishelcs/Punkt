@@ -6,22 +6,24 @@
 
 #include <token/token.h>
 
+// Forward-declare ParseNodeVisitor to avoid circular dependencies
+class ParseNodeVisitor;
+
 class ParseNode {
 public:
-    ParseNode(std::unique_ptr<Token> token) : token(std::move(token)), parent{nullptr} {}
+    ParseNode(std::unique_ptr<Token> token);
 
-    const std::vector<std::unique_ptr<ParseNode>>& GetChildren() const {
-        return children;
-    }
+    const std::vector<std::unique_ptr<ParseNode>>& GetChildren() const;
 
-    void AppendChild(std::unique_ptr<ParseNode> node) {
-        node->parent = this;
-        children.push_back(std::move(node));
-    }
+    void AppendChild(std::unique_ptr<ParseNode> node);
 
     virtual std::string GetNodeString() = 0;
 
+    virtual void Accept(ParseNodeVisitor& visitor) = 0;
+
 protected:
+    void VisitChildren(ParseNodeVisitor& visitor);
+
     std::unique_ptr<Token> token;
 
 private:
