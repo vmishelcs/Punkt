@@ -3,7 +3,7 @@
 #include "error_node.h"
 
 ErrorNode::ErrorNode(std::unique_ptr<Token> token)
-    : ParseNode(std::move(token))
+    : ParseNode(ParseNodeType::ERROR_NODE, std::move(token))
 {}
 
 std::string ErrorNode::GetNodeString() {

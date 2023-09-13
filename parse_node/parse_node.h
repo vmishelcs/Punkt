@@ -11,12 +11,27 @@
 // Forward-declare ParseNodeVisitor to avoid circular dependencies
 class ParseNodeVisitor;
 
+enum class ParseNodeType {
+    CODE_BLOCK_NODE,
+    DECLARATION_STATEMENT_NODE,
+    ERROR_NODE,
+    IDENTIFIER_NODE,
+    INTEGER_LITERAL_NODE,
+    MAIN_NODE,
+    OPERATOR_NODE,
+    PRINT_STATEMENT_NODE,
+    PROGRAM_NODE
+};
+
 class ParseNode {
 public:
-    ParseNode(std::unique_ptr<Token> token);
+    ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token);
+
+    ParseNodeType GetNodeType() const;
 
     Token& GetToken() const;
 
+    ParseNode& GetParent();
     ParseNode& GetChild(int i);
     std::vector<std::unique_ptr<ParseNode>>& GetChildren();
     void AppendChild(std::unique_ptr<ParseNode> node);
@@ -42,6 +57,7 @@ protected:
     std::unique_ptr<Token> token;
 
 private:
+    ParseNodeType node_type;
     ParseNode *parent;
     std::vector<std::unique_ptr<ParseNode>> children;
     std::unique_ptr<Type> type; // Type that describes this node, if any

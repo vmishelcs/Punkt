@@ -3,7 +3,7 @@
 #include "main_node.h"
 
 MainNode::MainNode(std::unique_ptr<Token> token)
-    : ParseNode(std::move(token))
+    : ParseNode(ParseNodeType::MAIN_NODE, std::move(token))
 {}
 
 std::string MainNode::GetNodeString() {

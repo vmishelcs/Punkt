@@ -2,7 +2,9 @@
 
 #include "operator_node.h"
 
-OperatorNode::OperatorNode(std::unique_ptr<Token> token) : ParseNode(std::move(token)) {
+OperatorNode::OperatorNode(std::unique_ptr<Token> token)
+    : ParseNode(ParseNodeType::OPERATOR_NODE, std::move(token))
+{
     PunctuatorToken& punctuator_token = dynamic_cast<PunctuatorToken&>(*(this->token));
     punctuator_enum = punctuator_token.GetPunctuatorEnum();
 }

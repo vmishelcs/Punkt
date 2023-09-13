@@ -3,7 +3,7 @@
 #include "identifier_node.h"
 
 IdentifierNode::IdentifierNode(std::unique_ptr<Token> token)
-    : ParseNode(std::move(token))
+    : ParseNode(ParseNodeType::IDENTIFIER_NODE, std::move(token))
 {}
 
 std::string IdentifierNode::GetNodeString() {

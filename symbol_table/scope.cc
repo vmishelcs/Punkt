@@ -16,7 +16,7 @@ std::unique_ptr<Scope> Scope::CreateSubscope() {
     return std::unique_ptr<Scope>(new Scope(ScopeType::SUBSCOPE, this));
 }
 
-void Scope::DeclareInScope(std::string symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum) {
+void Scope::DeclareInScope(const std::string& symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum) {
     symbol_table.Insert(
         symbol,
         tl,

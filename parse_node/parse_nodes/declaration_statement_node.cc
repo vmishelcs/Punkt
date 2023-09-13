@@ -3,7 +3,7 @@
 #include "declaration_statement_node.h"
 
 DeclarationStatementNode::DeclarationStatementNode(std::unique_ptr<Token> token)
-    : ParseNode(std::move(token))
+    : ParseNode(ParseNodeType::DECLARATION_STATEMENT_NODE, std::move(token))
 {}
 
 std::string DeclarationStatementNode::GetNodeString() {

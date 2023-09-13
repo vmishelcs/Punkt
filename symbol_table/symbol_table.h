@@ -15,13 +15,15 @@ struct SymbolData {
 
 class SymbolTable {
 public:
-    void Insert(std::string symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum);
-    SymbolData GetSymbolData(std::string symbol);
+    void Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum);
+    const SymbolData& GetSymbolData(const std::string& symbol);
 
-    bool Contains(std::string symbol) const;
+    bool Contains(const std::string& symbol) const;
+
+    void UndefinedSymbolReference(const std::string& symbol, const TextLocation& tl);
 
 private:
-    void SymbolRedefinitionError(std::string symbol, SymbolData symbol_data);
+    void SymbolRedefinitionError(const std::string& symbol, const TextLocation& tl);
 
     std::unordered_map<std::string, SymbolData> table;
 };

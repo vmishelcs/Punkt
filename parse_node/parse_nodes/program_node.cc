@@ -3,7 +3,7 @@
 #include "program_node.h"
 
 ProgramNode::ProgramNode(std::unique_ptr<Token> token)
-    : ParseNode(std::move(token))
+    : ParseNode(ParseNodeType::PROGRAM_NODE, std::move(token))
 {}
 
 std::string ProgramNode::GetNodeString() {

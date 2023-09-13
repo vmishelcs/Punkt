@@ -1,15 +1,24 @@
 #include "parse_node.h"
 #include "parse_node_visitor.h"
 
-ParseNode::ParseNode(std::unique_ptr<Token> token)
+ParseNode::ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token)
     : token(std::move(token))
+    , node_type(node_type)
     , parent{nullptr}
     , type{nullptr}
     , scope{nullptr}
 {}
 
+ParseNodeType ParseNode::GetNodeType() const {
+    return node_type;
+}
+
 Token& ParseNode::GetToken() const {
     return *token;
+}
+
+ParseNode& ParseNode::GetParent() {
+    return *parent;
 }
 
 ParseNode& ParseNode::GetChild(int i) {

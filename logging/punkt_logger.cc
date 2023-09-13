@@ -10,6 +10,7 @@ PunktLogger::PunktLogger() {
     ::google::InitGoogleLogging("", LogPrefix);
     loggers[LogType::SCANNER] = std::make_unique<PunktLogger::Logger>(LogType::SCANNER);
     loggers[LogType::PARSER] = std::make_unique<PunktLogger::Logger>(LogType::PARSER);
+    loggers[LogType::SYMBOL_TABLE] = std::make_unique<PunktLogger::Logger>(LogType::SYMBOL_TABLE);
 }
 
 void PunktLogger::Log(LogType log_type, std::string message) {
@@ -25,6 +26,8 @@ const char *PunktLogger::Logger::LoggerTypeToString() {
             return "SCANNER";
         case LogType::PARSER:
             return "PARSER";
+        case LogType::SYMBOL_TABLE:
+            return "SYMBOL TABLE";
         default:
             LOG(FATAL) << "Unknown log type in PunktLogger::Logger::TypeToString";
     }

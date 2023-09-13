@@ -3,7 +3,7 @@
 #include "integer_literal_node.h"
 
 IntegerLiteralNode::IntegerLiteralNode(std::unique_ptr<Token> token)
-    : ParseNode(std::move(token))
+    : ParseNode(ParseNodeType::INTEGER_LITERAL_NODE, std::move(token))
 {}
 
 std::string IntegerLiteralNode::GetNodeString() {

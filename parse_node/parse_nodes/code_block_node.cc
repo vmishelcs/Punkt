@@ -3,7 +3,7 @@
 #include "code_block_node.h"
 
 CodeBlockNode::CodeBlockNode(std::unique_ptr<Token> token)
-    : ParseNode(std::move(token))
+    : ParseNode(ParseNodeType::CODE_BLOCK_NODE, std::move(token))
 {}
 
 std::string CodeBlockNode::GetNodeString() {

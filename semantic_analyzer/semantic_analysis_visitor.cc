@@ -62,10 +62,19 @@ void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
 }
 void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
-    // Do nothing for now
+    if (!IsBeingDeclared(node)) {
+        // Implement getting setting proper node type
+    }
 }
 void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::INTEGER));
+}
+
+// Miscellaneous helpers
+bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {
+    ParseNode& parent = node.GetParent();
+    return (&(parent.GetChild(0)) == &node)
+        && (parent.GetNodeType() == ParseNodeType::DECLARATION_STATEMENT_NODE);
 }
 
 // Scoping

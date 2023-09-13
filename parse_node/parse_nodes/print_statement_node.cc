@@ -3,7 +3,7 @@
 #include "print_statement_node.h"
 
 PrintStatementNode::PrintStatementNode(std::unique_ptr<Token> token)
-    : ParseNode(std::move(token))
+    : ParseNode(ParseNodeType::PRINT_STATEMENT_NODE, std::move(token))
 {}
 
 std::string PrintStatementNode::GetNodeString() {

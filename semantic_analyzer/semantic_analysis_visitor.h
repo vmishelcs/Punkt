@@ -30,6 +30,9 @@ public:
     virtual void Visit(IntegerLiteralNode& node) override;
 
 private:
+    // Miscellaneous helpers
+    bool IsBeingDeclared(IdentifierNode& node);
+
     // Scoping
     void CreateGlobalScope(ProgramNode& node);
     void CreateSubscope(CodeBlockNode& node);
