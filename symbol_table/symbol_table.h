@@ -4,18 +4,26 @@
 #include <unordered_map>
 #include <string>
 
-struct SymbolMetadata {
+#include <input_handler/text_location.h>
+#include <semantic_analyzer/type.h>
+
+struct SymbolData {
     bool is_mutable;
+    TypeEnum type_enum;
+    const TextLocation& text_location;
 };
 
 class SymbolTable {
 public:
-    SymbolTable() {
+    void Insert(std::string symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum);
+    SymbolData GetSymbolData(std::string symbol);
 
-    }
+    bool Contains(std::string symbol) const;
 
 private:
-    std::unordered_map<std::string, SymbolMetadata> table;
+    void SymbolRedefinitionError(std::string symbol, SymbolData symbol_data);
+
+    std::unordered_map<std::string, SymbolData> table;
 };
 
 #endif // SYMBOL_TABLE_H_

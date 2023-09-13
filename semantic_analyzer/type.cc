@@ -13,7 +13,7 @@ TypeEnum Type::GetTypeEnum() const {
 }
 
 std::string Type::GetTypeString() const {
-    std::string result = "Type: ";
+    std::string result = "[Type: ";
     switch (type_enum) {
         case TypeEnum::NO_TYPE:
             result.append("NO TYPE");
@@ -27,6 +27,7 @@ std::string Type::GetTypeString() const {
         default:
             result.append("UNIMPLEMENTED TYPE");
     }
+    result.push_back(']');
     return result;
 }
 

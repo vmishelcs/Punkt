@@ -10,8 +10,8 @@ SemanticAnalyzer::SemanticAnalyzer(std::unique_ptr<ParseNode> ast)
 {}
 
 std::unique_ptr<ParseNode> SemanticAnalyzer::BeginSemanticAnalysis() {
-    SemanticAnalysisVisitor sav;
-    ast->Accept(sav);
+    SemanticAnalysisVisitor semantic_analysis_visitor;
+    ast->Accept(semantic_analysis_visitor);
 
     return std::move(ast);
 }

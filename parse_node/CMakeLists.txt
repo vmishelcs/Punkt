@@ -13,4 +13,5 @@ target_link_libraries(parse_node
     print_statement_node
     program_node
     type
+    scope
 )

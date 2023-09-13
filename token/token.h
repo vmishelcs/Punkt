@@ -23,7 +23,7 @@ public:
     bool IsEOF() const { return token_type == TokenType::EOF_TOKEN; }
     std::string GetLexeme() const { return lexeme; }
     TokenType GetTokenType() const { return token_type; }
-    TextLocation GetLocation() const { return location; }
+    const TextLocation& GetLocation() const { return location; }
     virtual std::string GetTokenString() const = 0;
 
     friend std::ostream& operator<<(std::ostream& os, const Token& t) {

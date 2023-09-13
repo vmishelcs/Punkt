@@ -28,6 +28,14 @@ public:
     virtual void Visit(ErrorNode& node) override;
     virtual void Visit(IdentifierNode& node) override;
     virtual void Visit(IntegerLiteralNode& node) override;
+
+private:
+    // Scoping
+    void CreateGlobalScope(ProgramNode& node);
+    void CreateSubscope(CodeBlockNode& node);
+
+    // Symbol table
+    void Declare(IdentifierNode& node, bool is_mutable, TypeEnum type_enum);
 };
 
 #endif // SEMANTIC_ANALYSIS_VISITOR_H_

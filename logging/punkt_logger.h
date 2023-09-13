@@ -10,6 +10,7 @@
 enum class LogType {
     SCANNER,
     PARSER,
+    SYMBOL_TABLE
 };
 
 class PunktLogger {
