@@ -15,7 +15,7 @@ void PrintDecoratedAST(const std::unique_ptr<ParseNode>& node, int depth = 0) {
 		if (node->HasScope()) {
 			std::cout << ' ' << node->GetScope().GetScopeTypeString();
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 
         for (const auto& child : node->GetChildren()) {
             PrintDecoratedAST(child, depth + 1);
