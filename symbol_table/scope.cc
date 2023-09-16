@@ -1,7 +1,5 @@
 #include "scope.h"
 
-Scope Scope::NULL_SCOPE(ScopeType::NULL_SCOPE, nullptr);
-
 Scope::Scope(ScopeType scope_type, Scope *base_scope)
     : scope_type(scope_type)
     , base_scope(base_scope)

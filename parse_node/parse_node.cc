@@ -68,14 +68,14 @@ void ParseNode::SetScope(std::unique_ptr<Scope> scope) {
     this->scope = std::move(scope);
 }
 
-Scope& ParseNode::GetLocalScope() {
+std::optional<std::reference_wrapper<Scope>> ParseNode::GetLocalScope() {
     for (ParseNode *node : GetPathToRoot()) {
         if (node->HasScope()) {
             return node->GetScope();
         }
     }
 
-    return Scope::NULL_SCOPE;
+    return std::nullopt;
 }
 
 void ParseNode::VisitChildren(ParseNodeVisitor& visitor) {

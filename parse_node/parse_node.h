@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <optional>
 
 #include <token/token.h>
 #include <semantic_analyzer/type.h>
@@ -49,7 +50,7 @@ public:
     bool HasScope() const;
     Scope& GetScope() const;
     void SetScope(std::unique_ptr<Scope> scope);
-    Scope& GetLocalScope();
+    std::optional<std::reference_wrapper<Scope>> GetLocalScope();
 
 protected:
     void VisitChildren(ParseNodeVisitor& visitor);

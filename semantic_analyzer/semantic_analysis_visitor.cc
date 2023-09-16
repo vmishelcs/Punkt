@@ -82,12 +82,12 @@ void SemanticAnalysisVisitor::CreateGlobalScope(ProgramNode& node) {
     node.SetScope(Scope::CreateGlobalScope());
 }
 void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
-    Scope& local_scope = node.GetLocalScope();
+    Scope& local_scope = node.GetLocalScope().value().get();
     node.SetScope(local_scope.CreateSubscope());
 }
 
 void SemanticAnalysisVisitor::Declare(IdentifierNode& node, bool is_mutable, TypeEnum type_enum) {
-    Scope& local_scope = node.GetLocalScope();
+    Scope& local_scope = node.GetLocalScope().value().get();
     local_scope.DeclareInScope(
         node.GetToken().GetLexeme(),
         node.GetToken().GetLocation(),

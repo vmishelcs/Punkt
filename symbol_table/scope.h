@@ -23,8 +23,6 @@ public:
 
     std::string GetScopeTypeString() const;
 
-    static Scope NULL_SCOPE;
-
 private:
     Scope(ScopeType scope_type, Scope *base_scope = nullptr);
 
