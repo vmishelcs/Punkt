@@ -79,6 +79,7 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
             node.SetType(std::make_unique<Type>(symbol_data.type_enum));
         }
     }
+    // Otherwise, semantic analysis is handled by VisitLeave(DeclarationStatementNode&)
 }
 void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::INTEGER));
