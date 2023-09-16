@@ -85,6 +85,15 @@ void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
 }
 
 // Miscellaneous helpers
+void SemanticAnalysisVisitor::Declare(IdentifierNode& node, bool is_mutable, TypeEnum type_enum) {
+    Scope& local_scope = node.GetLocalScope().value().get();
+    local_scope.DeclareInScope(
+        node.GetToken().GetLexeme(),
+        node.GetToken().GetLocation(),
+        is_mutable,
+        type_enum
+    );
+}
 bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {
     ParseNode& parent = node.GetParent();
     return (&(parent.GetChild(0)) == &node)
@@ -98,14 +107,4 @@ void SemanticAnalysisVisitor::CreateGlobalScope(ProgramNode& node) {
 void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
     Scope& local_scope = node.GetLocalScope().value().get();
     node.SetScope(local_scope.CreateSubscope());
-}
-
-void SemanticAnalysisVisitor::Declare(IdentifierNode& node, bool is_mutable, TypeEnum type_enum) {
-    Scope& local_scope = node.GetLocalScope().value().get();
-    local_scope.DeclareInScope(
-        node.GetToken().GetLexeme(),
-        node.GetToken().GetLocation(),
-        is_mutable,
-        type_enum
-    );
 }

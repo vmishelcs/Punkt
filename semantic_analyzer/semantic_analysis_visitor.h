@@ -31,14 +31,12 @@ public:
 
 private:
     // Miscellaneous helpers
+    void Declare(IdentifierNode& node, bool is_mutable, TypeEnum type_enum);
     bool IsBeingDeclared(IdentifierNode& node);
 
     // Scoping
     void CreateGlobalScope(ProgramNode& node);
     void CreateSubscope(CodeBlockNode& node);
-
-    // Symbol table
-    void Declare(IdentifierNode& node, bool is_mutable, TypeEnum type_enum);
 };
 
 #endif // SEMANTIC_ANALYSIS_VISITOR_H_
