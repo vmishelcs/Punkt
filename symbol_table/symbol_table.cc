@@ -15,7 +15,7 @@ void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool
     }
 }
 
-const SymbolData& SymbolTable::GetSymbolData(const std::string& symbol) {
+SymbolData& SymbolTable::Get(const std::string& symbol) {
     return table.at(symbol);
 }
 

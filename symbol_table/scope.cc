@@ -23,6 +23,14 @@ void Scope::DeclareInScope(const std::string& symbol, const TextLocation& tl, bo
     );
 }
 
+bool Scope::Declares(const std::string& symbol) {
+    return symbol_table.Contains(symbol);
+}
+
+SymbolData& Scope::GetSymbolData(const std::string& symbol) {
+    return symbol_table.Get(symbol);
+}
+
 ScopeType Scope::GetScopeType() const {
     return scope_type;
 }

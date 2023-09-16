@@ -63,7 +63,21 @@ void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
 }
 void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
     if (!IsBeingDeclared(node)) {
-        // Implement getting setting proper node type
+        std::optional<std::reference_wrapper<SymbolData>> symbol_data_opt
+            = node.FindIdentifierSymbolData();
+
+        if (!symbol_data_opt.has_value()) {
+            SymbolTable::UndefinedSymbolReference(
+                node.GetToken().GetLexeme(),
+                node.GetToken().GetLocation()
+            );
+            node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+            Declare(node, false, TypeEnum::ERROR);
+        }
+        else {
+            SymbolData& symbol_data = symbol_data_opt.value();
+            node.SetType(std::make_unique<Type>(symbol_data.type_enum));
+        }
     }
 }
 void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {

@@ -51,6 +51,8 @@ public:
     Scope& GetScope() const;
     void SetScope(std::unique_ptr<Scope> scope);
     std::optional<std::reference_wrapper<Scope>> GetLocalScope();
+    bool ScopeDeclares(const std::string& identifier);
+    SymbolData& GetDeclarationData(const std::string& identifier);
 
 protected:
     void VisitChildren(ParseNodeVisitor& visitor);

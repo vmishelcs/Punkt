@@ -78,6 +78,17 @@ std::optional<std::reference_wrapper<Scope>> ParseNode::GetLocalScope() {
     return std::nullopt;
 }
 
+bool ParseNode::ScopeDeclares(const std::string& identifier) {
+    if (!HasScope()) {
+        return false;
+    }
+    return scope->Declares(identifier);
+}
+
+SymbolData& ParseNode::GetDeclarationData(const std::string& identifier) {
+    return scope->GetSymbolData(identifier);
+}
+
 void ParseNode::VisitChildren(ParseNodeVisitor& visitor) {
     for (auto& child : children) {
         child->Accept(visitor);

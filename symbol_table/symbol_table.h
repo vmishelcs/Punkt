@@ -16,11 +16,11 @@ struct SymbolData {
 class SymbolTable {
 public:
     void Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum);
-    const SymbolData& GetSymbolData(const std::string& symbol);
+    SymbolData& Get(const std::string& symbol);
 
     bool Contains(const std::string& symbol) const;
 
-    void UndefinedSymbolReference(const std::string& symbol, const TextLocation& tl);
+    static void UndefinedSymbolReference(const std::string& symbol, const TextLocation& tl);
 
 private:
     void SymbolRedefinitionError(const std::string& symbol, const TextLocation& tl);

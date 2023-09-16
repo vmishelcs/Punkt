@@ -13,3 +13,13 @@ std::string IdentifierNode::GetNodeString() {
 void IdentifierNode::Accept(ParseNodeVisitor& visitor) {
     visitor.Visit(*this);
 }
+
+std::optional<std::reference_wrapper<SymbolData>> IdentifierNode::FindIdentifierSymbolData() {
+    std::string identifier = token->GetLexeme();
+    for (ParseNode *node : GetPathToRoot()) {
+        if (node->ScopeDeclares(identifier)) {
+            return node->GetDeclarationData(identifier);
+        }
+    }
+    return std::nullopt;
+}
