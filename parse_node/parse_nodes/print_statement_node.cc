@@ -6,7 +6,7 @@ PrintStatementNode::PrintStatementNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::PRINT_STATEMENT_NODE, std::move(token))
 {}
 
-std::string PrintStatementNode::GetNodeString() {
+std::string PrintStatementNode::GetNodeString() const {
     return "PRINT STATEMENT NODE: " + token->GetTokenString();
 }
 

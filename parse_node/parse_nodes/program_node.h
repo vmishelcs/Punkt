@@ -7,7 +7,7 @@ class ProgramNode : public ParseNode {
 public:
     ProgramNode(std::unique_ptr<Token> token);
     
-    virtual std::string GetNodeString();
+    virtual std::string GetNodeString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 };

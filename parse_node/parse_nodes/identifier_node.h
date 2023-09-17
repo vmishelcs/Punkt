@@ -8,11 +8,11 @@ class IdentifierNode : public ParseNode {
 public:
     IdentifierNode(std::unique_ptr<Token> token);
 
-    virtual std::string GetNodeString() override;
+    virtual std::string GetNodeString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
-    std::optional<std::reference_wrapper<SymbolData>> FindIdentifierSymbolData();
+    std::optional<std::reference_wrapper<const SymbolData>> FindIdentifierSymbolData();
 };
 
 #endif // IDENTIFIER_NODE_H_

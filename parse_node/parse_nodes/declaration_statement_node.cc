@@ -6,7 +6,7 @@ DeclarationStatementNode::DeclarationStatementNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::DECLARATION_STATEMENT_NODE, std::move(token))
 {}
 
-std::string DeclarationStatementNode::GetNodeString() {
+std::string DeclarationStatementNode::GetNodeString() const {
     return "DECLARATION STATEMENT NODE: " + token->GetTokenString();
 }
 

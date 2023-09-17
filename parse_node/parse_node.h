@@ -32,14 +32,14 @@ public:
 
     Token& GetToken() const;
 
-    ParseNode& GetParent();
-    ParseNode& GetChild(int i);
-    std::vector<std::unique_ptr<ParseNode>>& GetChildren();
+    ParseNode& GetParent() const;
+    ParseNode& GetChild(int i) const;
+    std::vector<std::reference_wrapper<ParseNode>> GetChildren() const;
     void AppendChild(std::unique_ptr<ParseNode> node);
 
     std::vector<ParseNode *> GetPathToRoot();
 
-    virtual std::string GetNodeString() = 0;
+    virtual std::string GetNodeString() const = 0;
 
     virtual void Accept(ParseNodeVisitor& visitor) = 0;
 

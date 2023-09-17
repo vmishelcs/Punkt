@@ -6,7 +6,7 @@ ProgramNode::ProgramNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::PROGRAM_NODE, std::move(token))
 {}
 
-std::string ProgramNode::GetNodeString() {
+std::string ProgramNode::GetNodeString() const {
     return "PROGRAM NODE: " + token->GetTokenString();
 }
 

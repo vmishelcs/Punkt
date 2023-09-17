@@ -14,12 +14,16 @@ public:
     Type();
     Type(TypeEnum type_enum);
     Type(const Type& type);
+    Type(Type&& type);
 
     TypeEnum GetTypeEnum() const;
     std::string GetTypeString() const;
+    
+    bool IsErrorType() const;
 
     Type& operator=(Type& other);
     Type& operator=(Type&& other);
+    bool operator==(const Type& other) const;
 
 private:
     TypeEnum type_enum;

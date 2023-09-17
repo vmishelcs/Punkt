@@ -6,7 +6,7 @@ ErrorNode::ErrorNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::ERROR_NODE, std::move(token))
 {}
 
-std::string ErrorNode::GetNodeString() {
+std::string ErrorNode::GetNodeString() const {
     return "SYNTAX ERROR: " + token->GetTokenString();
 }
 

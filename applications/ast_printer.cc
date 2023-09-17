@@ -1,22 +1,23 @@
+#include <cassert>
+
 #include <parse_node/parse_node.h>
 #include <parser/parser.h>
 
-void PrintAST(const std::unique_ptr<ParseNode>& node, int depth = 0) {
-    if (node) {
-        for (int i = 0; i < depth; ++i) {
-            std::cout << "    ";
-        }
-        std::cout << node->GetNodeString() << std::endl;
-        for (const auto& child : node->GetChildren()) {
-            PrintAST(child, depth + 1);
-        }
+void PrintAST(const ParseNode& node, int depth = 0) {
+    for (int i = 0; i < depth; ++i) {
+        std::cout << "    ";
+    }
+    std::cout << node.GetNodeString() << std::endl;
+    for (const auto& child : node.GetChildren()) {
+        PrintAST(child, depth + 1);
     }
 }
 
 void ParseFile(std::string file_name) {
     Scanner scanner(file_name);
     std::unique_ptr<ParseNode> ast = Parser::Parse(scanner);
-    PrintAST(ast);
+    assert(ast != nullptr && "Parser::Parse returned nullptr");
+    PrintAST(*ast);
 }
 
 int main(int argc, char **argv) {

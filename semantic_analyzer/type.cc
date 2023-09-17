@@ -12,6 +12,10 @@ Type::Type(const Type& type)
     : type_enum(type.type_enum)
 {}
 
+Type::Type(Type&& type)
+    : type_enum(std::move(type.type_enum))
+{}
+
 TypeEnum Type::GetTypeEnum() const {
     return type_enum;
 }
@@ -35,6 +39,10 @@ std::string Type::GetTypeString() const {
     return result;
 }
 
+bool Type::IsErrorType() const {
+    return type_enum == TypeEnum::ERROR;
+}
+
 Type& Type::operator=(Type& other) {
     this->type_enum = other.type_enum;
     return *this;
@@ -43,4 +51,8 @@ Type& Type::operator=(Type& other) {
 Type& Type::operator=(Type&& other) {
     this->type_enum = std::move(other.type_enum);
     return *this;
+}
+
+bool Type::operator==(const Type& other) const {
+    return this->type_enum == other.type_enum;
 }

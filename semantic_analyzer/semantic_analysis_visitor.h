@@ -37,6 +37,10 @@ private:
     // Scoping
     void CreateGlobalScope(ProgramNode& node);
     void CreateSubscope(CodeBlockNode& node);
+
+    // Error reporting
+    void InvalidOperandTypeError(OperatorNode& node, std::vector<std::reference_wrapper<const Type>>& types);
+    void OperandHasErrorTypeError(OperatorNode& node);
 };
 
 #endif // SEMANTIC_ANALYSIS_VISITOR_H_

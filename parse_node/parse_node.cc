@@ -17,16 +17,20 @@ Token& ParseNode::GetToken() const {
     return *token;
 }
 
-ParseNode& ParseNode::GetParent() {
+ParseNode& ParseNode::GetParent() const {
     return *parent;
 }
 
-ParseNode& ParseNode::GetChild(int i) {
+ParseNode& ParseNode::GetChild(int i) const {
     return *children[i];
 }
 
-std::vector<std::unique_ptr<ParseNode>>& ParseNode::GetChildren() {
-    return children;
+std::vector<std::reference_wrapper<ParseNode>> ParseNode::GetChildren() const {
+    std::vector<std::reference_wrapper<ParseNode>> result;
+    for (const auto& child_ptr : children) {
+        result.push_back(*child_ptr);
+    }
+    return result;
 }
 
 void ParseNode::AppendChild(std::unique_ptr<ParseNode> node) {

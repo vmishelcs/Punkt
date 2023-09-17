@@ -2,6 +2,7 @@
 
 #include <symbol_table/scope.h>
 #include <token/keyword_token.h>
+#include <semantic_analyzer/signatures/signatures.h>
 
 #include "type.h"
 
@@ -40,7 +41,31 @@ void SemanticAnalysisVisitor::VisitEnter(OperatorNode& node) {
     // Do nothing
 }
 void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
+    std::vector<std::reference_wrapper<const Type>> child_types;
+    for (ParseNode& child : node.GetChildren()) {
+        Type& child_type = child.GetType();
+        if (child_type.IsErrorType()) {
+            OperandHasErrorTypeError(node);
+            node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+            return;
+        }
+        child_types.push_back(child_type);
+    }
 
+    PunctuatorToken& punctuator_token = dynamic_cast<PunctuatorToken&>(node.GetToken());
+    auto signature_opt = Signatures::AcceptingSignature(
+        punctuator_token.GetPunctuatorEnum(),
+        child_types
+    );
+
+    if (signature_opt.has_value()) {
+        const Signature& signature = signature_opt.value();
+        node.SetType(std::make_unique<Type>(signature.GetOutputType()));
+    }
+    else {
+        InvalidOperandTypeError(node, child_types);
+        node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+    }
 }
 
 void SemanticAnalysisVisitor::VisitEnter(PrintStatementNode& node) {
@@ -74,7 +99,7 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
             Declare(node, false, TypeEnum::ERROR);
         }
         else {
-            SymbolData& symbol_data = symbol_data_opt.value();
+            const SymbolData& symbol_data = symbol_data_opt.value();
             node.SetType(std::make_unique<Type>(symbol_data.type));
         }
     }
@@ -107,4 +132,12 @@ void SemanticAnalysisVisitor::CreateGlobalScope(ProgramNode& node) {
 void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
     Scope& local_scope = node.GetLocalScope().value().get();
     node.SetScope(local_scope.CreateSubscope());
+}
+
+// Error reporting
+void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::vector<std::reference_wrapper<const Type>>& types) {
+
+}
+void SemanticAnalysisVisitor::OperandHasErrorTypeError(OperatorNode& node) {
+    
 }

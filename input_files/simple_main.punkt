@@ -1,4 +1,6 @@
 main {
     var a = 1.
-    var b = a.
+    var b = 2.
+    var c = 3.
+    var x = (-b + (b*b - 4*a*c)) / (2*a).
 }
