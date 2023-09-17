@@ -1,9 +1,5 @@
 #include "type.h"
 
-Type::Type()
-    : type_enum(TypeEnum::NO_TYPE)
-{}
-
 Type::Type(TypeEnum type_enum)
     : type_enum(type_enum)
 {}

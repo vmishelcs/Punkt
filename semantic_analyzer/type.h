@@ -11,7 +11,6 @@ enum class TypeEnum {
 
 class Type {
 public:
-    Type();
     Type(TypeEnum type_enum);
     Type(const Type& type);
     Type(Type&& type);
