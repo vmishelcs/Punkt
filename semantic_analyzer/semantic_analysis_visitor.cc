@@ -136,8 +136,8 @@ void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
 
 // Error reporting
 void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::vector<std::reference_wrapper<const Type>>& types) {
-
+    // TODO: Implement this
 }
 void SemanticAnalysisVisitor::OperandHasErrorTypeError(OperatorNode& node) {
-    
+    // TODO: Implement this
 }
