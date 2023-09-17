@@ -6,8 +6,8 @@ IdentifierNode::IdentifierNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::IDENTIFIER_NODE, std::move(token))
 {}
 
-std::string IdentifierNode::GetNodeString() const {
-    return "IDENTIFIER NODE: " + token->GetTokenString();
+std::string IdentifierNode::AsString() const {
+    return "IDENTIFIER NODE: " + token->AsString();
 }
 
 void IdentifierNode::Accept(ParseNodeVisitor& visitor) {

@@ -12,7 +12,7 @@ public:
         , keyword(std::move(keyword))
     {}
 
-    virtual std::string GetTokenString() const override {
+    virtual std::string AsString() const override {
         std::string result = "KEYWORD, " + this->GetLexeme();
         return result;
     }

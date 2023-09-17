@@ -9,7 +9,7 @@ public:
         : Token("Punkt", TextLocation("", 0, 0), TokenType::PROGRAM_TOKEN)
     {}
 
-    virtual std::string GetTokenString() const override {
+    virtual std::string AsString() const override {
         std::string result = "PROGRAM, " + this->GetLexeme();
         return result;
     }

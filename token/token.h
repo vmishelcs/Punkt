@@ -24,10 +24,10 @@ public:
     std::string GetLexeme() const { return lexeme; }
     TokenType GetTokenType() const { return token_type; }
     const TextLocation& GetLocation() const { return location; }
-    virtual std::string GetTokenString() const = 0;
+    virtual std::string AsString() const = 0;
 
     friend std::ostream& operator<<(std::ostream& os, const Token& t) {
-        os << "(" << t.GetTokenString() << ", " << t.location << ")";
+        os << "(" << t.AsString() << ", " << t.location << ")";
         return os;
     }
 

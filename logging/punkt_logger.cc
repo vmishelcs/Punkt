@@ -11,6 +11,7 @@ PunktLogger::PunktLogger() {
     loggers[LogType::SCANNER] = std::make_unique<PunktLogger::Logger>(LogType::SCANNER);
     loggers[LogType::PARSER] = std::make_unique<PunktLogger::Logger>(LogType::PARSER);
     loggers[LogType::SYMBOL_TABLE] = std::make_unique<PunktLogger::Logger>(LogType::SYMBOL_TABLE);
+    loggers[LogType::SEMANTIC_ANALYZER] = std::make_unique<PunktLogger::Logger>(LogType::SEMANTIC_ANALYZER);
 }
 
 void PunktLogger::Log(LogType log_type, std::string message) {
@@ -20,7 +21,7 @@ void PunktLogger::Log(LogType log_type, std::string message) {
     loggers.at(log_type)->LogMessage(message);
 }
 
-const char *PunktLogger::Logger::LoggerTypeToString() {
+const char *PunktLogger::Logger::AsString() {
     switch (logger_type) {
         case LogType::SCANNER:
             return "SCANNER";
@@ -28,6 +29,8 @@ const char *PunktLogger::Logger::LoggerTypeToString() {
             return "PARSER";
         case LogType::SYMBOL_TABLE:
             return "SYMBOL TABLE";
+        case LogType::SEMANTIC_ANALYZER:
+            return "SEMANTIC ANALYZER";
         default:
             LOG(FATAL) << "Unknown log type in PunktLogger::Logger::TypeToString";
     }
@@ -40,5 +43,5 @@ void PunktLogger::Logger::LogMessage(std::string message) {
 }
 
 void PunktLogger::Logger::PrintStoredMessage(int msg_index) {
-    LOG(ERROR) << "- " << LoggerTypeToString() << ": " << messages[msg_index] << std::endl;
+    LOG(ERROR) << "- " << AsString() << ": " << messages[msg_index] << std::endl;
 }

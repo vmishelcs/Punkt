@@ -6,8 +6,8 @@ MainNode::MainNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::MAIN_NODE, std::move(token))
 {}
 
-std::string MainNode::GetNodeString() const {
-    return "MAIN NODE: " + token->GetTokenString();
+std::string MainNode::AsString() const {
+    return "MAIN NODE: " + token->AsString();
 }
 
 void MainNode::Accept(ParseNodeVisitor& visitor) {

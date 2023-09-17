@@ -17,7 +17,7 @@ public:
     Type(Type&& type);
 
     TypeEnum GetTypeEnum() const;
-    std::string GetTypeString() const;
+    std::string AsString() const;
     
     bool IsErrorType() const;
 

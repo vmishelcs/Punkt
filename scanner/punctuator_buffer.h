@@ -22,7 +22,7 @@ public:
         return ch;
     }
 
-    std::string GetString() const {
+    std::string AsString() const {
         std::string result;
         for (const LocatedChar& ch : buffer) {
             result.push_back(ch.character);

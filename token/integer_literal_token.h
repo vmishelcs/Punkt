@@ -10,7 +10,7 @@ public:
         , value(value)
     {}
 
-    virtual std::string GetTokenString() const override {
+    virtual std::string AsString() const override {
         std::string result = "INTEGER_LITERAL, "
             + this->GetLexeme()
             + ", value = " + std::to_string(this->value);

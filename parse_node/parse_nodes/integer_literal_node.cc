@@ -6,8 +6,8 @@ IntegerLiteralNode::IntegerLiteralNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::INTEGER_LITERAL_NODE, std::move(token))
 {}
 
-std::string IntegerLiteralNode::GetNodeString() const {
-    return "INTEGER LITERAL NODE: " + token->GetTokenString();
+std::string IntegerLiteralNode::AsString() const {
+    return "INTEGER LITERAL NODE: " + token->AsString();
 }
 
 void IntegerLiteralNode::Accept(ParseNodeVisitor& visitor) {

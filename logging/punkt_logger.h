@@ -10,7 +10,8 @@
 enum class LogType {
     SCANNER,
     PARSER,
-    SYMBOL_TABLE
+    SYMBOL_TABLE,
+    SEMANTIC_ANALYZER
 };
 
 // TODO: Remove dependency on Google Logging!!!
@@ -33,7 +34,7 @@ private:
 
         Logger(LogType type) : logger_type(type) {}
         
-        const char *LoggerTypeToString();
+        const char *AsString();
         void LogMessage(std::string message);
         void PrintStoredMessage(int msg_index);
 

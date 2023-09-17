@@ -7,7 +7,7 @@ class ErrorNode : public ParseNode {
 public:
     ErrorNode(std::unique_ptr<Token> token);
 
-    virtual std::string GetNodeString() const override;
+    virtual std::string AsString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 };

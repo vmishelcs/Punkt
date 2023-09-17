@@ -9,7 +9,7 @@ std::unique_ptr<PunctuatorToken> PunctuatorScanner::Scan(
 }
 
 std::unique_ptr<PunctuatorToken> PunctuatorScanner::ScanPunctuator() {
-    std::string scanned_string = scanned.GetString();
+    std::string scanned_string = scanned.AsString();
     int num_punctuators_with_prefix = Punctuator::PunctuatorsWithPrefix(scanned_string);
 
     if (num_punctuators_with_prefix == 1 && Punctuator::IsPunctuator(scanned_string)) {
@@ -23,7 +23,7 @@ std::unique_ptr<PunctuatorToken> PunctuatorScanner::ScanPunctuator() {
 
     if (num_punctuators_with_prefix == 0 || !input_stream->HasNext()) {
         FindLatestValidPunctuator();
-        scanned_string = scanned.GetString();
+        scanned_string = scanned.AsString();
         Punctuator punctuator(scanned_string);
         return std::make_unique<PunctuatorToken>(
             scanned_string,
@@ -37,7 +37,7 @@ std::unique_ptr<PunctuatorToken> PunctuatorScanner::ScanPunctuator() {
 }
 
 void PunctuatorScanner::FindLatestValidPunctuator() {
-    while (!Punctuator::IsPunctuator(scanned.GetString()) && !scanned.IsEmpty()) {
+    while (!Punctuator::IsPunctuator(scanned.AsString()) && !scanned.IsEmpty()) {
         LocatedChar ch = scanned.PopBack();
         input_stream->PutBack(ch);
     }

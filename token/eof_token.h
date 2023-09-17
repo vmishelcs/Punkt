@@ -11,7 +11,7 @@ public:
         : Token("EOF", LocatedChar::EOF_LOCATED_CHAR.location, TokenType::EOF_TOKEN)
     {}
 
-    virtual std::string GetTokenString() const override {
+    virtual std::string AsString() const override {
         return "EOF TOKEN";
     }
 };

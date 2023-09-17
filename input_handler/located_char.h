@@ -23,8 +23,6 @@ struct LocatedChar {
         , location(lc.location)
     {}
 
-    std::string GetLocationString() const { return location.GetString(); }
-
     bool IsWhitespace() const {
         return isspace(character);
     }

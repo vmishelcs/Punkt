@@ -9,7 +9,7 @@ public:
         : Token(lexeme, location, TokenType::IDENTIFIER)
     {}
     
-    virtual std::string GetTokenString() const override {
+    virtual std::string AsString() const override {
         std::string result = "IDENTIFIER, " + this->GetLexeme();
         return result;
     }

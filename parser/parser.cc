@@ -399,7 +399,7 @@ std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expect
         + "\', expected "
         + expected
         + " at "
-        + now_reading->GetLocation().GetString();
+        + now_reading->GetLocation().AsString();
     logger.Log(LogType::PARSER, message);
     return GetSyntaxErrorNode();
 }

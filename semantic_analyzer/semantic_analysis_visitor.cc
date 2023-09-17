@@ -3,6 +3,7 @@
 #include <symbol_table/scope.h>
 #include <token/keyword_token.h>
 #include <semantic_analyzer/signatures/signatures.h>
+#include <logging/punkt_logger.h>
 
 #include "type.h"
 
@@ -136,7 +137,21 @@ void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
 
 // Error reporting
 void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::vector<std::reference_wrapper<const Type>>& types) {
-    // TODO: Implement this
+    auto& logger = PunktLogger::GetInstance();
+
+    std::string message = "Operator \'" + node.GetToken().GetLexeme()
+        + "\' not defined for ";
+    message += "[";
+    for (const auto& elem : types) {
+        message += elem.get().AsString();
+        if (&elem != &types.back()) {
+            message += ", ";
+        }
+    }
+    message += "] at\n";
+    message += ("\t" + node.GetToken().GetLocation().AsString());
+
+    logger.Log(LogType::SEMANTIC_ANALYZER, message);    
 }
 void SemanticAnalysisVisitor::OperandHasErrorTypeError(OperatorNode& node) {
     // TODO: Implement this
