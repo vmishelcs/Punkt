@@ -2,15 +2,15 @@
 
 #include <logging/punkt_logger.h>
 
-void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum) {
+void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type) {
     if (Contains(symbol)) {
         SymbolRedefinitionError(symbol, tl);
     }
     else {
         table.insert({symbol, {
+            .text_location = tl,
             .is_mutable = is_mutable,
-            .type_enum = type_enum,
-            .text_location = tl
+            .type = type
         }});
     }
 }

@@ -13,6 +13,8 @@ class Type {
 public:
     Type();
     Type(TypeEnum type_enum);
+    Type(const Type& type);
+
     TypeEnum GetTypeEnum() const;
     std::string GetTypeString() const;
 

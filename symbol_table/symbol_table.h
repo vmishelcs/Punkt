@@ -8,14 +8,14 @@
 #include <semantic_analyzer/type.h>
 
 struct SymbolData {
-    bool is_mutable;
-    TypeEnum type_enum;
     const TextLocation& text_location;
+    bool is_mutable;
+    const Type& type;
 };
 
 class SymbolTable {
 public:
-    void Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum);
+    void Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type);
     SymbolData& Get(const std::string& symbol);
 
     bool Contains(const std::string& symbol) const;

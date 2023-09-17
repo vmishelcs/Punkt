@@ -17,7 +17,7 @@ public:
     static std::unique_ptr<Scope> CreateGlobalScope();
     std::unique_ptr<Scope> CreateSubscope();
 
-    void DeclareInScope(const std::string& symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum);
+    void DeclareInScope(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type);
     bool Declares(const std::string& symbol);
 
     SymbolData& GetSymbolData(const std::string& symbol);

@@ -14,12 +14,12 @@ std::unique_ptr<Scope> Scope::CreateSubscope() {
     return std::unique_ptr<Scope>(new Scope(ScopeType::SUBSCOPE, this));
 }
 
-void Scope::DeclareInScope(const std::string& symbol, const TextLocation& tl, bool is_mutable, TypeEnum type_enum) {
+void Scope::DeclareInScope(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type) {
     symbol_table.Insert(
         symbol,
         tl,
         is_mutable,
-        type_enum
+        type
     );
 }
 

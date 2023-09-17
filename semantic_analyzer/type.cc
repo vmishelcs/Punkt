@@ -8,6 +8,10 @@ Type::Type(TypeEnum type_enum)
     : type_enum(type_enum)
 {}
 
+Type::Type(const Type& type)
+    : type_enum(type.type_enum)
+{}
+
 TypeEnum Type::GetTypeEnum() const {
     return type_enum;
 }

@@ -31,7 +31,7 @@ public:
 
 private:
     // Miscellaneous helpers
-    void Declare(IdentifierNode& node, bool is_mutable, TypeEnum type_enum);
+    void Declare(IdentifierNode& node, bool is_mutable, const Type& type);
     bool IsBeingDeclared(IdentifierNode& node);
 
     // Scoping

@@ -1,5 +1,4 @@
 main {
     var a = 1.
     var b = a.
-    var x = y.
 }

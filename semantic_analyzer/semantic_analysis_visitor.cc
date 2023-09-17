@@ -22,7 +22,7 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
     IdentifierNode& identifier = dynamic_cast<IdentifierNode&>(node.GetChild(0));
     ParseNode& initializer = node.GetChild(1);
 
-    TypeEnum declaration_type = initializer.GetType().GetTypeEnum();
+    Type& declaration_type = initializer.GetType();
 
     identifier.SetType(std::make_unique<Type>(declaration_type));
 
@@ -76,7 +76,7 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
         }
         else {
             SymbolData& symbol_data = symbol_data_opt.value();
-            node.SetType(std::make_unique<Type>(symbol_data.type_enum));
+            node.SetType(std::make_unique<Type>(symbol_data.type));
         }
     }
     // Otherwise, semantic analysis is handled by VisitLeave(DeclarationStatementNode&)
@@ -86,13 +86,13 @@ void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
 }
 
 // Miscellaneous helpers
-void SemanticAnalysisVisitor::Declare(IdentifierNode& node, bool is_mutable, TypeEnum type_enum) {
+void SemanticAnalysisVisitor::Declare(IdentifierNode& node, bool is_mutable, const Type& type) {
     Scope& local_scope = node.GetLocalScope().value().get();
     local_scope.DeclareInScope(
         node.GetToken().GetLexeme(),
         node.GetToken().GetLocation(),
         is_mutable,
-        type_enum
+        type
     );
 }
 bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {
