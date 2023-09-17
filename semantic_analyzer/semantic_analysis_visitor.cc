@@ -46,7 +46,6 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
     for (ParseNode& child : node.GetChildren()) {
         Type& child_type = child.GetType();
         if (child_type.IsErrorType()) {
-            OperandHasErrorTypeError(node);
             node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
             return;
         }
@@ -152,7 +151,4 @@ void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::v
     message += ("\t" + node.GetToken().GetLocation().AsString());
 
     logger.Log(LogType::SEMANTIC_ANALYZER, message);    
-}
-void SemanticAnalysisVisitor::OperandHasErrorTypeError(OperatorNode& node) {
-    // TODO: Implement this
 }
