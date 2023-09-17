@@ -1,6 +1,6 @@
 #include "input_handler.h"
 
-const LocatedChar LocatedChar::EOF_LOCATED_CHAR(0, "null", -1, -1);
+LocatedChar LocatedChar::EOF_LOCATED_CHAR(0, "", -1, -1);
 
 InputHandler::InputHandler(std::string input_file_name) : input_file_name(input_file_name) {
     if (input_file_name.length() == 0) {
@@ -33,6 +33,11 @@ LocatedChar InputHandler::Next() {
         char_stream.pop_front();
         return lc;
     }
+
+    if (LocatedChar::EOF_LOCATED_CHAR.location.file_name.length() == 0) {
+        // This means we haven't properly initialized the EOF char
+        InitializeEOFLocatedChar();
+    }
     return LocatedChar::EOF_LOCATED_CHAR;
 }
 
@@ -60,4 +65,13 @@ void InputHandler::PreloadNextLine() {
         char_stream.push_back(LocatedChar('\n', input_file_name, line_num, column_num));
         ++column_num;
     }
+}
+
+void InputHandler::InitializeEOFLocatedChar() {
+    LocatedChar::EOF_LOCATED_CHAR = LocatedChar(
+        0,
+        this->input_file_name,
+        this->line_num,
+        this->column_num
+    );
 }

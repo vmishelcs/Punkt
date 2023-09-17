@@ -22,6 +22,7 @@ private:
     bool LineHasMoreChars() const;
     bool FileHasMoreLines() const;
     void PreloadNextLine();
+    void InitializeEOFLocatedChar();
 
     std::string input_file_name;
     std::ifstream input_file;
