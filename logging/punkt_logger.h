@@ -13,6 +13,7 @@ enum class LogType {
     SYMBOL_TABLE
 };
 
+// TODO: Remove dependency on Google Logging!!!
 class PunktLogger {
 public:
     static PunktLogger& GetInstance() {

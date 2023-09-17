@@ -63,8 +63,7 @@ void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
 }
 void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
     if (!IsBeingDeclared(node)) {
-        std::optional<std::reference_wrapper<SymbolData>> symbol_data_opt
-            = node.FindIdentifierSymbolData();
+        auto symbol_data_opt = node.FindIdentifierSymbolData();
 
         if (!symbol_data_opt.has_value()) {
             SymbolTable::UndefinedSymbolReference(
