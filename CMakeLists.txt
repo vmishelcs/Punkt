@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.20.0)
+cmake_minimum_required(VERSION 3.24.0)
 set(CMAKE_C_COMPILER "/usr/bin/gcc")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(Punkt)
+
+include_directories(${CMAKE_SOURCE_DIR})
 
 # No in-source build
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
@@ -19,18 +22,15 @@ add_compile_options(
 	-Wuninitialized
 )
 
-include_directories(${CMAKE_SOURCE_DIR})
 include(FetchContent)
 FetchContent_Declare(
 	googletest
 	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+	FIND_PACKAGE_ARGS NAMES googletest
 )
+FetchContent_MakeAvailable(googletest)
 
 find_package(glog 0.6.0 REQUIRED)
-
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
