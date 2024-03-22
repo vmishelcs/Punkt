@@ -32,7 +32,7 @@ const char *PunktLogger::Logger::AsString() {
         case LogType::SEMANTIC_ANALYZER:
             return "SEMANTIC ANALYZER";
         default:
-            LOG(FATAL) << "Unknown log type in PunktLogger::Logger::TypeToString";
+            LOG(FATAL) << "Internal error - unknown log type in PunktLogger::Logger::TypeToString";
     }
 }
 

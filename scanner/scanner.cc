@@ -1,3 +1,5 @@
+#include <glog/logging.h>
+
 #include <token/all_tokens.h>
 #include <logging/punkt_logger.h>
 
@@ -77,7 +79,64 @@ std::unique_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
 }
 
 std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
-    return PunctuatorScanner::Scan(first_char, input_stream);
+    std::string buffer;
+    LocatedChar lc = first_char;
+
+    // These switch cases may get more complex with addition of new punctuators.
+    switch (lc.character) {
+        case '{':
+            buffer.push_back(lc.character);
+            break;
+            
+        case '}':
+            buffer.push_back(lc.character);
+            break;
+            
+        case '(':
+            buffer.push_back(lc.character);
+            break;
+            
+        case ')':
+            buffer.push_back(lc.character);
+            break;
+            
+        case ',':
+            buffer.push_back(lc.character);
+            break;
+            
+        case '.':
+            buffer.push_back(lc.character);
+           break;
+            
+        case '=':
+            buffer.push_back(lc.character);
+            break;
+            
+        case '+':
+            buffer.push_back(lc.character);
+            break;
+            
+        case '-':
+            buffer.push_back(lc.character);
+            break;
+            
+        case '*':
+            buffer.push_back(lc.character);
+            break;
+            
+        case '/':
+            buffer.push_back(lc.character);
+            break;
+
+        default:
+            LOG(FATAL) << "Internal error - unexpected punctuator character";
+    }
+    return std::make_unique<PunctuatorToken>(
+        buffer,
+        first_char.location,
+        Punctuator(buffer)
+    );
+    // return PunctuatorScanner::Scan(first_char, input_stream);
 }
 
 void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {
