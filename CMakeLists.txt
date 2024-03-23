@@ -23,18 +23,38 @@ add_compile_options(
 )
 
 include(FetchContent)
+
+# GoogleTest 1.14.0
 FetchContent_Declare(
 	googletest
 	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-	FIND_PACKAGE_ARGS NAMES googletest
 )
 FetchContent_MakeAvailable(googletest)
+message(STATUS "Found GoogleTest")
 
-find_package(glog 0.6.0 REQUIRED)
+# Glog 0.7.0
+set(WITH_GFLAGS OFF)
+FetchContent_Declare(
+	glog
+	URL https://github.com/google/glog/archive/refs/tags/v0.7.0.zip
+)
+FetchContent_MakeAvailable(glog)
+message(STATUS "Found GLog")
+
+# LLVM 18.1.2
+find_package(LLVM 18.1.2 REQUIRED CONFIG)
+message(STATUS "Found LLVM")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+include_directories(${LLVM_INCLUDE_DIRS})
+message(STATUS "LLVM include directories: ${LLVM_INCLUDE_DIRS}")
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+add_definitions(${LLVM_DEFINITIONS_LIST})
+
+# Link ${llvm_libs} with targets
+llvm_map_components_to_libnames(llvm_libs core)
 
 enable_testing()
 
-include(GoogleTest)
 add_subdirectory(applications)
 add_subdirectory(logging)
 add_subdirectory(input_handler)

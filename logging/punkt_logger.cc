@@ -2,12 +2,12 @@
 
 #include "punkt_logger.h"
 
-static void LogPrefix(std::ostream &s, const google::LogMessageInfo &l, void *) {
-   s << l.severity;
+static void LogPrefix(std::ostream &s, const google::LogMessage &l, void *) {
+    s << l.severity();
 }
 
 PunktLogger::PunktLogger() {
-    ::google::InitGoogleLogging("", LogPrefix);
+    google::InstallPrefixFormatter(LogPrefix);
     loggers[LogType::SCANNER] = std::make_unique<PunktLogger::Logger>(LogType::SCANNER);
     loggers[LogType::PARSER] = std::make_unique<PunktLogger::Logger>(LogType::PARSER);
     loggers[LogType::SYMBOL_TABLE] = std::make_unique<PunktLogger::Logger>(LogType::SYMBOL_TABLE);
@@ -33,6 +33,7 @@ const char *PunktLogger::Logger::AsString() {
             return "SEMANTIC ANALYZER";
         default:
             LOG(FATAL) << "Internal error - unknown log type in PunktLogger::Logger::TypeToString";
+            exit(1);
     }
 }
 
