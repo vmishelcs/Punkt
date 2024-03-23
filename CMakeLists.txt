@@ -32,7 +32,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 message(STATUS "Found GoogleTest")
 
-# Glog 0.7.0
+# Glog 0.7.0 (Requires libunwind-dev)
 set(WITH_GFLAGS OFF)
 FetchContent_Declare(
 	glog
