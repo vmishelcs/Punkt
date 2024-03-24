@@ -5,6 +5,7 @@
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
+#include <llvm/IR/ValueSymbolTable.h>
 
 #include <parse_node/parse_nodes/all_nodes.h>
 
@@ -15,13 +16,11 @@ public:
     std::string DumpLLVMIR();
 
     // Non-leaf nodes
-    void VisitEnter(CodeBlockNode& node);
-    void VisitLeave(CodeBlockNode& node);
+    llvm::Value *GenerateCode(CodeBlockNode& node);
 
     llvm::Value *GenerateCode(DeclarationStatementNode& node);
 
-    void VisitEnter(MainNode& node);
-    void VisitLeave(MainNode& node);
+    llvm::Value *GenerateCode(MainNode& node);
 
     void VisitEnter(OperatorNode& node);
     void VisitLeave(OperatorNode& node);
@@ -29,8 +28,7 @@ public:
     void VisitEnter(PrintStatementNode& node);
     void VisitLeave(PrintStatementNode& node);
 
-    void VisitEnter(ProgramNode& node);
-    void VisitLeave(ProgramNode& node);
+    llvm::Value *GenerateCode(ProgramNode& node);
 
     // Leaf nodes
     llvm::Value *GenerateCode(ErrorNode& node);
@@ -41,6 +39,7 @@ private:
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;
     std::unique_ptr<llvm::IRBuilder<>> builder;
+    llvm::ValueSymbolTable value_symbol_table;
 };
 
 #endif // CODE_GENERATION_VISITOR_H_

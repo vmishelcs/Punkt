@@ -3,6 +3,7 @@
 #include <parse_node/parse_node.h>
 #include <parser/parser.h>
 #include <semantic_analyzer/semantic_analyzer.h>
+#include <code_generator/code_generator.h>
 
 void GenerateIRCode(std::string file_name) {
 	Scanner scanner(file_name);
@@ -11,6 +12,8 @@ void GenerateIRCode(std::string file_name) {
 
 	std::unique_ptr<ParseNode> decorated_ast = SemanticAnalyzer::Analyze(std::move(ast));
 	assert(decorated_ast != nullptr && "SemanticAnalyzer::Analyze returned nullptr");
+
+	CodeGenerator::GenerateIR(std::move(decorated_ast));
 }
 
 int main(int argc, char **argv) {

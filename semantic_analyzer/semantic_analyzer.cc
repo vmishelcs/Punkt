@@ -1,3 +1,4 @@
+#include "semantic_analysis_visitor.h"
 #include "semantic_analyzer.h"
 
 std::unique_ptr<ParseNode> SemanticAnalyzer::Analyze(std::unique_ptr<ParseNode> ast) {
