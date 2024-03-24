@@ -1,3 +1,4 @@
+#include <code_generator/code_generation_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 #include <token/integer_literal_token.h>
 
@@ -18,4 +19,8 @@ std::string IntegerLiteralNode::AsString() const {
 
 void IntegerLiteralNode::Accept(ParseNodeVisitor& visitor) {
     visitor.Visit(*this);
+}
+
+llvm::Value *IntegerLiteralNode::GenerateCode(CodeGenerationVisitor& visitor) {
+    return visitor.GenerateCode(*this);
 }

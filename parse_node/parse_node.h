@@ -5,12 +5,17 @@
 #include <vector>
 #include <optional>
 
+#include <llvm/IR/Value.h>
+
 #include <token/token.h>
 #include <semantic_analyzer/type.h>
 #include <symbol_table/scope.h>
 
 // Forward-declare ParseNodeVisitor to avoid circular dependencies
 class ParseNodeVisitor;
+
+// Forward-declare CodeGenerationVisitor to avoid circular dependencies
+class CodeGenerationVisitor;
 
 enum class ParseNodeType {
     CODE_BLOCK_NODE,
@@ -53,6 +58,8 @@ public:
     std::optional<std::reference_wrapper<Scope>> GetLocalScope();
     bool ScopeDeclares(const std::string& identifier);
     SymbolData& GetDeclarationData(const std::string& identifier);
+
+    virtual llvm::Value *GenerateCode(CodeGenerationVisitor& visitor) = 0;
 
 protected:
     void VisitChildren(ParseNodeVisitor& visitor);

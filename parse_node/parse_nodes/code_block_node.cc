@@ -15,3 +15,7 @@ void CodeBlockNode::Accept(ParseNodeVisitor& visitor) {
     VisitChildren(visitor);
     visitor.VisitLeave(*this);
 }
+
+llvm::Value *CodeBlockNode::GenerateCode(CodeGenerationVisitor& visitor) {
+    return nullptr;
+}

@@ -13,6 +13,8 @@ public:
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
     std::optional<std::reference_wrapper<const SymbolData>> FindIdentifierSymbolData();
+
+    virtual llvm::Value *GenerateCode(CodeGenerationVisitor& visitor) override;
 };
 
 #endif // IDENTIFIER_NODE_H_

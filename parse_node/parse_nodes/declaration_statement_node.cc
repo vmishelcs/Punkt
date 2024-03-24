@@ -15,3 +15,7 @@ void DeclarationStatementNode::Accept(ParseNodeVisitor& visitor) {
     VisitChildren(visitor);
     visitor.VisitLeave(*this);
 }
+
+llvm::Value *DeclarationStatementNode::GenerateCode(CodeGenerationVisitor& visitor) {
+    return nullptr;
+}

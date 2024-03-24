@@ -14,4 +14,5 @@ target_link_libraries(parse_node
     program_node
     type
     scope
+    ${llvm_libs}
 )

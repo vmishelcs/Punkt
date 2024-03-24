@@ -6,38 +6,35 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
-#include <parse_node/parse_node_visitor.h>
+#include <parse_node/parse_nodes/all_nodes.h>
 
-class CodeGenerationVisitor : public ParseNodeVisitor {
+class CodeGenerationVisitor {
 public:
     CodeGenerationVisitor();
 
     std::string DumpLLVMIR();
 
     // Non-leaf nodes
-    virtual void VisitEnter(CodeBlockNode& node) override;
-    virtual void VisitLeave(CodeBlockNode& node) override;
+    void VisitEnter(CodeBlockNode& node);
+    void VisitLeave(CodeBlockNode& node);
 
-    virtual void VisitEnter(DeclarationStatementNode& node) override;
-    virtual void VisitLeave(DeclarationStatementNode& node) override;
+    llvm::Value *GenerateCode(DeclarationStatementNode& node);
 
-    virtual void VisitEnter(MainNode& node) override;
-    virtual void VisitLeave(MainNode& node) override;
+    void VisitEnter(MainNode& node);
+    void VisitLeave(MainNode& node);
 
-    virtual void VisitEnter(OperatorNode& node) override;
-    virtual void VisitLeave(OperatorNode& node) override;
+    void VisitEnter(OperatorNode& node);
+    void VisitLeave(OperatorNode& node);
 
-    virtual void VisitEnter(PrintStatementNode& node) override;
-    virtual void VisitLeave(PrintStatementNode& node) override;
+    void VisitEnter(PrintStatementNode& node);
+    void VisitLeave(PrintStatementNode& node);
 
-    virtual void VisitEnter(ProgramNode& node) override;
-    virtual void VisitLeave(ProgramNode& node) override;
+    void VisitEnter(ProgramNode& node);
+    void VisitLeave(ProgramNode& node);
 
     // Leaf nodes
-    virtual void Visit(ErrorNode& node) override;
-    virtual void Visit(IdentifierNode& node) override;
-    virtual void Visit(IntegerLiteralNode& node) override;
-
+    llvm::Value *GenerateCode(ErrorNode& node);
+    llvm::Value *GenerateCode(IdentifierNode& node);
     llvm::Value *GenerateCode(IntegerLiteralNode& node);
 
 private:

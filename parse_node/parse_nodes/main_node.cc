@@ -15,3 +15,7 @@ void MainNode::Accept(ParseNodeVisitor& visitor) {
     VisitChildren(visitor);
     visitor.VisitLeave(*this);
 }
+
+llvm::Value *MainNode::GenerateCode(CodeGenerationVisitor& visitor) {
+    return nullptr;
+}

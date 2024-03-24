@@ -1,4 +1,7 @@
+#include "llvm/TargetParser/Host.h"
+
 #include "code_generation_visitor.h"
+
 
 CodeGenerationVisitor::CodeGenerationVisitor()
     : context(std::make_unique<llvm::LLVMContext>())
@@ -6,7 +9,8 @@ CodeGenerationVisitor::CodeGenerationVisitor()
     , module(std::make_unique<llvm::Module>("program_module", *context))
     , builder(std::make_unique<llvm::IRBuilder<>>(*context))
 {
-
+    std::string target_triple = llvm::sys::getDefaultTargetTriple();
+    module->setTargetTriple(target_triple);
 }
 
 std::string CodeGenerationVisitor::DumpLLVMIR() {
@@ -24,11 +28,11 @@ void CodeGenerationVisitor::VisitLeave(CodeBlockNode& node) {
 
 }
 
-void CodeGenerationVisitor::VisitEnter(DeclarationStatementNode& node) {
-    
-}
-void CodeGenerationVisitor::VisitLeave(DeclarationStatementNode& node) {
-    
+llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node) {
+    // Generate a binding for the value we want assigned to a variable
+    // llvm::Value *binding = node.GetChild(1).GenerateCode(*this);
+
+    return nullptr;
 }
 
 void CodeGenerationVisitor::VisitEnter(MainNode& node) {
@@ -60,16 +64,12 @@ void CodeGenerationVisitor::VisitLeave(ProgramNode& node) {
 }
 
 // Leaf nodes
-void CodeGenerationVisitor::Visit(ErrorNode& node) {
-    
+llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode& node) {
+    return nullptr;
 }
-void CodeGenerationVisitor::Visit(IdentifierNode& node) {
-    
+llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
+    return nullptr;
 }
-void CodeGenerationVisitor::Visit(IntegerLiteralNode& node) {
-    
-}
-
 llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode& node) {
     return llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(*context), node.GetValue());
 }

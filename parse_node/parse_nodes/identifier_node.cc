@@ -23,3 +23,7 @@ std::optional<std::reference_wrapper<const SymbolData>> IdentifierNode::FindIden
     }
     return std::nullopt;
 }
+
+llvm::Value *IdentifierNode::GenerateCode(CodeGenerationVisitor& visitor) {
+    return nullptr;
+}

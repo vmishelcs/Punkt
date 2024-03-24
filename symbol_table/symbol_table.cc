@@ -10,7 +10,8 @@ void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool
         table.insert({symbol, {
             .text_location = tl,
             .is_mutable = is_mutable,
-            .type = type
+            .type = type,
+            .binding = nullptr
         }});
     }
 }

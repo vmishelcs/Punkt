@@ -13,3 +13,7 @@ std::string ErrorNode::AsString() const {
 void ErrorNode::Accept(ParseNodeVisitor& visitor) {
     visitor.Visit(*this);
 }
+
+llvm::Value *ErrorNode::GenerateCode(CodeGenerationVisitor& visitor) {
+    return nullptr;
+}
