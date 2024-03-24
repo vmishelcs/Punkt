@@ -56,6 +56,7 @@ llvm_map_components_to_libnames(llvm_libs core)
 enable_testing()
 
 add_subdirectory(applications)
+add_subdirectory(code_generator)
 add_subdirectory(logging)
 add_subdirectory(input_handler)
 add_subdirectory(parse_node)

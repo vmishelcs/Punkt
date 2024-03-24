@@ -7,6 +7,8 @@ class IntegerLiteralNode : public ParseNode {
 public:
     IntegerLiteralNode(std::unique_ptr<Token> token);
 
+    int GetValue() const;
+
     virtual std::string AsString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
