@@ -7,6 +7,8 @@
 #include "code_generation_visitor.h"
 
 
+const std::string CodeGenerationVisitor::main_function_name = "main";
+
 CodeGenerationVisitor::CodeGenerationVisitor()
     : context(std::make_unique<llvm::LLVMContext>())
     /* TODO: ModuleID should probably be the input source code file name */
@@ -24,13 +26,9 @@ std::string CodeGenerationVisitor::DumpLLVMIR() {
     return ir_ostream.str();
 }
 
-// Non-leaf nodes
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
-    for (ParseNode& child : node.GetChildren()) {
-        child.GenerateCode(*this);
-    }
-
-    return nullptr;
+    // Currently supports only one statement per code block
+    return node.GetChild(0).GenerateCode(*this);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node) {
@@ -56,10 +54,23 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
-    llvm::Function *main_func = module->getFunction(llvm::StringRef("main"));
+    // Main always returns void
+    llvm::Type *return_type = llvm::Type::getVoidTy(*context);
+
+    // Main does not take any arguments
+    bool variable_number_of_args = false;
+    llvm::FunctionType *function_type = llvm::FunctionType::get(return_type, variable_number_of_args);
+
+    // Create an LLVM::Function object
+    llvm::Function *main_func = llvm::Function::Create(function_type,
+            llvm::Function::ExternalLinkage,
+            main_function_name,
+            *module);
+
     llvm::BasicBlock *entry_block = llvm::BasicBlock::Create(*context, "entry", main_func);
     builder->SetInsertPoint(entry_block);
 
+    // Generate each statement within the function
     for (ParseNode& child : node.GetChildren()) {
         child.GenerateCode(*this);
     }
@@ -90,7 +101,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
     return node.GetChild(0).GenerateCode(*this);
 }
 
-// Leaf nodes
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode& node) {
     return nullptr;
 }
