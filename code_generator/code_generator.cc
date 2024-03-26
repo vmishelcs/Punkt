@@ -16,5 +16,5 @@ CodeGenerator::CodeGenerator(std::string file_name, std::unique_ptr<ParseNode> d
 void CodeGenerator::BeginCodeGeneration() {
     CodeGenerationVisitor code_generation_visitor(file_name);
     decorated_ast->GenerateCode(code_generation_visitor);
-    std::cout << code_generation_visitor.DumpLLVMIR() << '\n';
+    std::cout << code_generation_visitor.GetIRString() << '\n';
 }

@@ -19,7 +19,7 @@ CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
     module->setTargetTriple(target_triple);
 }
 
-std::string CodeGenerationVisitor::DumpLLVMIR() {
+std::string CodeGenerationVisitor::GetIRString() {
     std::string output;
     llvm::raw_string_ostream ir_ostream(output);
     module->print(ir_ostream, nullptr);

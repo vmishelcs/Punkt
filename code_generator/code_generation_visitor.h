@@ -13,9 +13,8 @@ class CodeGenerationVisitor {
 public:
     CodeGenerationVisitor(std::string module_id);
 
-    std::string DumpLLVMIR();
+    std::string GetIRString();
 
-    // Non-leaf nodes
     llvm::Value *GenerateCode(CodeBlockNode& node);
 
     llvm::Value *GenerateCode(DeclarationStatementNode& node);
@@ -30,7 +29,6 @@ public:
 
     llvm::Value *GenerateCode(ProgramNode& node);
 
-    // Leaf nodes
     llvm::Value *GenerateCode(ErrorNode& node);
     llvm::Value *GenerateCode(IdentifierNode& node);
     llvm::Value *GenerateCode(IntegerLiteralNode& node);
