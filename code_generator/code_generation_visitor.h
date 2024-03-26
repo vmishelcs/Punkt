@@ -37,7 +37,6 @@ private:
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;
     std::unique_ptr<llvm::IRBuilder<>> builder;
-    llvm::ValueSymbolTable value_symbol_table;
 
     static const std::string main_function_name;
 };

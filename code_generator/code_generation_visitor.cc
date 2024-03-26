@@ -11,7 +11,6 @@ const std::string CodeGenerationVisitor::main_function_name = "main";
 
 CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
     : context(std::make_unique<llvm::LLVMContext>())
-    /* TODO: ModuleID should probably be the input source code file name */
     , module(std::make_unique<llvm::Module>(module_id, *context))
     , builder(std::make_unique<llvm::IRBuilder<>>(*context))
 {
@@ -70,7 +69,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
     llvm::BasicBlock *entry_block = llvm::BasicBlock::Create(*context, "entry", main_func);
     builder->SetInsertPoint(entry_block);
 
-    // Generate each statement within the function
+    // Generate code for children of the MainNode
     for (ParseNode& child : node.GetChildren()) {
         child.GenerateCode(*this);
     }
