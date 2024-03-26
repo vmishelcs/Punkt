@@ -3,7 +3,7 @@
 #include "punkt_logger.h"
 
 static void LogPrefix(std::ostream &s, const google::LogMessage &l, void *) {
-    s << l.severity();
+    s << l.severity() << "Internal Error -";
 }
 
 PunktLogger::PunktLogger() {
@@ -16,7 +16,7 @@ PunktLogger::PunktLogger() {
 
 void PunktLogger::Log(LogType log_type, std::string message) {
     if (!loggers.contains(log_type)) {
-        std::runtime_error("Logger type not stored in logger map");
+        LOG(FATAL) << "logger type not stored in logger map";
     }
     loggers.at(log_type)->LogMessage(message);
 }
@@ -32,8 +32,8 @@ const char *PunktLogger::Logger::ToString() {
         case LogType::SEMANTIC_ANALYZER:
             return "SEMANTIC ANALYZER";
         default:
-            LOG(FATAL) << "Internal error - unknown log type in PunktLogger::Logger::TypeToString";
-            exit(1);
+            LOG(FATAL) << "unknown log type in PunktLogger::Logger::TypeToString";
+            return nullptr;
     }
 }
 

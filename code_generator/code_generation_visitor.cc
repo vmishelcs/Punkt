@@ -102,10 +102,18 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode& node) {
+    LOG(FATAL) << "encountered ErrorNode " << node.ToString() << " in CodeGenerationVisitor";
     return nullptr;
 }
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
-    return nullptr;
+    // Look up the identifier in the symbol table
+    auto symbol_data_opt = node.FindIdentifierSymbolData();
+    if (!symbol_data_opt.has_value()) {
+        LOG(FATAL) << "unable to find " << node.ToString() << " in symbol table";
+    }
+
+    const SymbolData& symbol_data = symbol_data_opt.value();
+    return symbol_data.binding;
 }
 llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode& node) {
     return llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(*context), node.GetValue());
