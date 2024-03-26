@@ -16,7 +16,7 @@ struct TextLocation {
 		, column(tl.column)
 	{}
 
-	std::string AsString() const {
+	std::string ToString() const {
 		std::string result = file_name + ':' + std::to_string(line) + ':' + std::to_string(column);
 		return result;
 	}

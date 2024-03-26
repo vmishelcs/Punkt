@@ -7,8 +7,8 @@ CodeBlockNode::CodeBlockNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::CODE_BLOCK_NODE, std::move(token))
 {}
 
-std::string CodeBlockNode::AsString() const {
-    return "CODE BLOCK NODE: " + token->AsString();
+std::string CodeBlockNode::ToString() const {
+    return "CODE BLOCK NODE: " + token->ToString();
 }
 
 void CodeBlockNode::Accept(ParseNodeVisitor& visitor) {

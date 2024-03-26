@@ -12,7 +12,7 @@ public:
         , punctuator(std::move(punctuator))
     {}
 
-    virtual std::string AsString() const override {
+    virtual std::string ToString() const override {
         std::string result = "PUNCTUATOR, " + this->GetLexeme();
         return result;
     }

@@ -13,8 +13,8 @@ int IntegerLiteralNode::GetValue() const {
     return integer_literal_token.GetValue();
 }
 
-std::string IntegerLiteralNode::AsString() const {
-    return "INTEGER LITERAL NODE: " + token->AsString();
+std::string IntegerLiteralNode::ToString() const {
+    return "INTEGER LITERAL NODE: " + token->ToString();
 }
 
 void IntegerLiteralNode::Accept(ParseNodeVisitor& visitor) {

@@ -142,13 +142,13 @@ void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::v
         + "\' not defined for ";
     message += "[";
     for (const auto& elem : types) {
-        message += elem.get().AsString();
+        message += elem.get().ToString();
         if (&elem != &types.back()) {
             message += ", ";
         }
     }
     message += "] at\n";
-    message += ("\t" + node.GetToken().GetLocation().AsString());
+    message += ("\t" + node.GetToken().GetLocation().ToString());
 
     logger.Log(LogType::SEMANTIC_ANALYZER, message);    
 }

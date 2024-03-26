@@ -16,7 +16,7 @@ TypeEnum Type::GetTypeEnum() const {
     return type_enum;
 }
 
-std::string Type::AsString() const {
+std::string Type::ToString() const {
     std::string result = "[Type: ";
     switch (type_enum) {
         case TypeEnum::NO_TYPE:

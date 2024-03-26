@@ -9,12 +9,12 @@ void PrintDecoratedAST(ParseNode& node, int depth = 0) {
 		std::cout << "    ";
 	}
 
-	std::cout << node.AsString();
+	std::cout << node.ToString();
 	if (node.HasType()) {
-		std::cout << ' ' << node.GetType().AsString();
+		std::cout << ' ' << node.GetType().ToString();
 	}
 	if (node.HasScope()) {
-		std::cout << ' ' << node.GetScope().AsString();
+		std::cout << ' ' << node.GetScope().ToString();
 	}
 	std::cout << '\n';
 

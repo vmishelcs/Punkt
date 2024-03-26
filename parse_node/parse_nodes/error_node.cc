@@ -6,8 +6,8 @@ ErrorNode::ErrorNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::ERROR_NODE, std::move(token))
 {}
 
-std::string ErrorNode::AsString() const {
-    return "SYNTAX ERROR: " + token->AsString();
+std::string ErrorNode::ToString() const {
+    return "SYNTAX ERROR: " + token->ToString();
 }
 
 void ErrorNode::Accept(ParseNodeVisitor& visitor) {

@@ -7,7 +7,7 @@ class CodeBlockNode : public ParseNode {
 public:
     CodeBlockNode(std::unique_ptr<Token> token);
 
-    virtual std::string AsString() const override;
+    virtual std::string ToString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 

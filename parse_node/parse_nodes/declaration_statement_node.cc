@@ -7,8 +7,8 @@ DeclarationStatementNode::DeclarationStatementNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::DECLARATION_STATEMENT_NODE, std::move(token))
 {}
 
-std::string DeclarationStatementNode::AsString() const {
-    return "DECLARATION STATEMENT NODE: " + token->AsString();
+std::string DeclarationStatementNode::ToString() const {
+    return "DECLARATION STATEMENT NODE: " + token->ToString();
 }
 
 void DeclarationStatementNode::Accept(ParseNodeVisitor& visitor) {

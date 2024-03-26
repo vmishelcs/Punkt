@@ -27,15 +27,15 @@ bool SymbolTable::Contains(const std::string& symbol) const {
 void SymbolTable::UndefinedSymbolReference(const std::string& symbol, const TextLocation& tl) {
     auto& logger = PunktLogger::GetInstance();
     std::string message = "Reference to undefined symbol \'" + symbol + "\' at \n";
-    message += ("\t" + tl.AsString());
+    message += ("\t" + tl.ToString());
     logger.Log(LogType::SYMBOL_TABLE, message);
 }
 
 void SymbolTable::SymbolRedefinitionError(const std::string& symbol, const TextLocation& tl) {
     auto& logger = PunktLogger::GetInstance();
     std::string message = "Redefinition of symbol \'" + symbol + "\' at \n";
-    message += ("\t" + tl.AsString() + "\n");
+    message += ("\t" + tl.ToString() + "\n");
     message += ("previously defined at \n");
-    message += ("\t" + table.at(symbol).text_location.AsString());
+    message += ("\t" + table.at(symbol).text_location.ToString());
     logger.Log(LogType::SYMBOL_TABLE, message);
 }

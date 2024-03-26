@@ -34,7 +34,7 @@ private:
 
         Logger(LogType type) : logger_type(type) {}
         
-        const char *AsString();
+        const char *ToString();
         void LogMessage(std::string message);
         void PrintStoredMessage(int msg_index);
 

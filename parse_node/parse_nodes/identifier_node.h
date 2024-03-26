@@ -10,7 +10,7 @@ public:
 
     std::string GetName() const;
 
-    virtual std::string AsString() const override;
+    virtual std::string ToString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 

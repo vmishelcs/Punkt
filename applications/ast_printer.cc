@@ -7,7 +7,7 @@ void PrintAST(const ParseNode& node, int depth = 0) {
     for (int i = 0; i < depth; ++i) {
         std::cout << "    ";
     }
-    std::cout << node.AsString() << std::endl;
+    std::cout << node.ToString() << std::endl;
     for (const auto& child : node.GetChildren()) {
         PrintAST(child, depth + 1);
     }

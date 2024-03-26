@@ -13,8 +13,8 @@ std::string IdentifierNode::GetName() const {
     return identifier_token.GetLexeme();
 }
 
-std::string IdentifierNode::AsString() const {
-    return "IDENTIFIER NODE: " + token->AsString();
+std::string IdentifierNode::ToString() const {
+    return "IDENTIFIER NODE: " + token->ToString();
 }
 
 void IdentifierNode::Accept(ParseNodeVisitor& visitor) {

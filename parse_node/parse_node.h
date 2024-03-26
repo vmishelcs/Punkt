@@ -44,7 +44,7 @@ public:
 
     std::vector<ParseNode *> GetPathToRoot();
 
-    virtual std::string AsString() const = 0;
+    virtual std::string ToString() const = 0;
 
     virtual void Accept(ParseNodeVisitor& visitor) = 0;
 

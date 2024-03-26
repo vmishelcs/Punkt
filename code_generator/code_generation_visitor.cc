@@ -39,7 +39,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     auto symbol_data_opt = identifier_node.FindIdentifierSymbolData();
     if (!symbol_data_opt.has_value()) {
         LOG(FATAL) << "Internal error - missing entry in symbol table for "
-                << identifier_node.AsString();
+                << identifier_node.ToString();
     }
     else {
         SymbolData &symbol_data = symbol_data_opt.value();

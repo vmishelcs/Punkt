@@ -35,7 +35,7 @@ ScopeType Scope::GetScopeType() const {
     return scope_type;
 }
 
-std::string Scope::AsString() const {
+std::string Scope::ToString() const {
     std::string result = "[Scope: ";
     switch (scope_type) {
         case ScopeType::GLOBAL_SCOPE:

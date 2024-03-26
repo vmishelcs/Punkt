@@ -21,7 +21,7 @@ void PunktLogger::Log(LogType log_type, std::string message) {
     loggers.at(log_type)->LogMessage(message);
 }
 
-const char *PunktLogger::Logger::AsString() {
+const char *PunktLogger::Logger::ToString() {
     switch (logger_type) {
         case LogType::SCANNER:
             return "SCANNER";
@@ -44,5 +44,5 @@ void PunktLogger::Logger::LogMessage(std::string message) {
 }
 
 void PunktLogger::Logger::PrintStoredMessage(int msg_index) {
-    LOG(ERROR) << "- " << AsString() << ": " << messages[msg_index] << std::endl;
+    LOG(ERROR) << "- " << ToString() << ": " << messages[msg_index] << std::endl;
 }

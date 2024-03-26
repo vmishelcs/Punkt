@@ -7,8 +7,8 @@ ProgramNode::ProgramNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::PROGRAM_NODE, std::move(token))
 {}
 
-std::string ProgramNode::AsString() const {
-    return "PROGRAM NODE: " + token->AsString();
+std::string ProgramNode::ToString() const {
+    return "PROGRAM NODE: " + token->ToString();
 }
 
 void ProgramNode::Accept(ParseNodeVisitor& visitor) {

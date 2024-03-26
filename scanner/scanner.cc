@@ -143,6 +143,6 @@ void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {
     auto& logger = PunktLogger::GetInstance();
     std::string message = "Unexpected character \'";
     message.push_back(ch.character);
-    message.append("\' at ").append(ch.location.AsString());
+    message.append("\' at ").append(ch.location.ToString());
     logger.Log(LogType::SCANNER, message);
 }

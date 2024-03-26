@@ -9,8 +9,8 @@ OperatorNode::OperatorNode(std::unique_ptr<Token> token)
     punctuator_enum = punctuator_token.GetPunctuatorEnum();
 }
 
-std::string OperatorNode::AsString() const {
-    return "OPERATOR NODE: " + token->AsString();
+std::string OperatorNode::ToString() const {
+    return "OPERATOR NODE: " + token->ToString();
 }
 
 void OperatorNode::Accept(ParseNodeVisitor& visitor) {
