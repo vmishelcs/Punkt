@@ -5,13 +5,14 @@
 
 class CodeGenerator {
 public:
-    static void GenerateIR(std::unique_ptr<ParseNode> decorated_ast);
+    static void GenerateIR(std::string file_name, std::unique_ptr<ParseNode> decorated_ast);
 
 private:
-    CodeGenerator(std::unique_ptr<ParseNode> decorated_ast);
+    CodeGenerator(std::string file_name, std::unique_ptr<ParseNode> decorated_ast);
 
     void BeginCodeGeneration();
 
+    std::string file_name;
     std::unique_ptr<ParseNode> decorated_ast;
 };
 

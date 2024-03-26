@@ -11,7 +11,7 @@
 
 class CodeGenerationVisitor {
 public:
-    CodeGenerationVisitor();
+    CodeGenerationVisitor(std::string module_id);
 
     std::string DumpLLVMIR();
 

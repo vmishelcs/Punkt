@@ -9,10 +9,10 @@
 
 const std::string CodeGenerationVisitor::main_function_name = "main";
 
-CodeGenerationVisitor::CodeGenerationVisitor()
+CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
     : context(std::make_unique<llvm::LLVMContext>())
     /* TODO: ModuleID should probably be the input source code file name */
-    , module(std::make_unique<llvm::Module>("program_module", *context))
+    , module(std::make_unique<llvm::Module>(module_id, *context))
     , builder(std::make_unique<llvm::IRBuilder<>>(*context))
 {
     std::string target_triple = llvm::sys::getDefaultTargetTriple();
