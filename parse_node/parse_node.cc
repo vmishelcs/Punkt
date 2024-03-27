@@ -9,7 +9,7 @@ ParseNode::ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token)
     , scope{nullptr}
 {}
 
-ParseNodeType ParseNode::GetNodeType() const {
+ParseNodeType ParseNode::GetParseNodeType() const {
     return node_type;
 }
 

@@ -74,6 +74,8 @@
         "slist": "cpp",
         "shared_mutex": "cpp",
         "complex": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "*.def": "cpp",
+        "*.inc": "cpp"
     }
 }

@@ -21,11 +21,9 @@ public:
 
     llvm::Value *GenerateCode(MainNode& node);
 
-    void VisitEnter(OperatorNode& node);
-    void VisitLeave(OperatorNode& node);
+    llvm::Value *GenerateCode(OperatorNode& node);
 
-    void VisitEnter(PrintStatementNode& node);
-    void VisitLeave(PrintStatementNode& node);
+    llvm::Value *GenerateCode(PrintStatementNode& node);
 
     llvm::Value *GenerateCode(ProgramNode& node);
 

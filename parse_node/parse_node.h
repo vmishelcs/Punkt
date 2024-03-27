@@ -33,7 +33,7 @@ class ParseNode {
 public:
     ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token);
 
-    ParseNodeType GetNodeType() const;
+    ParseNodeType GetParseNodeType() const;
 
     Token& GetToken() const;
 

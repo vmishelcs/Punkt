@@ -82,18 +82,12 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
     return main_func;
 }
 
-void CodeGenerationVisitor::VisitEnter(OperatorNode& node) {
-    
-}
-void CodeGenerationVisitor::VisitLeave(OperatorNode& node) {
-    
+llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
+    return nullptr;
 }
 
-void CodeGenerationVisitor::VisitEnter(PrintStatementNode& node) {
-    
-}
-void CodeGenerationVisitor::VisitLeave(PrintStatementNode& node) {
-    
+llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
+    return nullptr;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {

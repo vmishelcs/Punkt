@@ -122,7 +122,7 @@ void SemanticAnalysisVisitor::Declare(IdentifierNode& node, bool is_mutable, con
 bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {
     ParseNode& parent = node.GetParent();
     return (&(parent.GetChild(0)) == &node)
-        && (parent.GetNodeType() == ParseNodeType::DECLARATION_STATEMENT_NODE);
+        && (parent.GetParseNodeType() == ParseNodeType::DECLARATION_STATEMENT_NODE);
 }
 
 // Scoping
