@@ -1,3 +1,4 @@
+#include <code_generator/code_generation_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
 #include "error_node.h"
@@ -15,5 +16,5 @@ void ErrorNode::Accept(ParseNodeVisitor& visitor) {
 }
 
 llvm::Value *ErrorNode::GenerateCode(CodeGenerationVisitor& visitor) {
-    return nullptr;
+    return visitor.GenerateCode(*this);
 }

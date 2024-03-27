@@ -1,9 +1,11 @@
 add_library(code_block_node code_block_node.cc)
+target_link_libraries(code_block_node code_generation_visitor)
 
 add_library(declaration_statement_node declaration_statement_node.cc)
 target_link_libraries(declaration_statement_node code_generation_visitor)
 
 add_library(error_node error_node.cc)
+target_link_libraries(error_node code_generation_visitor)
 
 add_library(identifier_node identifier_node.cc)
 target_link_libraries(identifier_node code_generation_visitor)
@@ -18,6 +20,7 @@ add_library(operator_node operator_node.cc)
 target_link_libraries(operator_node code_generation_visitor)
 
 add_library(print_statement_node print_statement_node.cc)
+target_link_libraries(print_statement_node code_generation_visitor)
 
 add_library(program_node program_node.cc)
 target_link_libraries(program_node code_generation_visitor)

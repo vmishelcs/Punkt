@@ -1,3 +1,4 @@
+#include <code_generator/code_generation_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
 #include "print_statement_node.h"
