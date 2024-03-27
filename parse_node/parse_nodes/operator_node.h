@@ -10,6 +10,8 @@ class OperatorNode : public ParseNode {
 public:
     OperatorNode(std::unique_ptr<Token> token);
 
+    inline PunctuatorEnum GetPunctuatorEnum() { return punctuator_enum; }
+
     virtual std::string ToString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;

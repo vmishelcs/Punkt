@@ -32,6 +32,11 @@ public:
     llvm::Value *GenerateCode(IntegerLiteralNode& node);
 
 private:
+    llvm::Value *GenerateBinaryOperatorCode(llvm::Value *lhs, llvm::Value *rhs,
+            PunctuatorEnum punctuator);
+
+    llvm::Value *FatalCodeGenerationError(std::string error_msg);
+
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;
     std::unique_ptr<llvm::IRBuilder<>> builder;

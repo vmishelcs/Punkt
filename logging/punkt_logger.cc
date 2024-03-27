@@ -3,7 +3,7 @@
 #include "punkt_logger.h"
 
 static void LogPrefix(std::ostream &s, const google::LogMessage &l, void *) {
-    s << l.severity() << "Internal Error -";
+    s << l.severity();
 }
 
 PunktLogger::PunktLogger() {

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 
+#include <llvm/IR/Instructions.h>
 #include <llvm/IR/Value.h>
 
 #include <input_handler/text_location.h>
@@ -13,7 +14,7 @@ struct SymbolData {
     const TextLocation& text_location;
     bool is_mutable;
     const Type& type;
-    llvm::Value *binding;
+    llvm::AllocaInst *binding;
 };
 
 class SymbolTable {

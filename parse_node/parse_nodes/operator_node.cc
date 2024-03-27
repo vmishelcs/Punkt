@@ -1,3 +1,4 @@
+#include <code_generator/code_generation_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
 #include "operator_node.h"
@@ -20,5 +21,5 @@ void OperatorNode::Accept(ParseNodeVisitor& visitor) {
 }
 
 llvm::Value *OperatorNode::GenerateCode(CodeGenerationVisitor &visitor) {
-    return nullptr;
+    return visitor.GenerateCode(*this);
 }

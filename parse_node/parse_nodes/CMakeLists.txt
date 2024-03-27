@@ -15,6 +15,7 @@ add_library(main_node main_node.cc)
 target_link_libraries(main_node code_generation_visitor)
 
 add_library(operator_node operator_node.cc)
+target_link_libraries(operator_node code_generation_visitor)
 
 add_library(print_statement_node print_statement_node.cc)
 
