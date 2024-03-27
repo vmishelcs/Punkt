@@ -106,9 +106,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode& node) {
-    FatalCodeGenerationError("encountered ErrorNode " + node.ToString()
+    return FatalCodeGenerationError("encountered ErrorNode " + node.ToString()
             + " in CodeGenerationVisitor");
-    return nullptr;
 }
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
     // Look up the identifier in the symbol table
