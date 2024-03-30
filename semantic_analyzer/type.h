@@ -6,6 +6,7 @@
 enum class TypeEnum {
     NO_TYPE,
     INTEGER,
+    STRING,
     ERROR
 };
 

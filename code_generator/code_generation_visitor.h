@@ -16,20 +16,16 @@ public:
     std::string GetIRString();
 
     llvm::Value *GenerateCode(CodeBlockNode& node);
-
     llvm::Value *GenerateCode(DeclarationStatementNode& node);
-
     llvm::Value *GenerateCode(MainNode& node);
-
     llvm::Value *GenerateCode(OperatorNode& node);
-
     llvm::Value *GenerateCode(PrintStatementNode& node);
-
     llvm::Value *GenerateCode(ProgramNode& node);
-
+    
     llvm::Value *GenerateCode(ErrorNode& node);
     llvm::Value *GenerateCode(IdentifierNode& node);
     llvm::Value *GenerateCode(IntegerLiteralNode& node);
+    llvm::Value *GenerateCode(StringLiteralNode& node);
 
 private:
     llvm::Value *GenerateBinaryOperatorCode(llvm::Value *lhs, llvm::Value *rhs,

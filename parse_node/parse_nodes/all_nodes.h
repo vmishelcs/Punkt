@@ -10,5 +10,6 @@
 #include "operator_node.h"
 #include "print_statement_node.h"
 #include "program_node.h"
+#include "string_literal_node.h"
 
 #endif // ALL_NODES_H_

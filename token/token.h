@@ -8,6 +8,7 @@ enum class TokenType {
     IDENTIFIER,
     KEYWORD,
     INTEGER_LITERAL,
+    STRING_LITERAL,
     PUNCTUATOR,
     EOF_TOKEN
 };

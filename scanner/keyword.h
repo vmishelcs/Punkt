@@ -9,7 +9,7 @@
 
 enum class KeywordEnum {
     MAIN,
-    VAR,
+    CONST,
     PRINT
 };
 

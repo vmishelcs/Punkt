@@ -7,5 +7,6 @@
 #include "keyword_token.h"
 #include "program_token.h"
 #include "punctuator_token.h"
+#include "string_literal_token.h"
 
 #endif // ALL_TOKENS_H_

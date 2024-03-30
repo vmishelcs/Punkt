@@ -41,6 +41,9 @@ struct LocatedChar {
     bool IsPunctuatorStart() const {
         return Punctuator::PunctuatorsWithPrefix(std::string(1, character)) > 0;
     }
+    bool IsStringStart() const {
+        return character == '\"';
+    }
     
     char character;
     TextLocation location;

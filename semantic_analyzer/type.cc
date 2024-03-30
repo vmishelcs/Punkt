@@ -25,6 +25,9 @@ std::string Type::ToString() const {
         case TypeEnum::INTEGER:
             result.append("INTEGER");
             break;
+        case TypeEnum::STRING:
+            result.append("STRING");
+            break;
         case TypeEnum::ERROR:
             result.append("ERROR");
             break;

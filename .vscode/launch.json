@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "name": "InputHandler Test",
             "type": "cppdbg",
@@ -30,11 +31,11 @@
             ]
         },
         {
-            "name": "Token Printer - random_words_1",
+            "name": "Token Printer - simple_main.punkt",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/applications/token_printer",
-            "args": ["random_words_1.punkt"],
+            "args": ["simple_main.punkt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

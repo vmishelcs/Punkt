@@ -63,6 +63,9 @@ private:
     bool StartsIntegerLiteral(Token& token);
     std::unique_ptr<ParseNode> ParseIntegerLiteral();
 
+    bool StartsStringLiteral(Token& token);
+    std::unique_ptr<ParseNode> ParseStringLiteral();
+
     std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
     std::unique_ptr<ParseNode> GetSyntaxErrorNode();
 

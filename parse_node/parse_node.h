@@ -26,7 +26,8 @@ enum class ParseNodeType {
     MAIN_NODE,
     OPERATOR_NODE,
     PRINT_STATEMENT_NODE,
-    PROGRAM_NODE
+    PROGRAM_NODE,
+    STRING_LITERAL_NODE
 };
 
 class ParseNode {

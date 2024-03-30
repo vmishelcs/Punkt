@@ -28,6 +28,7 @@ public:
     virtual void Visit(ErrorNode& node) = 0;
     virtual void Visit(IdentifierNode& node) = 0;
     virtual void Visit(IntegerLiteralNode& node) = 0;
+    virtual void Visit(StringLiteralNode& node) = 0;
 };
 
 #endif // PARSE_NODE_VISITOR_H_

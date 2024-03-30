@@ -1,3 +1,4 @@
 main {
-    var a = 1.
+    const msg = "Hello World!".
+    const msg2 = msg.
 }

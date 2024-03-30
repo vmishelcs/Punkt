@@ -24,3 +24,6 @@ target_link_libraries(print_statement_node code_generation_visitor)
 
 add_library(program_node program_node.cc)
 target_link_libraries(program_node code_generation_visitor)
+
+add_library(string_literal_node string_literal_node.cc)
+target_link_libraries(string_literal_node code_generation_visitor)

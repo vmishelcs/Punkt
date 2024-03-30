@@ -19,7 +19,7 @@ void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode& node) {
     // Do nothing
 }
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
-    bool is_mutable = KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
+    // bool is_mutable = KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
 
     IdentifierNode& identifier = dynamic_cast<IdentifierNode&>(node.GetChild(0));
     ParseNode& initializer = node.GetChild(1);
@@ -28,7 +28,7 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
 
     identifier.SetType(std::make_unique<Type>(declaration_type));
 
-    Declare(identifier, is_mutable, declaration_type);
+    Declare(identifier, /* is_mutable = */ false, declaration_type);
 }
 
 void SemanticAnalysisVisitor::VisitEnter(MainNode& node) {
@@ -107,6 +107,9 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
 }
 void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::INTEGER));
+}
+void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
+    node.SetType(std::make_unique<Type>(TypeEnum::STRING));
 }
 
 // Miscellaneous helpers

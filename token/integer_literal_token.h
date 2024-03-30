@@ -11,9 +11,7 @@ public:
     {}
 
     virtual std::string ToString() const override {
-        std::string result = "INTEGER_LITERAL, "
-            + this->GetLexeme()
-            + ", value = " + std::to_string(this->value);
+        std::string result = "INTEGER_LITERAL, value = " + std::to_string(this->value);
         return result;
     }
     

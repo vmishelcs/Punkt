@@ -2,7 +2,7 @@
 
 std::unordered_map<std::string, KeywordEnum> Keyword::dictionary = {
     { "main",  KeywordEnum::MAIN  },
-    { "var",   KeywordEnum::VAR   },
+    { "const", KeywordEnum::CONST },
     { "print", KeywordEnum::PRINT }
 };
 
