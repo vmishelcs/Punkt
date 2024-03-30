@@ -17,25 +17,25 @@ TypeEnum Type::GetTypeEnum() const {
 }
 
 std::string Type::ToString() const {
-    std::string result = "[Type: ";
+    std::string result = "[Type: " + GetTypeEnumString(type_enum) + "]";
+    return result;
+}
+
+std::string Type::GetTypeEnumString(TypeEnum type_enum) {
     switch (type_enum) {
         case TypeEnum::NO_TYPE:
-            result.append("NO TYPE");
-            break;
+            return "NO TYPE";
+        case TypeEnum::CHARACTER:
+            return "CHARACTER";
         case TypeEnum::INTEGER:
-            result.append("INTEGER");
-            break;
+            return "INTEGER";
         case TypeEnum::STRING:
-            result.append("STRING");
-            break;
+            return "STRING";
         case TypeEnum::ERROR:
-            result.append("ERROR");
-            break;
+            return "ERROR";
         default:
-            result.append("UNIMPLEMENTED TYPE");
+            return "UNIMPLEMENTED_TYPE";
     }
-    result.push_back(']');
-    return result;
 }
 
 bool Type::IsErrorType() const {

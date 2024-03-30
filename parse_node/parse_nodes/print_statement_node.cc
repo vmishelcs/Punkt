@@ -18,5 +18,5 @@ void PrintStatementNode::Accept(ParseNodeVisitor& visitor) {
 }
 
 llvm::Value *PrintStatementNode::GenerateCode(CodeGenerationVisitor &visitor) {
-    return nullptr;
+    return visitor.GenerateCode(*this);
 }

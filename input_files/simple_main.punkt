@@ -1,4 +1,6 @@
 main {
-    const msg = "Hello World!".
-    const msg2 = msg.
+    const a = 1.
+    const b = 2.
+    const c = 3.
+    print "a = ", a, ", b = ", b, ", c = ", c.
 }

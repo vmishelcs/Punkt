@@ -13,7 +13,7 @@ public:
     {}
 
     virtual std::string ToString() const override {
-        std::string result = "PUNCTUATOR, " + this->GetLexeme();
+        std::string result = "PUNCTUATOR, \'" + this->GetLexeme() + "\'";
         return result;
     }
 
