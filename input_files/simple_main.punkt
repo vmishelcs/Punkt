@@ -1,7 +1,4 @@
 main {
     const a = 1.
-    const b = 2.
-    const c = 3.
-    print "a = ", a, ", b = ", b, ", c = ", c.
-    print "(-b + (b * b - 4 * a * c)) / (2 * a) = ", (-b + (b * b - 4 * a * c)) / (2 * a).
+    print -----1.
 }

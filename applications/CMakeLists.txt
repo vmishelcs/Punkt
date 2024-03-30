@@ -10,6 +10,9 @@ target_link_libraries(decorated_ast_printer parser semantic_analyzer)
 add_executable(code_printer code_printer.cc)
 target_link_libraries(code_printer parser semantic_analyzer code_generator)
 
+add_executable(punkt_compiler punkt_compiler.cc)
+target_link_libraries(punkt_compiler parser semantic_analyzer code_generator)
+
 target_compile_definitions(
 	token_printer
 	PRIVATE

@@ -328,7 +328,7 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
         return FatalCodeGenerationError("failed obtaining llvm::Value object for fmt string");
     }
 
-    args.push_back(llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), line_feed_char));
+    args.push_back(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), line_feed_char));
     if (args.back() == nullptr) {
         return FatalCodeGenerationError("failed to generate line feed argument for printf");
     }
