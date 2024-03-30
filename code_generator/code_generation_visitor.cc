@@ -92,6 +92,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
     unsigned num_operands = node.GetChildren().size();
+    if (num_operands == 1) {
+        llvm::Value *operand = node.GetChild(0).GenerateCode(*this);
+        return GenerateUnaryOperatorCode(operand, node.GetPunctuatorEnum());
+    }
     if (num_operands == 2) {
         llvm::Value *lhs = node.GetChild(0).GenerateCode(*this);
         llvm::Value *rhs = node.GetChild(1).GenerateCode(*this);
@@ -187,8 +191,25 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode& node) {
 }
 
 //--------------------------------------------------------------------------------------//
-//                               Binary operator helpers                                //
+//                                   Operator helpers                                   //
 //--------------------------------------------------------------------------------------//
+llvm::Value *CodeGenerationVisitor::GenerateUnaryOperatorCode(llvm::Value *operand,
+        PunctuatorEnum punctuator)
+{
+    llvm::Value *val = nullptr;
+    switch (punctuator) {
+        case PunctuatorEnum::PLUS:
+            // Do nothing :)
+            return operand;
+        case PunctuatorEnum::MINUS:
+            // Multiply operand by -1
+            val = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), -1);
+            return builder->CreateMul(operand, val, "negtmp");
+        default:
+            return FatalCodeGenerationError("unimplemented unary operator");
+    }
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateBinaryOperatorCode(llvm::Value *lhs, llvm::Value *rhs,
         PunctuatorEnum punctuator)
 {

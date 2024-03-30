@@ -32,6 +32,7 @@ public:
 private:
     void GenerateGlobalConstants();
 
+    llvm::Value *GenerateUnaryOperatorCode(llvm::Value *operand, PunctuatorEnum punctuator);
     llvm::Value *GenerateBinaryOperatorCode(llvm::Value *lhs, llvm::Value *rhs,
             PunctuatorEnum punctuator);
 
