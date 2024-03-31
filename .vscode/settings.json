@@ -76,6 +76,7 @@
         "complex": "cpp",
         "future": "cpp",
         "*.def": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "codecvt": "cpp"
     }
 }

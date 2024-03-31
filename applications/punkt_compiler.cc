@@ -7,5 +7,5 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-    std::cout << "Current path: " << std::filesystem::current_path() << '\n';
+    // std::cout << "Current path: " << fs::current_path() << '\n';
 }

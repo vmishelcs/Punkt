@@ -2,8 +2,8 @@
 
 #include <scanner/scanner.h>
 
-void ScanFile(std::string file_name) {
-	Scanner scanner(file_name);
+void ScanFile(fs::path file_path) {
+	Scanner scanner(file_path);
 	while (scanner.HasNext()) {
 		std::cout << *scanner.Next() << std::endl;
 	}
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	std::string input_file_directory = INPUT_FILE_DIRECTORY;
-	std::string file_name = input_file_directory + argv[1];
-	ScanFile(file_name);
+	fs::path input_file_directory = fs::path(INPUT_FILE_DIRECTORY);
+	fs::path file_path = input_file_directory / argv[1];
+	ScanFile(file_path);
 }

@@ -8,7 +8,7 @@
 
 class LocatedCharStream {
 public:
-	LocatedCharStream(std::string input_file_name);
+	LocatedCharStream(fs::path file_path);
 
 	LocatedChar Next();
 	LocatedChar NextNonwhitespaceChar();

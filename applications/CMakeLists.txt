@@ -16,23 +16,23 @@ target_link_libraries(punkt_compiler parser semantic_analyzer code_generator)
 target_compile_definitions(
 	token_printer
 	PRIVATE
-	INPUT_FILE_DIRECTORY="${PROJECT_SOURCE_DIR}/input_files/"
+	INPUT_FILE_DIRECTORY="${PROJECT_SOURCE_DIR}/applications_input_files/"
 )
 
 target_compile_definitions(
 	ast_printer
 	PRIVATE
-	INPUT_FILE_DIRECTORY="${PROJECT_SOURCE_DIR}/input_files/"
+	INPUT_FILE_DIRECTORY="${PROJECT_SOURCE_DIR}/applications_input_files/"
 )
 
 target_compile_definitions(
 	decorated_ast_printer
 	PRIVATE
-	INPUT_FILE_DIRECTORY="${PROJECT_SOURCE_DIR}/input_files/"
+	INPUT_FILE_DIRECTORY="${PROJECT_SOURCE_DIR}/applications_input_files/"
 )
 
 target_compile_definitions(
 	code_printer
 	PRIVATE
-	INPUT_FILE_DIRECTORY="${PROJECT_SOURCE_DIR}/input_files/"
+	INPUT_FILE_DIRECTORY="${PROJECT_SOURCE_DIR}/applications_input_files/"
 )

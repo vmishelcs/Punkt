@@ -8,10 +8,10 @@
 
 class Parser {
 public:
-    static std::unique_ptr<ParseNode> Parse(Scanner& scanner);
+    static std::unique_ptr<ParseNode> Parse(fs::path file_path);
 
 private:
-    Parser(Scanner& scanner);
+    Parser(std::unique_ptr<Scanner> scanner);
 
     void ReadToken();
 
@@ -69,7 +69,7 @@ private:
     std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
     std::unique_ptr<ParseNode> GetSyntaxErrorNode();
 
-    Scanner& scanner;
+    std::unique_ptr<Scanner> scanner;
     std::unique_ptr<Token> now_reading;
 };
 

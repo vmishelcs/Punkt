@@ -2,14 +2,13 @@
 
 LocatedChar LocatedChar::EOF_LOCATED_CHAR(0, "", -1, -1);
 
-InputHandler::InputHandler(std::string input_file_name) : input_file_name(input_file_name) {
-    if (input_file_name.length() == 0) {
-        throw new std::runtime_error("File name length must be greater than 0");
+InputHandler::InputHandler(fs::path file_path) : file_path(file_path) {
+    if (file_path.filename().empty()) {
+        throw new std::runtime_error("error: no file provided");
     }
-    input_file = std::ifstream(input_file_name, std::ios::in);
+    input_file = std::ifstream(file_path, std::ios::in);
     if (!input_file.is_open()) {
-        std::string message = "Failed to open input file ";
-        message.append(input_file_name);
+        std::string message = "error: failed to open input file " + file_path.string();
         throw new std::runtime_error(message);
     }
 
@@ -58,11 +57,11 @@ void InputHandler::PreloadNextLine() {
     column_num = 1;
     line_num += 1;
     while (input_file >> std::noskipws >> c && c != '\n') {
-        char_stream.push_back(LocatedChar(c, input_file_name, line_num, column_num));
+        char_stream.push_back(LocatedChar(c, file_path.filename(), line_num, column_num));
         ++column_num;
     }
     if (!input_file.eof()) {
-        char_stream.push_back(LocatedChar('\n', input_file_name, line_num, column_num));
+        char_stream.push_back(LocatedChar('\n', file_path.filename(), line_num, column_num));
         ++column_num;
     }
 }
@@ -70,7 +69,7 @@ void InputHandler::PreloadNextLine() {
 void InputHandler::InitializeEOFLocatedChar() {
     LocatedChar::EOF_LOCATED_CHAR = LocatedChar(
         0,
-        this->input_file_name,
+        this->file_path.filename(),
         this->line_num,
         this->column_num
     );

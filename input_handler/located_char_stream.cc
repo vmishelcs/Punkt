@@ -1,8 +1,8 @@
 #include "located_char_stream.h"
 
-LocatedCharStream::LocatedCharStream(std::string input_file_name)
+LocatedCharStream::LocatedCharStream(fs::path file_path)
     : next_char(LocatedChar::EOF_LOCATED_CHAR) {
-    this->input_handler = std::make_unique<InputHandler>(input_file_name);
+    this->input_handler = std::make_unique<InputHandler>(file_path);
     this->next_char = input_handler->Next();
 }
 

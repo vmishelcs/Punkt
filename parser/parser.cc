@@ -6,18 +6,18 @@
 
 #include "parser.h"
 
-Parser::Parser(Scanner& scanner) : scanner(scanner) {
-    ReadToken();
-}
-
-std::unique_ptr<ParseNode> Parser::Parse(Scanner& scanner) {
-    Parser parser(scanner);
+std::unique_ptr<ParseNode> Parser::Parse(fs::path file_path) {
+    std::unique_ptr<Scanner> scanner = std::make_unique<Scanner>(file_path);
+    Parser parser(std::move(scanner));
     return parser.ParseProgram();
 }
 
+Parser::Parser(std::unique_ptr<Scanner> scanner) : scanner(std::move(scanner)) {
+    ReadToken();
+}
+
 void Parser::ReadToken() {
-    now_reading = nullptr;
-    now_reading = scanner.Next();
+    now_reading = scanner->Next();
     if (!now_reading) {
         std::runtime_error("Failed to read next token in Parser::ReadToken");
     }

@@ -7,8 +7,8 @@
 #include "keyword.h"
 #include "punctuator_scanner.h"
 
-Scanner::Scanner(std::string input_file_name) : next_token(std::unique_ptr<EOFToken>()) {
-    this->input_stream = std::make_unique<LocatedCharStream>(input_file_name);
+Scanner::Scanner(fs::path file_path) : next_token(std::unique_ptr<EOFToken>()) {
+    this->input_stream = std::make_unique<LocatedCharStream>(file_path);
     this->next_token = GetNextToken();
 }
 

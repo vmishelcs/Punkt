@@ -2,17 +2,20 @@
 #define INPUT_HANDLER_H_
 
 #include <deque>
+#include <filesystem>
 #include <fstream>
 #include <string>
 
 #include "located_char.h"
+
+namespace fs = std::filesystem;
 
 /**
  * InputHandler class for reading the input file providing a stream of LocatedChars.
  */
 class InputHandler {
 public:
-    InputHandler(std::string input_file_name);
+    InputHandler(fs::path file_path);
     ~InputHandler();
 
     LocatedChar Next();
@@ -24,7 +27,7 @@ private:
     void PreloadNextLine();
     void InitializeEOFLocatedChar();
 
-    std::string input_file_name;
+    fs::path file_path;
     std::ifstream input_file;
     std::deque<LocatedChar> char_stream;
     unsigned int line_num;

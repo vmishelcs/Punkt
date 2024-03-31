@@ -9,7 +9,7 @@
 
 class Scanner {
 public:
-    Scanner(std::string input_file_name);
+    Scanner(fs::path file_path);
 
     std::unique_ptr<Token> Next();
     bool HasNext() const;

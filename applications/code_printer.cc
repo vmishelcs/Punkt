@@ -5,15 +5,14 @@
 #include <semantic_analyzer/semantic_analyzer.h>
 #include <code_generator/code_generator.h>
 
-void GenerateIRCode(std::string file_name) {
-	Scanner scanner(file_name);
-    std::unique_ptr<ParseNode> ast = Parser::Parse(scanner);
+void GenerateIRCode(fs::path file_path) {
+    std::unique_ptr<ParseNode> ast = Parser::Parse(file_path);
 	assert(ast != nullptr && "Parser::Parse returned nullptr");
 
 	std::unique_ptr<ParseNode> decorated_ast = SemanticAnalyzer::Analyze(std::move(ast));
 	assert(decorated_ast != nullptr && "SemanticAnalyzer::Analyze returned nullptr");
 
-	CodeGenerator::GenerateIR(file_name, std::move(decorated_ast));
+	// CodeGenerator::GenerateIR(file_name, std::move(decorated_ast));
 }
 
 int main(int argc, char **argv) {
@@ -22,7 +21,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-    std::string input_file_directory = INPUT_FILE_DIRECTORY;
-	std::string file_name = input_file_directory + argv[1];
-	GenerateIRCode(file_name);
+    fs::path input_file_directory = fs::path(INPUT_FILE_DIRECTORY);
+	fs::path file_path = input_file_directory / argv[1];
+	GenerateIRCode(file_path);
 }

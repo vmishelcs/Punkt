@@ -23,12 +23,13 @@ void PrintDecoratedAST(ParseNode& node, int depth = 0) {
 	}
 }
 
-void AnalyzeFile(std::string file_name) {
-	Scanner scanner(file_name);
-    std::unique_ptr<ParseNode> ast = Parser::Parse(scanner);
+void AnalyzeFile(fs::path file_path) {
+    std::unique_ptr<ParseNode> ast = Parser::Parse(file_path);
 	assert(ast != nullptr && "Parser::Parse returned nullptr");
+
 	std::unique_ptr<ParseNode> decorated_ast = SemanticAnalyzer::Analyze(std::move(ast));
 	assert(decorated_ast != nullptr && "SemanticAnalyzer::Analyze returned nullptr");
+	
     PrintDecoratedAST(*decorated_ast);
 }
 
@@ -38,7 +39,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-    std::string input_file_directory = INPUT_FILE_DIRECTORY;
-	std::string file_name = input_file_directory + argv[1];
-	AnalyzeFile(file_name);
+    fs::path input_file_directory = fs::path(INPUT_FILE_DIRECTORY);
+	fs::path file_path = input_file_directory / argv[1];
+	AnalyzeFile(file_path);
 }

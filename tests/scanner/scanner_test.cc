@@ -6,8 +6,8 @@
 
 class ScannerTest : public ::testing::Test {
 protected:
-	void ReadWordsIntoVector(std::string& file_name, std::vector<std::string>& strings) {
-		std::ifstream file(file_name);
+	void ReadWordsIntoVector(fs::path& file_path, std::vector<std::string>& strings) {
+		std::ifstream file(file_path);
 		ASSERT_FALSE(file.fail());
 		std::string word;
 		while (file >> word) {
@@ -16,19 +16,19 @@ protected:
 		file.close();
 	}
 
-	std::string test_file_directory = SCANNER_TEST_FILE_DIRECTORY;
+	fs::path test_file_directory = fs::path(SCANNER_TEST_FILE_DIRECTORY);
 };
 
 TEST_F(ScannerTest, TestInit) {
-	Scanner scanner(test_file_directory + "TestInit.punkt");
+	Scanner scanner(test_file_directory / "TestInit.punkt");
 }
 
 TEST_F(ScannerTest, TestScanIdentifiers) {
-	std::string file_name = test_file_directory + "TestScanIdentifiers.punkt";
+	fs::path file_path = test_file_directory / "TestScanIdentifiers.punkt";
 	std::vector<std::string> strings;
-	ReadWordsIntoVector(file_name, strings);
+	ReadWordsIntoVector(file_path, strings);
 
-	Scanner scanner(file_name);
+	Scanner scanner(file_path);
 	for (auto str : strings) {
 		auto token = scanner.Next();
 		ASSERT_EQ(token->GetLexeme(), str);
@@ -37,8 +37,8 @@ TEST_F(ScannerTest, TestScanIdentifiers) {
 }
 
 TEST_F(ScannerTest, TestScanIntegerLiterals) {
-	std::string file_name = test_file_directory + "TestScanIntegerLiterals.punkt";
-	std::ifstream file(file_name);
+	fs::path file_path = test_file_directory / "TestScanIntegerLiterals.punkt";
+	std::ifstream file(file_path);
 	std::string int_literal;
 	std::string int_value;
 	std::vector<std::string> strings;
@@ -49,7 +49,7 @@ TEST_F(ScannerTest, TestScanIntegerLiterals) {
 	}
 	file.close();
 
-	Scanner scanner(file_name);
+	Scanner scanner(file_path);
 	int n = strings.size();
 	for (int i = 0; i < n; ++i) {
 		auto token = scanner.Next();
@@ -62,11 +62,11 @@ TEST_F(ScannerTest, TestScanIntegerLiterals) {
 }
 
 TEST_F(ScannerTest, TestScanKeywords) {
-	std::string file_name = test_file_directory + "TestScanKeywords.punkt";
+	fs::path file_path = test_file_directory / "TestScanKeywords.punkt";
 	std::vector<std::string> strings;
-	ReadWordsIntoVector(file_name, strings);
+	ReadWordsIntoVector(file_path, strings);
 
-	Scanner scanner(file_name);
+	Scanner scanner(file_path);
 	int n = strings.size();
 	for (int i = 0; i < n; ++i) {
 		auto token = scanner.Next();
@@ -76,11 +76,11 @@ TEST_F(ScannerTest, TestScanKeywords) {
 }
 
 TEST_F(ScannerTest, TestScanKeywordsAndIdentifiers) {
-	std::string file_name = test_file_directory + "TestScanKeywordsAndIdentifiers.punkt";
+	fs::path file_path = test_file_directory / "TestScanKeywordsAndIdentifiers.punkt";
 	std::vector<std::string> strings;
-	ReadWordsIntoVector(file_name, strings);
+	ReadWordsIntoVector(file_path, strings);
 
-	Scanner scanner(file_name);
+	Scanner scanner(file_path);
 	int n = strings.size();
 	for (int i = 0; i < n; ++i) {
 		auto token = scanner.Next();
@@ -95,12 +95,12 @@ TEST_F(ScannerTest, TestScanKeywordsAndIdentifiers) {
 }
 
 TEST_F(ScannerTest, TestScanPunctuatorsSimple) {
-	std::string file_name = test_file_directory + "TestScanPunctuatorsSimple.punkt";
+	fs::path file_path = test_file_directory / "TestScanPunctuatorsSimple.punkt";
 	std::vector<std::string> strings;
-	ReadWordsIntoVector(file_name, strings);
+	ReadWordsIntoVector(file_path, strings);
 	ASSERT_EQ(strings.size(), 11);
 
-	Scanner scanner(file_name);
+	Scanner scanner(file_path);
 	std::shared_ptr<Token> token = nullptr;
 	std::shared_ptr<PunctuatorToken> punctuator_token = nullptr;
 	int num_scanned_punctuators = 10;
