@@ -6,5 +6,4 @@ target_link_libraries(scanner
     token
     keyword
     punctuator
-    logger
 )

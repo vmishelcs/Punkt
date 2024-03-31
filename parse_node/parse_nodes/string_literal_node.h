@@ -13,7 +13,7 @@ public:
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
-    llvm::Value *GenerateCode(CodeGenerationVisitor& visitor) override;
+    llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 };
 
 #endif // STRING_LITERAL_NODE_H_

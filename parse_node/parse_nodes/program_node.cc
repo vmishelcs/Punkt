@@ -1,4 +1,4 @@
-#include <code_generator/code_generation_visitor.h>
+#include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
 #include "program_node.h"
@@ -17,6 +17,6 @@ void ProgramNode::Accept(ParseNodeVisitor& visitor) {
     visitor.VisitLeave(*this);
 }
 
-llvm::Value *ProgramNode::GenerateCode(CodeGenerationVisitor &visitor) {
+llvm::Value *ProgramNode::GenerateCode(ParseNodeIRVisitor& visitor) {
     return visitor.GenerateCode(*this);
 }

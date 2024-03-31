@@ -1,4 +1,4 @@
-#include <code_generator/code_generation_visitor.h>
+#include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 #include <token/identifier_token.h>
 
@@ -31,6 +31,6 @@ std::optional<std::reference_wrapper<SymbolData>> IdentifierNode::FindIdentifier
     return std::nullopt;
 }
 
-llvm::Value *IdentifierNode::GenerateCode(CodeGenerationVisitor& visitor) {
+llvm::Value *IdentifierNode::GenerateCode(ParseNodeIRVisitor& visitor) {
     return visitor.GenerateCode(*this);
 }

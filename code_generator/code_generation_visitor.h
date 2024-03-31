@@ -6,28 +6,25 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/Value.h>
-#include <llvm/IR/ValueSymbolTable.h>
+#include <parse_node/parse_node_ir_visitor.h>
 
-#include <parse_node/parse_nodes/all_nodes.h>
-
-class CodeGenerationVisitor {
+class CodeGenerationVisitor : public ParseNodeIRVisitor {
 public:
     CodeGenerationVisitor(std::string module_id);
 
     std::string GetIRString();
 
-    llvm::Value *GenerateCode(CodeBlockNode& node);
-    llvm::Value *GenerateCode(DeclarationStatementNode& node);
-    llvm::Value *GenerateCode(MainNode& node);
-    llvm::Value *GenerateCode(OperatorNode& node);
-    llvm::Value *GenerateCode(PrintStatementNode& node);
-    llvm::Value *GenerateCode(ProgramNode& node);
+    virtual llvm::Value *GenerateCode(CodeBlockNode& node) override;
+    virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) override;
+    virtual llvm::Value *GenerateCode(MainNode& node) override;
+    virtual llvm::Value *GenerateCode(OperatorNode& node) override;
+    virtual llvm::Value *GenerateCode(PrintStatementNode& node) override;
+    virtual llvm::Value *GenerateCode(ProgramNode& node) override;
     
-    llvm::Value *GenerateCode(ErrorNode& node);
-    llvm::Value *GenerateCode(IdentifierNode& node);
-    llvm::Value *GenerateCode(IntegerLiteralNode& node);
-    llvm::Value *GenerateCode(StringLiteralNode& node);
+    virtual llvm::Value *GenerateCode(ErrorNode& node) override;
+    virtual llvm::Value *GenerateCode(IdentifierNode& node) override;
+    virtual llvm::Value *GenerateCode(IntegerLiteralNode& node) override;
+    virtual llvm::Value *GenerateCode(StringLiteralNode& node) override;
 
 private:
     void GenerateGlobalConstants();

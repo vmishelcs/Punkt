@@ -16,7 +16,7 @@ public:
 
     std::optional<std::reference_wrapper<SymbolData>> FindIdentifierSymbolData();
 
-    virtual llvm::Value *GenerateCode(CodeGenerationVisitor& visitor) override;
+    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 };
 
 #endif // IDENTIFIER_NODE_H_

@@ -11,7 +11,7 @@ public:
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
-    virtual llvm::Value *GenerateCode(CodeGenerationVisitor& visitor) override;
+    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 };
 
 #endif // CODE_BLOCK_NODE_H_

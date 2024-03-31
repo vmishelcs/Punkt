@@ -14,8 +14,8 @@
 // Forward-declare ParseNodeVisitor to avoid circular dependencies
 class ParseNodeVisitor;
 
-// Forward-declare CodeGenerationVisitor to avoid circular dependencies
-class CodeGenerationVisitor;
+// Forward-declare ParseNodeIRVisitor to avoid circular dependencies
+class ParseNodeIRVisitor;
 
 enum class ParseNodeType {
     CODE_BLOCK_NODE,
@@ -60,7 +60,7 @@ public:
     bool ScopeDeclares(const std::string& identifier);
     SymbolData& GetDeclarationData(const std::string& identifier);
 
-    virtual llvm::Value *GenerateCode(CodeGenerationVisitor& visitor) = 0;
+    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) = 0;
 
 protected:
     void VisitChildren(ParseNodeVisitor& visitor);

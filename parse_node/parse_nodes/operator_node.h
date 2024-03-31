@@ -16,7 +16,7 @@ public:
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
-    virtual llvm::Value *GenerateCode(CodeGenerationVisitor& visitor) override;
+    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 
 private:
     PunctuatorEnum punctuator_enum;

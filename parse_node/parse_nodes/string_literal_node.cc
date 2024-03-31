@@ -1,4 +1,4 @@
-#include <code_generator/code_generation_visitor.h>
+#include <parse_node/parse_node_ir_visitor.h>
 #include <token/string_literal_token.h>
 #include <parse_node/parse_node_visitor.h>
 
@@ -21,6 +21,6 @@ void StringLiteralNode::Accept(ParseNodeVisitor& visitor) {
     visitor.Visit(*this);
 }
 
-llvm::Value *StringLiteralNode::GenerateCode(CodeGenerationVisitor& visitor) {
+llvm::Value *StringLiteralNode::GenerateCode(ParseNodeIRVisitor& visitor) {
     return visitor.GenerateCode(*this);
 }
