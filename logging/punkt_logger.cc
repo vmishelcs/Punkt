@@ -1,12 +1,8 @@
-#include <glog/logging.h>
+#include <execinfo.h>
 
 #include "punkt_logger.h"
 
 std::unique_ptr<PunktLogger> PunktLogger::instance = nullptr;
-
-static void LogPrefix(std::ostream &s, const google::LogMessage &m, void *) {
-    s << "\u001b[31m" << google::GetLogSeverityName(m.severity()) << "\u001b[0m" << ':';
-}
 
 void PunktLogger::Log(LogType log_type, std::string message) {
     PunktLogger *punkt_logger = GetInstance();
@@ -17,16 +13,15 @@ void PunktLogger::Log(LogType log_type, std::string message) {
 }
 
 void PunktLogger::LogFatal(std::string message) {
-    // Make sure logger is initialized
-    GetInstance();
-    LOG(ERROR) << message << "\ncompilation terminated.";
+    std::cerr << "\u001b[31mERROR\u001b[0m: " << message
+            << "\ncompilation terminated." << std::endl;
     std::exit(1);
 }
 
 void *PunktLogger::LogFatalInternalError(std::string message) {
-    // Make sure logger is initialized
-    GetInstance();
-    LOG(FATAL) << "internal error: " << message;
+    std::cerr << "\u001b[31minteral error\u001b[0m: " << message << std::endl;
+    std::exit(1);
+
     return nullptr;
 }
 
@@ -60,8 +55,8 @@ const char *PunktLogger::Logger::ToString() {
         case LogType::SEMANTIC_ANALYZER:
             return "semantic analyzer";
         default:
-            LOG(FATAL) << "unknown log type in PunktLogger::Logger::TypeToString";
-            return nullptr;
+            return (const char *)PunktLogger::LogFatalInternalError(
+                    "unimplemented LogType in Logger::ToString");
     }
 }
 
@@ -70,16 +65,18 @@ void PunktLogger::Logger::LogMessage(std::string message) {
 }
 
 void PunktLogger::Logger::PrintLogMessage(const std::string &message) {
-    LOG(ERROR) << "\u001b[33m" << ToString() << "\u001b[0m" << ": " << message << std::endl;
+    std::string logger_type_string = ToString();
+    std::cerr << "\u001b[31mERROR\u001b[0m: "
+            << "\u001b[33m" << logger_type_string
+            << "\u001b[0m: " << message << std::endl;
 }
 
 PunktLogger::PunktLogger() {
-    google::InitGoogleLogging("punkt");
-    google::InstallPrefixFormatter(LogPrefix);
     loggers[LogType::SCANNER] = std::make_unique<PunktLogger::Logger>(LogType::SCANNER);
     loggers[LogType::PARSER] = std::make_unique<PunktLogger::Logger>(LogType::PARSER);
     loggers[LogType::SYMBOL_TABLE] = std::make_unique<PunktLogger::Logger>(LogType::SYMBOL_TABLE);
-    loggers[LogType::SEMANTIC_ANALYZER] = std::make_unique<PunktLogger::Logger>(LogType::SEMANTIC_ANALYZER);
+    loggers[LogType::SEMANTIC_ANALYZER] =
+            std::make_unique<PunktLogger::Logger>(LogType::SEMANTIC_ANALYZER);
 }
 
 PunktLogger *PunktLogger::GetInstance() {

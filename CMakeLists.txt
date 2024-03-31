@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.24.0)
-set(CMAKE_C_COMPILER "/usr/bin/gcc")
-set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+cmake_minimum_required(VERSION 3.29)
+set(CMAKE_C_COMPILER "/usr/bin/gcc-12")
+set(CMAKE_CXX_COMPILER "/usr/bin/g++-12")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(Punkt)
@@ -14,9 +14,9 @@ endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
 add_compile_options(
 	-g
-	# -Wall
-	# -Wextra
-	# -Werror
+	-Wall
+	-Wextra
+	-Werror
 	-Wno-unused-parameter
 	-Wno-deprecated-copy
 	-Wuninitialized
@@ -24,22 +24,14 @@ add_compile_options(
 
 include(FetchContent)
 
-# GoogleTest 1.14.0
+# gtest
 FetchContent_Declare(
-	googletest
-	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        v1.13.0 # release-1.13.0
 )
 FetchContent_MakeAvailable(googletest)
-message(STATUS "Found GoogleTest")
-
-# Glog 0.7.0 (Requires libunwind-dev)
-set(WITH_GFLAGS OFF)
-FetchContent_Declare(
-	glog
-	URL https://github.com/google/glog/archive/refs/tags/v0.7.0.zip
-)
-FetchContent_MakeAvailable(glog)
-message(STATUS "Found GLog")
+message(STATUS "Found GTest")
 
 # LLVM 18.1.2
 find_package(LLVM 18.1.2 REQUIRED CONFIG)

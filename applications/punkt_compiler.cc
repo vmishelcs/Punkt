@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 	std::cout << "input file:  " << input_file_path.string() << std::endl;
 	std::cout << "output file: " << output_file_path.string() << std::endl;
 
-	// Compile(input_file_path, output_file_path);
+	Compile(input_file_path, output_file_path);
 
 	return 0;
 }

@@ -1,5 +1,6 @@
 #include <cassert>
 
+#include <logging/punkt_logger.h>
 #include <parse_node/parse_node.h>
 #include <parser/parser.h>
 
@@ -28,4 +29,5 @@ int main(int argc, char **argv) {
     fs::path input_file_directory = fs::path(INPUT_FILE_DIRECTORY);
 	fs::path file_path = input_file_directory / argv[1];
     ParseFile(file_path);
+    PunktLogger::DumpCompileErrors(stderr);
 }

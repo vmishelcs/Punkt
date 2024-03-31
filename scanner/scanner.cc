@@ -1,4 +1,4 @@
-#include <glog/logging.h>
+// #include <glog/logging.h>
 
 #include <token/all_tokens.h>
 #include <logging/punkt_logger.h>
@@ -132,7 +132,7 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
             break;
 
         default:
-            LOG(FATAL) << "Internal error - unexpected punctuator character";
+            PunktLogger::LogFatalInternalError("unexpected punctuator character");
     }
     return std::make_unique<PunctuatorToken>(
         buffer,

@@ -40,7 +40,7 @@ private:
     llvm::Value *GetPrintfFmtString(Type type);
     llvm::Value *PrintLineFeed();
 
-    llvm::Value *FatalCodeGenerationError(std::string error_msg);
+    llvm::Value *CodeGenerationInternalError(std::string error_msg);
 
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;

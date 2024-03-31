@@ -1,6 +1,6 @@
-#include <glog/logging.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/TargetParser/Host.h>
+#include <logging/punkt_logger.h>
 #include <semantic_analyzer/type.h>
 
 #include "code_generation_visitor.h"
@@ -23,8 +23,8 @@ CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
 }
 
 void CodeGenerationVisitor::WriteIRToFd(int fd) {
-    // llvm::raw_fd_ostream ir_ostream(fd, /* shouldClose = */ false);
-    // module->print(ir_ostream, nullptr);
+    llvm::raw_fd_ostream ir_ostream(fd, /* shouldClose = */ false);
+    module->print(ir_ostream, nullptr);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
@@ -32,7 +32,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
     for (ParseNode& child : node.GetChildren()) {
         ret_value = child.GenerateCode(*this);
         if (!ret_value) {
-            return FatalCodeGenerationError("CodeBlockNode code generation error");
+            return CodeGenerationInternalError("CodeBlockNode code generation error");
         }
     }
     return ret_value;
@@ -47,7 +47,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
 
     auto symbol_data_opt = identifier_node.FindIdentifierSymbolData();
     if (!symbol_data_opt.has_value()) {
-        FatalCodeGenerationError("missing entry in symbol table for "
+        CodeGenerationInternalError("missing entry in symbol table for "
                 + identifier_node.ToString());
     }
     else {
@@ -100,7 +100,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
         return GenerateBinaryOperatorCode(lhs, rhs, node.GetPunctuatorEnum());
     }
     else {
-        return FatalCodeGenerationError("code generation not implemented for "
+        return CodeGenerationInternalError("code generation not implemented for "
                 + std::to_string(num_operands) + " operands");
     }
 }
@@ -108,7 +108,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
 llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
     llvm::Function *printf_func = module->getFunction(printf_function_name);
     if (!printf_func) {
-        return FatalCodeGenerationError("unable to obtain function pointer for printf");
+        return CodeGenerationInternalError("unable to obtain function pointer for printf");
     }
 
     llvm::Value *ret_value = nullptr;
@@ -119,12 +119,12 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
 
         args.push_back(GetPrintfFmtString(child.GetType()));
         if (args.back() == nullptr) {
-            return FatalCodeGenerationError("failed obtaining llvm::Value object for fmt string");
+            return CodeGenerationInternalError("failed obtaining llvm::Value object for fmt string");
         }
 
         args.push_back(child.GenerateCode(*this));
         if (args.back() == nullptr) {
-            return FatalCodeGenerationError("failed to generate argument for printf");
+            return CodeGenerationInternalError("failed to generate argument for printf");
         }
 
         ret_value = builder->CreateCall(printf_func, args, "printf_ret");
@@ -148,7 +148,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
     // Look up the identifier in the symbol table
     auto symbol_data_opt = node.FindIdentifierSymbolData();
     if (!symbol_data_opt.has_value()) {
-        FatalCodeGenerationError("unable to find " + node.ToString() + " in symbol table");
+        CodeGenerationInternalError("unable to find " + node.ToString() + " in symbol table");
     }
 
     const SymbolData& symbol_data = symbol_data_opt.value();
@@ -204,7 +204,7 @@ llvm::Value *CodeGenerationVisitor::GenerateUnaryOperatorCode(llvm::Value *opera
             val = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), -1);
             return builder->CreateMul(operand, val, "negtmp");
         default:
-            return FatalCodeGenerationError("unimplemented unary operator");
+            return CodeGenerationInternalError("unimplemented unary operator");
     }
 }
 
@@ -221,7 +221,7 @@ llvm::Value *CodeGenerationVisitor::GenerateBinaryOperatorCode(llvm::Value *lhs,
         case PunctuatorEnum::DIVIDE:
             return builder->CreateSDiv(lhs, rhs, "divtmp");
         default:
-            return FatalCodeGenerationError("unimplemented binary operator");
+            return CodeGenerationInternalError("unimplemented binary operator");
     }
 }
 
@@ -240,7 +240,7 @@ void CodeGenerationVisitor::GeneratePrintfDeclaration() {
 	llvm::Function *printf_func = llvm::Function::Create(printf_func_type,
             llvm::Function::ExternalLinkage, printf_function_name, *module);
     if (!printf_func) {
-        FatalCodeGenerationError("could not generate declaration for printf");
+        CodeGenerationInternalError("could not generate declaration for printf");
     }
 }
 
@@ -248,17 +248,17 @@ void CodeGenerationVisitor::GeneratePrintfFmtStrings() {
     llvm::Value *fmt_str = nullptr;
 
     if (fmt_str = GenerateFmtString(TypeEnum::CHARACTER, char_fmt_str), !fmt_str) {
-        FatalCodeGenerationError("failed to generate format string for CHARACTER type");
+        CodeGenerationInternalError("failed to generate format string for CHARACTER type");
     }
     global_constants_table[char_fmt_str] = fmt_str;
 
     if (fmt_str = GenerateFmtString(TypeEnum::INTEGER, int_fmt_str), !fmt_str) {
-        FatalCodeGenerationError("failed to generate format string for INTEGER type");
+        CodeGenerationInternalError("failed to generate format string for INTEGER type");
     }
     global_constants_table[int_fmt_str] = fmt_str;
 
     if (fmt_str = GenerateFmtString(TypeEnum::STRING, string_fmt_str), !fmt_str) {
-        FatalCodeGenerationError("failed to generate format string for STRING type");
+        CodeGenerationInternalError("failed to generate format string for STRING type");
     }
     global_constants_table[string_fmt_str] = fmt_str;
 }
@@ -299,12 +299,12 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(TypeEnum type_enum) {
             key = &string_fmt_str;
             break;
         default:
-            return FatalCodeGenerationError("unimplemented format string for type "
+            return CodeGenerationInternalError("unimplemented format string for type "
                     + Type::GetTypeEnumString(type_enum));
     }
 
     if (!global_constants_table.contains(*key)) {
-        return FatalCodeGenerationError("unimplemented format string");
+        return CodeGenerationInternalError("unimplemented format string");
     }
     return global_constants_table.at(*key);
 }
@@ -316,19 +316,19 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(Type type) {
 llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
     llvm::Function *printf_func = module->getFunction(printf_function_name);
     if (!printf_func) {
-        return FatalCodeGenerationError("unable to obtain function pointer for printf");
+        return CodeGenerationInternalError("unable to obtain function pointer for printf");
     }
 
     std::vector<llvm::Value *> args;
 
     args.push_back(GetPrintfFmtString(TypeEnum::CHARACTER));
     if (args.back() == nullptr) {
-        return FatalCodeGenerationError("failed obtaining llvm::Value object for fmt string");
+        return CodeGenerationInternalError("failed obtaining llvm::Value object for fmt string");
     }
 
     args.push_back(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), line_feed_char));
     if (args.back() == nullptr) {
-        return FatalCodeGenerationError("failed to generate line feed argument for printf");
+        return CodeGenerationInternalError("failed to generate line feed argument for printf");
     }
 
     return builder->CreateCall(printf_func, args, "printf_ret");
@@ -345,10 +345,10 @@ void CodeGenerationVisitor::GenerateGlobalConstants() {
 //                                    Error handling                                    //
 //--------------------------------------------------------------------------------------//
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode& node) {
-    return FatalCodeGenerationError("encountered ErrorNode " + node.ToString());
+    return (llvm::Value *)PunktLogger::LogFatalInternalError(
+            "encountered ErrorNode " + node.ToString());
 }
 
-llvm::Value *CodeGenerationVisitor::FatalCodeGenerationError(std::string error_msg) {
-    LOG(FATAL) << "Internal Error -- " << error_msg;
-    return nullptr;
+llvm::Value *CodeGenerationVisitor::CodeGenerationInternalError(std::string message) {
+    return (llvm::Value *)PunktLogger::LogFatalInternalError(message);
 }

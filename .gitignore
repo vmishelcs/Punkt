@@ -26,6 +26,7 @@ bld/
 [Ll]og/
 [Ll]ogs/
 [Bb]uild/
+punkt_compiler
 
 # VS Code files for those working on multiple tools
 .vscode/*

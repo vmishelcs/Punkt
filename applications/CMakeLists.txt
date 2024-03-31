@@ -12,6 +12,9 @@ target_link_libraries(code_printer parser semantic_analyzer code_generator)
 
 add_executable(punkt_compiler punkt_compiler.cc)
 target_link_libraries(punkt_compiler parser semantic_analyzer code_generator)
+set_target_properties(punkt_compiler PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
 
 target_compile_definitions(
 	token_printer
