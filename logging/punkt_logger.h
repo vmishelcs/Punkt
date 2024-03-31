@@ -14,18 +14,25 @@ enum class LogType {
     SEMANTIC_ANALYZER
 };
 
-// TODO: Remove dependency on Google Logging!!!
 class PunktLogger {
 public:
-    static PunktLogger& GetInstance() {
-        static PunktLogger instance;
-        return instance;
-    }
+    friend std::unique_ptr<PunktLogger> std::make_unique<PunktLogger>();
 
     PunktLogger(const PunktLogger&) = delete;
     void operator=(const PunktLogger&) = delete;
 
-    void Log(LogType log_type, std::string message);
+    // Logs an error for the Punkt programmer. The 'log_type' parameter is used to display which
+    // compilation step encountered the error (e.g. SCANNER, PARSER, SYMBOL_TABLE, etc).
+    static void Log(LogType log_type, std::string message);
+
+    // Logs a fatal error for the Punkt programmer. This should be used to user errors that are
+    // unrecoverable (such as absence of input files to the compiler) because this method crashes
+    // the program.
+    static void LogFatal(std::string message);
+
+    // For logging internal errors within the compiler. This should only be used in unrecoverable
+    // situations (e.g. error during code generation) as this will crash the program.
+    static void *LogFatalInternalError(std::string message);
 
 private:
     class Logger {
@@ -43,7 +50,8 @@ private:
     };
 
     PunktLogger();
-    static PunktLogger instance;
+    static std::unique_ptr<PunktLogger> instance;
+    static PunktLogger *GetInstance();
 
     std::unordered_map<LogType, std::unique_ptr<Logger>> loggers;
 };

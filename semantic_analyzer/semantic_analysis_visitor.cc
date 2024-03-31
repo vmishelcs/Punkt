@@ -138,9 +138,9 @@ void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
 }
 
 // Error reporting
-void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::vector<std::reference_wrapper<const Type>>& types) {
-    auto& logger = PunktLogger::GetInstance();
-
+void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node,
+        std::vector<std::reference_wrapper<const Type>>& types)
+{
     std::string message = "Operator \'" + node.GetToken().GetLexeme()
         + "\' not defined for ";
     message += "[";
@@ -153,5 +153,5 @@ void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::v
     message += "] at\n";
     message += ("\t" + node.GetToken().GetLocation().ToString());
 
-    logger.Log(LogType::SEMANTIC_ANALYZER, message);    
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);    
 }

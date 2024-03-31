@@ -1,4 +1,4 @@
 add_library(input_handler input_handler.cc)
-target_link_libraries(input_handler glog::glog)
+target_link_libraries(input_handler logger)
 add_library(located_char_stream located_char_stream.cc)
 target_link_libraries(located_char_stream input_handler)

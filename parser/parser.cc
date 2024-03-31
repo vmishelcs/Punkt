@@ -397,14 +397,13 @@ std::unique_ptr<ParseNode> Parser::ParseStringLiteral() {
 }
 
 std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expected) {
-    auto& logger = PunktLogger::GetInstance();
     std::string message = "Unexpected token \'"
         + now_reading->GetLexeme()
         + "\', expected "
         + expected
         + " at "
         + now_reading->GetLocation().ToString();
-    logger.Log(LogType::PARSER, message);
+    PunktLogger::Log(LogType::PARSER, message);
     return GetSyntaxErrorNode();
 }
 

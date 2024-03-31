@@ -189,20 +189,18 @@ void Scanner::ReadStringLiteral(std::string& buffer)
 }
 
 void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {
-    auto& logger = PunktLogger::GetInstance();
     std::string message = "Unexpected character \'";
     message.push_back(ch.character);
     message.append("\' at ").append(ch.location.ToString());
-    logger.Log(LogType::SCANNER, message);
+    PunktLogger::Log(LogType::SCANNER, message);
 }
 void Scanner::LexicalErrorExpectedDifferentCharacter(char actual_char, char expected_char,
         TextLocation location) 
 {
-    auto& logger = PunktLogger::GetInstance();
     std::string message = "Expected \'";
     message.push_back(expected_char);
     message += "\' instead of \'";
     message.push_back(actual_char);
     message += "\' at " + location.ToString();
-    logger.Log(LogType::SCANNER, message);
+    PunktLogger::Log(LogType::SCANNER, message);
 }

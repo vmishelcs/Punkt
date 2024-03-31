@@ -1,15 +1,18 @@
+#include <cstdlib>
+
+#include <logging/punkt_logger.h>
+
 #include "input_handler.h"
 
 LocatedChar LocatedChar::EOF_LOCATED_CHAR(0, "", -1, -1);
 
 InputHandler::InputHandler(fs::path file_path) : file_path(file_path) {
     if (file_path.filename().empty()) {
-        throw new std::runtime_error("error: no file provided");
+        PunktLogger::LogFatal("no input file");
     }
     input_file = std::ifstream(file_path, std::ios::in);
     if (!input_file.is_open()) {
-        std::string message = "error: failed to open input file " + file_path.string();
-        throw new std::runtime_error(message);
+        PunktLogger::LogFatal("failed to open input file " + file_path.string());
     }
 
     line_num = 0;
