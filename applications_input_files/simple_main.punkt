@@ -1,3 +1,4 @@
 main {
-    const s = "Hello World!
+    const a = 2.
+    print 2*a.
 }

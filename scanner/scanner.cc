@@ -199,8 +199,6 @@ void Scanner::LexicalErrorExpectedDifferentCharacter(char actual_char, char expe
 {
     std::string message = "Expected \'";
     message.push_back(expected_char);
-    message += "\' instead of \'";
-    message.push_back(actual_char);
     message += "\' at " + location.ToString();
     PunktLogger::Log(LogType::SCANNER, message);
 }
