@@ -33,13 +33,13 @@ void *PunktLogger::LogFatalInternalError(std::string message) {
 const char *PunktLogger::Logger::ToString() {
     switch (logger_type) {
         case LogType::SCANNER:
-            return "SCANNER";
+            return "scanner";
         case LogType::PARSER:
-            return "PARSER";
+            return "parser";
         case LogType::SYMBOL_TABLE:
-            return "SYMBOL TABLE";
+            return "symbol table";
         case LogType::SEMANTIC_ANALYZER:
-            return "SEMANTIC ANALYZER";
+            return "semantic analyzer";
         default:
             LOG(FATAL) << "unknown log type in PunktLogger::Logger::TypeToString";
             return nullptr;
@@ -53,7 +53,7 @@ void PunktLogger::Logger::LogMessage(std::string message) {
 }
 
 void PunktLogger::Logger::PrintStoredMessage(int msg_index) {
-    LOG(ERROR) << "- " << ToString() << ": " << messages[msg_index] << std::endl;
+    LOG(ERROR) << ToString() << ": " << messages[msg_index] << std::endl;
 }
 
 PunktLogger::PunktLogger() {
