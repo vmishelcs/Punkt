@@ -1,3 +1,6 @@
+#ifndef SEMANTIC_ANALYZER_H_
+#define SEMANTIC_ANALYZER_H_
+
 #include <parse_node/parse_node.h>
 
 class SemanticAnalyzer {
@@ -11,3 +14,5 @@ private:
 
     std::unique_ptr<ParseNode> ast;
 };
+
+#endif // SEMANTIC_ANALYZER_H_

@@ -20,4 +20,4 @@ public:
     virtual llvm::Value *GenerateCode(StringLiteralNode& node) = 0;
 };
 
-#endif // IR_VISITOR_H_
+#endif // PARSE_NODE_IR_VISITOR_H_

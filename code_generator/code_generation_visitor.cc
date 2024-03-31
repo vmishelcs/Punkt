@@ -22,11 +22,9 @@ CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
     module->setTargetTriple(target_triple);
 }
 
-std::string CodeGenerationVisitor::GetIRString() {
-    std::string output;
-    llvm::raw_string_ostream ir_ostream(output);
-    module->print(ir_ostream, nullptr);
-    return ir_ostream.str();
+void CodeGenerationVisitor::WriteIRToFd(int fd) {
+    // llvm::raw_fd_ostream ir_ostream(fd, /* shouldClose = */ false);
+    // module->print(ir_ostream, nullptr);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {

@@ -2,9 +2,8 @@
 #define PUNKT_LOGGER_H_
 
 #include <iostream>
-#include <iomanip>
+#include <map>
 #include <memory>
-#include <unordered_map>
 #include <vector>
 
 enum class LogType {
@@ -34,6 +33,12 @@ public:
     // situations (e.g. error during code generation) as this will crash the program.
     static void *LogFatalInternalError(std::string message);
 
+    // Returns true if there are user-facing compilation errors.
+    static bool ThereAreCompileErrors();
+
+    // Dumps compile errors from each compilation stage into specified 'stream'.
+    static void DumpCompileErrors(FILE *stream);
+
 private:
     class Logger {
         friend PunktLogger;
@@ -43,7 +48,7 @@ private:
         
         const char *ToString();
         void LogMessage(std::string message);
-        void PrintStoredMessage(int msg_index);
+        void PrintLogMessage(const std::string& message);
 
         LogType logger_type;
         std::vector<std::string> messages;
@@ -53,7 +58,7 @@ private:
     static std::unique_ptr<PunktLogger> instance;
     static PunktLogger *GetInstance();
 
-    std::unordered_map<LogType, std::unique_ptr<Logger>> loggers;
+    std::map<LogType, std::unique_ptr<Logger>> loggers;
 };
 
 #endif // PUNKT_LOGGER_H_

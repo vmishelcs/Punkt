@@ -5,7 +5,7 @@
 std::unique_ptr<PunktLogger> PunktLogger::instance = nullptr;
 
 static void LogPrefix(std::ostream &s, const google::LogMessage &m, void *) {
-    s << google::GetLogSeverityName(m.severity()) << ':';
+    s << "\u001b[31m" << google::GetLogSeverityName(m.severity()) << "\u001b[0m" << ':';
 }
 
 void PunktLogger::Log(LogType log_type, std::string message) {
@@ -17,17 +17,36 @@ void PunktLogger::Log(LogType log_type, std::string message) {
 }
 
 void PunktLogger::LogFatal(std::string message) {
-    // Make sure glog is initialized
+    // Make sure logger is initialized
     GetInstance();
     LOG(ERROR) << message << "\ncompilation terminated.";
     std::exit(1);
 }
 
 void *PunktLogger::LogFatalInternalError(std::string message) {
-    // Make sure glog is initialized
+    // Make sure logger is initialized
     GetInstance();
     LOG(FATAL) << "internal error: " << message;
     return nullptr;
+}
+
+bool PunktLogger::ThereAreCompileErrors() {
+    PunktLogger *logger = GetInstance();
+    for (const auto& entry : logger->loggers) {
+        if (!entry.second->messages.empty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void PunktLogger::DumpCompileErrors(FILE *stream) {
+    PunktLogger *logger = GetInstance();
+    for (const auto& entry : logger->loggers) {
+        for (const auto& msg : entry.second->messages) {
+            entry.second->PrintLogMessage(msg);
+        }
+    }
 }
 
 const char *PunktLogger::Logger::ToString() {
@@ -47,13 +66,11 @@ const char *PunktLogger::Logger::ToString() {
 }
 
 void PunktLogger::Logger::LogMessage(std::string message) {
-    int msg_index = messages.size();
     messages.push_back(message);
-    PrintStoredMessage(msg_index);
 }
 
-void PunktLogger::Logger::PrintStoredMessage(int msg_index) {
-    LOG(ERROR) << ToString() << ": " << messages[msg_index] << std::endl;
+void PunktLogger::Logger::PrintLogMessage(const std::string &message) {
+    LOG(ERROR) << "\u001b[33m" << ToString() << "\u001b[0m" << ": " << message << std::endl;
 }
 
 PunktLogger::PunktLogger() {

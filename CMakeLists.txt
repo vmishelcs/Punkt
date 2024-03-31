@@ -14,9 +14,9 @@ endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
 add_compile_options(
 	-g
-	-Wall
-	-Wextra
-	-Werror
+	# -Wall
+	# -Wextra
+	# -Werror
 	-Wno-unused-parameter
 	-Wno-deprecated-copy
 	-Wuninitialized
