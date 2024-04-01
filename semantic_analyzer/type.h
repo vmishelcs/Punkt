@@ -11,12 +11,6 @@ enum class TypeEnum {
     ERROR
 };
 
-struct type_enum_hash {
-    std::size_t operator()(TypeEnum t) const {
-        return static_cast<std::size_t>(t);
-    }
-};
-
 class Type {
 public:
     Type(TypeEnum type_enum);
@@ -25,6 +19,7 @@ public:
 
     TypeEnum GetTypeEnum() const;
     std::string ToString() const;
+    std::string GetAttributeString() const;
     static std::string GetTypeEnumString(TypeEnum type_enum);
     
     bool IsErrorType() const;

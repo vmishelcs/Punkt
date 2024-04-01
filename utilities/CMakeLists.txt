@@ -1,0 +1,1 @@
+add_library(xml_generator_visitor xml_generator_visitor.cc)

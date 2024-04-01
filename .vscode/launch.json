@@ -29,11 +29,11 @@
             ]
         },
         {
-            "name": "Token Printer - simple_main.punkt",
+            "name": "Token Printer - test_input.punkt",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/applications/token_printer",
-            "args": ["simple_main.punkt"],
+            "args": ["test_input.punkt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -53,11 +53,11 @@
             ]
         },
         {
-            "name": "AST Printer - simple_main.punkt",
+            "name": "AST Printer - test_input.punkt",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/applications/ast_printer",
-            "args": ["simple_main.punkt"],
+            "args": ["test_input.punkt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -77,11 +77,11 @@
             ]
         },
         {
-            "name": "Decorated AST Printer - simple_main.punkt",
+            "name": "Decorated AST Printer - test_input.punkt",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/applications/decorated_ast_printer",
-            "args": ["simple_main.punkt"],
+            "args": ["test_input.punkt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -101,11 +101,11 @@
             ]
         },
         {
-            "name": "IR Code Printer - simple_main.punkt",
+            "name": "IR Code Printer - test_input.punkt",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/applications/code_printer",
-            "args": ["simple_main.punkt"],
+            "args": ["test_input.punkt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

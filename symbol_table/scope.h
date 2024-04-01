@@ -25,6 +25,8 @@ public:
     ScopeType GetScopeType() const;
 
     std::string ToString() const;
+    std::string GetAttributeString() const;
+    static std::string GetScopeTypeString(ScopeType scope_type);
 
 private:
     Scope(ScopeType scope_type, Scope *base_scope = nullptr);

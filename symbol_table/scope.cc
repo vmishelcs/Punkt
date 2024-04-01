@@ -36,17 +36,20 @@ ScopeType Scope::GetScopeType() const {
 }
 
 std::string Scope::ToString() const {
-    std::string result = "[Scope: ";
+    return "[Scope: " + GetScopeTypeString(scope_type) + "]";
+}
+
+std::string Scope::GetAttributeString() const {
+    return GetScopeTypeString(scope_type);
+}
+
+std::string Scope::GetScopeTypeString(ScopeType scope_type) {
     switch (scope_type) {
         case ScopeType::GLOBAL_SCOPE:
-            result.append("GLOBAL SCOPE");
-            break;
+            return "global scope";
         case ScopeType::SUBSCOPE:
-            result.append("SUBSCOPE");
-            break;
+            return "subscope";
         default:
-            result.append("UNIMPLEMENTED SCOPE");
+            return "unimplemented scope";
     }
-    result.push_back(']');
-    return result;
 }
