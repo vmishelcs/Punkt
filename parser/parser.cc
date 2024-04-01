@@ -9,7 +9,12 @@
 std::unique_ptr<ParseNode> Parser::Parse(fs::path file_path) {
     std::unique_ptr<Scanner> scanner = std::make_unique<Scanner>(file_path);
     Parser parser(std::move(scanner));
-    return parser.ParseProgram();
+    auto ast = parser.ParseProgram();
+
+    ProgramNode& program_node = dynamic_cast<ProgramNode&>(*ast);
+    program_node.SetModuleID(file_path.string());
+
+    return ast;
 }
 
 Parser::Parser(std::unique_ptr<Scanner> scanner) : scanner(std::move(scanner)) {
@@ -19,7 +24,7 @@ Parser::Parser(std::unique_ptr<Scanner> scanner) : scanner(std::move(scanner)) {
 void Parser::ReadToken() {
     now_reading = scanner->Next();
     if (!now_reading) {
-        std::runtime_error("Failed to read next token in Parser::ReadToken");
+        PunktLogger::LogFatalInternalError("failed to read token in Parser::ReadToken");
     }
 }
 

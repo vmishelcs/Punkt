@@ -9,18 +9,15 @@ namespace fs = std::filesystem;
 
 class CodeGenerator {
 public:
-    static void WriteIR(fs::path input_file_path, std::unique_ptr<ParseNode> decorated_ast, 
-            fs::path output_file_path);
+    static void WriteIR(std::unique_ptr<ParseNode> decorated_ast, fs::path output_file_path);
 
 private:
-    CodeGenerator(fs::path input_file_path, std::unique_ptr<ParseNode> decorated_ast,
-            fs::path output_file_path);
+    CodeGenerator(std::unique_ptr<ParseNode> decorated_ast, fs::path output_file_path);
 
     void WriteIRToOutputFile();
 
-    fs::path input_file_path;
-    fs::path output_file_path;
     std::unique_ptr<ParseNode> decorated_ast;
+    fs::path output_file_path;
 };
 
 #endif // CODE_GENERATOR_H_

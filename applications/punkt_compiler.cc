@@ -10,8 +10,8 @@ static const char *GetCmdOption(int argc, char *argv[], const std::string& optio
 static fs::path GetInputFilePath(const char *input);
 static fs::path GetOutputFilePath(int argc, char *argv[]);
 static void Compile(fs::path input_file_path, fs::path output_file_path);
-static void GenerateCodeIfNoErrors(fs::path input_file_path,
-		std::unique_ptr<ParseNode> decorated_ast, fs::path output_file_path);
+static void GenerateCodeIfNoErrors(std::unique_ptr<ParseNode> decorated_ast,
+		fs::path output_file_path);
 static bool ThereAreErrors();
 
 int main(int argc, char *argv[]) {
@@ -79,18 +79,18 @@ static fs::path GetOutputFilePath(int argc, char *argv[]) {
 static void Compile(fs::path input_file_path, fs::path output_file_path) {
 	auto ast = Parser::Parse(input_file_path);
 	auto decorated_ast = SemanticAnalyzer::Analyze(std::move(ast));
-	GenerateCodeIfNoErrors(input_file_path, std::move(decorated_ast), output_file_path);
+	GenerateCodeIfNoErrors(std::move(decorated_ast), output_file_path);
 }
 
-static void GenerateCodeIfNoErrors(fs::path input_file_path,
-		std::unique_ptr<ParseNode> decorated_ast, fs::path output_file_path)
+static void GenerateCodeIfNoErrors(std::unique_ptr<ParseNode> decorated_ast,
+		fs::path output_file_path)
 {
 	if (ThereAreErrors()) {
 		PunktLogger::DumpCompileErrors(stderr);
 		std::cerr << "program has errors. no output file generated.\n";
 	}
 	else {
-		CodeGenerator::WriteIR(input_file_path, std::move(decorated_ast), output_file_path);
+		CodeGenerator::WriteIR(std::move(decorated_ast), output_file_path);
 	}
 }
 
