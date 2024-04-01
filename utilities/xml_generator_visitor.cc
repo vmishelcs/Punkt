@@ -1,21 +1,21 @@
 #include "xml_generator_visitor.h"
 
 std::unique_ptr<XMLTag> XMLTag::CreateStartTag(std::string name) {
-    return std::make_unique<XMLTag>(name, TagType::START);
+    return std::make_unique<XMLTag>(name, XMLTag::Type::START);
 }
 
 std::unique_ptr<XMLTag> XMLTag::CreateEndTag(std::string name) {
-    return std::make_unique<XMLTag>(name, TagType::END);
+    return std::make_unique<XMLTag>(name, XMLTag::Type::END);
 }
 
 std::unique_ptr<XMLTag> XMLTag::CreateSelfClosingTag(std::string name) {
-    return std::make_unique<XMLTag>(name, TagType::EMPTY_ELEMENT);
+    return std::make_unique<XMLTag>(name, XMLTag::Type::EMPTY_ELEMENT);
 }
 
-XMLTag::XMLTag(std::string name, TagType tag_type) : name(name), tag_type(tag_type) {}
+XMLTag::XMLTag(std::string name, XMLTag::Type tag_type) : name(name), tag_type(tag_type) {}
 
 void XMLTag::AddAttribute(std::string name, std::string value) {
-    if (tag_type == TagType::EMPTY_ELEMENT || tag_type == TagType::START) {
+    if (tag_type == XMLTag::Type::EMPTY_ELEMENT || tag_type == XMLTag::Type::START) {
         attributes[name] = value;
     }
 }
@@ -23,7 +23,7 @@ void XMLTag::AddAttribute(std::string name, std::string value) {
 std::string XMLTag::ToString() const {
     std::string result = "<";
 
-    if (tag_type == TagType::END) {
+    if (tag_type == XMLTag::Type::END) {
         result.push_back('/');
     }
 
@@ -41,7 +41,7 @@ std::string XMLTag::ToString() const {
         result.pop_back();
     }
 
-    if (tag_type == TagType::EMPTY_ELEMENT) {
+    if (tag_type == XMLTag::Type::EMPTY_ELEMENT) {
         result.push_back(' ');
         result.push_back('/');
     }
