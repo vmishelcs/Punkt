@@ -5,6 +5,7 @@
 
 enum class TypeEnum {
     NO_TYPE,
+    BOOLEAN,
     CHARACTER,
     INTEGER,
     STRING,

@@ -1,6 +1,7 @@
 #ifndef ALL_TOKENS_H_
 #define ALL_TOKENS_H_
 
+#include "boolean_literal_token.h"
 #include "eof_token.h"
 #include "identifier_token.h"
 #include "integer_literal_token.h"

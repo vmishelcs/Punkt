@@ -26,6 +26,50 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature>> Signatures::signature
         {
             Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::INTEGER)
         }
+    },
+    {
+        PunctuatorEnum::CMP_EQ,
+        {
+            Signature({Type(TypeEnum::BOOLEAN), Type(TypeEnum::BOOLEAN)}, TypeEnum::BOOLEAN),
+            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN),
+            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN),
+        }
+    },
+    {
+        PunctuatorEnum::CMP_NEQ,
+        {
+            Signature({Type(TypeEnum::BOOLEAN), Type(TypeEnum::BOOLEAN)}, TypeEnum::BOOLEAN),
+            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN),
+            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN),
+        }
+    },
+    {
+        PunctuatorEnum::CMP_G,
+        {
+            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN),
+            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN),
+        }
+    },
+    {
+        PunctuatorEnum::CMP_L,
+        {
+            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN),
+            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN),
+        }
+    },
+    {
+        PunctuatorEnum::CMP_GEQ,
+        {
+            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN),
+            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN),
+        }
+    },
+    {
+        PunctuatorEnum::CMP_LEQ,
+        {
+            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN),
+            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN),
+        }
     }
 };
 

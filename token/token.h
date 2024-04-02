@@ -7,6 +7,7 @@ enum class TokenType {
     PROGRAM_TOKEN,
     IDENTIFIER,
     KEYWORD,
+    BOOLEAN_LITERAL,
     INTEGER_LITERAL,
     STRING_LITERAL,
     PUNCTUATOR,

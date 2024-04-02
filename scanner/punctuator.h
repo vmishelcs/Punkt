@@ -19,6 +19,12 @@ enum class PunctuatorEnum {
     MINUS,
     MULTIPLY,
     DIVIDE,
+    CMP_EQ,
+    CMP_NEQ,
+    CMP_G,
+    CMP_L,
+    CMP_GEQ,
+    CMP_LEQ
 };
 
 class Punctuator : public ReservedComponent {

@@ -1,5 +1,3 @@
-// #include <glog/logging.h>
-
 #include <token/all_tokens.h>
 #include <logging/punkt_logger.h>
 
@@ -61,8 +59,15 @@ std::unique_ptr<Token> Scanner::ScanIdentifier(LocatedChar first_char) {
     }
 
     if (Keyword::IsKeyword(buffer)) {
-        Keyword keyword(buffer);
-        return std::make_unique<KeywordToken>(buffer, first_char.location, std::move(keyword));
+        if (Keyword::ForLexeme(buffer) == KeywordEnum::TRUE ||
+            Keyword::ForLexeme(buffer) == KeywordEnum::FALSE) {
+            return std::make_unique<BooleanLiteralToken>(
+                    buffer,
+                    first_char.location,
+                    Keyword::ForLexeme(buffer) == KeywordEnum::TRUE
+            );
+        }
+        return std::make_unique<KeywordToken>(buffer, first_char.location, Keyword(buffer));
     }
 
     return std::make_unique<IdentifierToken>(buffer, first_char.location);
@@ -85,50 +90,36 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
     std::string buffer;
     LocatedChar lc = first_char;
 
-    // These switch cases may get more complex with addition of new punctuators.
     switch (lc.character) {
         case '{':
-            buffer.push_back(lc.character);
-            break;
-            
         case '}':
-            buffer.push_back(lc.character);
-            break;
-            
         case '(':
-            buffer.push_back(lc.character);
-            break;
-            
         case ')':
-            buffer.push_back(lc.character);
-            break;
-            
         case ',':
-            buffer.push_back(lc.character);
-            break;
-            
         case '.':
-            buffer.push_back(lc.character);
-           break;
-            
-        case '=':
-            buffer.push_back(lc.character);
-            break;
-            
         case '+':
-            buffer.push_back(lc.character);
-            break;
-            
         case '-':
-            buffer.push_back(lc.character);
-            break;
-            
         case '*':
-            buffer.push_back(lc.character);
-            break;
-            
         case '/':
             buffer.push_back(lc.character);
+            break;
+
+        case '=':
+            buffer.push_back(lc.character);
+            if (input_stream->Peek().character == '=' ||
+                    input_stream->Peek().character == '<' ||
+                    input_stream->Peek().character == '>') {
+                buffer.push_back(input_stream->Next().character);
+            }
+            break;
+
+        case '!':
+        case '<':
+        case '>':
+            buffer.push_back(lc.character);
+            if (input_stream->Peek().character == '=') {
+                buffer.push_back(input_stream->Next().character);
+            }
             break;
 
         default:

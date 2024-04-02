@@ -16,6 +16,7 @@ public:
     
     virtual llvm::Value *GenerateCode(ErrorNode& node) = 0;
     virtual llvm::Value *GenerateCode(IdentifierNode& node) = 0;
+    virtual llvm::Value *GenerateCode(BooleanLiteralNode& node) = 0;
     virtual llvm::Value *GenerateCode(IntegerLiteralNode& node) = 0;
     virtual llvm::Value *GenerateCode(StringLiteralNode& node) = 0;
 };

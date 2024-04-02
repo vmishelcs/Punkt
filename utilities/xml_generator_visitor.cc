@@ -110,6 +110,7 @@ void XMLGeneratorVisitor::VisitLeave(MainNode& node) {
 void XMLGeneratorVisitor::VisitEnter(OperatorNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("OperatorNode");
 
+    tag->AddAttribute("operator", node.GetToken().GetLexeme());
     AddBasicParseNodeAttributes(*tag, node);
 
     OutputTag(*tag);
@@ -163,7 +164,16 @@ void XMLGeneratorVisitor::Visit(ErrorNode& node) {
 void XMLGeneratorVisitor::Visit(IdentifierNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("IdentifierNode");
 
+    tag->AddAttribute("name", node.GetName());
     AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+}
+void XMLGeneratorVisitor::Visit(BooleanLiteralNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("BooleanLiteralNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+    tag->AddAttribute("value", std::to_string(node.GetValue()));
 
     OutputTag(*tag);
 }

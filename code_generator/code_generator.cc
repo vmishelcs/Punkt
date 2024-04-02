@@ -22,6 +22,11 @@ void CodeGenerator::WriteIRToOutputFile() {
 
     decorated_ast->GenerateCode(code_generation_visitor);
 
+    if (output_file_path.empty()) {
+        code_generation_visitor.WriteIRToFD(STDERR_FILENO);
+        return;
+    }
+
     // Create output file
 	int output_fd = open(output_file_path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0660);
 	if (output_fd == -1) {
@@ -29,7 +34,7 @@ void CodeGenerator::WriteIRToOutputFile() {
 				+ " errno: " + strerror(errno));
 	}
 
-    code_generation_visitor.WriteIRToFd(output_fd);
+    code_generation_visitor.WriteIRToFD(output_fd);
 
     close(output_fd);
 }

@@ -42,6 +42,15 @@ private:
     bool StartsExpression(Token& token);
     std::unique_ptr<ParseNode> ParseExpression();
 
+    bool StartsBooleanExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseBooleanExpression();
+
+    bool StartsEqualityExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseEqualityExpression();
+
+    bool StartsComparisonExpression(Token& token);
+    std::unique_ptr<ParseNode> ParseComparisonExpression();
+
     bool StartsAdditiveExpression(Token& token);
     std::unique_ptr<ParseNode> ParseAdditiveExpression();
 
@@ -59,6 +68,9 @@ private:
 
     bool StartsIdentifier(Token& token);
     std::unique_ptr<ParseNode> ParseIdentifier();
+
+    bool StartsBooleanLiteral(Token& token);
+    std::unique_ptr<ParseNode> ParseBooleanLiteral();
 
     bool StartsIntegerLiteral(Token& token);
     std::unique_ptr<ParseNode> ParseIntegerLiteral();

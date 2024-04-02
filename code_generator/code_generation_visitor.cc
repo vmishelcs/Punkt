@@ -5,7 +5,6 @@
 
 #include "code_generation_visitor.h"
 
-
 static const std::string main_function_name = "main";
 static const std::string printf_function_name = "printf";
 static const std::string char_fmt_str = "%c";
@@ -22,7 +21,7 @@ CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
     module->setTargetTriple(target_triple);
 }
 
-void CodeGenerationVisitor::WriteIRToFd(int fd) {
+void CodeGenerationVisitor::WriteIRToFD(int fd) {
     llvm::raw_fd_ostream ir_ostream(fd, /* shouldClose = */ false);
     module->print(ir_ostream, nullptr);
 }
@@ -159,6 +158,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
 //--------------------------------------------------------------------------------------//
 //                            Code generation for constants                             //
 //--------------------------------------------------------------------------------------//
+llvm::Value *CodeGenerationVisitor::GenerateCode(BooleanLiteralNode& node) {
+    return llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), (int)node.GetValue());
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode& node) {
     return llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(*context), node.GetValue());
 }
@@ -292,6 +295,7 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(TypeEnum type_enum) {
         case TypeEnum::CHARACTER:
             key = &char_fmt_str;
             break;
+        case TypeEnum::BOOLEAN:
         case TypeEnum::INTEGER:
             key = &int_fmt_str;
             break;
@@ -326,7 +330,7 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
         return CodeGenerationInternalError("failed obtaining llvm::Value object for fmt string");
     }
 
-    args.push_back(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), line_feed_char));
+    args.push_back(llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), line_feed_char));
     if (args.back() == nullptr) {
         return CodeGenerationInternalError("failed to generate line feed argument for printf");
     }

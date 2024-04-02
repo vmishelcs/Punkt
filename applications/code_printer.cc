@@ -12,7 +12,7 @@ void GenerateIRCode(fs::path file_path) {
 	std::unique_ptr<ParseNode> decorated_ast = SemanticAnalyzer::Analyze(std::move(ast));
 	assert(decorated_ast != nullptr && "SemanticAnalyzer::Analyze returned nullptr");
 
-	// CodeGenerator::GenerateIR(file_name, std::move(decorated_ast));
+	CodeGenerator::WriteIR(std::move(decorated_ast));
 }
 
 int main(int argc, char **argv) {

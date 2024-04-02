@@ -30,6 +30,8 @@ std::string Type::GetTypeEnumString(TypeEnum type_enum) {
     switch (type_enum) {
         case TypeEnum::NO_TYPE:
             return "no type";
+        case TypeEnum::BOOLEAN:
+            return "boolean";
         case TypeEnum::CHARACTER:
             return "character";
         case TypeEnum::INTEGER:

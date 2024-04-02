@@ -27,6 +27,7 @@ public:
     // Leaf nodes
     virtual void Visit(ErrorNode& node) = 0;
     virtual void Visit(IdentifierNode& node) = 0;
+    virtual void Visit(BooleanLiteralNode& node) = 0;
     virtual void Visit(IntegerLiteralNode& node) = 0;
     virtual void Visit(StringLiteralNode& node) = 0;
 

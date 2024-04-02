@@ -12,7 +12,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
 public:
     CodeGenerationVisitor(std::string module_id);
 
-    void WriteIRToFd(int fd);
+    void WriteIRToFD(int fd);
 
     virtual llvm::Value *GenerateCode(CodeBlockNode& node) override;
     virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) override;
@@ -23,6 +23,7 @@ public:
     
     virtual llvm::Value *GenerateCode(ErrorNode& node) override;
     virtual llvm::Value *GenerateCode(IdentifierNode& node) override;
+    virtual llvm::Value *GenerateCode(BooleanLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(IntegerLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(StringLiteralNode& node) override;
 

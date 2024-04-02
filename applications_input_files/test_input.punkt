@@ -1,4 +1,4 @@
 main {
-    const a = 1 + 2.
-    const str = "Hello World!".
+    const a = true.
+    const b = a == true == false.
 }

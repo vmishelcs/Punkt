@@ -1,20 +1,30 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <logging/punkt_logger.h>
+
 #include "punctuator.h"
 
 std::unordered_map<std::string, PunctuatorEnum> Punctuator::dictionary = {
-    { "{", PunctuatorEnum::OPEN_BRACE        },
-    { "}", PunctuatorEnum::CLOSE_BRACE       },
-    { "(", PunctuatorEnum::OPEN_PARENTHESIS  },
-    { ")", PunctuatorEnum::CLOSE_PARENTHESIS },
-    { ",", PunctuatorEnum::SEPARATOR         },
-    { ".", PunctuatorEnum::TERMINATOR        },
-    { "=", PunctuatorEnum::EQUAL             },
-    { "+", PunctuatorEnum::PLUS              },
-    { "-", PunctuatorEnum::MINUS             },
-    { "*", PunctuatorEnum::MULTIPLY          },
-    { "/", PunctuatorEnum::DIVIDE            }
+    { "{",  PunctuatorEnum::OPEN_BRACE        },
+    { "}",  PunctuatorEnum::CLOSE_BRACE       },
+    { "(",  PunctuatorEnum::OPEN_PARENTHESIS  },
+    { ")",  PunctuatorEnum::CLOSE_PARENTHESIS },
+    { ",",  PunctuatorEnum::SEPARATOR         },
+    { ".",  PunctuatorEnum::TERMINATOR        },
+    { "=",  PunctuatorEnum::EQUAL             },
+    { "+",  PunctuatorEnum::PLUS              },
+    { "-",  PunctuatorEnum::MINUS             },
+    { "*",  PunctuatorEnum::MULTIPLY          },
+    { "/",  PunctuatorEnum::DIVIDE            },
+    { "==", PunctuatorEnum::CMP_EQ            },
+    { "!=", PunctuatorEnum::CMP_NEQ           },
+    { ">",  PunctuatorEnum::CMP_G             },
+    { "<",  PunctuatorEnum::CMP_L             },
+    { ">=", PunctuatorEnum::CMP_GEQ           },
+    { "=>", PunctuatorEnum::CMP_GEQ           },
+    { "<=", PunctuatorEnum::CMP_LEQ           },
+    { "=<", PunctuatorEnum::CMP_LEQ           }
 };
 
 std::unordered_map<PunctuatorEnum, std::string> Punctuator::reverse_dictionary = [] {
@@ -52,7 +62,12 @@ std::unordered_map<std::string, int> Punctuator::num_punctuators_with_prefix = [
 }();
 
 Punctuator::Punctuator(std::string lexeme) : ReservedComponent(lexeme) {
-    this->punctuator_enum = dictionary.at(lexeme);
+    auto find_result = dictionary.find(lexeme);
+    if (find_result == dictionary.end()) {
+        PunktLogger::LogFatalInternalError("lexeme \"" + lexeme
+                + "\" missing from Punctuator dictionary");
+    }
+    this->punctuator_enum = find_result->second;
 }
 
 Punctuator::Punctuator(Punctuator&& punctuator) : ReservedComponent(std::move(punctuator)) {

@@ -226,14 +226,78 @@ std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(std::unique_ptr<Pars
 }
 
 bool Parser::StartsExpression(Token& token) {
-    return StartsAdditiveExpression(token);
+    return StartsBooleanExpression(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseExpression() {
     if (!StartsExpression(*now_reading)) {
         return SyntaxErrorUnexpectedToken("expression");
     }
 
-    return ParseAdditiveExpression();
+    return ParseBooleanExpression();
+}
+
+bool Parser::StartsBooleanExpression(Token& token) {
+    return StartsEqualityExpression(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseBooleanExpression() {
+    if (!StartsEqualityExpression(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("boolean expression");
+    }
+
+    return ParseEqualityExpression();
+}
+
+bool Parser::StartsEqualityExpression(Token& token) {
+    return StartsComparisonExpression(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseEqualityExpression() {
+    if (!StartsEqualityExpression(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("equality expression");
+    }
+
+    auto lhs = ParseComparisonExpression();
+
+    while (PunctuatorToken::IsTokenPunctuator(*now_reading,
+        {PunctuatorEnum::CMP_EQ, PunctuatorEnum::CMP_NEQ})) {
+        auto equality_operator = std::make_unique<OperatorNode>(std::move(now_reading));
+
+        ReadToken();
+
+        auto rhs = ParseComparisonExpression();
+
+        equality_operator->AppendChild(std::move(lhs));
+        equality_operator->AppendChild(std::move(rhs));
+        lhs = std::move(equality_operator);
+    }
+
+    return lhs;
+}
+
+bool Parser::StartsComparisonExpression(Token& token) {
+    return StartsAdditiveExpression(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseComparisonExpression() {
+    if (!StartsComparisonExpression(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("comparison expression");
+    }
+
+    auto lhs = ParseAdditiveExpression();
+
+    while (PunctuatorToken::IsTokenPunctuator(*now_reading,
+        {PunctuatorEnum::CMP_G, PunctuatorEnum::CMP_L,
+        PunctuatorEnum::CMP_GEQ, PunctuatorEnum::CMP_LEQ})) {
+        auto comparison_operator = std::make_unique<OperatorNode>(std::move(now_reading));
+
+        ReadToken();
+
+        auto rhs = ParseAdditiveExpression();
+
+        comparison_operator->AppendChild(std::move(lhs));
+        comparison_operator->AppendChild(std::move(rhs));
+        lhs = std::move(comparison_operator);
+    }
+
+    return lhs;
 }
 
 bool Parser::StartsAdditiveExpression(Token& token) {
@@ -320,6 +384,7 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
 bool Parser::StartsAtomicExpression(Token& token) {
     return StartsParenthesizedExpression(token)
             || StartsIdentifier(token)
+            || StartsBooleanLiteral(token)
             || StartsIntegerLiteral(token)
             || StartsStringLiteral(token);
         
@@ -330,6 +395,9 @@ std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
     }
     if (StartsIdentifier(*now_reading)) {
         return ParseIdentifier();
+    }
+    if (StartsBooleanLiteral(*now_reading)) {
+        return ParseBooleanLiteral();
     }
     if (StartsIntegerLiteral(*now_reading)) {
         return ParseIntegerLiteral();
@@ -371,6 +439,20 @@ std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
     ReadToken();
 
     return identifier;
+}
+
+bool Parser::StartsBooleanLiteral(Token& token) {
+    return token.GetTokenType() == TokenType::BOOLEAN_LITERAL;
+}
+
+std::unique_ptr<ParseNode> Parser::ParseBooleanLiteral() {
+    if (!StartsBooleanLiteral(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("boolean literal");
+    }
+
+    auto boolean_literal = std::make_unique<BooleanLiteralNode>(std::move(now_reading));
+    ReadToken();
+    return boolean_literal;
 }
 
 bool Parser::StartsIntegerLiteral(Token& token) {

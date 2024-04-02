@@ -105,6 +105,9 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
     }
     // Other semantic analysis is handled by VisitLeave(DeclarationStatementNode&)
 }
+void SemanticAnalysisVisitor::Visit(BooleanLiteralNode& node) {
+    node.SetType(std::make_unique<Type>(TypeEnum::BOOLEAN));
+}
 void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::INTEGER));
 }

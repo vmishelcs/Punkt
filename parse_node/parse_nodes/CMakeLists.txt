@@ -1,3 +1,5 @@
+add_library(boolean_literal_node boolean_literal_node.cc)
+
 add_library(code_block_node code_block_node.cc)
 
 add_library(declaration_statement_node declaration_statement_node.cc)

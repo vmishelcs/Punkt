@@ -10,7 +10,9 @@
 enum class KeywordEnum {
     MAIN,
     CONST,
-    PRINT
+    PRINT,
+    TRUE,
+    FALSE,
 };
 
 class Keyword : public ReservedComponent {
