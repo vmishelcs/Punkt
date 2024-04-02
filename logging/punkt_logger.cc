@@ -35,7 +35,7 @@ bool PunktLogger::ThereAreCompileErrors() {
     return false;
 }
 
-void PunktLogger::DumpCompileErrors(FILE *stream) {
+void PunktLogger::DumpCompileErrors() {
     PunktLogger *logger = GetInstance();
     for (const auto& entry : logger->loggers) {
         for (const auto& msg : entry.second->messages) {
@@ -56,7 +56,7 @@ const char *PunktLogger::Logger::ToString() {
             return "semantic analyzer";
         default:
             return (const char *)PunktLogger::LogFatalInternalError(
-                    "unimplemented LogType in Logger::ToString");
+                    "unimplemented LogType in PunktLogger::Logger::ToString");
     }
 }
 

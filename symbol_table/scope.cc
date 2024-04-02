@@ -1,3 +1,5 @@
+#include <logging/punkt_logger.h>
+
 #include "scope.h"
 
 Scope::Scope(ScopeType scope_type, Scope *base_scope)
@@ -50,6 +52,7 @@ std::string Scope::GetScopeTypeString(ScopeType scope_type) {
         case ScopeType::SUBSCOPE:
             return "subscope";
         default:
-            return "unimplemented scope";
+            return (const char *)PunktLogger::LogFatalInternalError(
+                    "unimplemented ScopeType in Scope::GetScopeTypeString");
     }
 }

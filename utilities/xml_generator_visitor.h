@@ -66,7 +66,8 @@ public:
     virtual void Visit(StringLiteralNode& node) override;
 
 private:
-    void AddParseNodeAttributes(XMLTag& tag, ParseNode& node);
+    void AddBasicParseNodeAttributes(XMLTag& tag, ParseNode& node);
+    void OutputTag(XMLTag& tag);
 
     std::ostream& output_stream;
 };

@@ -1,3 +1,5 @@
+#include <logging/punkt_logger.h>
+
 #include "type.h"
 
 Type::Type(TypeEnum type_enum)
@@ -37,7 +39,8 @@ std::string Type::GetTypeEnumString(TypeEnum type_enum) {
         case TypeEnum::ERROR:
             return "error";
         default:
-            return "unimplemented type";
+            return (const char *)PunktLogger::LogFatalInternalError(
+                    "unimplemented TypeEnum in Type::GetTypeEnumString");
     }
 }
 

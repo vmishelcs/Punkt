@@ -4,34 +4,16 @@
 #include <parse_node/parse_node.h>
 #include <parser/parser.h>
 #include <semantic_analyzer/semantic_analyzer.h>
+#include <utilities/xml_generator_visitor.h>
 
-void PrintDecoratedAST(ParseNode& node, int depth = 0) {
-	for (int i = 0; i < depth; ++i) {
-		std::cout << "    ";
-	}
-
-	std::cout << node.ToString();
-	if (node.HasType()) {
-		std::cout << ' ' << node.GetType().ToString();
-	}
-	if (node.HasScope()) {
-		std::cout << ' ' << node.GetScope().ToString();
-	}
-	std::cout << '\n';
-
-	for (const auto& child : node.GetChildren()) {
-		PrintDecoratedAST(child, depth + 1);
-	}
-}
-
-void AnalyzeFile(fs::path file_path) {
+std::unique_ptr<ParseNode> AnalyzeFile(fs::path file_path) {
     std::unique_ptr<ParseNode> ast = Parser::Parse(file_path);
 	assert(ast != nullptr && "Parser::Parse returned nullptr");
 
 	std::unique_ptr<ParseNode> decorated_ast = SemanticAnalyzer::Analyze(std::move(ast));
 	assert(decorated_ast != nullptr && "SemanticAnalyzer::Analyze returned nullptr");
-	
-    PrintDecoratedAST(*decorated_ast);
+
+	return decorated_ast;
 }
 
 int main(int argc, char **argv) {
@@ -42,6 +24,11 @@ int main(int argc, char **argv) {
 
     fs::path input_file_directory = fs::path(INPUT_FILE_DIRECTORY);
 	fs::path file_path = input_file_directory / argv[1];
-	AnalyzeFile(file_path);
-	PunktLogger::DumpCompileErrors(stderr);
+
+	auto decorated_ast = AnalyzeFile(file_path);
+
+	PunktLogger::DumpCompileErrors();
+
+	XMLGeneratorVisitor xml_visitor(std::cerr);
+	decorated_ast->Accept(xml_visitor);
 }

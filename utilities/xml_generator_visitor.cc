@@ -1,3 +1,5 @@
+#include <string>
+
 #include "xml_generator_visitor.h"
 
 std::unique_ptr<XMLTag> XMLTag::CreateStartTag(std::string name) {
@@ -29,22 +31,24 @@ std::string XMLTag::ToString() const {
 
     result += name;
 
-    if (attributes.size() > 0) {
-        result.push_back(' ');
+    if (tag_type == XMLTag::Type::END) {
+        result.push_back('>');
+        return result;
     }
+
+    result.push_back(' ');
 
     for (const auto& [name, value] : attributes) {
         result += (name + "=\"" + value + "\" ");
     }
 
-    if (attributes.size() > 0) {
+    if (tag_type != XMLTag::Type::EMPTY_ELEMENT) {
         result.pop_back();
     }
-
-    if (tag_type == XMLTag::Type::EMPTY_ELEMENT) {
-        result.push_back(' ');
+    else {
         result.push_back('/');
     }
+
     result.push_back('>');
 
     return result;
@@ -54,94 +58,140 @@ XMLGeneratorVisitor::XMLGeneratorVisitor(std::ostream& output_stream)
     : output_stream(output_stream)
 {
     output_stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" << std::endl;
+    this->depth = 0;
 }
 
 // Non-leaf nodes
 void XMLGeneratorVisitor::VisitEnter(CodeBlockNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("CodeBlockNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
 }
 void XMLGeneratorVisitor::VisitLeave(CodeBlockNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("CodeBlockNode");
-    output_stream << tag->ToString() << std::endl;
+
+    --depth;
+    OutputTag(*tag);
 }
 
 void XMLGeneratorVisitor::VisitEnter(DeclarationStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("DeclarationStatementNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
 }
 void XMLGeneratorVisitor::VisitLeave(DeclarationStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("DeclarationStatementNode");
-    output_stream << tag->ToString() << std::endl;
+    
+    --depth;
+    OutputTag(*tag);
 }
 
 void XMLGeneratorVisitor::VisitEnter(MainNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("MainNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
 }
 void XMLGeneratorVisitor::VisitLeave(MainNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("MainNode");
-    output_stream << tag->ToString() << std::endl;
+
+    --depth;
+    OutputTag(*tag);
 }
 
 void XMLGeneratorVisitor::VisitEnter(OperatorNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("OperatorNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
 }
 void XMLGeneratorVisitor::VisitLeave(OperatorNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("OperatorNode");
-    output_stream << tag->ToString() << std::endl;
+
+    --depth;
+    OutputTag(*tag);
 }
 
 void XMLGeneratorVisitor::VisitEnter(PrintStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("PrintStatementNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
 }
 void XMLGeneratorVisitor::VisitLeave(PrintStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("PrintStatementNode");
-    output_stream << tag->ToString() << std::endl;
+
+    --depth;
+    OutputTag(*tag);
 }
 
 void XMLGeneratorVisitor::VisitEnter(ProgramNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("ProgramNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
 }
 void XMLGeneratorVisitor::VisitLeave(ProgramNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("ProgramNode");
-    output_stream << tag->ToString() << std::endl;
+
+    --depth;
+    OutputTag(*tag);
 }
 
 // Leaf nodes
 void XMLGeneratorVisitor::Visit(ErrorNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("ErrorNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
 }
 void XMLGeneratorVisitor::Visit(IdentifierNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("IdentifierNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
 }
 void XMLGeneratorVisitor::Visit(IntegerLiteralNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("IntegerLiteralNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+    tag->AddAttribute("value", std::to_string(node.GetValue()));
+
+    OutputTag(*tag);
 }
 void XMLGeneratorVisitor::Visit(StringLiteralNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("StringLiteralNode");
-    AddParseNodeAttributes(*tag, node);
-    output_stream << tag->ToString() << std::endl;
+
+    AddBasicParseNodeAttributes(*tag, node);
+    tag->AddAttribute("value", node.GetValue());
+
+    OutputTag(*tag);
 }
 
-void XMLGeneratorVisitor::AddParseNodeAttributes(XMLTag& tag, ParseNode& node) {
-    tag.AddAttribute("type",
-            node.HasType() ? node.GetType().GetAttributeString() : "null");
-    tag.AddAttribute("scope",
-            node.HasScope() ? node.GetScope().GetAttributeString() : "null");
+void XMLGeneratorVisitor::AddBasicParseNodeAttributes(XMLTag& tag, ParseNode& node) {
+    if (node.HasScope()) { tag.AddAttribute("scope", node.GetScope().GetAttributeString()); }
+    if (node.HasType()) { tag.AddAttribute("type", node.GetType().GetAttributeString()); }
+}
+
+void XMLGeneratorVisitor::OutputTag(XMLTag& tag) {
+    for (int i = 0; i < depth; ++i) {
+        output_stream << "    ";
+    }
+    output_stream << tag.ToString() << std::endl;
 }

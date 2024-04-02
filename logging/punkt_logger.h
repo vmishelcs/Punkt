@@ -36,8 +36,8 @@ public:
     // Returns true if there are user-facing compilation errors.
     static bool ThereAreCompileErrors();
 
-    // Dumps compile errors from each compilation stage into specified 'stream'.
-    static void DumpCompileErrors(FILE *stream);
+    // Dumps compile errors from each compilation stage into std::cerr stream.
+    static void DumpCompileErrors();
 
 private:
     class Logger {

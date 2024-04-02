@@ -1,6 +1,7 @@
+#include <logging/punkt_logger.h>
+
 #include "symbol_table.h"
 
-#include <logging/punkt_logger.h>
 
 void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type) {
     if (Contains(symbol)) {
