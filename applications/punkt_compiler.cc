@@ -113,12 +113,14 @@ static void Compile(fs::path input_file_path, fs::path output_file_path,
 		bool dump_decorated_ast, fs::path dump_decorated_ast_file_path) {
 	auto ast = Parser::Parse(input_file_path);
 	if (!ThereAreErrors() && dump_ast) {
+		// TODO: Implement output to files
 		XMLGeneratorVisitor xml_generator_visitor(std::cout);
 		ast->Accept(xml_generator_visitor);
 	}
 
 	auto decorated_ast = SemanticAnalyzer::Analyze(std::move(ast));
 	if (!ThereAreErrors() && dump_decorated_ast) {
+		// TODO: Implement output to files
 		XMLGeneratorVisitor xml_generator_visitor(std::cout);
 		decorated_ast->Accept(xml_generator_visitor);
 	}
