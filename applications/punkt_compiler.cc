@@ -71,7 +71,8 @@ int main(int argc, char *argv[]) {
 				<< std::endl;
 	}
 
-	Compile(input_file_path, output_file_path, dump_ast, dump_ast_file_path, dump_decorated_ast, dump_decorated_ast_file_path);
+	Compile(input_file_path, output_file_path, dump_ast, dump_ast_file_path,
+			dump_decorated_ast, dump_decorated_ast_file_path);
 
 	return 0;
 }
