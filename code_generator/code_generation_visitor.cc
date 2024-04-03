@@ -1,3 +1,5 @@
+#include <variant>
+
 #include <llvm/IR/Verifier.h>
 #include <llvm/TargetParser/Host.h>
 #include <logging/punkt_logger.h>
@@ -11,6 +13,9 @@ static const std::string char_fmt_str = "%c";
 static const std::string int_fmt_str = "%d";
 static const std::string string_fmt_str = "%s";
 static const char line_feed_char = 10;
+
+using code_gen_func_type_1_operand = llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *, llvm::Value *);
+using code_gen_func_type_2_operand = llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *, llvm::Value *, llvm::Value *);
 
 CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
     : context(std::make_unique<llvm::LLVMContext>())
@@ -91,12 +96,31 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
     unsigned num_operands = node.GetChildren().size();
     if (num_operands == 1) {
         llvm::Value *operand = node.GetChild(0).GenerateCode(*this);
-        return GenerateUnaryOperatorCode(operand, node.GetPunctuatorEnum());
+
+        // Obtain codegen function pointer for 1 operand from variant.
+        try {
+            auto fp = std::get<code_gen_func_type_1_operand>(node.GetCodeGenFunc());
+            return fp(context.get(), builder.get(), operand);
+        }
+        catch (std::bad_variant_access const& ex) {
+            return (llvm::Value *)PunktLogger::LogFatalInternalError(
+                    "bad variant access when generating code for 1 operand");
+        }
+
     }
     if (num_operands == 2) {
         llvm::Value *lhs = node.GetChild(0).GenerateCode(*this);
         llvm::Value *rhs = node.GetChild(1).GenerateCode(*this);
-        return GenerateBinaryOperatorCode(lhs, rhs, node.GetPunctuatorEnum());
+
+        // Obtain codegen function pointer for 2 operands from variant.
+        try {
+            auto fp = std::get<code_gen_func_type_2_operand>(node.GetCodeGenFunc());
+            return fp(context.get(), builder.get(), lhs, rhs);
+        }
+        catch (std::bad_variant_access const& ex) {
+            return (llvm::Value *)PunktLogger::LogFatalInternalError(
+                    "bad variant access when generating code for 2 operands");
+        }
     }
     else {
         return CodeGenerationInternalError("code generation not implemented for "
@@ -140,7 +164,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
     
     GenerateGlobalConstants();
 
-    return node.GetChild(0).GenerateCode(*this);
+    auto result = node.GetChild(0).GenerateCode(*this);
+
+    llvm::verifyModule(*module);
+
+    return result;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
@@ -189,43 +217,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode& node) {
     string_var->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::Global);
 
     return string_var;
-}
-
-//--------------------------------------------------------------------------------------//
-//                                   Operator helpers                                   //
-//--------------------------------------------------------------------------------------//
-llvm::Value *CodeGenerationVisitor::GenerateUnaryOperatorCode(llvm::Value *operand,
-        PunctuatorEnum punctuator)
-{
-    llvm::Value *val = nullptr;
-    switch (punctuator) {
-        case PunctuatorEnum::PLUS:
-            // Do nothing :)
-            return operand;
-        case PunctuatorEnum::MINUS:
-            // Multiply operand by -1
-            val = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), -1);
-            return builder->CreateMul(operand, val, "negtmp");
-        default:
-            return CodeGenerationInternalError("unimplemented unary operator");
-    }
-}
-
-llvm::Value *CodeGenerationVisitor::GenerateBinaryOperatorCode(llvm::Value *lhs, llvm::Value *rhs,
-        PunctuatorEnum punctuator)
-{
-    switch (punctuator) {
-        case PunctuatorEnum::PLUS:
-            return builder->CreateAdd(lhs, rhs, "addtmp");
-        case PunctuatorEnum::MINUS:
-            return builder->CreateSub(lhs, rhs, "subtmp");
-        case PunctuatorEnum::MULTIPLY:
-            return builder->CreateMul(lhs, rhs, "multmp");
-        case PunctuatorEnum::DIVIDE:
-            return builder->CreateSDiv(lhs, rhs, "divtmp");
-        default:
-            return CodeGenerationInternalError("unimplemented binary operator");
-    }
 }
 
 //--------------------------------------------------------------------------------------//

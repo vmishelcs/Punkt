@@ -26,7 +26,6 @@ bld/
 [Ll]og/
 [Ll]ogs/
 [Bb]uild/
-punkt_compiler
 
 # VS Code files for those working on multiple tools
 .vscode/*
@@ -51,3 +50,10 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+# Pytest
+/**/.pytest_cache
+/**/__pycache__
+
+# Actual test output files
+/tests/test_output_files/actual/

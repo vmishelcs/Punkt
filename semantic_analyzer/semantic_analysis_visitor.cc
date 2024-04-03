@@ -61,6 +61,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
     if (signature_opt.has_value()) {
         const Signature& signature = signature_opt.value();
         node.SetType(std::make_unique<Type>(signature.GetOutputType()));
+        node.SetCodeGenFunc(signature.GetCodeGenFunc());
     }
     else {
         InvalidOperandTypeError(node, child_types);

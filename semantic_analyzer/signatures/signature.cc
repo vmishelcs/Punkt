@@ -1,12 +1,33 @@
+#include <functional>
+#include <vector>
+
+#include <code_generator/code_generation_visitor.h>
+#include <semantic_analyzer/type.h>
+
 #include "signature.h"
 
-Signature::Signature(std::initializer_list<Type> input_types, Type output_type)
+using code_gen_function_variant = std::variant<
+        llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *, llvm::Value *),
+        llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *, llvm::Value *, llvm::Value *)>;
+
+Signature::Signature(std::initializer_list<Type> input_types, Type output_type, llvm::Value *(*fp)(llvm::LLVMContext *context, llvm::IRBuilder<> *, llvm::Value *))
     : input_types(input_types)
     , output_type(std::move(output_type))
+    , func_variant(fp)
+{}
+
+Signature::Signature(std::initializer_list<Type> input_types, Type output_type, llvm::Value *(*fp)(llvm::LLVMContext *context, llvm::IRBuilder<> *, llvm::Value *, llvm::Value *))
+    : input_types(input_types)
+    , output_type(std::move(output_type))
+    , func_variant(fp)
 {}
 
 const Type& Signature::GetOutputType() const {
     return output_type;
+}
+
+code_gen_function_variant Signature::GetCodeGenFunc() const {
+    return func_variant;
 }
 
 bool Signature::Accepts(std::vector<std::reference_wrapper<const Type>>& types) const {

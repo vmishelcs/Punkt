@@ -3,9 +3,9 @@
 
 #include <map>
 
+#include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
-#include <llvm/IR/IRBuilder.h>
 #include <parse_node/parse_node_ir_visitor.h>
 
 class CodeGenerationVisitor : public ParseNodeIRVisitor {
@@ -29,10 +29,6 @@ public:
 
 private:
     void GenerateGlobalConstants();
-
-    llvm::Value *GenerateUnaryOperatorCode(llvm::Value *operand, PunctuatorEnum punctuator);
-    llvm::Value *GenerateBinaryOperatorCode(llvm::Value *lhs, llvm::Value *rhs,
-            PunctuatorEnum punctuator);
 
     void GeneratePrintfDeclaration();
     void GeneratePrintfFmtStrings();

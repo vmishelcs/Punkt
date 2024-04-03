@@ -4,6 +4,9 @@ target_link_libraries(token_printer scanner)
 add_executable(ast_printer ast_printer.cc)
 target_link_libraries(ast_printer parser xml_generator_visitor)
 
+add_executable(ast_xml_printer ast_xml_printer.cc)
+target_link_libraries(ast_xml_printer parser xml_generator_visitor)
+
 add_executable(decorated_ast_printer decorated_ast_printer.cc)
 target_link_libraries(decorated_ast_printer parser semantic_analyzer xml_generator_visitor)
 
