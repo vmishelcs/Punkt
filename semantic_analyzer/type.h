@@ -28,6 +28,7 @@ public:
     Type& operator=(Type& other);
     Type& operator=(Type&& other);
     bool operator==(const Type& other) const;
+    bool operator==(TypeEnum type_enum) const;
 
 private:
     TypeEnum type_enum;

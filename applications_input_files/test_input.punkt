@@ -1,5 +1,6 @@
 main {
-    const a = true == true != false.
-    const b = false == false != true.
-    const c = true != false == true.
+    const a = true.
+    const b = false.
+    const c = a == b.
+    # print a == b.
 }

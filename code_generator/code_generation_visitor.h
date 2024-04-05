@@ -34,8 +34,9 @@ private:
     void GeneratePrintfFmtStrings();
     llvm::Value *GenerateFmtString(TypeEnum type_enum, std::string fmt_str);
     llvm::Value *GetPrintfFmtString(TypeEnum type_enum);
-    llvm::Value *GetPrintfFmtString(Type type);
+    llvm::Value *GetPrintfFmtString(const Type& type);
     llvm::Value *PrintLineFeed();
+    llvm::Value *PrintValue(llvm::Value *value, const Type& type);
 
     llvm::Value *CodeGenerationInternalError(std::string error_msg);
 

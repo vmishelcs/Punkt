@@ -7,12 +7,12 @@
 
 #include "code_generation_visitor.h"
 
-static const std::string main_function_name = "main";
-static const std::string printf_function_name = "printf";
-static const std::string char_fmt_str = "%c";
-static const std::string int_fmt_str = "%d";
-static const std::string string_fmt_str = "%s";
-static const char line_feed_char = 10;
+static const std::string kMainFunctionName = "main";
+static const std::string kPrintfFunctionName = "printf";
+static const std::string kCharFmtString = "%c";
+static const std::string kIntFmtString = "%d";
+static const std::string kStrFmtString = "%s";
+static const char kLineFeedChar = 10;
 
 using code_gen_func_type_1_operand = llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *, llvm::Value *);
 using code_gen_func_type_2_operand = llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *, llvm::Value *, llvm::Value *);
@@ -43,11 +43,16 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node) {
-    llvm::Value *v = node.GetChild(1).GenerateCode(*this);
     IdentifierNode& identifier_node = dynamic_cast<IdentifierNode&>(node.GetChild(0));
 
-    llvm::AllocaInst *alloca_instr = builder->CreateAlloca(
-            v->getType(), nullptr, llvm::Twine(identifier_node.GetName()));
+    llvm::Value *v = node.GetChild(1).GenerateCode(*this);
+    // Store boolean values as 8-bit integers.
+    if (node.GetChild(1).GetType() == TypeEnum::BOOLEAN) {
+        v = builder->CreateZExt(v, llvm::Type::getInt8Ty(*context), "zexttmp");
+    }
+
+    llvm::AllocaInst *store_value = builder->CreateAlloca(v->getType(), nullptr,
+            llvm::Twine(identifier_node.GetName()));
 
     auto symbol_data_opt = identifier_node.FindIdentifierSymbolData();
     if (!symbol_data_opt.has_value()) {
@@ -56,10 +61,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     }
     else {
         SymbolData &symbol_data = symbol_data_opt.value();
-        symbol_data.binding = alloca_instr;
+        symbol_data.binding = store_value;
     }
 
-    builder->CreateStore(v, alloca_instr);
+    builder->CreateStore(v, store_value);
 
     return v;
 }
@@ -75,7 +80,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
     // Create an LLVM::Function object
     llvm::Function *main_func = llvm::Function::Create(function_type,
             llvm::Function::ExternalLinkage,
-            main_function_name,
+            kMainFunctionName,
             *module);
 
     llvm::BasicBlock *entry_block = llvm::BasicBlock::Create(*context, "", main_func);
@@ -103,7 +108,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
             return fp(context.get(), builder.get(), operand);
         }
         catch (std::bad_variant_access const& ex) {
-            return (llvm::Value *)PunktLogger::LogFatalInternalError(
+            return CodeGenerationInternalError(
                     "bad variant access when generating code for 1 operand");
         }
 
@@ -118,7 +123,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
             return fp(context.get(), builder.get(), lhs, rhs);
         }
         catch (std::bad_variant_access const& ex) {
-            return (llvm::Value *)PunktLogger::LogFatalInternalError(
+            return CodeGenerationInternalError(
                     "bad variant access when generating code for 2 operands");
         }
     }
@@ -129,7 +134,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
-    llvm::Function *printf_func = module->getFunction(printf_function_name);
+    llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
     if (!printf_func) {
         return CodeGenerationInternalError("unable to obtain function pointer for printf");
     }
@@ -138,19 +143,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
 
     // We call printf for each 'operand'
     for (ParseNode& child : node.GetChildren()) {
-        std::vector<llvm::Value *> args;
-
-        args.push_back(GetPrintfFmtString(child.GetType()));
-        if (args.back() == nullptr) {
-            return CodeGenerationInternalError("failed obtaining llvm::Value object for fmt string");
-        }
-
-        args.push_back(child.GenerateCode(*this));
-        if (args.back() == nullptr) {
-            return CodeGenerationInternalError("failed to generate argument for printf");
-        }
-
-        ret_value = builder->CreateCall(printf_func, args, "printf_ret");
+        ret_value = PrintValue(child.GenerateCode(*this), child.GetType());
     }
 
     // Print line feed once we are finished
@@ -187,7 +180,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
 //                            Code generation for constants                             //
 //--------------------------------------------------------------------------------------//
 llvm::Value *CodeGenerationVisitor::GenerateCode(BooleanLiteralNode& node) {
-    return llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), (int)node.GetValue());
+    return llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), (int)node.GetValue());
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode& node) {
@@ -232,7 +225,7 @@ void CodeGenerationVisitor::GeneratePrintfDeclaration() {
 
     // Create the function declaration
 	llvm::Function *printf_func = llvm::Function::Create(printf_func_type,
-            llvm::Function::ExternalLinkage, printf_function_name, *module);
+            llvm::Function::ExternalLinkage, kPrintfFunctionName, *module);
     if (!printf_func) {
         CodeGenerationInternalError("could not generate declaration for printf");
     }
@@ -241,20 +234,20 @@ void CodeGenerationVisitor::GeneratePrintfDeclaration() {
 void CodeGenerationVisitor::GeneratePrintfFmtStrings() {
     llvm::Value *fmt_str = nullptr;
 
-    if (fmt_str = GenerateFmtString(TypeEnum::CHARACTER, char_fmt_str), !fmt_str) {
+    if (fmt_str = GenerateFmtString(TypeEnum::CHARACTER, kCharFmtString), !fmt_str) {
         CodeGenerationInternalError("failed to generate format string for CHARACTER type");
     }
-    global_constants_table[char_fmt_str] = fmt_str;
+    global_constants_table[kCharFmtString] = fmt_str;
 
-    if (fmt_str = GenerateFmtString(TypeEnum::INTEGER, int_fmt_str), !fmt_str) {
+    if (fmt_str = GenerateFmtString(TypeEnum::INTEGER, kIntFmtString), !fmt_str) {
         CodeGenerationInternalError("failed to generate format string for INTEGER type");
     }
-    global_constants_table[int_fmt_str] = fmt_str;
+    global_constants_table[kIntFmtString] = fmt_str;
 
-    if (fmt_str = GenerateFmtString(TypeEnum::STRING, string_fmt_str), !fmt_str) {
+    if (fmt_str = GenerateFmtString(TypeEnum::STRING, kStrFmtString), !fmt_str) {
         CodeGenerationInternalError("failed to generate format string for STRING type");
     }
-    global_constants_table[string_fmt_str] = fmt_str;
+    global_constants_table[kStrFmtString] = fmt_str;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateFmtString(TypeEnum type_enum, std::string fmt_str) {
@@ -284,14 +277,14 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(TypeEnum type_enum) {
     const std::string *key = nullptr;
     switch (type_enum) {
         case TypeEnum::CHARACTER:
-            key = &char_fmt_str;
+            key = &kCharFmtString;
             break;
         case TypeEnum::BOOLEAN:
         case TypeEnum::INTEGER:
-            key = &int_fmt_str;
+            key = &kIntFmtString;
             break;
         case TypeEnum::STRING:
-            key = &string_fmt_str;
+            key = &kStrFmtString;
             break;
         default:
             return CodeGenerationInternalError("unimplemented format string for type "
@@ -304,12 +297,12 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(TypeEnum type_enum) {
     return global_constants_table.at(*key);
 }
 
-llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(Type type) {
+llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(const Type& type) {
     return GetPrintfFmtString(type.GetTypeEnum());
 }
 
 llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
-    llvm::Function *printf_func = module->getFunction(printf_function_name);
+    llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
     if (!printf_func) {
         return CodeGenerationInternalError("unable to obtain function pointer for printf");
     }
@@ -321,12 +314,44 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
         return CodeGenerationInternalError("failed obtaining llvm::Value object for fmt string");
     }
 
-    args.push_back(llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), line_feed_char));
+    args.push_back(llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), kLineFeedChar));
     if (args.back() == nullptr) {
         return CodeGenerationInternalError("failed to generate line feed argument for printf");
     }
 
     return builder->CreateCall(printf_func, args, "printf_ret");
+}
+
+llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, const Type& type) {
+    llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
+    if (!printf_func) {
+        return CodeGenerationInternalError("unable to obtain llvm::Function pointer for printf");
+    }
+
+    std::vector<llvm::Value *> printf_args;
+
+    printf_args.push_back(GetPrintfFmtString(type));
+    if (printf_args.back() == nullptr) {
+        return CodeGenerationInternalError("failed obtaining llvm::Value object for fmt string");
+    }
+
+    auto print_value = value;
+
+    // When printing booleans, we first truncate to 1-bit such that only the least significant bit
+    // remains. Then we extend to 32 bits and print the boolean as an integer.
+    if (type == TypeEnum::BOOLEAN) {
+        auto truncated_value = builder->CreateTrunc(print_value, llvm::Type::getInt1Ty(*context),
+                "trunctmp");
+        print_value = builder->CreateZExt(truncated_value, llvm::Type::getInt32Ty(*context),
+                "zexttmp");
+    }
+
+    printf_args.push_back(print_value);
+    if (printf_args.back() == nullptr) {
+        return CodeGenerationInternalError("failed to generate argument for printf");
+    }
+
+    return builder->CreateCall(printf_func, printf_args, "printf_ret");
 }
 
 //--------------------------------------------------------------------------------------//

@@ -63,3 +63,7 @@ Type& Type::operator=(Type&& other) {
 bool Type::operator==(const Type& other) const {
     return this->type_enum == other.type_enum;
 }
+
+bool Type::operator==(TypeEnum type_enum) const {
+    return this->type_enum == type_enum;
+}
