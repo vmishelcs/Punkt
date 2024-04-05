@@ -1,5 +1,9 @@
 #include "operator_code_generator.h"
 
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Value.h>
+
 llvm::Value *OperatorCodeGenerator::UnaryNoOp(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *operand) {
     return operand;
 }
