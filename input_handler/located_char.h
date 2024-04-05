@@ -26,6 +26,9 @@ struct LocatedChar {
     bool IsWhitespace() const {
         return isspace(character);
     }
+    bool IsCommentStart() const {
+        return character == '#';
+    }
     bool IsIdentifierStart() const {
         return isalpha(character)|| (character == '_');
     }
@@ -43,6 +46,9 @@ struct LocatedChar {
     }
     bool IsStringStart() const {
         return character == '\"';
+    }
+    bool IsPartOfComment() const {
+        return character != '#' && character != '\n';
     }
     
     char character;

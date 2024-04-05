@@ -1,0 +1,4 @@
+main {
+    const x = 1.
+}
+# comment with no line feed

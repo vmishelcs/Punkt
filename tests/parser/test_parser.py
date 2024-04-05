@@ -231,4 +231,40 @@ class TestParser(object):
         actual_output_path = self.run_ast_printer()
         self.output_matches(actual_output_path)
 
+    def test_good_comment_1(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_comment_2(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_comment_3(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_comment_4(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_comment_5(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_comment_6(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_comment_7(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_comment_8(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_comment_9(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
     

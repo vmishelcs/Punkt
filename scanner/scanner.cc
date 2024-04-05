@@ -35,6 +35,13 @@ std::unique_ptr<Token> Scanner::GetNextToken() {
     else if (ch.IsStringStart()) {
         return ScanString(ch);
     }
+    else if (ch.IsCommentStart()) {
+        ch = this->input_stream->Next();
+        while (ch.IsPartOfComment() && !IsEndOfInput(ch)) {
+            ch = this->input_stream->Next();
+        }
+        return GetNextToken();
+    }
     else if (IsEndOfInput(ch)) {
         return std::make_unique<EOFToken>();
     }

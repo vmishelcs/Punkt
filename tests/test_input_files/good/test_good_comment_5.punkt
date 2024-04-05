@@ -1,0 +1,4 @@
+#comment outside of main
+main {
+    const x = 1.
+}
