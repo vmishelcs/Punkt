@@ -302,24 +302,8 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(const Type& type) {
 }
 
 llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
-    llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
-    if (!printf_func) {
-        return CodeGenerationInternalError("unable to obtain function pointer for printf");
-    }
-
-    std::vector<llvm::Value *> args;
-
-    args.push_back(GetPrintfFmtString(TypeEnum::CHARACTER));
-    if (args.back() == nullptr) {
-        return CodeGenerationInternalError("failed obtaining llvm::Value object for fmt string");
-    }
-
-    args.push_back(llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), kLineFeedChar));
-    if (args.back() == nullptr) {
-        return CodeGenerationInternalError("failed to generate line feed argument for printf");
-    }
-
-    return builder->CreateCall(printf_func, args, "printf_ret");
+    return PrintValue(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), kLineFeedChar),
+            Type(TypeEnum::CHARACTER));
 }
 
 llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, const Type& type) {
@@ -344,6 +328,10 @@ llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, const Type& t
                 "trunctmp");
         print_value = builder->CreateZExt(truncated_value, llvm::Type::getInt32Ty(*context),
                 "zexttmp");
+    }
+    // When printing characters, we sign extend to 32 bits.
+    else if (type == TypeEnum::CHARACTER) {
+        print_value = builder->CreateSExt(print_value, llvm::Type::getInt32Ty(*context), "sexttmp");
     }
 
     printf_args.push_back(print_value);
