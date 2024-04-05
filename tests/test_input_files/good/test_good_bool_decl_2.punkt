@@ -1,0 +1,6 @@
+main {
+    const a = true == false.
+    const b = false == true.
+    const c = true == true.
+    const d = false == false.
+}

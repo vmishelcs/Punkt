@@ -1,0 +1,10 @@
+main {
+    const a = true != true != true.
+    const b = true != true != false.
+    const c = true != false != true.
+    const d = true != false != false.
+    const e = false != false != false.
+    const f = false != false != true.
+    const g = false != true != false.
+    const h = false != true != true.
+}

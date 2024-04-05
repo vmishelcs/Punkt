@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="a" />
+                <OperatorNode operator="==">
+                    <OperatorNode operator="==">
+                        <BooleanLiteralNode value="1" />
+                        <BooleanLiteralNode value="1" />
+                    </OperatorNode>
+                    <BooleanLiteralNode value="1" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="b" />
+                <OperatorNode operator="==">
+                    <OperatorNode operator="==">
+                        <BooleanLiteralNode value="1" />
+                        <BooleanLiteralNode value="1" />
+                    </OperatorNode>
+                    <BooleanLiteralNode value="0" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="c" />
+                <OperatorNode operator="==">
+                    <OperatorNode operator="==">
+                        <BooleanLiteralNode value="1" />
+                        <BooleanLiteralNode value="0" />
+                    </OperatorNode>
+                    <BooleanLiteralNode value="1" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="d" />
+                <OperatorNode operator="==">
+                    <OperatorNode operator="==">
+                        <BooleanLiteralNode value="1" />
+                        <BooleanLiteralNode value="0" />
+                    </OperatorNode>
+                    <BooleanLiteralNode value="0" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="e" />
+                <OperatorNode operator="==">
+                    <OperatorNode operator="==">
+                        <BooleanLiteralNode value="0" />
+                        <BooleanLiteralNode value="0" />
+                    </OperatorNode>
+                    <BooleanLiteralNode value="0" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="f" />
+                <OperatorNode operator="==">
+                    <OperatorNode operator="==">
+                        <BooleanLiteralNode value="0" />
+                        <BooleanLiteralNode value="0" />
+                    </OperatorNode>
+                    <BooleanLiteralNode value="1" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="g" />
+                <OperatorNode operator="==">
+                    <OperatorNode operator="==">
+                        <BooleanLiteralNode value="0" />
+                        <BooleanLiteralNode value="1" />
+                    </OperatorNode>
+                    <BooleanLiteralNode value="0" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="h" />
+                <OperatorNode operator="==">
+                    <OperatorNode operator="==">
+                        <BooleanLiteralNode value="0" />
+                        <BooleanLiteralNode value="1" />
+                    </OperatorNode>
+                    <BooleanLiteralNode value="1" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>
