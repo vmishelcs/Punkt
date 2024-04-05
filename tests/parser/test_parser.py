@@ -1,7 +1,6 @@
 import inspect
 import os
 import subprocess
-import filecmp
 
 from pathlib import Path
 
