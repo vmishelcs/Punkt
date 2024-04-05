@@ -365,8 +365,7 @@ void CodeGenerationVisitor::GenerateGlobalConstants() {
 //                                    Error handling                                    //
 //--------------------------------------------------------------------------------------//
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode& node) {
-    return (llvm::Value *)PunktLogger::LogFatalInternalError(
-            "encountered ErrorNode " + node.ToString());
+    return CodeGenerationInternalError("encountered ErrorNode " + node.ToString());
 }
 
 llvm::Value *CodeGenerationVisitor::CodeGenerationInternalError(std::string message) {
