@@ -45,13 +45,13 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
 llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node) {
     IdentifierNode& identifier_node = dynamic_cast<IdentifierNode&>(node.GetChild(0));
 
-    llvm::Value *v = node.GetChild(1).GenerateCode(*this);
+    llvm::Value *value = node.GetChild(1).GenerateCode(*this);
     // Store boolean values as 8-bit integers.
     if (node.GetChild(1).GetType() == TypeEnum::BOOLEAN) {
-        v = builder->CreateZExt(v, llvm::Type::getInt8Ty(*context), "zexttmp");
+        value = builder->CreateZExt(value, llvm::Type::getInt8Ty(*context), "zexttmp");
     }
 
-    llvm::AllocaInst *store_value = builder->CreateAlloca(v->getType(), nullptr,
+    llvm::AllocaInst *store_value = builder->CreateAlloca(value->getType(), nullptr,
             llvm::Twine(identifier_node.GetName()));
 
     auto symbol_data_opt = identifier_node.FindIdentifierSymbolData();
@@ -64,9 +64,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
         symbol_data.binding = store_value;
     }
 
-    builder->CreateStore(v, store_value);
+    builder->CreateStore(value, store_value);
 
-    return v;
+    return value;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
