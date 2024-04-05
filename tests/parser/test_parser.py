@@ -95,6 +95,38 @@ class TestParser(object):
         actual_output_path = self.run_ast_printer()
         self.output_matches(actual_output_path)
 
+    def test_good_code_block_1(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_code_block_2(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_code_block_3(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_code_block_4(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_code_block_5(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_code_block_6(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_code_block_7(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_code_block_8(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
     def test_good_decl_1(self):
         actual_output_path = self.run_ast_printer()
         self.output_matches(actual_output_path)
@@ -114,3 +146,89 @@ class TestParser(object):
     def test_good_decl_5(self):
         actual_output_path = self.run_ast_printer()
         self.output_matches(actual_output_path)
+
+    def test_good_decl_6(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_decl_7(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_decl_8(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+    
+    def test_good_int_ops_1(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_int_ops_2(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_int_ops_3(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_int_ops_4(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_int_ops_5(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_int_ops_6(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_int_ops_7(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_str_decl_1(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+    
+    def test_good_str_decl_2(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+    
+    def test_good_str_decl_3(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+    
+    def test_good_str_decl_4(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+    
+    def test_good_str_decl_5(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_str_decl_6(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_expression_1(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_expression_2(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_identifiers_1(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_identifiers_2(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_identifiers_3(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    

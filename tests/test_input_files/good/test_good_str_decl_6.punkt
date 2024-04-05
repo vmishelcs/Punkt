@@ -1,0 +1,13 @@
+main {
+    const a = 
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque et dui nibh. Proin "
+    "pretium dui eu purus consequat facilisis. Sed interdum, felis ut vehicula commodo, sem nisl "
+    "condimentum erat, ac lacinia urna dolor sit amet urna. Vivamus mattis justo sapien, ut "
+    "molestie ligula ullamcorper ut. Fusce nec molestie nisl, sit amet tempus ante. Orci varius "
+    "natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum at "
+    "felis ut nisl interdum rhoncus non dapibus tellus. Vivamus eget turpis a mi dictum interdum "
+    "ut libero. Morbi eu enim eget nulla convallis convallis. Sed eget libero ac sem venenatis "
+    "placerat a ac nibh. Donec in nunc placerat orci vulputate vulputate vitae sed massa. Nam "
+    "efficitur, quam venenatis sagittis molestie, odio lectus porta tellus, id efficitur sapien "
+    "mauris eget quam.".
+}

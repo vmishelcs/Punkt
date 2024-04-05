@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="________________" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_a" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_abc" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_A" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_ABC" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_1" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_123" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>

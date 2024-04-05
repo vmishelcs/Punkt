@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="a" />
+                <OperatorNode operator="+">
+                    <IntegerLiteralNode value="1" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="b" />
+                <OperatorNode operator="-">
+                    <IntegerLiteralNode value="1" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="c" />
+                <OperatorNode operator="+">
+                    <OperatorNode operator="-">
+                        <IntegerLiteralNode value="1" />
+                    </OperatorNode>
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="d" />
+                <OperatorNode operator="-">
+                    <OperatorNode operator="+">
+                        <IntegerLiteralNode value="1" />
+                    </OperatorNode>
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="e" />
+                <OperatorNode operator="+">
+                    <OperatorNode operator="+">
+                        <OperatorNode operator="+">
+                            <OperatorNode operator="+">
+                                <OperatorNode operator="+">
+                                    <OperatorNode operator="+">
+                                        <OperatorNode operator="+">
+                                            <OperatorNode operator="+">
+                                                <OperatorNode operator="+">
+                                                    <OperatorNode operator="+">
+                                                        <OperatorNode operator="+">
+                                                            <OperatorNode operator="+">
+                                                                <OperatorNode operator="+">
+                                                                    <OperatorNode operator="+">
+                                                                        <OperatorNode operator="+">
+                                                                            <OperatorNode operator="+">
+                                                                                <OperatorNode operator="+">
+                                                                                    <OperatorNode operator="+">
+                                                                                        <OperatorNode operator="+">
+                                                                                            <OperatorNode operator="+">
+                                                                                                <OperatorNode operator="+">
+                                                                                                    <OperatorNode operator="+">
+                                                                                                        <OperatorNode operator="+">
+                                                                                                            <OperatorNode operator="+">
+                                                                                                                <OperatorNode operator="+">
+                                                                                                                    <OperatorNode operator="+">
+                                                                                                                        <OperatorNode operator="+">
+                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                <OperatorNode operator="+">
+                                                                                                                                    <OperatorNode operator="+">
+                                                                                                                                        <OperatorNode operator="+">
+                                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                                <OperatorNode operator="+">
+                                                                                                                                                    <OperatorNode operator="+">
+                                                                                                                                                        <OperatorNode operator="+">
+                                                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                                                <OperatorNode operator="+">
+                                                                                                                                                                    <OperatorNode operator="+">
+                                                                                                                                                                        <OperatorNode operator="+">
+                                                                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                                                                <OperatorNode operator="+">
+                                                                                                                                                                                    <OperatorNode operator="+">
+                                                                                                                                                                                        <OperatorNode operator="+">
+                                                                                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                                                                                <OperatorNode operator="+">
+                                                                                                                                                                                                    <OperatorNode operator="+">
+                                                                                                                                                                                                        <OperatorNode operator="+">
+                                                                                                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                                                                                                <OperatorNode operator="+">
+                                                                                                                                                                                                                    <OperatorNode operator="+">
+                                                                                                                                                                                                                        <OperatorNode operator="+">
+                                                                                                                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                                                                                                                <OperatorNode operator="+">
+                                                                                                                                                                                                                                    <OperatorNode operator="+">
+                                                                                                                                                                                                                                        <OperatorNode operator="+">
+                                                                                                                                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                                                                                                                                <OperatorNode operator="+">
+                                                                                                                                                                                                                                                    <OperatorNode operator="+">
+                                                                                                                                                                                                                                                        <OperatorNode operator="+">
+                                                                                                                                                                                                                                                            <OperatorNode operator="+">
+                                                                                                                                                                                                                                                                <IntegerLiteralNode value="1" />
+                                                                                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                </OperatorNode>
+                                                                                                                                                            </OperatorNode>
+                                                                                                                                                        </OperatorNode>
+                                                                                                                                                    </OperatorNode>
+                                                                                                                                                </OperatorNode>
+                                                                                                                                            </OperatorNode>
+                                                                                                                                        </OperatorNode>
+                                                                                                                                    </OperatorNode>
+                                                                                                                                </OperatorNode>
+                                                                                                                            </OperatorNode>
+                                                                                                                        </OperatorNode>
+                                                                                                                    </OperatorNode>
+                                                                                                                </OperatorNode>
+                                                                                                            </OperatorNode>
+                                                                                                        </OperatorNode>
+                                                                                                    </OperatorNode>
+                                                                                                </OperatorNode>
+                                                                                            </OperatorNode>
+                                                                                        </OperatorNode>
+                                                                                    </OperatorNode>
+                                                                                </OperatorNode>
+                                                                            </OperatorNode>
+                                                                        </OperatorNode>
+                                                                    </OperatorNode>
+                                                                </OperatorNode>
+                                                            </OperatorNode>
+                                                        </OperatorNode>
+                                                    </OperatorNode>
+                                                </OperatorNode>
+                                            </OperatorNode>
+                                        </OperatorNode>
+                                    </OperatorNode>
+                                </OperatorNode>
+                            </OperatorNode>
+                        </OperatorNode>
+                    </OperatorNode>
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="f" />
+                <OperatorNode operator="-">
+                    <OperatorNode operator="-">
+                        <OperatorNode operator="-">
+                            <OperatorNode operator="-">
+                                <OperatorNode operator="-">
+                                    <OperatorNode operator="-">
+                                        <OperatorNode operator="-">
+                                            <OperatorNode operator="-">
+                                                <OperatorNode operator="-">
+                                                    <OperatorNode operator="-">
+                                                        <OperatorNode operator="-">
+                                                            <OperatorNode operator="-">
+                                                                <OperatorNode operator="-">
+                                                                    <OperatorNode operator="-">
+                                                                        <OperatorNode operator="-">
+                                                                            <OperatorNode operator="-">
+                                                                                <OperatorNode operator="-">
+                                                                                    <OperatorNode operator="-">
+                                                                                        <OperatorNode operator="-">
+                                                                                            <OperatorNode operator="-">
+                                                                                                <OperatorNode operator="-">
+                                                                                                    <OperatorNode operator="-">
+                                                                                                        <OperatorNode operator="-">
+                                                                                                            <OperatorNode operator="-">
+                                                                                                                <OperatorNode operator="-">
+                                                                                                                    <OperatorNode operator="-">
+                                                                                                                        <OperatorNode operator="-">
+                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                <OperatorNode operator="-">
+                                                                                                                                    <OperatorNode operator="-">
+                                                                                                                                        <OperatorNode operator="-">
+                                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                                <OperatorNode operator="-">
+                                                                                                                                                    <OperatorNode operator="-">
+                                                                                                                                                        <OperatorNode operator="-">
+                                                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                                                <OperatorNode operator="-">
+                                                                                                                                                                    <OperatorNode operator="-">
+                                                                                                                                                                        <OperatorNode operator="-">
+                                                                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                                                                <OperatorNode operator="-">
+                                                                                                                                                                                    <OperatorNode operator="-">
+                                                                                                                                                                                        <OperatorNode operator="-">
+                                                                                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                                                                                <OperatorNode operator="-">
+                                                                                                                                                                                                    <OperatorNode operator="-">
+                                                                                                                                                                                                        <OperatorNode operator="-">
+                                                                                                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                                                                                                <OperatorNode operator="-">
+                                                                                                                                                                                                                    <OperatorNode operator="-">
+                                                                                                                                                                                                                        <OperatorNode operator="-">
+                                                                                                                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                                                                                                                <OperatorNode operator="-">
+                                                                                                                                                                                                                                    <OperatorNode operator="-">
+                                                                                                                                                                                                                                        <OperatorNode operator="-">
+                                                                                                                                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                                                                                                                                <OperatorNode operator="-">
+                                                                                                                                                                                                                                                    <OperatorNode operator="-">
+                                                                                                                                                                                                                                                        <OperatorNode operator="-">
+                                                                                                                                                                                                                                                            <OperatorNode operator="-">
+                                                                                                                                                                                                                                                                <IntegerLiteralNode value="1" />
+                                                                                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                                </OperatorNode>
+                                                                                                                                                                            </OperatorNode>
+                                                                                                                                                                        </OperatorNode>
+                                                                                                                                                                    </OperatorNode>
+                                                                                                                                                                </OperatorNode>
+                                                                                                                                                            </OperatorNode>
+                                                                                                                                                        </OperatorNode>
+                                                                                                                                                    </OperatorNode>
+                                                                                                                                                </OperatorNode>
+                                                                                                                                            </OperatorNode>
+                                                                                                                                        </OperatorNode>
+                                                                                                                                    </OperatorNode>
+                                                                                                                                </OperatorNode>
+                                                                                                                            </OperatorNode>
+                                                                                                                        </OperatorNode>
+                                                                                                                    </OperatorNode>
+                                                                                                                </OperatorNode>
+                                                                                                            </OperatorNode>
+                                                                                                        </OperatorNode>
+                                                                                                    </OperatorNode>
+                                                                                                </OperatorNode>
+                                                                                            </OperatorNode>
+                                                                                        </OperatorNode>
+                                                                                    </OperatorNode>
+                                                                                </OperatorNode>
+                                                                            </OperatorNode>
+                                                                        </OperatorNode>
+                                                                    </OperatorNode>
+                                                                </OperatorNode>
+                                                            </OperatorNode>
+                                                        </OperatorNode>
+                                                    </OperatorNode>
+                                                </OperatorNode>
+                                            </OperatorNode>
+                                        </OperatorNode>
+                                    </OperatorNode>
+                                </OperatorNode>
+                            </OperatorNode>
+                        </OperatorNode>
+                    </OperatorNode>
+                </OperatorNode>
+            </DeclarationStatementNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>

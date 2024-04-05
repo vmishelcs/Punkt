@@ -1,0 +1,6 @@
+main {
+    const a_b_c_d_e_f = 1.
+    const _a_b_c_d_e_ = 1.
+    const a_1 = 1.
+    const abc_123 = 1.
+}

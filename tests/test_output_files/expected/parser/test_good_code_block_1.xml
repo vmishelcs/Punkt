@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <CodeBlockNode>
+                <DeclarationStatementNode>
+                    <IdentifierNode name="a" />
+                    <OperatorNode operator="+">
+                        <IntegerLiteralNode value="1" />
+                        <IntegerLiteralNode value="2" />
+                    </OperatorNode>
+                </DeclarationStatementNode>
+            </CodeBlockNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>

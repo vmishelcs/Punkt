@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="a1" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <CodeBlockNode>
+                <DeclarationStatementNode>
+                    <IdentifierNode name="b1" />
+                    <IdentifierNode name="a1" />
+                </DeclarationStatementNode>
+                <CodeBlockNode>
+                    <DeclarationStatementNode>
+                        <IdentifierNode name="c1" />
+                        <IdentifierNode name="a1" />
+                    </DeclarationStatementNode>
+                    <DeclarationStatementNode>
+                        <IdentifierNode name="c2" />
+                        <IdentifierNode name="b1" />
+                    </DeclarationStatementNode>
+                </CodeBlockNode>
+            </CodeBlockNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>

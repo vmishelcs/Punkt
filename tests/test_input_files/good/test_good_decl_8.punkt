@@ -1,0 +1,10 @@
+main {
+    const a = 1.
+    const a1 = -a.
+    const a2 = +a.
+    const a3 = +-a.
+    const a4 = -+a.
+    const a5 = -+-+-+-+-+-+-+-+a.
+    const a6 = ----------------a.
+    const a7 = ++++++++++++++++a.
+}

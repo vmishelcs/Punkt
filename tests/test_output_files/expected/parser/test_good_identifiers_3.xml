@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="a_b_c_d_e_f" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_a_b_c_d_e_" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="a_1" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="abc_123" />
+                <IntegerLiteralNode value="1" />
+            </DeclarationStatementNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>

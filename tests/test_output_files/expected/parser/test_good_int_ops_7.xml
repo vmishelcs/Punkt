@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="a" />
+                <OperatorNode operator="/">
+                    <IntegerLiteralNode value="1" />
+                    <IntegerLiteralNode value="2" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="b" />
+                <OperatorNode operator="-">
+                    <IntegerLiteralNode value="1" />
+                    <OperatorNode operator="/">
+                        <IntegerLiteralNode value="1" />
+                        <IntegerLiteralNode value="2" />
+                    </OperatorNode>
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="c" />
+                <OperatorNode operator="/">
+                    <OperatorNode operator="+">
+                        <IntegerLiteralNode value="1" />
+                        <IntegerLiteralNode value="1" />
+                    </OperatorNode>
+                    <IntegerLiteralNode value="2" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="d" />
+                <OperatorNode operator="/">
+                    <IntegerLiteralNode value="1" />
+                    <OperatorNode operator="+">
+                        <IntegerLiteralNode value="1" />
+                        <IntegerLiteralNode value="1" />
+                    </OperatorNode>
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="e" />
+                <OperatorNode operator="/">
+                    <OperatorNode operator="+">
+                        <IntegerLiteralNode value="1" />
+                        <IntegerLiteralNode value="2" />
+                    </OperatorNode>
+                    <OperatorNode operator="+">
+                        <IntegerLiteralNode value="4" />
+                        <IntegerLiteralNode value="8" />
+                    </OperatorNode>
+                </OperatorNode>
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="f" />
+                <OperatorNode operator="*">
+                    <OperatorNode operator="/">
+                        <OperatorNode operator="*">
+                            <OperatorNode operator="/">
+                                <OperatorNode operator="*">
+                                    <OperatorNode operator="/">
+                                        <IntegerLiteralNode value="1" />
+                                        <IntegerLiteralNode value="2" />
+                                    </OperatorNode>
+                                    <IntegerLiteralNode value="4" />
+                                </OperatorNode>
+                                <IntegerLiteralNode value="8" />
+                            </OperatorNode>
+                            <IntegerLiteralNode value="16" />
+                        </OperatorNode>
+                        <IntegerLiteralNode value="32" />
+                    </OperatorNode>
+                    <IntegerLiteralNode value="64" />
+                </OperatorNode>
+            </DeclarationStatementNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>
