@@ -1,8 +1,14 @@
 main {
     const a = +1.
+    print a.
     const b = -1.
+    print b.
     const c = +-1.
+    print c.
     const d = -+1.
+    print d.
     const e = ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++1.
+    print e.
     const f = ------------------------------------------------------------1.
+    print f.
 }

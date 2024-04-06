@@ -19,3 +19,4 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 ### Notes
 
 * Comments start with `#` and continue until either the next `#` or the end of the line.
+* Maximum identifier length is 32 characters.

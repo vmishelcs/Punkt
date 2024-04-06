@@ -3,4 +3,5 @@ main {
     const b = a.
     const c = b.
     const d = c.
+    print a, b, c, d.
 }

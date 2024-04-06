@@ -1,4 +1,5 @@
 main {
     const a = 1 # declaration continued on next line...
      + 2.
+    print a.
 }

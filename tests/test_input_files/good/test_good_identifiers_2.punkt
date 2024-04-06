@@ -1,10 +1,18 @@
 main {
     const _ = 1.
-    const ________________ = 1.
-    const _a = 1.
-    const _abc = 1.
-    const _A = 1.
-    const _ABC = 1.
-    const _1 = 1.
-    const _123 = 1.
+    print _.
+    const ________________ = 2.
+    print ________________.
+    const _a = 3.
+    print _a.
+    const _abc = 4.
+    print _abc.
+    const _A = 5.
+    print _A.
+    const _ABC = 6.
+    print _ABC.
+    const _1 = 7.
+    print _1.
+    const _123 = 8.
+    print _123.
 }

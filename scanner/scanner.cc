@@ -5,6 +5,8 @@
 #include "keyword.h"
 #include "punctuator_scanner.h"
 
+static const size_t kMaxIdentifierLength = 32;
+
 Scanner::Scanner(fs::path file_path) : next_token(std::unique_ptr<EOFToken>()) {
     this->input_stream = std::make_unique<LocatedCharStream>(file_path);
     this->next_token = GetNextToken();
@@ -79,6 +81,11 @@ std::unique_ptr<Token> Scanner::ScanIdentifier(LocatedChar first_char) {
             );
         }
         return std::make_unique<KeywordToken>(buffer, first_char.location, Keyword(buffer));
+    }
+
+    if (buffer.size() > kMaxIdentifierLength) {
+        LexicalErrorIdentifierTooLong(buffer);
+        return GetNextToken();
     }
 
     return std::make_unique<IdentifierToken>(buffer, first_char.location);
@@ -206,6 +213,12 @@ void Scanner::ReadStringLiteral(std::string& buffer)
         buffer.push_back(ch.character);
         ch = input_stream->Peek();
     }
+}
+
+void Scanner::LexicalErrorIdentifierTooLong(std::string id_name) {
+    std::string message = "identifier name " + id_name + " too long; max identifier name "
+            + "length is " + std::to_string(kMaxIdentifierLength) + " characters.";
+    PunktLogger::Log(LogType::SCANNER, message);
 }
 
 void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {

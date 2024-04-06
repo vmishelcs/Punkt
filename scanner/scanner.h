@@ -26,6 +26,7 @@ private:
 
     bool IsEndOfInput(LocatedChar ch);
 
+    void LexicalErrorIdentifierTooLong(std::string id_name);
     void LexicalErrorUnexpectedCharacter(LocatedChar ch);
     void LexicalErrorExpectedDifferentCharacter(char expected_char, TextLocation location);
 

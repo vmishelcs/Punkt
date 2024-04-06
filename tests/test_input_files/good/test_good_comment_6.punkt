@@ -1,4 +1,5 @@
 main {
     const x = 1.
+    print x.
 }
 # comment with no line feed

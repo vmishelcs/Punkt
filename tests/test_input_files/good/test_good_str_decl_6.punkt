@@ -10,4 +10,5 @@ main {
     "placerat a ac nibh. Donec in nunc placerat orci vulputate vulputate vitae sed massa. Nam "
     "efficitur, quam venenatis sagittis molestie, odio lectus porta tellus, id efficitur sapien "
     "mauris eget quam.".
+    print a.
 }

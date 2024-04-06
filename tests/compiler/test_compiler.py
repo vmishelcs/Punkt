@@ -154,210 +154,210 @@ class TestCompiler(object):
         actual_output_path = self.run_compiler()
         self.output_matches(actual_output_path)
 
-    # def test_good_decl_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_decl_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
     
-    # def test_good_decl_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_decl_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_decl_3(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_decl_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_decl_4(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_decl_4(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_decl_5(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_decl_5(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_decl_6(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_decl_6(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_decl_7(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_decl_7(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_decl_8(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_decl_8(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
     
-    # def test_good_int_ops_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_int_ops_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_int_ops_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_int_ops_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_int_ops_3(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_int_ops_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_int_ops_4(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_int_ops_4(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_int_ops_5(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_int_ops_5(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_int_ops_6(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_int_ops_6(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_int_ops_7(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_int_ops_7(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_str_decl_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_str_decl_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
     
-    # def test_good_str_decl_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_str_decl_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
     
-    # def test_good_str_decl_3(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_str_decl_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
     
-    # def test_good_str_decl_4(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_str_decl_4(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
     
-    # def test_good_str_decl_5(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_str_decl_5(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_str_decl_6(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_str_decl_6(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_expression_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_expression_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_expression_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_expression_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_identifiers_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_identifiers_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_identifiers_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_identifiers_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_identifiers_3(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_identifiers_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_3(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_4(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_4(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_5(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_5(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_6(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_6(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_7(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_7(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_8(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_8(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_comment_9(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_comment_9(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_decl_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_decl_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_decl_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_decl_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_decl_3(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_decl_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_decl_4(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_decl_4(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_decl_5(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_decl_5(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_decl_6(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_decl_6(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_char_decl_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_char_decl_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_char_decl_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_char_decl_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_char_decl_3(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_char_decl_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_char_decl_4(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_char_decl_4(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_char_decl_5(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_char_decl_5(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_expr_1(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_expr_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_expr_2(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_expr_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_expr_3(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_expr_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_expr_4(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_expr_4(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_expr_5(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_expr_5(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
 
-    # def test_good_bool_expr_6(self):
-    #     actual_output_path = self.run_compiler()
-    #     self.output_matches(actual_output_path)
+    def test_good_bool_expr_6(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)

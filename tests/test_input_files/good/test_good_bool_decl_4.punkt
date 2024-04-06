@@ -7,4 +7,5 @@ main {
     const f = false == false == true.
     const g = false == true == false.
     const h = false == true == true.
+    print a,b,c,d,e,f,g,h.
 }

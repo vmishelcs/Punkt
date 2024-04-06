@@ -1,3 +1,4 @@
 main {
     const a = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".
+    print a.
 }

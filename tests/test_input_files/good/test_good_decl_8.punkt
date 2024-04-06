@@ -1,10 +1,18 @@
 main {
     const a = 1.
+    print a.
     const a1 = -a.
+    print a1.
     const a2 = +a.
+    print a2.
     const a3 = +-a.
+    print a3.
     const a4 = -+a.
+    print a4.
     const a5 = -+-+-+-+-+-+-+-+a.
+    print a5.
     const a6 = ----------------a.
+    print a6.
     const a7 = ++++++++++++++++a.
+    print a7.
 }
