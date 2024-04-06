@@ -37,18 +37,46 @@ llvm::Value *OperatorCodeGenerator::BooleanCmpNeqCodeGenerator(llvm::LLVMContext
 //--------------------------------------------------------------------------------------//
 //                                      Characters                                      //
 //--------------------------------------------------------------------------------------//
-llvm::Value *OperatorCodeGenerator::CharacterCmpEqCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+llvm::Value *OperatorCodeGenerator::CharacterCmpEQCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
 {
     auto lhs_sext = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
     auto rhs_sext = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
     return builder->CreateICmpEQ(lhs_sext, rhs_sext, "cmptmp");
 }
 
-llvm::Value *OperatorCodeGenerator::CharacterCmpNeqCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+llvm::Value *OperatorCodeGenerator::CharacterCmpNEQCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
 {
     auto lhs_sext = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
     auto rhs_sext = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
     return builder->CreateICmpNE(lhs_sext, rhs_sext, "cmptmp");
+}
+
+llvm::Value *OperatorCodeGenerator::CharacterCmpGTCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+{
+    auto lhs_sext = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+    auto rhs_sext = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+    return builder->CreateICmpSGT(lhs_sext, rhs_sext, "cmptmp");
+}
+
+llvm::Value *OperatorCodeGenerator::CharacterCmpLTCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+{
+    auto lhs_sext = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+    auto rhs_sext = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+    return builder->CreateICmpSLT(lhs_sext, rhs_sext, "cmptmp");
+}
+
+llvm::Value *OperatorCodeGenerator::CharacterCmpGEQCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+{
+    auto lhs_sext = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+    auto rhs_sext = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+    return builder->CreateICmpSGE(lhs_sext, rhs_sext, "cmptmp");
+}
+
+llvm::Value *OperatorCodeGenerator::CharacterCmpLEQCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+{
+    auto lhs_sext = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+    auto rhs_sext = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+    return builder->CreateICmpSLE(lhs_sext, rhs_sext, "cmptmp");
 }
 
 //--------------------------------------------------------------------------------------//
@@ -79,12 +107,32 @@ llvm::Value *OperatorCodeGenerator::IntegerDivideCodeGenerator(llvm::LLVMContext
     return builder->CreateSDiv(lhs, rhs, "divtmp");
 }
 
-llvm::Value *OperatorCodeGenerator::IntegerCmpEqCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+llvm::Value *OperatorCodeGenerator::IntegerCmpEQCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
 {
     return builder->CreateICmpEQ(lhs, rhs, "cmptmp");
 }
 
-llvm::Value *OperatorCodeGenerator::IntegerCmpNeqCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+llvm::Value *OperatorCodeGenerator::IntegerCmpNEQCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
 {
     return builder->CreateICmpNE(lhs, rhs, "cmptmp");
+}
+
+llvm::Value *OperatorCodeGenerator::IntegerCmpGTCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+{
+    return builder->CreateICmpSGT(lhs, rhs, "cmptmp");
+}
+
+llvm::Value *OperatorCodeGenerator::IntegerCmpLTCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+{
+    return builder->CreateICmpSLT(lhs, rhs, "cmptmp");
+}
+
+llvm::Value *OperatorCodeGenerator::IntegerCmpGEQCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+{
+    return builder->CreateICmpSGE(lhs, rhs, "cmptmp");
+}
+
+llvm::Value *OperatorCodeGenerator::IntegerCmpLEQCodeGenerator(llvm::LLVMContext *context, llvm::IRBuilder<> *builder, llvm::Value *lhs, llvm::Value *rhs)
+{
+    return builder->CreateICmpSLE(lhs, rhs, "cmptmp"); 
 }

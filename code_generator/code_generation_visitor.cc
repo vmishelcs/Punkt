@@ -52,7 +52,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     }
 
     llvm::AllocaInst *store_value = builder->CreateAlloca(value->getType(), nullptr,
-            llvm::Twine(identifier_node.GetName()));
+            identifier_node.GetName());
 
     auto symbol_data_opt = identifier_node.FindIdentifierSymbolData();
     if (!symbol_data_opt.has_value()) {
@@ -289,7 +289,7 @@ llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, const Type& t
         print_value = builder->CreateZExt(truncated_value, llvm::Type::getInt32Ty(*context),
                 "zexttmp");
     }
-    // When printing characters, we sign extend to 32 bits.
+    // When printing characters, we sign-extend to 32 bits.
     else if (type == TypeEnum::CHARACTER) {
         print_value = builder->CreateSExt(print_value, llvm::Type::getInt32Ty(*context), "sexttmp");
     }

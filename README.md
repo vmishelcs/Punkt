@@ -13,6 +13,7 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 | Integer literal | [ `0`-`9` ]<sup>+</sup> |
 | String literal | **\"**[ ^ `"` `\n` ]<sup>*</sup>**\"** |
 | Arithmetic operators | `+` `-` `*` `/` |
+| Comparison operators | `==` `!=` `>` `>=` `<` `<=` |
 | Punctuators | `{` `}` `(` `)` `=` `.` `,` |
 
 ### Notes

@@ -317,3 +317,19 @@ class TestParser(object):
     def test_good_bool_expr_2(self):
         actual_output_path = self.run_ast_printer()
         self.output_matches(actual_output_path)
+
+    def test_good_bool_expr_3(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_bool_expr_4(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_bool_expr_5(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_bool_expr_6(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
