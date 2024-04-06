@@ -9,12 +9,21 @@
             </DeclarationStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="abcdef" />
-                <IntegerLiteralNode value="1" />
+                <IntegerLiteralNode value="2" />
             </DeclarationStatementNode>
             <DeclarationStatementNode>
-                <IdentifierNode name="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" />
-                <IntegerLiteralNode value="1" />
+                <IdentifierNode name="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" />
+                <IntegerLiteralNode value="3" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="abcdef" />
+            </PrintStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

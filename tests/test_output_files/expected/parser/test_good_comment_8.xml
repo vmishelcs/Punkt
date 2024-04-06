@@ -10,6 +10,9 @@
                     <IntegerLiteralNode value="2" />
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

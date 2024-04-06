@@ -33,6 +33,11 @@
                     <BooleanLiteralNode value="1" />
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+                <IdentifierNode name="b" />
+                <IdentifierNode name="c" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

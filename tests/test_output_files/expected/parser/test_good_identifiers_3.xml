@@ -7,18 +7,30 @@
                 <IdentifierNode name="a_b_c_d_e_f" />
                 <IntegerLiteralNode value="1" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a_b_c_d_e_f" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="_a_b_c_d_e_" />
-                <IntegerLiteralNode value="1" />
+                <IntegerLiteralNode value="2" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="_a_b_c_d_e_" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="a_1" />
-                <IntegerLiteralNode value="1" />
+                <IntegerLiteralNode value="3" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a_1" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="abc_123" />
-                <IntegerLiteralNode value="1" />
+                <IntegerLiteralNode value="4" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="abc_123" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

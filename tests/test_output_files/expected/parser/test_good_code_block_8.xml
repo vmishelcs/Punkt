@@ -7,11 +7,20 @@
                 <IdentifierNode name="a1" />
                 <IntegerLiteralNode value="1" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a1" />
+            </PrintStatementNode>
             <CodeBlockNode>
                 <DeclarationStatementNode>
                     <IdentifierNode name="b1" />
                     <IdentifierNode name="a1" />
                 </DeclarationStatementNode>
+                <PrintStatementNode>
+                    <IdentifierNode name="a1" />
+                </PrintStatementNode>
+                <PrintStatementNode>
+                    <IdentifierNode name="b1" />
+                </PrintStatementNode>
                 <CodeBlockNode>
                     <DeclarationStatementNode>
                         <IdentifierNode name="c1" />
@@ -21,8 +30,29 @@
                         <IdentifierNode name="c2" />
                         <IdentifierNode name="b1" />
                     </DeclarationStatementNode>
+                    <PrintStatementNode>
+                        <IdentifierNode name="a1" />
+                    </PrintStatementNode>
+                    <PrintStatementNode>
+                        <IdentifierNode name="b1" />
+                    </PrintStatementNode>
+                    <PrintStatementNode>
+                        <IdentifierNode name="c1" />
+                    </PrintStatementNode>
+                    <PrintStatementNode>
+                        <IdentifierNode name="c2" />
+                    </PrintStatementNode>
                 </CodeBlockNode>
+                <PrintStatementNode>
+                    <IdentifierNode name="a1" />
+                </PrintStatementNode>
+                <PrintStatementNode>
+                    <IdentifierNode name="b1" />
+                </PrintStatementNode>
             </CodeBlockNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a1" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

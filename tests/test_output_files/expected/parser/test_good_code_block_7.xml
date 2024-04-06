@@ -7,12 +7,24 @@
                 <IdentifierNode name="a" />
                 <IntegerLiteralNode value="1" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
             <CodeBlockNode>
                 <DeclarationStatementNode>
                     <IdentifierNode name="b" />
                     <IdentifierNode name="a" />
                 </DeclarationStatementNode>
+                <PrintStatementNode>
+                    <IdentifierNode name="a" />
+                </PrintStatementNode>
+                <PrintStatementNode>
+                    <IdentifierNode name="b" />
+                </PrintStatementNode>
             </CodeBlockNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

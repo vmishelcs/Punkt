@@ -13,6 +13,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

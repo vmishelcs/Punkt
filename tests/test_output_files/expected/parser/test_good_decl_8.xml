@@ -7,18 +7,27 @@
                 <IdentifierNode name="a" />
                 <IntegerLiteralNode value="1" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="a1" />
                 <OperatorNode operator="-">
                     <IdentifierNode name="a" />
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a1" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="a2" />
                 <OperatorNode operator="+">
                     <IdentifierNode name="a" />
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a2" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="a3" />
                 <OperatorNode operator="+">
@@ -27,6 +36,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a3" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="a4" />
                 <OperatorNode operator="-">
@@ -35,6 +47,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a4" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="a5" />
                 <OperatorNode operator="-">
@@ -71,6 +86,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a5" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="a6" />
                 <OperatorNode operator="-">
@@ -107,6 +125,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a6" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="a7" />
                 <OperatorNode operator="+">
@@ -143,6 +164,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a7" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

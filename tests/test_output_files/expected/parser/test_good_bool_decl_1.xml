@@ -11,6 +11,12 @@
                 <IdentifierNode name="b" />
                 <BooleanLiteralNode value="0" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="b" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

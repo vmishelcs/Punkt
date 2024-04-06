@@ -75,6 +75,19 @@
                     <IntegerLiteralNode value="64" />
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+                <CharacterLiteralNode value="32" />
+                <IdentifierNode name="b" />
+                <CharacterLiteralNode value="32" />
+                <IdentifierNode name="c" />
+                <CharacterLiteralNode value="32" />
+                <IdentifierNode name="d" />
+                <CharacterLiteralNode value="32" />
+                <IdentifierNode name="e" />
+                <CharacterLiteralNode value="32" />
+                <IdentifierNode name="f" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

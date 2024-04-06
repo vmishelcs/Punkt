@@ -7,6 +7,9 @@
                 <IdentifierNode name="a" />
                 <StringLiteralNode value="test" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

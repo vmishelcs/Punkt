@@ -19,6 +19,12 @@
                 <IdentifierNode name="d" />
                 <IdentifierNode name="c" />
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+                <IdentifierNode name="b" />
+                <IdentifierNode name="c" />
+                <IdentifierNode name="d" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>

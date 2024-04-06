@@ -9,12 +9,18 @@
                     <IntegerLiteralNode value="1" />
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="a" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="b" />
                 <OperatorNode operator="-">
                     <IntegerLiteralNode value="1" />
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="b" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="c" />
                 <OperatorNode operator="+">
@@ -23,6 +29,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="c" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="d" />
                 <OperatorNode operator="-">
@@ -31,6 +40,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="d" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="e" />
                 <OperatorNode operator="+">
@@ -155,6 +167,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="e" />
+            </PrintStatementNode>
             <DeclarationStatementNode>
                 <IdentifierNode name="f" />
                 <OperatorNode operator="-">
@@ -279,6 +294,9 @@
                     </OperatorNode>
                 </OperatorNode>
             </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="f" />
+            </PrintStatementNode>
         </CodeBlockNode>
     </MainNode>
 </ProgramNode>
