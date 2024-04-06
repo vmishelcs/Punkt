@@ -28,7 +28,7 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
 
     identifier.SetType(std::make_unique<Type>(declaration_type));
 
-    Declare(identifier, /* is_mutable = */ false, declaration_type);
+    DeclareInLocalScope(identifier, /* is_mutable = */ false, declaration_type);
 }
 
 void SemanticAnalysisVisitor::VisitEnter(MainNode& node) {
@@ -97,7 +97,7 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
                 node.GetToken().GetLocation()
             );
             node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
-            Declare(node, false, TypeEnum::ERROR);
+            DeclareInLocalScope(node, false, TypeEnum::ERROR);
         }
         else {
             const SymbolData& symbol_data = symbol_data_opt.value();
@@ -120,9 +120,9 @@ void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
 }
 
 // Miscellaneous helpers
-void SemanticAnalysisVisitor::Declare(IdentifierNode& node, bool is_mutable, const Type& type) {
+void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode& node, bool is_mutable, const Type& type) {
     Scope& local_scope = node.GetLocalScope().value().get();
-    local_scope.DeclareInScope(
+    local_scope.Declare(
         node.GetToken().GetLexeme(),
         node.GetToken().GetLocation(),
         is_mutable,

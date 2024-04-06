@@ -1,10 +1,20 @@
 main {
     const a1 = 1.
+    print a1.
     {
         const b1 = a1.
+        print a1.
+        print b1.
         {
             const c1 = a1.
             const c2 = b1.
+            print a1.
+            print b1.
+            print c1.
+            print c2.
         }
+        print a1.
+        print b1.
     }
+    print a1.
 }

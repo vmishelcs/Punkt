@@ -23,6 +23,9 @@ class TestParser(object):
 
         self.actual_output_directory = Path(os.path.join(self.punkt_dir, "tests", "test_output_files", "actual", "parser"))
         self.actual_output_directory.mkdir(parents=True, exist_ok=True)
+        # Remove any old output
+        for file in os.scandir(self.actual_output_directory):
+            os.unlink(file)
 
         self.expected_output_directory = Path(os.path.join(self.punkt_dir, "tests", "test_output_files", "expected", "parser"))
         assert self.expected_output_directory.exists(), "expected output directory could not be found."

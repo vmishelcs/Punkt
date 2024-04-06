@@ -32,14 +32,10 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
-    llvm::Value *ret_value = nullptr;
     for (ParseNode& child : node.GetChildren()) {
-        ret_value = child.GenerateCode(*this);
-        if (!ret_value) {
-            return CodeGenerationInternalError("CodeBlockNode code generation error");
-        }
+        child.GenerateCode(*this);
     }
-    return ret_value;
+    return nullptr; // This method's return value is not used anywhere.
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node) {
@@ -61,7 +57,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     }
     else {
         SymbolData &symbol_data = symbol_data_opt.value();
-        symbol_data.binding = store_value;
+        symbol_data.llvm_alloc_value = store_value;
     }
 
     builder->CreateStore(value, store_value);
@@ -160,15 +156,14 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
-    // Look up the identifier in the symbol table
-    auto symbol_data_opt = node.FindIdentifierSymbolData();
-    if (!symbol_data_opt.has_value()) {
-        CodeGenerationInternalError("unable to find " + node.ToString() + " in symbol table");
+    // Search for an `llvm_alloc_value` in the symbol table.
+    auto alloca_instr = node.FindLLVMAllocation();
+    if (!alloca_instr) {
+        CodeGenerationInternalError("unable to find llvm_alloc_value instruction for " + node.ToString()
+                + " in symbol table");
     }
 
-    const SymbolData& symbol_data = symbol_data_opt.value();
-    return builder->CreateLoad(symbol_data.binding->getAllocatedType(), symbol_data.binding,
-            node.GetName());
+    return builder->CreateLoad(alloca_instr->getAllocatedType(), alloca_instr, node.GetName());
 }
 
 //--------------------------------------------------------------------------------------//

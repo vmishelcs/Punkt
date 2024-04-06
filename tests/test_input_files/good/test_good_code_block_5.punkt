@@ -4,12 +4,17 @@ main{
             {
                 {
                     const a = 5.
+                    print a.
                 }
                 const a = 4.
+                print a.
             }
             const a = 3.
+            print a.
         }
         const a = 2.
+        print a.
     }
     const a = 1.
+    print a.
 }

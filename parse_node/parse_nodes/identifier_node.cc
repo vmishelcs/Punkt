@@ -31,6 +31,16 @@ std::optional<std::reference_wrapper<SymbolData>> IdentifierNode::FindIdentifier
     return std::nullopt;
 }
 
+llvm::AllocaInst *IdentifierNode::FindLLVMAllocation() {
+    for (ParseNode *node : GetPathToRoot()) {
+        // TODO: This is really really ugly. Please make this better.
+        if (node->ScopeDeclares(this->GetName()) && node->GetScope().GetSymbolData(this->GetName()).llvm_alloc_value) {
+            return node->GetScope().GetSymbolData(this->GetName()).llvm_alloc_value;
+        }
+    }
+    return nullptr;
+}
+
 llvm::Value *IdentifierNode::GenerateCode(ParseNodeIRVisitor& visitor) {
     return visitor.GenerateCode(*this);
 }

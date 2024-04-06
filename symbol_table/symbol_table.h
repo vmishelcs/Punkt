@@ -14,7 +14,7 @@ struct SymbolData {
     const TextLocation& text_location;
     bool is_mutable;
     const Type& type;
-    llvm::AllocaInst *binding;
+    llvm::AllocaInst *llvm_alloc_value;
 };
 
 class SymbolTable {

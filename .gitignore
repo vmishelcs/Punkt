@@ -55,5 +55,7 @@ _deps
 /**/.pytest_cache
 /**/__pycache__
 
-# Actual test output files
+# Test output files
 /tests/test_output_files/actual/
+/tests/test_output_files/ir_output/
+/tests/test_output_files/exe_output/

@@ -1,6 +1,9 @@
 #ifndef IDENTIFIER_NODE_H_
 #define IDENTIFIER_NODE_H_
 
+#include <llvm/IR/Instruction.h>
+#include <llvm/IR/Value.h>
+
 #include <parse_node/parse_node.h>
 #include <symbol_table/symbol_table.h>
 
@@ -15,6 +18,8 @@ public:
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
     std::optional<std::reference_wrapper<SymbolData>> FindIdentifierSymbolData();
+
+    llvm::AllocaInst *FindLLVMAllocation();
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 };

@@ -34,7 +34,7 @@ public:
 
 private:
     // Miscellaneous helpers
-    void Declare(IdentifierNode& node, bool is_mutable, const Type& type);
+    void DeclareInLocalScope(IdentifierNode& node, bool is_mutable, const Type& type);
     bool IsBeingDeclared(IdentifierNode& node);
 
     // Scoping
