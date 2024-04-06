@@ -192,28 +192,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode& node) {
-    std::string str = node.GetValue();
-    auto char_type = llvm::Type::getInt8Ty(*context);
-
-    // Initialize a vector of chars
-    std::vector<llvm::Constant *> char_vec(str.length());
-    for (unsigned i = 0, end = str.length(); i < end; ++i) {
-        char_vec[i] = llvm::ConstantInt::get(char_type, str[i]);
-    }
-    char_vec.push_back(llvm::ConstantInt::get(char_type, 0)); // Null terminator
-
-    // Create a string type based on array of chars
-    auto string_type = llvm::ArrayType::get(char_type, char_vec.size());
-
-    // Declare private global variable
-    llvm::GlobalVariable *string_var =
-            (llvm::GlobalVariable *)module->getOrInsertGlobal("", string_type);
-    string_var->setInitializer(llvm::ConstantArray::get(string_type, char_vec));
-    string_var->setConstant(true);
-    string_var->setLinkage(llvm::GlobalValue::LinkageTypes::PrivateLinkage);
-    string_var->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::Global);
-
-    return string_var;
+    return builder->CreateGlobalString(node.GetValue(), "", 0, module.get());
 }
 
 //--------------------------------------------------------------------------------------//
@@ -255,26 +234,8 @@ void CodeGenerationVisitor::GeneratePrintfFmtStrings() {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateFmtString(TypeEnum type_enum, std::string fmt_str) {
-    auto char_type = llvm::Type::getInt8Ty(*context);
-    std::vector<llvm::Constant *> char_vec(fmt_str.size());
-    for (unsigned i = 0, end = fmt_str.length(); i < end; ++i) {
-        char_vec[i] = llvm::ConstantInt::get(char_type, fmt_str[i]);
-    }
-    char_vec.push_back(llvm::ConstantInt::get(char_type, 0)); // Null terminator
-
-    // Create a string type based on array of chars
-    auto fmt_string_type = llvm::ArrayType::get(char_type, char_vec.size());
-
-    // Declare private global variable
-    llvm::GlobalVariable *fmt_string_var =
-            (llvm::GlobalVariable *)module->getOrInsertGlobal(
-            ".fmt_" + Type::GetTypeEnumString(type_enum), fmt_string_type);
-    fmt_string_var->setInitializer(llvm::ConstantArray::get(fmt_string_type, char_vec));
-    fmt_string_var->setConstant(true);
-    fmt_string_var->setLinkage(llvm::GlobalValue::LinkageTypes::PrivateLinkage);
-    fmt_string_var->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::Global);
-
-    return fmt_string_var;
+    return builder->CreateGlobalString(fmt_str, ".fmt_" + Type::GetTypeEnumString(type_enum), 0,
+            module.get());
 }
 
 llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(TypeEnum type_enum) {
