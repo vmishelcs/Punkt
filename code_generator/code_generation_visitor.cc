@@ -134,11 +134,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
-    llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
-    if (!printf_func) {
-        return CodeGenerationInternalError("unable to obtain function pointer for printf");
-    }
-
     llvm::Value *ret_value = nullptr;
 
     // We call printf for each 'operand'
