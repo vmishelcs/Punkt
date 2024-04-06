@@ -385,6 +385,7 @@ bool Parser::StartsAtomicExpression(Token& token) {
     return StartsParenthesizedExpression(token)
             || StartsIdentifier(token)
             || StartsBooleanLiteral(token)
+            || StartsCharacterLiteral(token)
             || StartsIntegerLiteral(token)
             || StartsStringLiteral(token);
         
@@ -398,6 +399,9 @@ std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
     }
     if (StartsBooleanLiteral(*now_reading)) {
         return ParseBooleanLiteral();
+    }
+    if (StartsCharacterLiteral(*now_reading)) {
+        return ParseCharacterLiteral();
     }
     if (StartsIntegerLiteral(*now_reading)) {
         return ParseIntegerLiteral();
@@ -444,7 +448,6 @@ std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
 bool Parser::StartsBooleanLiteral(Token& token) {
     return token.GetTokenType() == TokenType::BOOLEAN_LITERAL;
 }
-
 std::unique_ptr<ParseNode> Parser::ParseBooleanLiteral() {
     if (!StartsBooleanLiteral(*now_reading)) {
         return SyntaxErrorUnexpectedToken("boolean literal");
@@ -453,6 +456,19 @@ std::unique_ptr<ParseNode> Parser::ParseBooleanLiteral() {
     auto boolean_literal = std::make_unique<BooleanLiteralNode>(std::move(now_reading));
     ReadToken();
     return boolean_literal;
+}
+
+bool Parser::StartsCharacterLiteral(Token& token) {
+    return token.GetTokenType() == TokenType::CHARACTER_LITERAL;
+}
+std::unique_ptr<ParseNode> Parser::ParseCharacterLiteral() {
+    if (!StartsCharacterLiteral(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("character literal");
+    }
+
+    auto character_literal = std::make_unique<CharacterLiteralNode>(std::move(now_reading));
+    ReadToken();
+    return character_literal;
 }
 
 bool Parser::StartsIntegerLiteral(Token& token) {

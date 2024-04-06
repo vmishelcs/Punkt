@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="H" />
+                <CharacterLiteralNode value="72" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="e" />
+                <CharacterLiteralNode value="101" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="l" />
+                <CharacterLiteralNode value="108" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="o" />
+                <CharacterLiteralNode value="111" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="_" />
+                <CharacterLiteralNode value="32" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="W" />
+                <CharacterLiteralNode value="87" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="r" />
+                <CharacterLiteralNode value="114" />
+            </DeclarationStatementNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="d" />
+                <CharacterLiteralNode value="100" />
+            </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="H" />
+                <IdentifierNode name="e" />
+                <IdentifierNode name="l" />
+                <IdentifierNode name="l" />
+                <IdentifierNode name="o" />
+                <IdentifierNode name="_" />
+                <IdentifierNode name="W" />
+                <IdentifierNode name="o" />
+                <IdentifierNode name="r" />
+                <IdentifierNode name="l" />
+                <IdentifierNode name="d" />
+            </PrintStatementNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>

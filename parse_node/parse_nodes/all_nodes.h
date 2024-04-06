@@ -2,6 +2,7 @@
 #define ALL_NODES_H_
 
 #include "boolean_literal_node.h"
+#include "character_literal_node.h"
 #include "code_block_node.h"
 #include "declaration_statement_node.h"
 #include "error_node.h"

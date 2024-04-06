@@ -24,6 +24,7 @@ public:
     virtual llvm::Value *GenerateCode(ErrorNode& node) override;
     virtual llvm::Value *GenerateCode(IdentifierNode& node) override;
     virtual llvm::Value *GenerateCode(BooleanLiteralNode& node) override;
+    virtual llvm::Value *GenerateCode(CharacterLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(IntegerLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(StringLiteralNode& node) override;
 

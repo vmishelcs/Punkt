@@ -109,6 +109,9 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
 void SemanticAnalysisVisitor::Visit(BooleanLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::BOOLEAN));
 }
+void SemanticAnalysisVisitor::Visit(CharacterLiteralNode& node) {
+    node.SetType(std::make_unique<Type>(TypeEnum::CHARACTER));
+}
 void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::INTEGER));
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ProgramNode>
+    <MainNode>
+        <CodeBlockNode>
+            <DeclarationStatementNode>
+                <IdentifierNode name="ch" />
+                <CharacterLiteralNode value="49" />
+            </DeclarationStatementNode>
+            <PrintStatementNode>
+                <IdentifierNode name="ch" />
+            </PrintStatementNode>
+        </CodeBlockNode>
+    </MainNode>
+</ProgramNode>

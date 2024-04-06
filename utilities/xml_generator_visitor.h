@@ -63,6 +63,7 @@ public:
     virtual void Visit(ErrorNode& node) override;
     virtual void Visit(IdentifierNode& node) override;
     virtual void Visit(BooleanLiteralNode& node) override;
+    virtual void Visit(CharacterLiteralNode& node) override;
     virtual void Visit(IntegerLiteralNode& node) override;
     virtual void Visit(StringLiteralNode& node) override;
 

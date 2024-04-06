@@ -1,0 +1,11 @@
+main {
+    const H = 'H'.
+    const e = 'e'.
+    const l = 'l'.
+    const o = 'o'.
+    const _ = ' '.
+    const W = 'W'.
+    const r = 'r'.
+    const d = 'd'.
+    print H, e, l, l, o, _, W, o, r, l, d.
+}

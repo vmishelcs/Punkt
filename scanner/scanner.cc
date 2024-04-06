@@ -23,6 +23,7 @@ bool Scanner::HasNext() const {
 std::unique_ptr<Token> Scanner::GetNextToken() {
     LocatedChar ch = this->input_stream->NextNonwhitespaceChar();
 
+    // TODO: Implement a way to read common escape sequences.
     if (ch.IsIdentifierStart()) {
         return ScanIdentifier(ch);
     }
@@ -31,6 +32,9 @@ std::unique_ptr<Token> Scanner::GetNextToken() {
     }
     else if (ch.IsPunctuatorStart()) {
         return ScanPunctuator(ch);
+    }
+    else if (ch.IsCharacterStart()) {
+        return ScanCharacter(ch);
     }
     else if (ch.IsStringStart()) {
         return ScanString(ch);
@@ -140,6 +144,24 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
     // return PunctuatorScanner::Scan(first_char, input_stream);
 }
 
+std::unique_ptr<Token> Scanner::ScanCharacter(LocatedChar first_char) {
+    LocatedChar char_literal = input_stream->Next();
+
+    if (char_literal.character == '\'') {
+        // Create a CharacterLiteralToken holding the null char
+        return std::make_unique<CharacterLiteralToken>("", char_literal.location, 0);
+    }
+
+    LocatedChar next = input_stream->Next();
+    if (next.character != '\'') {
+        LexicalErrorExpectedDifferentCharacter('\'', next.location);
+        return GetNextToken();
+    }
+
+    return std::make_unique<CharacterLiteralToken>(std::to_string(char_literal.character),
+            char_literal.location, char_literal.character);
+}
+
 std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char)
 {
     std::string buffer;
@@ -147,7 +169,7 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char)
 
     LocatedChar next_char = input_stream->Peek();
     if (next_char.character != '\"') {
-        LexicalErrorExpectedDifferentCharacter(next_char.character, '\"', next_char.location);
+        LexicalErrorExpectedDifferentCharacter('\"', next_char.location);
         return GetNextToken();
     }
 
@@ -160,7 +182,7 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char)
         ReadStringLiteral(buffer);
         next_char = input_stream->Peek();
         if (next_char.character != '\"') {
-            LexicalErrorExpectedDifferentCharacter(next_char.character, '\"', next_char.location);
+            LexicalErrorExpectedDifferentCharacter('\"', next_char.location);
             return GetNextToken();
         }
         input_stream->Next();
@@ -192,9 +214,7 @@ void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {
     message.append("\' at ").append(ch.location.ToString());
     PunktLogger::Log(LogType::SCANNER, message);
 }
-void Scanner::LexicalErrorExpectedDifferentCharacter(char actual_char, char expected_char,
-        TextLocation location) 
-{
+void Scanner::LexicalErrorExpectedDifferentCharacter(char expected_char, TextLocation location) {
     std::string message = "Expected \'";
     message.push_back(expected_char);
     message += "\' at " + location.ToString();

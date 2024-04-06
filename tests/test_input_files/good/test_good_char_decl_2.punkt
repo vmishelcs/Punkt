@@ -1,0 +1,4 @@
+main {
+    const null_char = ''.
+    print null_char.
+}

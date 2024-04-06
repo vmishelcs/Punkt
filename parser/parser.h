@@ -72,6 +72,9 @@ private:
     bool StartsBooleanLiteral(Token& token);
     std::unique_ptr<ParseNode> ParseBooleanLiteral();
 
+    bool StartsCharacterLiteral(Token& token);
+    std::unique_ptr<ParseNode> ParseCharacterLiteral();
+
     bool StartsIntegerLiteral(Token& token);
     std::unique_ptr<ParseNode> ParseIntegerLiteral();
 

@@ -19,6 +19,7 @@ class ParseNodeIRVisitor;
 
 enum class ParseNodeType {
     BOOLEAN_LITERAL_NODE,
+    CHARACTER_LITERAL_NODE,
     CODE_BLOCK_NODE,
     DECLARATION_STATEMENT_NODE,
     ERROR_NODE,

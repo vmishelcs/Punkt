@@ -183,6 +183,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(BooleanLiteralNode& node) {
     return llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), (int)node.GetValue());
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(CharacterLiteralNode& node) {
+    return llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), node.GetValue());
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode& node) {
     return llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(*context), node.GetValue());
 }

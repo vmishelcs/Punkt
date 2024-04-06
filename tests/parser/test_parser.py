@@ -289,3 +289,23 @@ class TestParser(object):
     def test_good_bool_decl_6(self):
         actual_output_path = self.run_ast_printer()
         self.output_matches(actual_output_path)
+
+    def test_good_char_decl_1(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_char_decl_2(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_char_decl_3(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_char_decl_4(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
+
+    def test_good_char_decl_5(self):
+        actual_output_path = self.run_ast_printer()
+        self.output_matches(actual_output_path)
