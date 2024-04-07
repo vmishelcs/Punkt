@@ -68,22 +68,21 @@ bool ParseNode::HasScope() const {
     return scope != nullptr;
 }
 
-Scope& ParseNode::GetScope() const {
-    return *scope;
+Scope *ParseNode::GetScope() const {
+    return scope.get();
 }
 
 void ParseNode::SetScope(std::unique_ptr<Scope> scope) {
     this->scope = std::move(scope);
 }
 
-std::optional<std::reference_wrapper<Scope>> ParseNode::GetLocalScope() {
-    for (ParseNode *node : GetPathToRoot()) {
+Scope *ParseNode::GetLocalScope() {
+    for (auto node : GetPathToRoot()) {
         if (node->HasScope()) {
             return node->GetScope();
         }
     }
-
-    return std::nullopt;
+    return nullptr;
 }
 
 bool ParseNode::ScopeDeclares(const std::string& identifier) {
@@ -93,8 +92,8 @@ bool ParseNode::ScopeDeclares(const std::string& identifier) {
     return scope->Declares(identifier);
 }
 
-SymbolData& ParseNode::GetDeclarationData(const std::string& identifier) {
-    return scope->GetSymbolData(identifier);
+SymbolTableEntry& ParseNode::GetDeclarationData(const std::string& identifier) {
+    return scope->GetSymbolTableEntry(identifier);
 }
 
 void ParseNode::VisitChildren(ParseNodeVisitor& visitor) {

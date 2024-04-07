@@ -218,7 +218,7 @@ void XMLGeneratorVisitor::Visit(StringLiteralNode& node) {
 }
 
 void XMLGeneratorVisitor::AddBasicParseNodeAttributes(XMLTag& tag, ParseNode& node) {
-    if (node.HasScope()) { tag.AddAttribute("scope", node.GetScope().GetAttributeString()); }
+    if (node.HasScope()) { tag.AddAttribute("scope", node.GetScope()->GetAttributeString()); }
     if (node.HasType()) { tag.AddAttribute("type", node.GetType()->GetAttributeString()); }
 }
 

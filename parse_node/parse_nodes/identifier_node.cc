@@ -21,22 +21,38 @@ void IdentifierNode::Accept(ParseNodeVisitor& visitor) {
     visitor.Visit(*this);
 }
 
-std::optional<std::reference_wrapper<SymbolData>> IdentifierNode::FindIdentifierSymbolData() {
-    std::string identifier = token->GetLexeme();
-    for (ParseNode *node : GetPathToRoot()) {
-        if (node->ScopeDeclares(identifier)) {
-            return node->GetDeclarationData(identifier);
+// Type *IdentifierNode::FindType() {
+//     std::string identifier = this->GetName();
+//     Scope *scope = this->GetLocalScope();
+//     while (scope) {
+//         if (scope->Declares(identifier) && scope->GetSymbolTableEntry(identifier).type) {
+//             return scope->GetSymbolTableEntry(identifier).type;
+//         }
+//         scope = scope->GetBaseScope();
+//     }
+//     return nullptr;
+// }
+
+std::optional<std::reference_wrapper<SymbolTableEntry>> IdentifierNode::FindSymbolTableEntry() {
+    std::string identifier = this->GetName();
+    Scope *scope = this->GetLocalScope();
+    while (scope) {
+        if (scope->Declares(identifier)) {
+            return scope->GetSymbolTableEntry(identifier);
         }
+        scope = scope->GetBaseScope();
     }
     return std::nullopt;
 }
 
-llvm::AllocaInst *IdentifierNode::FindLLVMAllocation() {
-    for (ParseNode *node : GetPathToRoot()) {
-        // TODO: This is really really ugly. Please make this better.
-        if (node->ScopeDeclares(this->GetName()) && node->GetScope().GetSymbolData(this->GetName()).llvm_alloc_value) {
-            return node->GetScope().GetSymbolData(this->GetName()).llvm_alloc_value;
+llvm::AllocaInst *IdentifierNode::FindAlloca() {
+    std::string identifier = this->GetName();
+    Scope *scope = this->GetLocalScope();
+    while (scope) {
+        if (scope->Declares(identifier) && scope->GetSymbolTableEntry(identifier).alloca) {
+            return scope->GetSymbolTableEntry(identifier).alloca;
         }
+        scope = scope->GetBaseScope();
     }
     return nullptr;
 }

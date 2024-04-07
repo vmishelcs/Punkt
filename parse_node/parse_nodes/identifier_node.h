@@ -17,9 +17,10 @@ public:
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
-    std::optional<std::reference_wrapper<SymbolData>> FindIdentifierSymbolData();
+    std::optional<std::reference_wrapper<SymbolTableEntry>> FindSymbolTableEntry();
 
-    llvm::AllocaInst *FindLLVMAllocation();
+    Type *FindType();
+    llvm::AllocaInst *FindAlloca();
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 };

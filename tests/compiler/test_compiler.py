@@ -185,6 +185,10 @@ class TestCompiler(object):
     def test_good_decl_8(self):
         actual_output_path = self.run_compiler()
         self.output_matches(actual_output_path)
+
+    def test_good_decl_9(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
     
     def test_good_int_ops_1(self):
         actual_output_path = self.run_compiler()

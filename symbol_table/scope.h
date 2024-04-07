@@ -17,14 +17,15 @@ public:
     static std::unique_ptr<Scope> CreateGlobalScope();
     std::unique_ptr<Scope> CreateSubscope();
 
-    void Declare(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type);
+    void Declare(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type);
     bool Declares(const std::string& symbol);
 
-    SymbolData& GetSymbolData(const std::string& symbol);
+    Scope *GetBaseScope() const;
+
+    SymbolTableEntry& GetSymbolTableEntry(const std::string& symbol);
 
     ScopeType GetScopeType() const;
 
-    std::string ToString() const;
     std::string GetAttributeString() const;
     static std::string GetScopeTypeString(ScopeType scope_type);
 

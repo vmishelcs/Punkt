@@ -10,17 +10,17 @@
 #include <input_handler/text_location.h>
 #include <semantic_analyzer/type.h>
 
-struct SymbolData {
+struct SymbolTableEntry {
     const TextLocation& text_location;
     bool is_mutable;
-    const Type& type;
-    llvm::AllocaInst *llvm_alloc_value;
+    Type *type;
+    llvm::AllocaInst *alloca;
 };
 
 class SymbolTable {
 public:
-    void Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type);
-    SymbolData& Get(const std::string& symbol);
+    void Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type);
+    SymbolTableEntry& Get(const std::string& symbol);
 
     bool Contains(const std::string& symbol) const;
 
@@ -29,7 +29,7 @@ public:
 private:
     void SymbolRedefinitionError(const std::string& symbol, const TextLocation& tl);
 
-    std::unordered_map<std::string, SymbolData> table;
+    std::unordered_map<std::string, SymbolTableEntry> table;
 };
 
 #endif // SYMBOL_TABLE_H_

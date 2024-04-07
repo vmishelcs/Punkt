@@ -16,7 +16,7 @@ std::unique_ptr<Scope> Scope::CreateSubscope() {
     return std::unique_ptr<Scope>(new Scope(ScopeType::SUBSCOPE, this));
 }
 
-void Scope::Declare(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type) {
+void Scope::Declare(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type) {
     symbol_table.Insert(
         symbol,
         tl,
@@ -29,16 +29,16 @@ bool Scope::Declares(const std::string& symbol) {
     return symbol_table.Contains(symbol);
 }
 
-SymbolData& Scope::GetSymbolData(const std::string& symbol) {
+Scope *Scope::GetBaseScope() const {
+    return base_scope;
+}
+
+SymbolTableEntry& Scope::GetSymbolTableEntry(const std::string& symbol) {
     return symbol_table.Get(symbol);
 }
 
 ScopeType Scope::GetScopeType() const {
     return scope_type;
-}
-
-std::string Scope::ToString() const {
-    return "[Scope: " + GetScopeTypeString(scope_type) + "]";
 }
 
 std::string Scope::GetAttributeString() const {

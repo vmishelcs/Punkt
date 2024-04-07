@@ -53,14 +53,14 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     llvm::AllocaInst *alloca_inst = builder->CreateAlloca(initializer_value->getType(), nullptr,
             identifier_node->GetName());
 
-    auto symbol_data_opt = identifier_node->FindIdentifierSymbolData();
-    if (!symbol_data_opt.has_value()) {
+    auto symbol_table_entry_opt = identifier_node->FindSymbolTableEntry();
+    if (!symbol_table_entry_opt.has_value()) {
         CodeGenerationInternalError("missing entry in symbol table for "
                 + identifier_node->ToString());
     }
     else {
-        SymbolData &symbol_data = symbol_data_opt.value();
-        symbol_data.llvm_alloc_value = alloca_inst;
+        SymbolTableEntry &symbol_table_entry = symbol_table_entry_opt.value();
+        symbol_table_entry.alloca = alloca_inst;
     }
 
     builder->CreateStore(initializer_value, alloca_inst);
@@ -209,10 +209,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
-    // Search for an `llvm_alloc_value` in the symbol table.
-    auto alloca_instr = node.FindLLVMAllocation();
+    // Search for an `alloca` in the symbol table.
+    auto alloca_instr = node.FindAlloca();
     if (!alloca_instr) {
-        CodeGenerationInternalError("unable to find llvm_alloc_value instruction for "
+        CodeGenerationInternalError("unable to find alloca instruction for "
                 + node.ToString() + " in symbol table");
     }
 

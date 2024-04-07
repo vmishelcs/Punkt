@@ -30,7 +30,8 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
 
     identifier->SetType(std::make_unique<Type>(*declaration_type));
 
-    DeclareInLocalScope(*identifier, /* is_mutable = */ false, *declaration_type);
+    // Note the use of identifier-owned Type pointer.
+    DeclareInLocalScope(*identifier, /* is_mutable = */ false, identifier->GetType());
 }
 
 void SemanticAnalysisVisitor::VisitEnter(IfStatementNode& node) {
@@ -102,19 +103,20 @@ void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
 }
 void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
     if (!IsBeingDeclared(node)) {
-        auto symbol_data_opt = node.FindIdentifierSymbolData();
+        auto symbol_table_entry_opt = node.FindSymbolTableEntry();
 
-        if (!symbol_data_opt.has_value()) {
+        if (!symbol_table_entry_opt.has_value()) {
             SymbolTable::UndefinedSymbolReference(
                 node.GetToken().GetLexeme(),
                 node.GetToken().GetLocation()
             );
             node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
-            DeclareInLocalScope(node, false, TypeEnum::ERROR);
+            // Note the use of identifier-owned Type pointer.
+            DeclareInLocalScope(node, false, node.GetType());
         }
         else {
-            const SymbolData& symbol_data = symbol_data_opt.value();
-            node.SetType(std::make_unique<Type>(symbol_data.type));
+            const SymbolTableEntry& symbol_table_entry = symbol_table_entry_opt.value();
+            node.SetType(std::make_unique<Type>(*symbol_table_entry.type));
         }
     }
     // Other semantic analysis is handled by VisitLeave(DeclarationStatementNode&)
@@ -135,9 +137,9 @@ void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
 //--------------------------------------------------------------------------------------//
 //                                Miscellaneous helpers                                 //
 //--------------------------------------------------------------------------------------//
-void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode& node, bool is_mutable, const Type& type) {
-    Scope& local_scope = node.GetLocalScope().value().get();
-    local_scope.Declare(
+void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode& node, bool is_mutable, Type *type) {
+    Scope *local_scope = node.GetLocalScope();
+    local_scope->Declare(
         node.GetToken().GetLexeme(),
         node.GetToken().GetLocation(),
         is_mutable,
@@ -157,8 +159,8 @@ void SemanticAnalysisVisitor::CreateGlobalScope(ProgramNode& node) {
     node.SetScope(Scope::CreateGlobalScope());
 }
 void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
-    Scope& local_scope = node.GetLocalScope().value().get();
-    node.SetScope(local_scope.CreateSubscope());
+    Scope *local_scope = node.GetLocalScope();
+    node.SetScope(local_scope->CreateSubscope());
 }
 
 //--------------------------------------------------------------------------------------//

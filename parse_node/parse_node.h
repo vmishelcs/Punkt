@@ -58,11 +58,12 @@ public:
     void SetType(std::unique_ptr<Type> type);
 
     bool HasScope() const;
-    Scope& GetScope() const;
+    Scope *GetScope() const;
     void SetScope(std::unique_ptr<Scope> scope);
-    std::optional<std::reference_wrapper<Scope>> GetLocalScope();
+
+    Scope *GetLocalScope();
     bool ScopeDeclares(const std::string& identifier);
-    SymbolData& GetDeclarationData(const std::string& identifier);
+    SymbolTableEntry& GetDeclarationData(const std::string& identifier);
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) = 0;
 

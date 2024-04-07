@@ -3,7 +3,7 @@
 #include "symbol_table.h"
 
 
-void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, const Type& type) {
+void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type) {
     if (Contains(symbol)) {
         SymbolRedefinitionError(symbol, tl);
     }
@@ -12,12 +12,12 @@ void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool
             .text_location = tl,
             .is_mutable = is_mutable,
             .type = type,
-            .llvm_alloc_value = nullptr
+            .alloca = nullptr
         }});
     }
 }
 
-SymbolData& SymbolTable::Get(const std::string& symbol) {
+SymbolTableEntry& SymbolTable::Get(const std::string& symbol) {
     return table.at(symbol);
 }
 
