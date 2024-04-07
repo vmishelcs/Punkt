@@ -18,6 +18,9 @@ public:
     Type(const Type& type);
     Type(Type&& type);
 
+    bool EquivalentTo(TypeEnum type_enum) const;
+    bool EquivalentTo(const Type& other_type) const;
+
     TypeEnum GetTypeEnum() const;
     std::string ToString() const;
     std::string GetAttributeString() const;

@@ -1,7 +1,6 @@
 #ifndef SIGNATURE_H_
 #define SIGNATURE_H_
 
-#include <functional>
 #include <memory>
 #include <variant>
 #include <vector>
@@ -29,7 +28,7 @@ public:
     // Returns a variant to a code generator function.
     code_gen_function_variant GetCodeGenFunc() const;
 
-    bool Accepts(std::vector<std::reference_wrapper<const Type>>& types) const;
+    bool Accepts(std::vector<Type *>& types) const;
 
 private:
     std::vector<Type> input_types;

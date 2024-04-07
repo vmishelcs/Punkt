@@ -56,8 +56,8 @@ bool ParseNode::HasType() const {
     return type != nullptr;
 }
 
-Type& ParseNode::GetType() const {
-    return *type;
+Type *ParseNode::GetType() const {
+    return type.get();
 }
 
 void ParseNode::SetType(std::unique_ptr<Type> type) {

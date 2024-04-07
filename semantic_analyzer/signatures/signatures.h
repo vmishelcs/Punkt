@@ -11,7 +11,11 @@
 
 class Signatures {
 public:
-    static std::optional<std::reference_wrapper<const Signature>> AcceptingSignature(PunctuatorEnum punctuator, std::vector<std::reference_wrapper<const Type>>& types);
+    // Returns a pointer to a const Signature object if the specified punctuator (i.e. operator)
+    // accepts the types compiled in the Type * vector. If no such signature exists, a nullptr is 
+    // returned.
+    static Signature const *AcceptingSignature(PunctuatorEnum punctuator,
+            std::vector<Type *>& types);
 
 private:
     static std::unordered_map<PunctuatorEnum, std::vector<Signature>> signature_map;

@@ -45,7 +45,7 @@ private:
     void CreateSubscope(CodeBlockNode& node);
 
     // ---- Error reporting ------------------------------------------------------------------
-    void InvalidOperandTypeError(OperatorNode& node, std::vector<std::reference_wrapper<const Type>>& types);
+    void InvalidOperandTypeError(OperatorNode& node, std::vector<Type*>& types);
     void IfStatementNonBooleanConditionError(IfStatementNode& node);
 };
 

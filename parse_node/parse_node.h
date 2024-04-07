@@ -54,7 +54,7 @@ public:
     virtual void Accept(ParseNodeVisitor& visitor) = 0;
 
     bool HasType() const;
-    Type& GetType() const;
+    Type *GetType() const;
     void SetType(std::unique_ptr<Type> type);
 
     bool HasScope() const;

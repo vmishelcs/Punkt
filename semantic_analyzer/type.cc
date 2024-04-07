@@ -14,6 +14,14 @@ Type::Type(Type&& type)
     : type_enum(std::move(type.type_enum))
 {}
 
+bool Type::EquivalentTo(TypeEnum type_enum) const {
+    return this->type_enum == type_enum;
+}
+
+bool Type::EquivalentTo(const Type& other_type) const {
+    return this->type_enum == other_type.type_enum;
+}
+
 TypeEnum Type::GetTypeEnum() const {
     return type_enum;
 }

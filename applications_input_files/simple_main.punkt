@@ -1,4 +1,9 @@
 main {
-    const a = 1 + 2.
-    const str = "Hello World!".
+    if true {
+        print "hello".
+    }
+
+    if false {
+        print "good bye".
+    }
 }

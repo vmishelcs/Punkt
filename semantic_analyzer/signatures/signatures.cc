@@ -75,12 +75,12 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature>> Signatures::signature
     }
 };
 
-std::optional<std::reference_wrapper<const Signature>> Signatures::AcceptingSignature(PunctuatorEnum punctuator, std::vector<std::reference_wrapper<const Type>>& types) {
-    auto& signatures = signature_map.at(punctuator);
+Signature const *Signatures::AcceptingSignature(PunctuatorEnum punctuator, std::vector<Type *>& types) {
+    const auto& signatures = signature_map.at(punctuator);
     for (const Signature& signature : signatures) {
         if (signature.Accepts(types)) {
-            return signature;
+            return &signature;
         }
     }
-    return std::nullopt;
+    return nullptr;
 }

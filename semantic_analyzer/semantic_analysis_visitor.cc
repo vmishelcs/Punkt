@@ -26,18 +26,18 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
     IdentifierNode *identifier = dynamic_cast<IdentifierNode *>(node.GetChild(0));
     auto initializer = node.GetChild(1);
 
-    Type& declaration_type = initializer->GetType();
+    Type *declaration_type = initializer->GetType();
 
-    identifier->SetType(std::make_unique<Type>(declaration_type));
+    identifier->SetType(std::make_unique<Type>(*declaration_type));
 
-    DeclareInLocalScope(*identifier, /* is_mutable = */ false, declaration_type);
+    DeclareInLocalScope(*identifier, /* is_mutable = */ false, *declaration_type);
 }
 
 void SemanticAnalysisVisitor::VisitEnter(IfStatementNode& node) {
 }
 void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
     // We make sure that the condition has boolean type.
-    if (node.GetChild(0)->GetType() != TypeEnum::BOOLEAN) {
+    if ( !(node.GetChild(0)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) ) {
         IfStatementNonBooleanConditionError(node);
         node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
     }
@@ -54,10 +54,10 @@ void SemanticAnalysisVisitor::VisitEnter(OperatorNode& node) {
     // Do nothing
 }
 void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
-    std::vector<std::reference_wrapper<const Type>> child_types;
+    std::vector<Type *> child_types;
     for (auto child : node.GetChildren()) {
-        Type& child_type = child->GetType();
-        if (child_type.IsErrorType()) {
+        Type *child_type = child->GetType();
+        if (child_type->IsErrorType()) {
             node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
             return;
         }
@@ -65,15 +65,14 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
     }
 
     PunctuatorToken& punctuator_token = dynamic_cast<PunctuatorToken&>(node.GetToken());
-    auto signature_opt = Signatures::AcceptingSignature(
+    auto signature = Signatures::AcceptingSignature(
         punctuator_token.GetPunctuatorEnum(),
         child_types
     );
 
-    if (signature_opt.has_value()) {
-        const Signature& signature = signature_opt.value();
-        node.SetType(std::make_unique<Type>(signature.GetOutputType()));
-        node.SetCodeGenFunc(signature.GetCodeGenFunc());
+    if (signature) {
+        node.SetType(std::make_unique<Type>(signature->GetOutputType()));
+        node.SetCodeGenFunc(signature->GetCodeGenFunc());
     }
     else {
         InvalidOperandTypeError(node, child_types);
@@ -165,21 +164,14 @@ void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
 //--------------------------------------------------------------------------------------//
 //                                    Error handling                                    //
 //--------------------------------------------------------------------------------------//
-void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node,
-        std::vector<std::reference_wrapper<const Type>>& types)
+void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::vector<Type*>& types)
 {
-    std::string message = "Operator \'" + node.GetToken().GetLexeme()
-        + "\' not defined for ";
-    message += "[";
-    for (const auto& elem : types) {
-        message += elem.get().ToString();
-        if (&elem != &types.back()) {
-            message += ", ";
-        }
+    std::string message = "operator \'" + node.GetToken().GetLexeme() + "\' not defined for [";
+    for (auto type : types) {
+        message += type->ToString() + " ";
     }
-    message += "] at\n";
-    message += ("\t" + node.GetToken().GetLocation().ToString());
-
+    message.pop_back();
+    message += "] at \n\t" + node.GetToken().GetLocation().ToString();
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);    
 }
 

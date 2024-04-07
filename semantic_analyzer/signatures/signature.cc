@@ -30,14 +30,13 @@ code_gen_function_variant Signature::GetCodeGenFunc() const {
     return func_variant;
 }
 
-bool Signature::Accepts(std::vector<std::reference_wrapper<const Type>>& types) const {
+bool Signature::Accepts(std::vector<Type *>& types) const {
     if (types.size() != input_types.size()) {
         return false;
     }
 
-    int n = input_types.size();
-    for (int i = 0; i < n; ++i) {
-        if (input_types[i] != types[i].get()) {
+    for (int i = 0, n = input_types.size(); i < n; ++i) {
+        if (!(types[i]->EquivalentTo(input_types[i]))) {
             return false;
         }
     }

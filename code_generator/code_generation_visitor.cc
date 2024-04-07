@@ -45,7 +45,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     llvm::Value *initializer_value = node.GetChild(1)->GenerateCode(*this);
     
     // Store boolean values as 8-bit integers.
-    if (node.GetChild(1)->GetType() == TypeEnum::BOOLEAN) {
+    if (node.GetChild(1)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) {
         initializer_value = builder->CreateZExt(initializer_value, llvm::Type::getInt8Ty(*context),
                 "zexttmp");
     }
@@ -187,7 +187,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
 
     // We call printf for each 'operand'
     for (auto child : node.GetChildren()) {
-        ret_value = PrintValue(child->GenerateCode(*this), child->GetType());
+        ret_value = PrintValue(child->GenerateCode(*this), *child->GetType());
     }
 
     // Print line feed once we are finished
