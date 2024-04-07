@@ -50,8 +50,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
                 "zexttmp");
     }
 
-    llvm::AllocaInst *alloca_inst = builder->CreateAlloca(initializer_value->getType(), nullptr,
-            identifier_node->GetName());
+    // Allocate stack memory for variables in the entry block of the function.
+    auto parent_function = builder->GetInsertBlock()->getParent();
+    llvm::AllocaInst *alloca_inst = CreateEntryBlockAlloca(parent_function,
+            identifier_node->GetName(), initializer_value->getType());
 
     auto symbol_table_entry_opt = identifier_node->FindSymbolTableEntry();
     if (!symbol_table_entry_opt.has_value()) {
@@ -355,6 +357,13 @@ llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, const Type& t
 //--------------------------------------------------------------------------------------//
 void CodeGenerationVisitor::GenerateGlobalConstants() {
     GeneratePrintfFmtStrings();
+}
+
+llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(llvm::Function *function,
+        const std::string& identifier_name, llvm::Type *llvm_type)
+{
+    llvm::IRBuilder<> tmp_builder(&function->getEntryBlock(), function->getEntryBlock().begin());
+    return tmp_builder.CreateAlloca(llvm_type, nullptr, identifier_name);
 }
 
 //--------------------------------------------------------------------------------------//

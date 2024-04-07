@@ -32,6 +32,9 @@ public:
 private:
     void GenerateGlobalConstants();
 
+    llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *function,
+            const std::string& identifier_name, llvm::Type *llvm_type);
+
     void GeneratePrintfDeclaration();
     void GeneratePrintfFmtStrings();
     llvm::Value *GenerateFmtString(TypeEnum type_enum, std::string fmt_str);
