@@ -1,12 +1,14 @@
-#ifndef DECLARATION_NODE_H_
-#define DECLARATION_NODE_H_
+#ifndef IF_STATEMENT_NODE_H_
+#define IF_STATEMENT_NODE_H_
 
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
-class DeclarationStatementNode : public ParseNode {
+class IfStatementNode : public ParseNode {
 public:
-    DeclarationStatementNode(std::unique_ptr<Token> token);
+    IfStatementNode(std::unique_ptr<Token> token);
+
+    bool HasElseBlock() const;
 
     virtual std::string ToString() const override;
 
@@ -15,4 +17,4 @@ public:
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 };
 
-#endif // DECLARATION_NODE_H_
+#endif // IF_STATEMENT_NODE_H_

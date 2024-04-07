@@ -1,3 +1,1 @@
-main {
-    const aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa = 1.
-}
+main { if {} else {} }

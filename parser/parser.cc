@@ -10,7 +10,10 @@ std::unique_ptr<ParseNode> Parser::Parse(fs::path file_path) {
     std::unique_ptr<Scanner> scanner = std::make_unique<Scanner>(file_path);
     Parser parser(std::move(scanner));
     auto ast = parser.ParseProgram();
-
+    
+    // TODO: This cast causes an exception on bad input.
+    // Example:
+    // main { else {} }
     ProgramNode& program_node = dynamic_cast<ProgramNode&>(*ast);
     program_node.SetModuleID(file_path.string());
 
@@ -112,6 +115,7 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
 bool Parser::StartsStatement(Token& token) {
     return StartsCodeBlock(token)
         || StartsDeclaration(token)
+        || StartsIfStatement(token)
         || StartsPrintStatement(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseStatement() {
@@ -120,6 +124,9 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
     }
     if (StartsDeclaration(*now_reading)) {
         return ParseDeclaration();
+    }
+    if (StartsIfStatement(*now_reading)) {
+        return ParseIfStatement();
     }
     if (StartsPrintStatement(*now_reading)) {
         return ParsePrintStatement();
@@ -181,6 +188,44 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
     declaration->AppendChild(std::move(initializer));
 
     return declaration;
+}
+
+bool Parser::StartsIfStatement(Token& token) {
+    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::IF});
+}
+bool Parser::StartsElseBlock(Token& token) {
+    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::ELSE});
+}
+std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
+    if (!StartsIfStatement(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("if statement");
+    }
+
+    auto if_statement = std::make_unique<IfStatementNode>(std::move(now_reading));
+
+    ReadToken();
+
+    auto condition = ParseExpression();
+
+    auto then_block = ParseCodeBlock();
+
+    if_statement->AppendChild(std::move(condition));
+    if_statement->AppendChild(std::move(then_block));
+
+    // We can add `elif` parsing later...
+    // while (StartsElifBlock(*now_reading)) {
+    //     ...
+    // }
+
+    if (StartsElseBlock(*now_reading)) {
+        ReadToken();
+
+        auto else_block = ParseCodeBlock();
+
+        if_statement->AppendChild(std::move(else_block));
+    }
+
+    return if_statement;
 }
 
 bool Parser::StartsPrintStatement(Token& token) {

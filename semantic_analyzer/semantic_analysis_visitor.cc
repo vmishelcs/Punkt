@@ -7,7 +7,9 @@
 
 #include "type.h"
 
-// Non-leaf nodes
+//--------------------------------------------------------------------------------------//
+//                                    Non-leaf nodes                                    //
+//--------------------------------------------------------------------------------------//
 void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode& node) {
     CreateSubscope(node);
 }
@@ -21,14 +23,24 @@ void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode& node) {
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
     // bool is_mutable = KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
 
-    IdentifierNode& identifier = dynamic_cast<IdentifierNode&>(node.GetChild(0));
-    ParseNode& initializer = node.GetChild(1);
+    IdentifierNode *identifier = dynamic_cast<IdentifierNode *>(node.GetChild(0));
+    auto initializer = node.GetChild(1);
 
-    Type& declaration_type = initializer.GetType();
+    Type& declaration_type = initializer->GetType();
 
-    identifier.SetType(std::make_unique<Type>(declaration_type));
+    identifier->SetType(std::make_unique<Type>(declaration_type));
 
-    DeclareInLocalScope(identifier, /* is_mutable = */ false, declaration_type);
+    DeclareInLocalScope(*identifier, /* is_mutable = */ false, declaration_type);
+}
+
+void SemanticAnalysisVisitor::VisitEnter(IfStatementNode& node) {
+}
+void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
+    // We make sure that the condition has boolean type.
+    if (node.GetChild(0)->GetType() != TypeEnum::BOOLEAN) {
+        IfStatementNonBooleanConditionError(node);
+        node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+    }
 }
 
 void SemanticAnalysisVisitor::VisitEnter(MainNode& node) {
@@ -43,8 +55,8 @@ void SemanticAnalysisVisitor::VisitEnter(OperatorNode& node) {
 }
 void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
     std::vector<std::reference_wrapper<const Type>> child_types;
-    for (ParseNode& child : node.GetChildren()) {
-        Type& child_type = child.GetType();
+    for (auto child : node.GetChildren()) {
+        Type& child_type = child->GetType();
         if (child_type.IsErrorType()) {
             node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
             return;
@@ -83,7 +95,9 @@ void SemanticAnalysisVisitor::VisitLeave(ProgramNode& node) {
     // Do nothing
 }
 
-// Leaf nodes
+//--------------------------------------------------------------------------------------//
+//                                      Leaf nodes                                      //
+//--------------------------------------------------------------------------------------//
 void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
 }
@@ -119,7 +133,9 @@ void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::STRING));
 }
 
-// Miscellaneous helpers
+//--------------------------------------------------------------------------------------//
+//                                Miscellaneous helpers                                 //
+//--------------------------------------------------------------------------------------//
 void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode& node, bool is_mutable, const Type& type) {
     Scope& local_scope = node.GetLocalScope().value().get();
     local_scope.Declare(
@@ -130,12 +146,14 @@ void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode& node, bool is_
     );
 }
 bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {
-    ParseNode& parent = node.GetParent();
-    return (&(parent.GetChild(0)) == &node)
-        && (parent.GetParseNodeType() == ParseNodeType::DECLARATION_STATEMENT_NODE);
+    auto parent = node.GetParent();
+    return (parent->GetChild(0) == &node)
+        && (parent->GetParseNodeType() == ParseNodeType::DECLARATION_STATEMENT_NODE);
 }
 
-// Scoping
+//--------------------------------------------------------------------------------------//
+//                                       Scoping                                        //
+//--------------------------------------------------------------------------------------//
 void SemanticAnalysisVisitor::CreateGlobalScope(ProgramNode& node) {
     node.SetScope(Scope::CreateGlobalScope());
 }
@@ -144,7 +162,9 @@ void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
     node.SetScope(local_scope.CreateSubscope());
 }
 
-// Error reporting
+//--------------------------------------------------------------------------------------//
+//                                    Error handling                                    //
+//--------------------------------------------------------------------------------------//
 void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node,
         std::vector<std::reference_wrapper<const Type>>& types)
 {
@@ -161,4 +181,10 @@ void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node,
     message += ("\t" + node.GetToken().GetLocation().ToString());
 
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);    
+}
+
+void SemanticAnalysisVisitor::IfStatementNonBooleanConditionError(IfStatementNode& node) {
+    std::string message = "if-statement at " + node.GetToken().GetLocation().ToString()
+            + " has non-boolean condition.";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }

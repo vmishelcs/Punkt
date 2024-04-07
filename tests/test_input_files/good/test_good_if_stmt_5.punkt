@@ -1,0 +1,42 @@
+main {
+    const x = 1.
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+    if x == 1 {
+        print "test".
+    }
+}

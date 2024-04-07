@@ -8,11 +8,13 @@
 #include "reserved_component.h"
 
 enum class KeywordEnum {
-    MAIN,
     CONST,
+    ELSE,
+    FALSE,
+    IF,
+    MAIN,
     PRINT,
     TRUE,
-    FALSE,
 };
 
 class Keyword : public ReservedComponent {

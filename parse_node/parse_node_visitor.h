@@ -12,6 +12,9 @@ public:
     virtual void VisitEnter(DeclarationStatementNode& node) = 0;
     virtual void VisitLeave(DeclarationStatementNode& node) = 0;
 
+    virtual void VisitEnter(IfStatementNode& node) = 0;
+    virtual void VisitLeave(IfStatementNode& node) = 0;
+
     virtual void VisitEnter(MainNode& node) = 0;
     virtual void VisitLeave(MainNode& node) = 0;
 

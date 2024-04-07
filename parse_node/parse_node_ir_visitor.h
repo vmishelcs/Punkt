@@ -9,6 +9,7 @@ class ParseNodeIRVisitor {
 public:
     virtual llvm::Value *GenerateCode(CodeBlockNode& node) = 0;
     virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) = 0;
+    virtual llvm::Value *GenerateCode(IfStatementNode& node) = 0;
     virtual llvm::Value *GenerateCode(MainNode& node) = 0;
     virtual llvm::Value *GenerateCode(OperatorNode& node) = 0;
     virtual llvm::Value *GenerateCode(PrintStatementNode& node) = 0;

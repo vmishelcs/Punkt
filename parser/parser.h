@@ -33,6 +33,10 @@ private:
     bool StartsDeclaration(Token& token);
     std::unique_ptr<ParseNode> ParseDeclaration();
 
+    bool StartsIfStatement(Token& token);
+    bool StartsElseBlock(Token& token);
+    std::unique_ptr<ParseNode> ParseIfStatement();
+
     bool StartsPrintStatement(Token& token);
     std::unique_ptr<ParseNode> ParsePrintStatement();
 

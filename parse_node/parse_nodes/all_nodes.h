@@ -7,6 +7,7 @@
 #include "declaration_statement_node.h"
 #include "error_node.h"
 #include "identifier_node.h"
+#include "if_statement_node.h"
 #include "integer_literal_node.h"
 #include "main_node.h"
 #include "operator_node.h"

@@ -32,37 +32,90 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
-    for (ParseNode& child : node.GetChildren()) {
-        child.GenerateCode(*this);
+    for (auto child : node.GetChildren()) {
+        child->GenerateCode(*this);
     }
     return nullptr; // This method's return value is not used anywhere.
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node) {
-    IdentifierNode& identifier_node = dynamic_cast<IdentifierNode&>(node.GetChild(0));
+    auto identifier_node = dynamic_cast<IdentifierNode *>(node.GetChild(0));
 
-    llvm::Value *value = node.GetChild(1).GenerateCode(*this);
+    // Generate code for initializer value.
+    llvm::Value *initializer_value = node.GetChild(1)->GenerateCode(*this);
+    
     // Store boolean values as 8-bit integers.
-    if (node.GetChild(1).GetType() == TypeEnum::BOOLEAN) {
-        value = builder->CreateZExt(value, llvm::Type::getInt8Ty(*context), "zexttmp");
+    if (node.GetChild(1)->GetType() == TypeEnum::BOOLEAN) {
+        initializer_value = builder->CreateZExt(initializer_value, llvm::Type::getInt8Ty(*context),
+                "zexttmp");
     }
 
-    llvm::AllocaInst *store_value = builder->CreateAlloca(value->getType(), nullptr,
-            identifier_node.GetName());
+    llvm::AllocaInst *alloca_inst = builder->CreateAlloca(initializer_value->getType(), nullptr,
+            identifier_node->GetName());
 
-    auto symbol_data_opt = identifier_node.FindIdentifierSymbolData();
+    auto symbol_data_opt = identifier_node->FindIdentifierSymbolData();
     if (!symbol_data_opt.has_value()) {
         CodeGenerationInternalError("missing entry in symbol table for "
-                + identifier_node.ToString());
+                + identifier_node->ToString());
     }
     else {
         SymbolData &symbol_data = symbol_data_opt.value();
-        symbol_data.llvm_alloc_value = store_value;
+        symbol_data.llvm_alloc_value = alloca_inst;
     }
 
-    builder->CreateStore(value, store_value);
+    builder->CreateStore(initializer_value, alloca_inst);
 
-    return value;
+    return initializer_value;
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
+    llvm::Value *condition = node.GetChild(0)->GenerateCode(*this);
+    if (!condition) {
+        return CodeGenerationInternalError("failed generating condition for if-statement");
+    }
+    // Truncate condition to make sure it has LLVM type `i8`.
+    condition = builder->CreateTrunc(condition, llvm::Type::getInt1Ty(*context), "trunctmp");
+
+    auto parent_function = builder->GetInsertBlock()->getParent();
+
+    // Create blocks for 'then' and 'else' cases, and the block where the control merges. Note that
+    // we do not require the programmer to provide an 'else' block, hence we leave it as null for
+    // now to be initialized later.
+    llvm::BasicBlock *then_block = llvm::BasicBlock::Create(*context, "then", parent_function);
+    llvm::BasicBlock *else_block = nullptr;
+    llvm::BasicBlock *merge_block = llvm::BasicBlock::Create(*context, "ifcont");
+
+    if (node.HasElseBlock()) {
+        // This is where we initialize 'else' if it was provided.
+        else_block = llvm::BasicBlock::Create(*context, "else");
+        builder->CreateCondBr(condition, then_block, else_block);
+    }
+    else {
+        builder->CreateCondBr(condition, then_block, merge_block);
+    }
+
+    // Emit 'then' block.
+    builder->SetInsertPoint(then_block);
+    node.GetChild(1)->GenerateCode(*this);
+    // Create a break statement to merge control flow.
+    builder->CreateBr(merge_block);
+    then_block = builder->GetInsertBlock();
+
+    if (node.HasElseBlock()) {
+        // Emit 'else' block.
+        parent_function->insert(parent_function->end(), else_block);
+        builder->SetInsertPoint(else_block);
+        node.GetChild(2)->GenerateCode(*this);
+        // Create a break statement to merge control flow.
+        builder->CreateBr(merge_block);
+        else_block = builder->GetInsertBlock();
+    }
+
+    // Emit 'merge' block.
+    parent_function->insert(parent_function->end(), merge_block);
+    builder->SetInsertPoint(merge_block);
+
+    return nullptr;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
@@ -83,7 +136,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
     builder->SetInsertPoint(entry_block);
 
     // Generate for 'main' code block
-    node.GetChild(0).GenerateCode(*this);
+    node.GetChild(0)->GenerateCode(*this);
 
     // Main always returns void
     builder->CreateRetVoid();
@@ -96,7 +149,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
 llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
     unsigned num_operands = node.GetChildren().size();
     if (num_operands == 1) {
-        llvm::Value *operand = node.GetChild(0).GenerateCode(*this);
+        llvm::Value *operand = node.GetChild(0)->GenerateCode(*this);
 
         // Obtain codegen function pointer for 1 operand from variant.
         try {
@@ -110,8 +163,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
 
     }
     if (num_operands == 2) {
-        llvm::Value *lhs = node.GetChild(0).GenerateCode(*this);
-        llvm::Value *rhs = node.GetChild(1).GenerateCode(*this);
+        llvm::Value *lhs = node.GetChild(0)->GenerateCode(*this);
+        llvm::Value *rhs = node.GetChild(1)->GenerateCode(*this);
 
         // Obtain codegen function pointer for 2 operands from variant.
         try {
@@ -133,8 +186,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
     llvm::Value *ret_value = nullptr;
 
     // We call printf for each 'operand'
-    for (ParseNode& child : node.GetChildren()) {
-        ret_value = PrintValue(child.GenerateCode(*this), child.GetType());
+    for (auto child : node.GetChildren()) {
+        ret_value = PrintValue(child->GenerateCode(*this), child->GetType());
     }
 
     // Print line feed once we are finished
@@ -148,7 +201,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
     
     GenerateGlobalConstants();
 
-    auto result = node.GetChild(0).GenerateCode(*this);
+    auto result = node.GetChild(0)->GenerateCode(*this);
 
     llvm::verifyModule(*module);
 
@@ -159,8 +212,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
     // Search for an `llvm_alloc_value` in the symbol table.
     auto alloca_instr = node.FindLLVMAllocation();
     if (!alloca_instr) {
-        CodeGenerationInternalError("unable to find llvm_alloc_value instruction for " + node.ToString()
-                + " in symbol table");
+        CodeGenerationInternalError("unable to find llvm_alloc_value instruction for "
+                + node.ToString() + " in symbol table");
     }
 
     return builder->CreateLoad(alloca_instr->getAllocatedType(), alloca_instr, node.GetName());

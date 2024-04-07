@@ -47,6 +47,9 @@ public:
     virtual void VisitEnter(DeclarationStatementNode& node) override;
     virtual void VisitLeave(DeclarationStatementNode& node) override;
 
+    virtual void VisitEnter(IfStatementNode& node) override;
+    virtual void VisitLeave(IfStatementNode& node) override;
+
     virtual void VisitEnter(MainNode& node) override;
     virtual void VisitLeave(MainNode& node) override;
 

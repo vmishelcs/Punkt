@@ -12,6 +12,9 @@ public:
     virtual void VisitEnter(DeclarationStatementNode& node) override;
     virtual void VisitLeave(DeclarationStatementNode& node) override;
 
+    virtual void VisitEnter(IfStatementNode& node) override;
+    virtual void VisitLeave(IfStatementNode& node) override;
+
     virtual void VisitEnter(MainNode& node) override;
     virtual void VisitLeave(MainNode& node) override;
 
@@ -33,16 +36,17 @@ public:
     virtual void Visit(StringLiteralNode& node) override;
 
 private:
-    // Miscellaneous helpers
+    // ---- Miscellaneous helpers ------------------------------------------------------------
     void DeclareInLocalScope(IdentifierNode& node, bool is_mutable, const Type& type);
     bool IsBeingDeclared(IdentifierNode& node);
 
-    // Scoping
+    // ---- Scoping --------------------------------------------------------------------------
     void CreateGlobalScope(ProgramNode& node);
     void CreateSubscope(CodeBlockNode& node);
 
-    // Error reporting
+    // ---- Error reporting ------------------------------------------------------------------
     void InvalidOperandTypeError(OperatorNode& node, std::vector<std::reference_wrapper<const Type>>& types);
+    void IfStatementNonBooleanConditionError(IfStatementNode& node);
 };
 
 #endif // SEMANTIC_ANALYSIS_VISITOR_H_

@@ -10,6 +10,8 @@ add_library(error_node error_node.cc)
 
 add_library(identifier_node identifier_node.cc)
 
+add_library(if_statement_node if_statement_node.cc)
+
 add_library(integer_literal_node integer_literal_node.cc)
 
 add_library(main_node main_node.cc)

@@ -24,6 +24,7 @@ enum class ParseNodeType {
     DECLARATION_STATEMENT_NODE,
     ERROR_NODE,
     IDENTIFIER_NODE,
+    IF_STATEMENT_NODE,
     INTEGER_LITERAL_NODE,
     MAIN_NODE,
     OPERATOR_NODE,
@@ -40,9 +41,10 @@ public:
 
     Token& GetToken() const;
 
-    ParseNode& GetParent() const;
-    ParseNode& GetChild(int i) const;
-    std::vector<std::reference_wrapper<ParseNode>> GetChildren() const;
+    ParseNode *GetParent() const;
+    unsigned NumChildren() const;
+    ParseNode *GetChild(unsigned i) const;
+    std::vector<ParseNode *> GetChildren() const;
     void AppendChild(std::unique_ptr<ParseNode> node);
 
     std::vector<ParseNode *> GetPathToRoot();

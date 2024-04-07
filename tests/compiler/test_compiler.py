@@ -361,3 +361,35 @@ class TestCompiler(object):
     def test_good_bool_expr_6(self):
         actual_output_path = self.run_compiler()
         self.output_matches(actual_output_path)
+
+    def test_good_if_stmt_1(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
+
+    def test_good_if_stmt_2(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
+
+    def test_good_if_stmt_3(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
+
+    def test_good_if_stmt_4(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
+
+    def test_good_if_stmt_5(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
+
+    def test_good_if_stmt_6(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
+
+    def test_good_if_stmt_7(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
+
+    def test_good_if_stmt_8(self):
+        actual_output_path = self.run_compiler()
+        self.output_matches(actual_output_path)
