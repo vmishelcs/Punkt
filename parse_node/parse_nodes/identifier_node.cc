@@ -1,16 +1,16 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
-#include <token/identifier_token.h>
+#include <token/token.h>
 
 #include "identifier_node.h"
 
 IdentifierNode::IdentifierNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::IDENTIFIER_NODE, std::move(token))
+    , name(this->token->GetLexeme())
 {}
 
 std::string IdentifierNode::GetName() const {
-    IdentifierToken& identifier_token = dynamic_cast<IdentifierToken&>(*token);
-    return identifier_token.GetLexeme();
+    return name;
 }
 
 std::string IdentifierNode::ToString() const {

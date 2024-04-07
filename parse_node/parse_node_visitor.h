@@ -6,6 +6,9 @@
 class ParseNodeVisitor {
 public:
     // Non-leaf nodes
+    virtual void VisitEnter(AssignmentStatementNode& node) = 0;
+    virtual void VisitLeave(AssignmentStatementNode& node) = 0;
+
     virtual void VisitEnter(CodeBlockNode& node) = 0;
     virtual void VisitLeave(CodeBlockNode& node) = 0;
 

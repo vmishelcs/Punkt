@@ -31,6 +31,29 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
     module->print(ir_ostream, nullptr);
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(AssignmentStatementNode& node) {
+    auto target = node.GetChild(0);
+    if (target->GetParseNodeType() == ParseNodeType::IDENTIFIER_NODE) {
+        IdentifierNode *identifier = static_cast<IdentifierNode *>(target);
+        auto alloca_inst = identifier->FindAlloca();
+
+        // Generate code for new value.
+        auto new_value = node.GetChild(1)->GenerateCode(*this);
+
+        // Store boolean values as 8-bit integers.
+        if (node.GetChild(1)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) {
+            new_value = builder->CreateZExt(new_value, llvm::Type::getInt8Ty(*context),
+                    "zexttmp");
+        }
+
+        builder->CreateStore(new_value, alloca_inst);
+        return new_value;
+    }
+    else {
+        return CodeGenerationInternalError("non-targettable expression in assingment statement");
+    }
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
     for (auto child : node.GetChildren()) {
         child->GenerateCode(*this);

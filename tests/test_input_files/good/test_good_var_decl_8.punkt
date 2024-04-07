@@ -1,0 +1,18 @@
+main {
+	var b = true.
+	if (b) {
+		b = false.
+		print "setting b to false ... ".
+	} else {
+		print "b is false.".
+	}
+
+	if (b) {
+		print "b has not been set to false.".
+	} else {
+		print "b really is false.".
+		b = true.
+	}
+
+	print b.
+}

@@ -1,0 +1,8 @@
+main {
+	var x = 0.
+	if x == 1 {
+		x = 1.
+		print "setting x <- 1".
+	}
+	print x.
+}

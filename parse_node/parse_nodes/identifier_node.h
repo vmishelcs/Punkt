@@ -6,12 +6,14 @@
 
 #include <parse_node/parse_node.h>
 #include <symbol_table/symbol_table.h>
+#include <token/token.h>
 
 class IdentifierNode : public ParseNode {
 public:
     IdentifierNode(std::unique_ptr<Token> token);
 
     std::string GetName() const;
+    bool IsMutable() const;
 
     virtual std::string ToString() const override;
 
@@ -19,10 +21,14 @@ public:
 
     std::optional<std::reference_wrapper<SymbolTableEntry>> FindSymbolTableEntry();
 
-    Type *FindType();
+    // Type *FindType();
     llvm::AllocaInst *FindAlloca();
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+
+private:
+    std::string name;
+    bool is_mutable;
 };
 
 #endif // IDENTIFIER_NODE_H_

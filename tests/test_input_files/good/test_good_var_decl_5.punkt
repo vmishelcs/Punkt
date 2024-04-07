@@ -1,0 +1,9 @@
+main {
+	var x = 0.
+	if (true) {
+		x = 1337.
+	} else {
+		x = 101.
+	}
+	print x.
+}

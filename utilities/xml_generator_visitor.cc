@@ -61,7 +61,24 @@ XMLGeneratorVisitor::XMLGeneratorVisitor(std::ostream& output_stream)
     this->depth = 0;
 }
 
-// Non-leaf nodes
+//--------------------------------------------------------------------------------------//
+//                                    Non-leaf nodes                                    //
+//--------------------------------------------------------------------------------------//
+void XMLGeneratorVisitor::VisitEnter(AssignmentStatementNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("AssignmentStatementNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(AssignmentStatementNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("AssignmentStatementNode");
+
+    --depth;
+    OutputTag(*tag);
+}
+
 void XMLGeneratorVisitor::VisitEnter(CodeBlockNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("CodeBlockNode");
 
@@ -81,6 +98,7 @@ void XMLGeneratorVisitor::VisitEnter(DeclarationStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("DeclarationStatementNode");
 
     AddBasicParseNodeAttributes(*tag, node);
+    tag->AddAttribute("mutable", node.GetToken().GetLexeme() == "var" ? "true" : "false");
 
     OutputTag(*tag);
     ++depth;
@@ -168,7 +186,9 @@ void XMLGeneratorVisitor::VisitLeave(ProgramNode& node) {
     OutputTag(*tag);
 }
 
-// Leaf nodes
+//--------------------------------------------------------------------------------------//
+//                                      Leaf nodes                                      //
+//--------------------------------------------------------------------------------------//
 void XMLGeneratorVisitor::Visit(ErrorNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("ErrorNode");
 

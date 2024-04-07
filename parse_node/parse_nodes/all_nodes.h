@@ -1,6 +1,7 @@
 #ifndef ALL_NODES_H_
 #define ALL_NODES_H_
 
+#include "assignment_statement_node.h"
 #include "boolean_literal_node.h"
 #include "character_literal_node.h"
 #include "code_block_node.h"

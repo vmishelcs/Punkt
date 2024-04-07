@@ -15,6 +15,7 @@ enum class KeywordEnum {
     MAIN,
     PRINT,
     TRUE,
+    VAR,
 };
 
 class Keyword : public ReservedComponent {

@@ -18,6 +18,7 @@ class ParseNodeVisitor;
 class ParseNodeIRVisitor;
 
 enum class ParseNodeType {
+    ASSIGNMENT_STATEMENT_NODE,
     BOOLEAN_LITERAL_NODE,
     CHARACTER_LITERAL_NODE,
     CODE_BLOCK_NODE,

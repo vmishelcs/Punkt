@@ -10,6 +10,37 @@
 //--------------------------------------------------------------------------------------//
 //                                    Non-leaf nodes                                    //
 //--------------------------------------------------------------------------------------//
+void SemanticAnalysisVisitor::VisitEnter(AssignmentStatementNode& node) {
+    // Do nothing
+}
+void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode& node) {
+    auto target = node.GetChild(0);
+    if (target->GetParseNodeType() == ParseNodeType::IDENTIFIER_NODE) {
+        IdentifierNode *identifier_node = static_cast<IdentifierNode *>(target);
+
+        // Make sure identifier is mutable.
+        if (!identifier_node->FindSymbolTableEntry().value().get().is_mutable) {
+            AssignmentToImmutableTargetError(*identifier_node);
+            node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+            return;
+        }
+
+        auto new_value = node.GetChild(1);
+
+        // Make sure we are assigning an equivalent type.
+        if (!identifier_node->GetType()->EquivalentTo(*new_value->GetType())) {
+            AssignmentTypeMismatchError(*identifier_node, *identifier_node->GetType(),
+                    *new_value->GetType());
+            node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+            return;
+        }
+    }
+    else {
+        NonTargettableExpressionError(*target);
+        node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+    }
+}
+
 void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode& node) {
     CreateSubscope(node);
 }
@@ -21,7 +52,7 @@ void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode& node) {
     // Do nothing
 }
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
-    // bool is_mutable = KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
+    bool is_mutable = KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
 
     IdentifierNode *identifier = dynamic_cast<IdentifierNode *>(node.GetChild(0));
     auto initializer = node.GetChild(1);
@@ -31,7 +62,7 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
     identifier->SetType(std::make_unique<Type>(*declaration_type));
 
     // Note the use of identifier-owned Type pointer.
-    DeclareInLocalScope(*identifier, /* is_mutable = */ false, identifier->GetType());
+    DeclareInLocalScope(*identifier, is_mutable, identifier->GetType());
 }
 
 void SemanticAnalysisVisitor::VisitEnter(IfStatementNode& node) {
@@ -180,5 +211,24 @@ void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::v
 void SemanticAnalysisVisitor::IfStatementNonBooleanConditionError(IfStatementNode& node) {
     std::string message = "if-statement at " + node.GetToken().GetLocation().ToString()
             + " has non-boolean condition.";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::NonTargettableExpressionError(ParseNode& node) {
+    std::string message = "non-targettable expression provided in assignment statement at \n\t"
+        + node.GetToken().GetLocation().ToString();
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::AssignmentToImmutableTargetError(ParseNode& node) {
+    std::string message = "variable at " + node.GetToken().GetLocation().ToString()
+            + " is immutable.";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::AssignmentTypeMismatchError(ParseNode& node, const Type& target_type,
+            const Type& value_type) {
+    std::string message = "cannot assign \'" + value_type.ToString()
+            + "\' value to a target of type \'" + target_type.ToString() + "\'.";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }

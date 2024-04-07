@@ -14,6 +14,7 @@ public:
 
     void WriteIRToFD(int fd);
 
+    virtual llvm::Value *GenerateCode(AssignmentStatementNode& node) override;
     virtual llvm::Value *GenerateCode(CodeBlockNode& node) override;
     virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) override;
     virtual llvm::Value *GenerateCode(IfStatementNode& node) override;

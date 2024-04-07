@@ -40,7 +40,10 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
 public:
     XMLGeneratorVisitor(std::ostream& output_stream);
 
-    // Non-leaf nodes
+    // ---- Non-leaf nodes -------------------------------------------------------------------
+    virtual void VisitEnter(AssignmentStatementNode& node) override;
+    virtual void VisitLeave(AssignmentStatementNode& node) override;
+
     virtual void VisitEnter(CodeBlockNode& node) override;
     virtual void VisitLeave(CodeBlockNode& node) override;
 
@@ -62,7 +65,7 @@ public:
     virtual void VisitEnter(ProgramNode& node) override;
     virtual void VisitLeave(ProgramNode& node) override;
 
-    // Leaf nodes
+    // ---- Leaf nodes -----------------------------------------------------------------------
     virtual void Visit(ErrorNode& node) override;
     virtual void Visit(IdentifierNode& node) override;
     virtual void Visit(BooleanLiteralNode& node) override;

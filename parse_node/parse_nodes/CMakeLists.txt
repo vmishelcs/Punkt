@@ -1,3 +1,5 @@
+add_library(assignment_statement_node assignment_statement_node.cc)
+
 add_library(boolean_literal_node boolean_literal_node.cc)
 
 add_library(character_literal_node character_literal_node.cc)

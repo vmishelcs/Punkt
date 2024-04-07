@@ -27,7 +27,7 @@ TypeEnum Type::GetTypeEnum() const {
 }
 
 std::string Type::ToString() const {
-    return "[Type: " + GetTypeEnumString(type_enum) + "]";
+    return GetTypeEnumString(type_enum);
 }
 
 std::string Type::GetAttributeString() const {

@@ -115,6 +115,7 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
 bool Parser::StartsStatement(Token& token) {
     return StartsCodeBlock(token)
         || StartsDeclaration(token)
+        || StartsAssignment(token)
         || StartsIfStatement(token)
         || StartsPrintStatement(token);
 }
@@ -124,6 +125,9 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
     }
     if (StartsDeclaration(*now_reading)) {
         return ParseDeclaration();
+    }
+    if (StartsAssignment(*now_reading)) {
+        return ParseAssignment();
     }
     if (StartsIfStatement(*now_reading)) {
         return ParseIfStatement();
@@ -164,23 +168,22 @@ bool Parser::StartsDeclaration(Token& token) {
     }
 
     KeywordToken& keyword_token = dynamic_cast<KeywordToken&>(token);
-    return KeywordToken::IsTokenKeyword(keyword_token, {KeywordEnum::CONST});
+    return KeywordToken::IsTokenKeyword(keyword_token, {KeywordEnum::CONST, KeywordEnum::VAR});
 }
 std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
     if (!StartsDeclaration(*now_reading)) {
         return SyntaxErrorUnexpectedToken("declaration statement");
     }
 
-    std::unique_ptr<ParseNode> declaration =
-        std::make_unique<DeclarationStatementNode>(std::move(now_reading));
+    auto declaration = std::make_unique<DeclarationStatementNode>(std::move(now_reading));
 
     ReadToken();
 
-    std::unique_ptr<ParseNode> identifier = ParseIdentifier();
+    auto identifier = ParseIdentifier();
 
     Expect(PunctuatorEnum::EQUAL);
 
-    std::unique_ptr<ParseNode> initializer = ParseExpression();
+    auto initializer = ParseExpression();
 
     Expect(PunctuatorEnum::TERMINATOR);
 
@@ -188,6 +191,44 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
     declaration->AppendChild(std::move(initializer));
 
     return declaration;
+}
+
+bool Parser::StartsAssignment(Token& token) {
+    return StartsTargettableExpression(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseAssignment() {
+    if (!StartsAssignment(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("assignment statement");
+    }
+
+    auto assignment = std::make_unique<AssignmentStatementNode>(nullptr);
+
+    auto target = ParseTargettableExpression();
+
+    Expect(PunctuatorEnum::EQUAL);
+
+    auto new_value = ParseExpression();
+
+    Expect(PunctuatorEnum::TERMINATOR);
+
+    assignment->AppendChild(std::move(target));
+    assignment->AppendChild(std::move(new_value));
+
+    return assignment;
+}
+
+bool Parser::StartsTargettableExpression(Token& token) {
+    return StartsIdentifier(token)
+        || StartsParenthesizedExpression(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseTargettableExpression() {
+    if (StartsParenthesizedExpression(*now_reading)) {
+        return ParseParenthesizedExpression();
+    }
+    if (StartsIdentifier(*now_reading)) {
+        return ParseIdentifier();
+    }
+    return SyntaxErrorUnexpectedToken("targettable expression");
 }
 
 bool Parser::StartsIfStatement(Token& token) {
@@ -482,8 +523,7 @@ std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
         return SyntaxErrorUnexpectedToken("identifier");
     }
 
-    std::unique_ptr<ParseNode> identifier =
-        std::make_unique<IdentifierNode>(std::move(now_reading));
+    auto identifier = std::make_unique<IdentifierNode>(std::move(now_reading));
 
     ReadToken();
 

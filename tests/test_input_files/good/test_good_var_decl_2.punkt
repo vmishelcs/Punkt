@@ -1,0 +1,8 @@
+main {
+	var x = 1.
+	var y = x.
+	print x, y.
+	y = 2 * y.
+	x = 3 * y.
+	print x,y.
+}

@@ -1,5 +1,6 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
+#include <parse_node/parse_node.h>
 
 #include "declaration_statement_node.h"
 
