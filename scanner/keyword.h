@@ -11,6 +11,7 @@ enum class KeywordEnum {
     CONST,
     ELSE,
     FALSE,
+    FOR,
     IF,
     MAIN,
     PRINT,

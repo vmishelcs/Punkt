@@ -6,7 +6,7 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 
 |Token type|REGEX|
 |----------|-----|
-| Keywords | `const` `else` `if` `main` `print` `var` |
+| Keywords | `const` `else` `for` `if` `main` `print` `var` |
 | Identifier |[ `_` `a`-`z`  `A`-`Z` ] [ `_` `a`-`z` `A`-`Z` `0`-`9` ]<sup>*</sup> |
 | Boolean literal | `true` `false` |
 | Character literal | **\'** \<printable-char\> **\'** | 

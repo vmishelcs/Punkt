@@ -4,6 +4,7 @@ std::unordered_map<std::string, KeywordEnum> Keyword::dictionary = {
     { "const", KeywordEnum::CONST },
     { "else",  KeywordEnum::ELSE  },
     { "false", KeywordEnum::FALSE },
+    { "for",   KeywordEnum::FOR   },
     { "if",    KeywordEnum::IF    },
     { "main",  KeywordEnum::MAIN  },
     { "print", KeywordEnum::PRINT },

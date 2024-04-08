@@ -1,0 +1,7 @@
+main {
+	const n = 7.
+	var i = 0.
+	for , i <= n, i = i + 1 {
+		print i.
+	}
+}

@@ -6,11 +6,18 @@
 
 BooleanLiteralNode::BooleanLiteralNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::BOOLEAN_LITERAL_NODE, std::move(token))
+{
+    BooleanLiteralToken *boolean_literal_token = (BooleanLiteralToken *)this->token.get();
+    this->value = boolean_literal_token->GetValue();
+}
+
+BooleanLiteralNode::BooleanLiteralNode(bool value)
+    : ParseNode(ParseNodeType::BOOLEAN_LITERAL_NODE, nullptr)
+    , value(value)
 {}
 
 bool BooleanLiteralNode::GetValue() const {
-    BooleanLiteralToken& boolean_literal_token = dynamic_cast<BooleanLiteralToken&>(*(this->token));
-    return boolean_literal_token.GetValue();
+    return value;
 }
 
 std::string BooleanLiteralNode::ToString() const {

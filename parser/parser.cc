@@ -81,9 +81,9 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
     std::unique_ptr<ParseNode> main = ParseMain();
     program->AppendChild(std::move(main));
 
-    if (now_reading->GetTokenType() != TokenType::EOF_TOKEN) {
-        return SyntaxErrorUnexpectedToken("end of program");
-    }
+    // if (now_reading->GetTokenType() != TokenType::EOF_TOKEN) {
+    //     return SyntaxErrorUnexpectedToken("end of program");
+    // }
 
     return program;
 }
@@ -117,6 +117,7 @@ bool Parser::StartsStatement(Token& token) {
         || StartsDeclaration(token)
         || StartsAssignment(token)
         || StartsIfStatement(token)
+        || StartsForStatement(token)
         || StartsPrintStatement(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseStatement() {
@@ -131,6 +132,9 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
     }
     if (StartsIfStatement(*now_reading)) {
         return ParseIfStatement();
+    }
+    if (StartsForStatement(*now_reading)) {
+        return ParseForStatement();
     }
     if (StartsPrintStatement(*now_reading)) {
         return ParsePrintStatement();
@@ -170,7 +174,7 @@ bool Parser::StartsDeclaration(Token& token) {
     KeywordToken& keyword_token = dynamic_cast<KeywordToken&>(token);
     return KeywordToken::IsTokenKeyword(keyword_token, {KeywordEnum::CONST, KeywordEnum::VAR});
 }
-std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
+std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
     if (!StartsDeclaration(*now_reading)) {
         return SyntaxErrorUnexpectedToken("declaration statement");
     }
@@ -185,7 +189,9 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
 
     auto initializer = ParseExpression();
 
-    Expect(PunctuatorEnum::TERMINATOR);
+    if (expect_terminator) {
+        Expect(PunctuatorEnum::TERMINATOR);   
+    }
 
     declaration->AppendChild(std::move(identifier));
     declaration->AppendChild(std::move(initializer));
@@ -196,23 +202,24 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration() {
 bool Parser::StartsAssignment(Token& token) {
     return StartsTargettableExpression(token);
 }
-std::unique_ptr<ParseNode> Parser::ParseAssignment() {
+std::unique_ptr<ParseNode> Parser::ParseAssignment(bool expect_terminator) {
     if (!StartsAssignment(*now_reading)) {
         return SyntaxErrorUnexpectedToken("assignment statement");
     }
 
-    auto assignment = std::make_unique<AssignmentStatementNode>(nullptr);
+    auto assignment = std::make_unique<AssignmentStatementNode>();
 
     auto target = ParseTargettableExpression();
+    assignment->AppendChild(std::move(target));
 
     Expect(PunctuatorEnum::EQUAL);
 
     auto new_value = ParseExpression();
-
-    Expect(PunctuatorEnum::TERMINATOR);
-
-    assignment->AppendChild(std::move(target));
     assignment->AppendChild(std::move(new_value));
+
+    if (expect_terminator) {
+        Expect(PunctuatorEnum::TERMINATOR);   
+    }
 
     return assignment;
 }
@@ -253,7 +260,7 @@ std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
     if_statement->AppendChild(std::move(condition));
     if_statement->AppendChild(std::move(then_block));
 
-    // We can add `elif` parsing later...
+    // TODO: We can add `elif` parsing later...
     // while (StartsElifBlock(*now_reading)) {
     //     ...
     // }
@@ -269,10 +276,66 @@ std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
     return if_statement;
 }
 
+bool Parser::StartsForStatement(Token& token) {
+    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::FOR});
+}
+std::unique_ptr<ParseNode> Parser::ParseForStatement() {
+    if (!StartsForStatement(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("for statement");
+    }
+
+    auto for_statement = std::make_unique<ForStatementNode>(std::move(now_reading));
+
+    ReadToken();
+
+    // Append a loop initializer node. If no initializer is specified, a noop is appended.
+    std::unique_ptr<ParseNode> init = nullptr;
+    if (StartsDeclaration(*now_reading)) {
+        init = ParseDeclaration(/* expect_terminator = */ false);
+    }
+    else if (StartsAssignment(*now_reading)) {
+        init = ParseAssignment(/* expect_terminator = */ false);
+    }
+    else {
+        init = std::make_unique<NopNode>();
+    }
+    for_statement->AppendChild(std::move(init));
+
+    Expect(PunctuatorEnum::SEPARATOR);
+
+    // Append a loop condition node. If no condition is specified, condition is always true.
+    std::unique_ptr<ParseNode> condition = nullptr;
+    if (StartsExpression(*now_reading)) {
+        condition = ParseExpression();
+    }
+    else {
+        condition = std::make_unique<BooleanLiteralNode>(true);
+    }
+    for_statement->AppendChild(std::move(condition));
+
+    Expect(PunctuatorEnum::SEPARATOR);
+
+    // Append a loop increment node. If no increment is specified, a noop is appended.
+    std::unique_ptr<ParseNode> increment = nullptr;
+    if (StartsAssignment(*now_reading)) {
+        increment = ParseAssignment(/* expect_terminator = */ false);
+    }
+    else {
+        increment = std::make_unique<NopNode>();
+    }
+    for_statement->AppendChild(std::move(increment));
+
+    // Append loop body.
+    auto loop_body = ParseCodeBlock();
+    for_statement->AppendChild(std::move(loop_body));
+
+    return for_statement;
+}
+
 bool Parser::StartsPrintStatement(Token& token) {
     return KeywordToken::IsTokenKeyword(token, {KeywordEnum::PRINT});
 }
-std::unique_ptr<ParseNode> Parser::ParsePrintStatement() {
+std::unique_ptr<ParseNode> Parser::ParsePrintStatement(bool expect_terminator) {
     if (!StartsPrintStatement(*now_reading)) {
         return SyntaxErrorUnexpectedToken("print statement");
     }
@@ -284,7 +347,9 @@ std::unique_ptr<ParseNode> Parser::ParsePrintStatement() {
 
     print_statement = ParsePrintExpressionList(std::move(print_statement));
 
-    Expect(PunctuatorEnum::TERMINATOR);
+    if (expect_terminator) {
+        Expect(PunctuatorEnum::TERMINATOR);   
+    }
 
     return print_statement;
 }

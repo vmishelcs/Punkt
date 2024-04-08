@@ -15,6 +15,9 @@ public:
     virtual void VisitEnter(DeclarationStatementNode& node) override;
     virtual void VisitLeave(DeclarationStatementNode& node) override;
 
+    virtual void VisitEnter(ForStatementNode& node) override;
+    virtual void VisitLeave(ForStatementNode& node) override;
+
     virtual void VisitEnter(IfStatementNode& node) override;
     virtual void VisitLeave(IfStatementNode& node) override;
 
@@ -32,6 +35,7 @@ public:
 
     // ---- Leaf nodes -----------------------------------------------------------------------
     virtual void Visit(ErrorNode& node) override;
+    virtual void Visit(NopNode& node) override;
     virtual void Visit(IdentifierNode& node) override;
     virtual void Visit(BooleanLiteralNode& node) override;
     virtual void Visit(CharacterLiteralNode& node) override;
@@ -45,11 +49,12 @@ private:
 
     // ---- Scoping --------------------------------------------------------------------------
     void CreateGlobalScope(ProgramNode& node);
-    void CreateSubscope(CodeBlockNode& node);
+    void CreateSubscope(ParseNode& node);
 
     // ---- Error reporting ------------------------------------------------------------------
     void InvalidOperandTypeError(OperatorNode& node, std::vector<Type*>& types);
-    void IfStatementNonBooleanConditionError(IfStatementNode& node);
+    void NonBooleanConditionError(IfStatementNode& node);
+    void NonBooleanConditionError(ForStatementNode& node);
     void NonTargettableExpressionError(ParseNode& node);
     void AssignmentToImmutableTargetError(ParseNode& node);
     void AssignmentTypeMismatchError(ParseNode& node, const Type& target_type,

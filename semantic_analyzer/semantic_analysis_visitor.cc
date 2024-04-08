@@ -1,10 +1,9 @@
-#include "semantic_analysis_visitor.h"
-
 #include <symbol_table/scope.h>
 #include <token/keyword_token.h>
 #include <semantic_analyzer/signatures/signatures.h>
 #include <logging/punkt_logger.h>
 
+#include "semantic_analysis_visitor.h"
 #include "type.h"
 
 //--------------------------------------------------------------------------------------//
@@ -17,6 +16,12 @@ void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode& node) {
     auto target = node.GetChild(0);
     if (target->GetParseNodeType() == ParseNodeType::IDENTIFIER_NODE) {
         IdentifierNode *identifier_node = static_cast<IdentifierNode *>(target);
+
+        // Make sure identifier is not classified with error type.
+        if (identifier_node->GetType()->EquivalentTo(TypeEnum::ERROR)) {
+            node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+            return;
+        }
 
         // Make sure identifier is mutable.
         if (!identifier_node->FindSymbolTableEntry().value().get().is_mutable) {
@@ -65,12 +70,23 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
     DeclareInLocalScope(*identifier, is_mutable, identifier->GetType());
 }
 
+void SemanticAnalysisVisitor::VisitEnter(ForStatementNode& node) {
+    CreateSubscope(node);
+}
+void SemanticAnalysisVisitor::VisitLeave(ForStatementNode& node) {
+    // Make sure that the condition has boolean type.
+    if ( !(node.GetChild(1)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) ) {
+        NonBooleanConditionError(node);
+        node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
+    }
+}
+
 void SemanticAnalysisVisitor::VisitEnter(IfStatementNode& node) {
 }
 void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
     // We make sure that the condition has boolean type.
     if ( !(node.GetChild(0)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) ) {
-        IfStatementNonBooleanConditionError(node);
+        NonBooleanConditionError(node);
         node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
     }
 }
@@ -132,6 +148,9 @@ void SemanticAnalysisVisitor::VisitLeave(ProgramNode& node) {
 void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::ERROR));
 }
+void SemanticAnalysisVisitor::Visit(NopNode& node) {
+    // Do nothing
+}
 void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
     if (!IsBeingDeclared(node)) {
         auto symbol_table_entry_opt = node.FindSymbolTableEntry();
@@ -150,7 +169,6 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
             node.SetType(std::make_unique<Type>(*symbol_table_entry.type));
         }
     }
-    // Other semantic analysis is handled by VisitLeave(DeclarationStatementNode&)
 }
 void SemanticAnalysisVisitor::Visit(BooleanLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::BOOLEAN));
@@ -189,7 +207,7 @@ bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {
 void SemanticAnalysisVisitor::CreateGlobalScope(ProgramNode& node) {
     node.SetScope(Scope::CreateGlobalScope());
 }
-void SemanticAnalysisVisitor::CreateSubscope(CodeBlockNode& node) {
+void SemanticAnalysisVisitor::CreateSubscope(ParseNode& node) {
     Scope *local_scope = node.GetLocalScope();
     node.SetScope(local_scope->CreateSubscope());
 }
@@ -208,8 +226,14 @@ void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::v
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);    
 }
 
-void SemanticAnalysisVisitor::IfStatementNonBooleanConditionError(IfStatementNode& node) {
+void SemanticAnalysisVisitor::NonBooleanConditionError(IfStatementNode& node) {
     std::string message = "if-statement at " + node.GetToken().GetLocation().ToString()
+            + " has non-boolean condition.";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::NonBooleanConditionError(ForStatementNode& node) {
+    std::string message = "for-statement at " + node.GetToken().GetLocation().ToString()
             + " has non-boolean condition.";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }

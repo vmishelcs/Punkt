@@ -1,12 +1,12 @@
-#ifndef ASSIGNMENT_STATEMENT_NODE_H_
-#define ASSIGNMENT_STATEMENT_NODE_H_
+#ifndef NOP_NODE_H_
+#define NOP_NODE_H_
 
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
-class AssignmentStatementNode : public ParseNode {
+class NopNode : public ParseNode {
 public:
-    AssignmentStatementNode();
+    NopNode();
 
     virtual std::string ToString() const override;
 
@@ -15,4 +15,4 @@ public:
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 };
 
-#endif // ASSIGNMENT_STATEMENT_NODE_H_
+#endif // NOP_NODE_H_

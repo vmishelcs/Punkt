@@ -1,0 +1,7 @@
+main {
+	var p_count = 0.
+	for var i = 1, i <= 4096, i = i * 2 {
+		print "2^", p_count, " = ", i.
+		p_count = p_count + 1.
+	}
+}

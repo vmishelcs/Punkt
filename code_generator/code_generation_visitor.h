@@ -17,6 +17,7 @@ public:
     virtual llvm::Value *GenerateCode(AssignmentStatementNode& node) override;
     virtual llvm::Value *GenerateCode(CodeBlockNode& node) override;
     virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) override;
+    virtual llvm::Value *GenerateCode(ForStatementNode& node) override;
     virtual llvm::Value *GenerateCode(IfStatementNode& node) override;
     virtual llvm::Value *GenerateCode(MainNode& node) override;
     virtual llvm::Value *GenerateCode(OperatorNode& node) override;
@@ -24,6 +25,7 @@ public:
     virtual llvm::Value *GenerateCode(ProgramNode& node) override;
     
     virtual llvm::Value *GenerateCode(ErrorNode& node) override;
+    virtual llvm::Value *GenerateCode(NopNode& node) override;
     virtual llvm::Value *GenerateCode(IdentifierNode& node) override;
     virtual llvm::Value *GenerateCode(BooleanLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(CharacterLiteralNode& node) override;

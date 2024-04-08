@@ -429,3 +429,63 @@ class TestCompiler(object):
     def test_good_var_decl_8(self):
         actual_output_path = self.run_compiler_good()
         self.output_matches(actual_output_path)
+
+    def test_good_for_stmt_1(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_for_stmt_2(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path) 
+
+    def test_good_for_stmt_3(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path) 
+
+    def test_good_for_stmt_4(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_for_stmt_5(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path) 
+    
+    def test_good_for_stmt_6(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path) 
+    
+    def test_good_for_stmt_7(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_for_stmt_8(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_for_stmt_9(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_for_stmt_10(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_for_stmt_11(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_for_stmt_12(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_for_stmt_13(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_for_stmt_14(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_for_stmt_15(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)

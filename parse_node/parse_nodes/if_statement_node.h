@@ -1,6 +1,7 @@
 #ifndef IF_STATEMENT_NODE_H_
 #define IF_STATEMENT_NODE_H_
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 

@@ -5,7 +5,7 @@
 
 class ParseNodeVisitor {
 public:
-    // Non-leaf nodes
+    // ---- Non-leaf nodes -------------------------------------------------------------------
     virtual void VisitEnter(AssignmentStatementNode& node) = 0;
     virtual void VisitLeave(AssignmentStatementNode& node) = 0;
 
@@ -14,6 +14,9 @@ public:
 
     virtual void VisitEnter(DeclarationStatementNode& node) = 0;
     virtual void VisitLeave(DeclarationStatementNode& node) = 0;
+
+    virtual void VisitEnter(ForStatementNode& node) = 0;
+    virtual void VisitLeave(ForStatementNode& node) = 0;
 
     virtual void VisitEnter(IfStatementNode& node) = 0;
     virtual void VisitLeave(IfStatementNode& node) = 0;
@@ -30,8 +33,9 @@ public:
     virtual void VisitEnter(ProgramNode& node) = 0;
     virtual void VisitLeave(ProgramNode& node) = 0;
 
-    // Leaf nodes
+    // ---- Leaf nodes -----------------------------------------------------------------------
     virtual void Visit(ErrorNode& node) = 0;
+    virtual void Visit(NopNode& node) = 0;
     virtual void Visit(IdentifierNode& node) = 0;
     virtual void Visit(BooleanLiteralNode& node) = 0;
     virtual void Visit(CharacterLiteralNode& node) = 0;

@@ -1,0 +1,5 @@
+main {
+	for var c = true, c, c = false {
+		print c.
+	}
+}

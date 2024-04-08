@@ -1,5 +1,7 @@
 #include <variant>
 
+#include <llvm/IR/Instruction.h>
+#include <llvm/IR/Value.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/TargetParser/Host.h>
 #include <logging/punkt_logger.h>
@@ -93,6 +95,60 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     return initializer_value;
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode& node) {
+    // Emit code for the loop initializer.
+    node.GetChild(0)->GenerateCode(*this);
+
+    auto parent_function = builder->GetInsertBlock()->getParent();
+
+    // Create a basic block to check if the loop condition is true/false.
+    auto condition_block = llvm::BasicBlock::Create(*context, "condcheck", parent_function);
+
+    // Create a basic block for the loop and add it to the parent function.
+    auto loop_block = llvm::BasicBlock::Create(*context, "loop");
+
+    // Create a basic block for the loop exit.
+    auto afterloop_block = llvm::BasicBlock::Create(*context, "afterloop");
+
+    // Insert an explicit fall-through from the current block (before the loop) to the loop
+    // condition block.
+    builder->CreateBr(condition_block);
+
+    // Now we are inserting instructions into the loop condition block.
+    builder->SetInsertPoint(condition_block);
+
+    // Check if the condition to enter the loop is satisfied.
+    auto end_condition = node.GetChild(1)->GenerateCode(*this);
+    end_condition = builder->CreateTrunc(end_condition, llvm::Type::getInt1Ty(*context),
+            "trunctmp");
+    builder->CreateCondBr(end_condition, loop_block, afterloop_block);
+
+    // Append the 'loop' block after the 'condition' block.
+    parent_function->insert(parent_function->end(), loop_block);
+
+    // Now we are inserting instructions into the loop block.
+    builder->SetInsertPoint(loop_block);
+
+    // Emit loop body.
+    node.GetChild(3)->GenerateCode(*this);
+
+    // Emit code for the step value, appending it to the end of the loop body.
+    node.GetChild(2)->GenerateCode(*this);
+
+    // Create an unconditional branch to the start of the loop, where we check if the condition to
+    // continue looping is true/false.
+    builder->CreateBr(condition_block);
+    
+    // Append the 'afterloop' block after the 'loop' block. We jump to this block if the loop
+    // condition fails.
+    parent_function->insert(parent_function->end(), afterloop_block);
+
+    // Any new code will be inserted in the 'afterloop' block.
+    builder->SetInsertPoint(afterloop_block);
+
+    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
     llvm::Value *condition = node.GetChild(0)->GenerateCode(*this);
     if (!condition) {
@@ -103,9 +159,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
 
     auto parent_function = builder->GetInsertBlock()->getParent();
 
-    // Create blocks for 'then' and 'else' cases, and the block where the control merges. Note that
-    // we do not require the programmer to provide an 'else' block, hence we leave it as null for
-    // now to be initialized later.
+    // Create blocks for 'then' and 'else' cases, and the 'merge' block where the control merges.
+    // Note that we do not require the programmer to provide an 'else' clause, hence we leave it as
+    // null for now to be initialized later.
     llvm::BasicBlock *then_block = llvm::BasicBlock::Create(*context, "then", parent_function);
     llvm::BasicBlock *else_block = nullptr;
     llvm::BasicBlock *merge_block = llvm::BasicBlock::Create(*context, "ifcont");
@@ -124,7 +180,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
     node.GetChild(1)->GenerateCode(*this);
     // Create a break statement to merge control flow.
     builder->CreateBr(merge_block);
-    then_block = builder->GetInsertBlock();
 
     if (node.HasElseBlock()) {
         // Emit 'else' block.
@@ -140,7 +195,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
     parent_function->insert(parent_function->end(), merge_block);
     builder->SetInsertPoint(merge_block);
 
-    return nullptr;
+    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
@@ -261,6 +316,14 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode& node) {
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode& node) {
     return builder->CreateGlobalString(node.GetValue(), "", 0, module.get());
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode& node) {
+    return builder->CreateAdd(
+        llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
+        llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
+        "nop"
+    );
 }
 
 //--------------------------------------------------------------------------------------//

@@ -1,0 +1,9 @@
+main {
+	const n = 5.
+	for var i = 0, i < n, i = i + 1 {
+		print "i = ", i.
+		for var j = i, j < n, j = j + 1 {
+			print "j = ", j.
+		}
+	}
+}

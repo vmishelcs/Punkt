@@ -31,10 +31,10 @@ private:
     std::unique_ptr<ParseNode> ParseCodeBlock();
 
     bool StartsDeclaration(Token& token);
-    std::unique_ptr<ParseNode> ParseDeclaration();
+    std::unique_ptr<ParseNode> ParseDeclaration(bool expect_terminator = true);
 
     bool StartsAssignment(Token& token);
-    std::unique_ptr<ParseNode> ParseAssignment();
+    std::unique_ptr<ParseNode> ParseAssignment(bool expect_terminator = true);
 
     bool StartsTargettableExpression(Token& token);
     std::unique_ptr<ParseNode> ParseTargettableExpression();
@@ -43,8 +43,11 @@ private:
     bool StartsElseBlock(Token& token);
     std::unique_ptr<ParseNode> ParseIfStatement();
 
+    bool StartsForStatement(Token& token);
+    std::unique_ptr<ParseNode> ParseForStatement();
+
     bool StartsPrintStatement(Token& token);
-    std::unique_ptr<ParseNode> ParsePrintStatement();
+    std::unique_ptr<ParseNode> ParsePrintStatement(bool expect_terminator = true);
 
     bool StartsPrintExpressionList(Token& token);
     std::unique_ptr<ParseNode> ParsePrintExpressionList(std::unique_ptr<ParseNode> print_statement);

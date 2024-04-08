@@ -4,12 +4,12 @@
 
 #include "assignment_statement_node.h"
 
-AssignmentStatementNode::AssignmentStatementNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::ASSIGNMENT_STATEMENT_NODE, std::move(token))
+AssignmentStatementNode::AssignmentStatementNode()
+    : ParseNode(ParseNodeType::ASSIGNMENT_STATEMENT_NODE, nullptr)
 {}
 
 std::string AssignmentStatementNode::ToString() const {
-    return "ASSIGNMENT STATEMENT NODE: " + token->ToString();
+    return "ASSIGNMENT STATEMENT NODE";
 }
 
 void AssignmentStatementNode::Accept(ParseNodeVisitor& visitor) {

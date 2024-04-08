@@ -110,6 +110,21 @@ void XMLGeneratorVisitor::VisitLeave(DeclarationStatementNode& node) {
     OutputTag(*tag);
 }
 
+void XMLGeneratorVisitor::VisitEnter(ForStatementNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("ForStatementNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(ForStatementNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("ForStatementNode");
+
+    --depth;
+    OutputTag(*tag);
+}
+
 void XMLGeneratorVisitor::VisitEnter(IfStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("IfStatementNode");
 
@@ -191,6 +206,13 @@ void XMLGeneratorVisitor::VisitLeave(ProgramNode& node) {
 //--------------------------------------------------------------------------------------//
 void XMLGeneratorVisitor::Visit(ErrorNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("ErrorNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+}
+void XMLGeneratorVisitor::Visit(NopNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("NopNode");
 
     AddBasicParseNodeAttributes(*tag, node);
 
