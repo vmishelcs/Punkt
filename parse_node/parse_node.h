@@ -46,7 +46,7 @@ public:
 
     ParseNodeType GetParseNodeType() const;
 
-    Token& GetToken() const;
+    Token *GetToken() const;
 
     ParseNode *GetParent() const;
     unsigned NumChildren() const;

@@ -29,8 +29,8 @@ public:
     // the program.
     static void LogFatal(std::string message);
 
-    // For logging internal errors within the compiler. This should only be used in unrecoverable
-    // situations (e.g. error during code generation) as this will crash the program.
+    /// @brief For logging internal errors within the compiler. This should only be used in unrecoverable
+    /// situations (e.g. error during code generation) as this will crash the program.
     static void *LogFatalInternalError(std::string message);
 
     // Returns true if there are user-facing compilation errors.

@@ -1,6 +1,8 @@
 #ifndef TOKEN_H_
 #define TOKEN_H_
 
+#include <string>
+
 #include <input_handler/text_location.h>
 
 enum class TokenType {

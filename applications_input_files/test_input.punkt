@@ -1,5 +1,5 @@
-function sub_ints(int x, int y) -> int {
-    return x - y.
+function myfunc<int x> -> int {
+    return x.
 } 
 
 main {

@@ -21,14 +21,14 @@ public:
         return keyword.GetKeywordEnum();
     }
 
-    static bool IsTokenKeyword(Token& token, std::initializer_list<KeywordEnum> keywords) {
-        if (token.GetTokenType() != TokenType::KEYWORD) {
+    static bool IsTokenKeyword(Token *token, std::initializer_list<KeywordEnum> keywords) {
+        KeywordToken *keyword_token = dynamic_cast<KeywordToken *>(token);
+        if (!keyword_token) {
             return false;
         }
 
-        KeywordToken& keyword_token = dynamic_cast<KeywordToken&>(token);
         for (const auto& keyword : keywords) {
-            if (keyword_token.GetKeywordEnum() == keyword) {
+            if (keyword_token->GetKeywordEnum() == keyword) {
                 return true;
             }
         }

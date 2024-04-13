@@ -13,8 +13,8 @@ ParseNodeType ParseNode::GetParseNodeType() const {
     return node_type;
 }
 
-Token& ParseNode::GetToken() const {
-    return *token;
+Token *ParseNode::GetToken() const {
+    return token.get();
 }
 
 ParseNode *ParseNode::GetParent() const {

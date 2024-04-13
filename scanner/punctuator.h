@@ -25,6 +25,8 @@ enum class PunctuatorEnum {
     CMP_L,
     CMP_GEQ,
     CMP_LEQ,
+    LANGLE,
+    RANGLE,
     ARROW,
 };
 

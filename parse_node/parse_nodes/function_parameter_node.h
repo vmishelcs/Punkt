@@ -11,6 +11,10 @@ class FunctionParameterNode : public ParseNode {
 public:
     FunctionParameterNode();
 
+    TypeNode *GetTypeNode() const;
+
+    IdentifierNode* GetIdentifierNode() const;    
+
     static std::unique_ptr<FunctionParameterNode> CreateParameterNode(
             std::unique_ptr<ParseNode> type,
             std::unique_ptr<ParseNode> identifier);

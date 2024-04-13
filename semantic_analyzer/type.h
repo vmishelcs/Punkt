@@ -14,6 +14,16 @@ enum class TypeEnum {
 
 class Type {
 public:
+    /// @brief Create a `Type` object specified by a `TypeEnum`.
+    /// @param type_enum Enum describing the type.
+    /// @return `unique_ptr` containing the `Type` object.
+    static std::unique_ptr<Type> CreateType(TypeEnum type_enum);
+
+    /// @brief Create a `Type` object equivalent to the specified type.
+    /// @param type Type object.
+    /// @return `unique_ptr` containing the `Type` object.
+    static std::unique_ptr<Type> CreateType(const Type& type);
+
     Type(TypeEnum type_enum);
     Type(const Type& type);
     Type(Type&& type);

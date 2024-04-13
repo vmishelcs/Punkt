@@ -8,6 +8,14 @@ FunctionParameterNode::FunctionParameterNode()
     : ParseNode(ParseNodeType::FUNCTION_PARAMETER_NODE, nullptr)
 {}
 
+TypeNode *FunctionParameterNode::GetTypeNode() const {
+    return dynamic_cast<TypeNode *>(GetChild(0));
+}
+
+IdentifierNode *FunctionParameterNode::GetIdentifierNode() const {
+    return dynamic_cast<IdentifierNode *>(GetChild(1));
+}
+
 std::unique_ptr<FunctionParameterNode> FunctionParameterNode::CreateParameterNode(
             std::unique_ptr<ParseNode> type,
             std::unique_ptr<ParseNode> identifier)

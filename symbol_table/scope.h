@@ -8,13 +8,19 @@
 
 enum class ScopeType {
     GLOBAL_SCOPE,
+    PARAMETER_SCOPE,
+    PROCEDURE_SCOPE,
     SUBSCOPE,
     NULL_SCOPE
 };
 
 class Scope {
 public:
+    Scope(ScopeType scope_type, Scope *base_scope = nullptr);
+
     static std::unique_ptr<Scope> CreateGlobalScope();
+    std::unique_ptr<Scope> CreateParameterScope();
+    std::unique_ptr<Scope> CreateProcedureScope();
     std::unique_ptr<Scope> CreateSubscope();
 
     void Declare(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type);
@@ -30,7 +36,6 @@ public:
     static std::string GetScopeTypeString(ScopeType scope_type);
 
 private:
-    Scope(ScopeType scope_type, Scope *base_scope = nullptr);
 
     ScopeType scope_type;
     Scope *base_scope;

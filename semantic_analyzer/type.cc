@@ -2,6 +2,14 @@
 
 #include "type.h"
 
+std::unique_ptr<Type> Type::CreateType(TypeEnum type_enum) {
+    return std::make_unique<Type>(type_enum);
+}
+
+std::unique_ptr<Type> Type::CreateType(const Type& type) {
+    return std::make_unique<Type>(type);
+}
+
 Type::Type(TypeEnum type_enum)
     : type_enum(type_enum)
 {}

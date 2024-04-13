@@ -14,8 +14,11 @@ std::unique_ptr<ParseNode> Parser::Parse(fs::path file_path) {
     // TODO: This cast causes an exception on bad input.
     // Example:
     // main { else {} }
-    ProgramNode& program_node = dynamic_cast<ProgramNode&>(*ast);
-    program_node.SetModuleID(file_path.string());
+    ProgramNode *program_node = dynamic_cast<ProgramNode *>(ast.get());
+    if (!program_node) {
+        return parser.GetSyntaxErrorNode();
+    }
+    program_node->SetModuleID(file_path.string());
 
     return ast;
 }
@@ -93,7 +96,7 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
 }
 
 bool Parser::StartsFunction(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::FUNCTION});
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::FUNCTION});
 }
 std::unique_ptr<ParseNode> Parser::ParseFunction() {
     if (!StartsFunction(*now_reading)) {
@@ -121,14 +124,14 @@ std::unique_ptr<ParseNode> Parser::ParseFunction() {
 }
 
 bool Parser::StartsFunctionPrototype(Token& token) {
-    return PunctuatorToken::IsTokenPunctuator(token, {PunctuatorEnum::OPEN_PARENTHESIS});
+    return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_L});
 }
 std::unique_ptr<ParseNode> Parser::ParseFunctionPrototype() {
     if (!StartsFunctionPrototype(*now_reading)) {
         return SyntaxErrorUnexpectedToken("function prototype");
     }
 
-    // Discard '('.
+    // Discard '<'.
     ReadToken();
 
     auto prototype = std::make_unique<FunctionPrototypeNode>();
@@ -141,7 +144,7 @@ std::unique_ptr<ParseNode> Parser::ParseFunctionPrototype() {
                 std::move(param_id));
         prototype->AppendChild(std::move(parameter_node));
     }
-    while (PunctuatorToken::IsTokenPunctuator(*now_reading, {PunctuatorEnum::SEPARATOR})) {
+    while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
         // Discard ','.
         ReadToken();
         auto param_type = ParseType();
@@ -151,8 +154,10 @@ std::unique_ptr<ParseNode> Parser::ParseFunctionPrototype() {
         prototype->AppendChild(std::move(parameter_node));
     }
 
-    Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+    // Expect closing '>'.
+    Expect(PunctuatorEnum::CMP_G);
 
+    // Expect '->' before return type.
     Expect(PunctuatorEnum::ARROW);
 
     // Parse return type.
@@ -163,7 +168,7 @@ std::unique_ptr<ParseNode> Parser::ParseFunctionPrototype() {
 }
 
 bool Parser::StartsMain(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::MAIN});
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::MAIN});
 }
 std::unique_ptr<ParseNode> Parser::ParseMain() {
     if (!StartsMain(*now_reading)) {
@@ -218,7 +223,7 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
 }
 
 bool Parser::StartsCodeBlock(Token& token) {
-    return PunctuatorToken::IsTokenPunctuator(token, {PunctuatorEnum::OPEN_BRACE});
+    return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::OPEN_BRACE});
 }
 std::unique_ptr<ParseNode> Parser::ParseCodeBlock() {
     if (!StartsCodeBlock(*now_reading)) {
@@ -240,7 +245,7 @@ std::unique_ptr<ParseNode> Parser::ParseCodeBlock() {
 }
 
 bool Parser::StartsDeclaration(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::CONST, KeywordEnum::VAR});
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::CONST, KeywordEnum::VAR});
 }
 std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
     if (!StartsDeclaration(*now_reading)) {
@@ -307,10 +312,10 @@ std::unique_ptr<ParseNode> Parser::ParseTargettableExpression() {
 }
 
 bool Parser::StartsIfStatement(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::IF});
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::IF});
 }
 bool Parser::StartsElseBlock(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::ELSE});
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::ELSE});
 }
 std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
     if (!StartsIfStatement(*now_reading)) {
@@ -345,7 +350,7 @@ std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
 }
 
 bool Parser::StartsForStatement(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::FOR});
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::FOR});
 }
 std::unique_ptr<ParseNode> Parser::ParseForStatement() {
     if (!StartsForStatement(*now_reading)) {
@@ -401,7 +406,7 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
 }
 
 bool Parser::StartsPrintStatement(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::PRINT});
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::PRINT});
 }
 std::unique_ptr<ParseNode> Parser::ParsePrintStatement(bool expect_terminator) {
     if (!StartsPrintStatement(*now_reading)) {
@@ -434,7 +439,7 @@ std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(std::unique_ptr<Pars
         return SyntaxErrorUnexpectedToken("printable expression");
     }
 
-    while (!PunctuatorToken::IsTokenPunctuator(*now_reading, {PunctuatorEnum::TERMINATOR})
+    while (!PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::TERMINATOR})
         && !now_reading->IsEOF()) {
         Expect(PunctuatorEnum::SEPARATOR);
         std::unique_ptr<ParseNode> expression = ParseExpression();
@@ -445,7 +450,7 @@ std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(std::unique_ptr<Pars
 }
 
 bool Parser::StartsReturnStatement(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::RETURN});
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::RETURN});
 }
 std::unique_ptr<ParseNode> Parser::ParseReturnStatement() {
     if (!StartsReturnStatement(*now_reading)) {
@@ -496,7 +501,7 @@ std::unique_ptr<ParseNode> Parser::ParseEqualityExpression() {
 
     auto lhs = ParseComparisonExpression();
 
-    while (PunctuatorToken::IsTokenPunctuator(*now_reading,
+    while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
         {PunctuatorEnum::CMP_EQ, PunctuatorEnum::CMP_NEQ})) {
         auto equality_operator = std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -522,7 +527,7 @@ std::unique_ptr<ParseNode> Parser::ParseComparisonExpression() {
 
     auto lhs = ParseAdditiveExpression();
 
-    while (PunctuatorToken::IsTokenPunctuator(*now_reading,
+    while (PunctuatorToken::IsTokenPunctuator(&(*now_reading),
         {PunctuatorEnum::CMP_G, PunctuatorEnum::CMP_L,
         PunctuatorEnum::CMP_GEQ, PunctuatorEnum::CMP_LEQ})) {
         auto comparison_operator = std::make_unique<OperatorNode>(std::move(now_reading));
@@ -549,7 +554,7 @@ std::unique_ptr<ParseNode> Parser::ParseAdditiveExpression() {
 
     std::unique_ptr<ParseNode> left = ParseMultiplicativeExpression();
 
-    while (PunctuatorToken::IsTokenPunctuator(*now_reading,
+    while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
         {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
         std::unique_ptr<ParseNode> additive_operator =
             std::make_unique<OperatorNode>(std::move(now_reading));
@@ -576,7 +581,7 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
 
     std::unique_ptr<ParseNode> left = ParseUnaryExpression();
 
-    while (PunctuatorToken::IsTokenPunctuator(*now_reading,
+    while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
         {PunctuatorEnum::MULTIPLY, PunctuatorEnum::DIVIDE})) {
         std::unique_ptr<ParseNode> multiplicative_operator =
             std::make_unique<OperatorNode>(std::move(now_reading));
@@ -594,7 +599,7 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
 }
 
 bool Parser::StartsUnaryExpression(Token& token) {
-    return PunctuatorToken::IsTokenPunctuator(token, {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})
+    return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})
         || StartsAtomicExpression(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
@@ -602,7 +607,7 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
         return SyntaxErrorUnexpectedToken("unary expression");
     }
 
-    if (PunctuatorToken::IsTokenPunctuator(*now_reading,
+    if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
         {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
         std::unique_ptr<ParseNode> unary_operator =
             std::make_unique<OperatorNode>(std::move(now_reading));
@@ -652,7 +657,7 @@ std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
 }
 
 bool Parser::StartsParenthesizedExpression(Token& token) {
-    return PunctuatorToken::IsTokenPunctuator(token, {PunctuatorEnum::OPEN_PARENTHESIS});
+    return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::OPEN_PARENTHESIS});
 }
 std::unique_ptr<ParseNode> Parser::ParseParenthesizedExpression() {
     if (!StartsParenthesizedExpression(*now_reading)) {
@@ -738,7 +743,7 @@ std::unique_ptr<ParseNode> Parser::ParseStringLiteral() {
 }
 
 bool Parser::StartsType(Token& token) {
-    return KeywordToken::IsTokenKeyword(token, {
+    return KeywordToken::IsTokenKeyword(&token, {
         KeywordEnum::BOOL,
         KeywordEnum::CHAR,
         KeywordEnum::INT,

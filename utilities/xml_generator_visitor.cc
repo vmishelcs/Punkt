@@ -98,7 +98,7 @@ void XMLGeneratorVisitor::VisitEnter(DeclarationStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("DeclarationStatementNode");
 
     AddBasicParseNodeAttributes(*tag, node);
-    tag->AddAttribute("mutable", node.GetToken().GetLexeme() == "var" ? "true" : "false");
+    tag->AddAttribute("mutable", node.GetToken()->GetLexeme() == "var" ? "true" : "false");
 
     OutputTag(*tag);
     ++depth;
@@ -142,6 +142,8 @@ void XMLGeneratorVisitor::VisitLeave(FunctionNode& node) {
 
 void XMLGeneratorVisitor::VisitEnter(FunctionParameterNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionParameterNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
 
     OutputTag(*tag);
     ++depth;
@@ -199,7 +201,7 @@ void XMLGeneratorVisitor::VisitLeave(MainNode& node) {
 void XMLGeneratorVisitor::VisitEnter(OperatorNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("OperatorNode");
 
-    tag->AddAttribute("operator", node.GetToken().GetLexeme());
+    tag->AddAttribute("operator", node.GetToken()->GetLexeme());
     AddBasicParseNodeAttributes(*tag, node);
 
     OutputTag(*tag);

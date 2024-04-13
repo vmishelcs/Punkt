@@ -21,14 +21,14 @@ public:
         return punctuator.GetPunctuatorEnum();
     }
 
-    static bool IsTokenPunctuator(Token& token, std::initializer_list<PunctuatorEnum> punctuators) {
-        if (token.GetTokenType() != TokenType::PUNCTUATOR) {
+    static bool IsTokenPunctuator(Token *token, std::initializer_list<PunctuatorEnum> punctuators) {
+        PunctuatorToken *punctuator_token = dynamic_cast<PunctuatorToken *>(token);
+        if (!punctuator_token) {
             return false;
         }
 
-        PunctuatorToken& punctuator_token = dynamic_cast<PunctuatorToken&>(token);
         for (const auto& punctuator : punctuators) {
-            if (punctuator_token.GetPunctuatorEnum() == punctuator) {
+            if (punctuator_token->GetPunctuatorEnum() == punctuator) {
                 return true;
             }
         }

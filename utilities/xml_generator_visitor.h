@@ -91,6 +91,7 @@ public:
     virtual void Visit(TypeNode& node) override;
 
 private:
+    int depth;
     void AddBasicParseNodeAttributes(XMLTag& tag, ParseNode& node);
     void OutputTag(XMLTag& tag);
 

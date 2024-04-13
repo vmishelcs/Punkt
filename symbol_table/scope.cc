@@ -9,11 +9,19 @@ Scope::Scope(ScopeType scope_type, Scope *base_scope)
 {}
 
 std::unique_ptr<Scope> Scope::CreateGlobalScope() {
-    return std::unique_ptr<Scope>(new Scope(ScopeType::GLOBAL_SCOPE));
+    return std::make_unique<Scope>(ScopeType::GLOBAL_SCOPE);
+}
+
+std::unique_ptr<Scope> Scope::CreateParameterScope() {
+    return std::make_unique<Scope>(ScopeType::PARAMETER_SCOPE, this);
+}
+
+std::unique_ptr<Scope> Scope::CreateProcedureScope() {
+    return std::make_unique<Scope>(ScopeType::PROCEDURE_SCOPE, this);
 }
 
 std::unique_ptr<Scope> Scope::CreateSubscope() {
-    return std::unique_ptr<Scope>(new Scope(ScopeType::SUBSCOPE, this));
+    return std::make_unique<Scope>(ScopeType::SUBSCOPE, this);
 }
 
 void Scope::Declare(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type) {
@@ -49,6 +57,10 @@ std::string Scope::GetScopeTypeString(ScopeType scope_type) {
     switch (scope_type) {
         case ScopeType::GLOBAL_SCOPE:
             return "global scope";
+        case ScopeType::PARAMETER_SCOPE:
+            return "parameter scope";
+        case ScopeType::PROCEDURE_SCOPE:
+            return "procedure scope";
         case ScopeType::SUBSCOPE:
             return "subscope";
         default:
