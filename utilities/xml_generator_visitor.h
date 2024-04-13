@@ -53,6 +53,15 @@ public:
     virtual void VisitEnter(ForStatementNode& node) override;
     virtual void VisitLeave(ForStatementNode& node) override;
 
+    virtual void VisitEnter(FunctionNode& node) override;
+    virtual void VisitLeave(FunctionNode& node) override;
+
+    virtual void VisitEnter(FunctionParameterNode& node) override;
+    virtual void VisitLeave(FunctionParameterNode& node) override;
+
+    virtual void VisitEnter(FunctionPrototypeNode& node) override;
+    virtual void VisitLeave(FunctionPrototypeNode& node) override;
+
     virtual void VisitEnter(IfStatementNode& node) override;
     virtual void VisitLeave(IfStatementNode& node) override;
 
@@ -68,6 +77,9 @@ public:
     virtual void VisitEnter(ProgramNode& node) override;
     virtual void VisitLeave(ProgramNode& node) override;
 
+    virtual void VisitEnter(ReturnStatementNode& node) override;
+    virtual void VisitLeave(ReturnStatementNode& node) override;
+
     // ---- Leaf nodes -----------------------------------------------------------------------
     virtual void Visit(ErrorNode& node) override;
     virtual void Visit(NopNode& node) override;
@@ -76,6 +88,7 @@ public:
     virtual void Visit(CharacterLiteralNode& node) override;
     virtual void Visit(IntegerLiteralNode& node) override;
     virtual void Visit(StringLiteralNode& node) override;
+    virtual void Visit(TypeNode& node) override;
 
 private:
     void AddBasicParseNodeAttributes(XMLTag& tag, ParseNode& node);

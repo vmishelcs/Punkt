@@ -1,5 +1,7 @@
+function sub_ints(int x, int y) -> int {
+    return x - y.
+} 
+
 main {
-    for var i = 0, i < 10, i = i + 1 {
-        print i.
-    }
+    # var x = f(1, 2).
 }

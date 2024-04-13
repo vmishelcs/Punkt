@@ -21,6 +21,12 @@ private:
     bool StartsProgram(Token& token);
     std::unique_ptr<ParseNode> ParseProgram();
 
+    bool StartsFunction(Token& token);
+    std::unique_ptr<ParseNode> ParseFunction();
+
+    bool StartsFunctionPrototype(Token& token);
+    std::unique_ptr<ParseNode> ParseFunctionPrototype();
+
     bool StartsMain(Token& token);
     std::unique_ptr<ParseNode> ParseMain();
 
@@ -51,6 +57,9 @@ private:
 
     bool StartsPrintExpressionList(Token& token);
     std::unique_ptr<ParseNode> ParsePrintExpressionList(std::unique_ptr<ParseNode> print_statement);
+
+    bool StartsReturnStatement(Token& token);
+    std::unique_ptr<ParseNode> ParseReturnStatement();
 
     bool StartsExpression(Token& token);
     std::unique_ptr<ParseNode> ParseExpression();
@@ -93,6 +102,9 @@ private:
 
     bool StartsStringLiteral(Token& token);
     std::unique_ptr<ParseNode> ParseStringLiteral();
+
+    bool StartsType(Token& token);
+    std::unique_ptr<ParseNode> ParseType();
 
     std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
     std::unique_ptr<ParseNode> GetSyntaxErrorNode();

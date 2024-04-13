@@ -10,6 +10,9 @@ target_link_libraries(parse_node
     declaration_statement_node
     error_node
     for_statement_node
+    function_node
+    function_parameter_node
+    function_prototype_node
     identifier_node
     if_statement_node
     integer_literal_node
@@ -18,7 +21,9 @@ target_link_libraries(parse_node
     operator_node
     print_statement_node
     program_node
+    return_statement_node
     string_literal_node
+    type_node
     type
     scope
     ${llvm_libs}

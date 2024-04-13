@@ -149,6 +149,18 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode& node) {
     return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionNode& node) {
+    return nullptr;
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionParameterNode& node) {
+    return nullptr;
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionPrototypeNode& node) {
+    return nullptr;
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
     llvm::Value *condition = node.GetChild(0)->GenerateCode(*this);
     if (!condition) {
@@ -288,6 +300,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
     return result;
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode& node) {
+    return nullptr;
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
     // Search for an `alloca` in the symbol table.
     auto alloca_instr = node.FindAlloca();
@@ -316,6 +332,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode& node) {
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode& node) {
     return builder->CreateGlobalString(node.GetValue(), "", 0, module.get());
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(TypeNode& node) {
+    return nullptr;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode& node) {

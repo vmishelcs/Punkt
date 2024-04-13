@@ -8,13 +8,19 @@
 #include "reserved_component.h"
 
 enum class KeywordEnum {
+    BOOL,
+    CHAR,
     CONST,
     ELSE,
     FALSE,
     FOR,
+    FUNCTION,
     IF,
+    INT,
     MAIN,
     PRINT,
+    RETURN,
+    STRING,
     TRUE,
     VAR,
 };

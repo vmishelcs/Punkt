@@ -24,7 +24,8 @@ std::unordered_map<std::string, PunctuatorEnum> Punctuator::dictionary = {
     { ">=", PunctuatorEnum::CMP_GEQ           },
     { "=>", PunctuatorEnum::CMP_GEQ           },
     { "<=", PunctuatorEnum::CMP_LEQ           },
-    { "=<", PunctuatorEnum::CMP_LEQ           }
+    { "=<", PunctuatorEnum::CMP_LEQ           },
+    { "->", PunctuatorEnum::ARROW             },
 };
 
 std::unordered_map<PunctuatorEnum, std::string> Punctuator::reverse_dictionary = [] {

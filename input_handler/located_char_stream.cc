@@ -26,7 +26,8 @@ LocatedChar LocatedCharStream::Peek() const {
 }
 
 void LocatedCharStream::PutBack(LocatedChar ch) {
-    input_handler->PutBack(ch);
+    input_handler->PutBack(next_char);
+    this->next_char = ch;
 }
 
 bool LocatedCharStream::HasNext() const {

@@ -66,7 +66,8 @@ void Parser::Expect(PunctuatorEnum punctuator) {
 }
 
 bool Parser::StartsProgram(Token& token) {
-    return StartsMain(token);
+    return StartsMain(token)
+        || StartsFunction(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseProgram() {
     if (!StartsProgram(*now_reading)) {
@@ -76,7 +77,10 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
     std::unique_ptr<ProgramToken> program_token = std::make_unique<ProgramToken>();
     std::unique_ptr<ParseNode> program = std::make_unique<ProgramNode>(std::move(program_token));
 
-    // Parse global variables here.
+    while (StartsFunction(*now_reading)) {
+        auto function = ParseFunction();
+        program->AppendChild(std::move(function));
+    }
 
     std::unique_ptr<ParseNode> main = ParseMain();
     program->AppendChild(std::move(main));
@@ -88,13 +92,78 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
     return program;
 }
 
-bool Parser::StartsMain(Token& token) {
-    if (token.GetTokenType() != TokenType::KEYWORD) {
-        return false;
+bool Parser::StartsFunction(Token& token) {
+    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::FUNCTION});
+}
+std::unique_ptr<ParseNode> Parser::ParseFunction() {
+    if (!StartsFunction(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("function");
     }
 
-    KeywordToken& keyword_token = dynamic_cast<KeywordToken&>(token);
-    return KeywordToken::IsTokenKeyword(keyword_token, {KeywordEnum::MAIN});
+    auto function = std::make_unique<FunctionNode>(std::move(now_reading));
+
+    // Discard 'function' keyword.
+    ReadToken();
+
+    auto function_id = ParseIdentifier();
+    if (!function_id) {
+        return SyntaxErrorUnexpectedToken("function identifier");
+    }
+    function->AppendChild(std::move(function_id));
+
+    auto function_prototype = ParseFunctionPrototype();
+    function->AppendChild(std::move(function_prototype));
+
+    auto function_body = ParseCodeBlock();
+    function->AppendChild(std::move(function_body));
+
+    return function;
+}
+
+bool Parser::StartsFunctionPrototype(Token& token) {
+    return PunctuatorToken::IsTokenPunctuator(token, {PunctuatorEnum::OPEN_PARENTHESIS});
+}
+std::unique_ptr<ParseNode> Parser::ParseFunctionPrototype() {
+    if (!StartsFunctionPrototype(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("function prototype");
+    }
+
+    // Discard '('.
+    ReadToken();
+
+    auto prototype = std::make_unique<FunctionPrototypeNode>();
+
+    // Parse parameters.
+    if (StartsType(*now_reading)) {
+        auto param_type = ParseType();
+        auto param_id = ParseIdentifier();
+        auto parameter_node = FunctionParameterNode::CreateParameterNode(std::move(param_type),
+                std::move(param_id));
+        prototype->AppendChild(std::move(parameter_node));
+    }
+    while (PunctuatorToken::IsTokenPunctuator(*now_reading, {PunctuatorEnum::SEPARATOR})) {
+        // Discard ','.
+        ReadToken();
+        auto param_type = ParseType();
+        auto param_id = ParseIdentifier();
+        auto parameter_node = FunctionParameterNode::CreateParameterNode(std::move(param_type),
+                std::move(param_id));
+        prototype->AppendChild(std::move(parameter_node));
+    }
+
+    Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+
+    Expect(PunctuatorEnum::ARROW);
+
+    // Parse return type.
+    auto return_type = ParseType();
+    prototype->AppendChild(std::move(return_type));
+
+    return prototype;
+}
+
+bool Parser::StartsMain(Token& token) {
+    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::MAIN});
 }
 std::unique_ptr<ParseNode> Parser::ParseMain() {
     if (!StartsMain(*now_reading)) {
@@ -118,7 +187,8 @@ bool Parser::StartsStatement(Token& token) {
         || StartsAssignment(token)
         || StartsIfStatement(token)
         || StartsForStatement(token)
-        || StartsPrintStatement(token);
+        || StartsPrintStatement(token)
+        || StartsReturnStatement(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseStatement() {
     if (StartsCodeBlock(*now_reading)) {
@@ -138,6 +208,9 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
     }
     if (StartsPrintStatement(*now_reading)) {
         return ParsePrintStatement();
+    }
+    if (StartsReturnStatement(*now_reading)) {
+        return ParseReturnStatement();
     }
     else {
         return SyntaxErrorUnexpectedToken("start of statement");
@@ -167,12 +240,7 @@ std::unique_ptr<ParseNode> Parser::ParseCodeBlock() {
 }
 
 bool Parser::StartsDeclaration(Token& token) {
-    if (token.GetTokenType() != TokenType::KEYWORD) {
-        return false;
-    }
-
-    KeywordToken& keyword_token = dynamic_cast<KeywordToken&>(token);
-    return KeywordToken::IsTokenKeyword(keyword_token, {KeywordEnum::CONST, KeywordEnum::VAR});
+    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::CONST, KeywordEnum::VAR});
 }
 std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
     if (!StartsDeclaration(*now_reading)) {
@@ -374,6 +442,26 @@ std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(std::unique_ptr<Pars
     }
 
     return print_statement;
+}
+
+bool Parser::StartsReturnStatement(Token& token) {
+    return KeywordToken::IsTokenKeyword(token, {KeywordEnum::RETURN});
+}
+std::unique_ptr<ParseNode> Parser::ParseReturnStatement() {
+    if (!StartsReturnStatement(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("return statement");
+    }
+
+    auto return_statement = std::make_unique<ReturnStatementNode>(std::move(now_reading));
+    // Discard 'return'.
+    ReadToken();
+
+    auto return_value = ParseExpression();
+    return_statement->AppendChild(std::move(return_value));
+
+    Expect(PunctuatorEnum::TERMINATOR);
+
+    return return_statement;
 }
 
 bool Parser::StartsExpression(Token& token) {
@@ -647,6 +735,24 @@ std::unique_ptr<ParseNode> Parser::ParseStringLiteral() {
             std::make_unique<StringLiteralNode>(std::move(now_reading));
     ReadToken();
     return string_literal;
+}
+
+bool Parser::StartsType(Token& token) {
+    return KeywordToken::IsTokenKeyword(token, {
+        KeywordEnum::BOOL,
+        KeywordEnum::CHAR,
+        KeywordEnum::INT,
+        KeywordEnum::STRING
+    });
+}
+std::unique_ptr<ParseNode> Parser::ParseType() {
+    if (!StartsType(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("type");
+    }
+
+    auto type_node = std::make_unique<TypeNode>(std::move(now_reading));
+    ReadToken();
+    return type_node;
 }
 
 std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expected) {

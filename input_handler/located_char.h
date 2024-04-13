@@ -57,6 +57,7 @@ struct LocatedChar {
     char character;
     TextLocation location;
     static LocatedChar EOF_LOCATED_CHAR;
+    static LocatedChar NULL_CHAR;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const LocatedChar& lc) {

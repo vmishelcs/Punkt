@@ -18,6 +18,15 @@ public:
     virtual void VisitEnter(ForStatementNode& node) = 0;
     virtual void VisitLeave(ForStatementNode& node) = 0;
 
+    virtual void VisitEnter(FunctionNode& node) = 0;
+    virtual void VisitLeave(FunctionNode& node) = 0;
+
+    virtual void VisitEnter(FunctionParameterNode& node) = 0;
+    virtual void VisitLeave(FunctionParameterNode& node) = 0;
+
+    virtual void VisitEnter(FunctionPrototypeNode& node) = 0;
+    virtual void VisitLeave(FunctionPrototypeNode& node) = 0;
+
     virtual void VisitEnter(IfStatementNode& node) = 0;
     virtual void VisitLeave(IfStatementNode& node) = 0;
 
@@ -33,6 +42,9 @@ public:
     virtual void VisitEnter(ProgramNode& node) = 0;
     virtual void VisitLeave(ProgramNode& node) = 0;
 
+    virtual void VisitEnter(ReturnStatementNode& node) = 0;
+    virtual void VisitLeave(ReturnStatementNode& node) = 0;
+
     // ---- Leaf nodes -----------------------------------------------------------------------
     virtual void Visit(ErrorNode& node) = 0;
     virtual void Visit(NopNode& node) = 0;
@@ -41,6 +53,7 @@ public:
     virtual void Visit(CharacterLiteralNode& node) = 0;
     virtual void Visit(IntegerLiteralNode& node) = 0;
     virtual void Visit(StringLiteralNode& node) = 0;
+    virtual void Visit(TypeNode& node) = 0;
 
 protected:
     int depth;

@@ -125,6 +125,47 @@ void XMLGeneratorVisitor::VisitLeave(ForStatementNode& node) {
     OutputTag(*tag);
 }
 
+void XMLGeneratorVisitor::VisitEnter(FunctionNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(FunctionNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("FunctionNode");
+
+    --depth;
+    OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(FunctionParameterNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionParameterNode");
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(FunctionParameterNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("FunctionParameterNode");
+
+    --depth;
+    OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(FunctionPrototypeNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionPrototypeNode");
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(FunctionPrototypeNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("FunctionPrototypeNode");
+
+    --depth;
+    OutputTag(*tag);
+}
+
 void XMLGeneratorVisitor::VisitEnter(IfStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("IfStatementNode");
 
@@ -201,6 +242,21 @@ void XMLGeneratorVisitor::VisitLeave(ProgramNode& node) {
     OutputTag(*tag);
 }
 
+void XMLGeneratorVisitor::VisitEnter(ReturnStatementNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("ReturnStatementNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(ReturnStatementNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("ReturnStatementNode");
+
+    --depth;
+    OutputTag(*tag);
+}
+
 //--------------------------------------------------------------------------------------//
 //                                      Leaf nodes                                      //
 //--------------------------------------------------------------------------------------//
@@ -255,6 +311,13 @@ void XMLGeneratorVisitor::Visit(StringLiteralNode& node) {
 
     AddBasicParseNodeAttributes(*tag, node);
     tag->AddAttribute("value", node.GetValue());
+
+    OutputTag(*tag);
+}
+void XMLGeneratorVisitor::Visit(TypeNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("TypeNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
 
     OutputTag(*tag);
 }

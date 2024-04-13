@@ -18,11 +18,15 @@ public:
     virtual llvm::Value *GenerateCode(CodeBlockNode& node) override;
     virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) override;
     virtual llvm::Value *GenerateCode(ForStatementNode& node) override;
+    virtual llvm::Value *GenerateCode(FunctionNode& node) override;
+    virtual llvm::Value *GenerateCode(FunctionParameterNode& node) override;
+    virtual llvm::Value *GenerateCode(FunctionPrototypeNode& node) override;
     virtual llvm::Value *GenerateCode(IfStatementNode& node) override;
     virtual llvm::Value *GenerateCode(MainNode& node) override;
     virtual llvm::Value *GenerateCode(OperatorNode& node) override;
     virtual llvm::Value *GenerateCode(PrintStatementNode& node) override;
     virtual llvm::Value *GenerateCode(ProgramNode& node) override;
+    virtual llvm::Value *GenerateCode(ReturnStatementNode& node) override;
     
     virtual llvm::Value *GenerateCode(ErrorNode& node) override;
     virtual llvm::Value *GenerateCode(NopNode& node) override;
@@ -31,6 +35,7 @@ public:
     virtual llvm::Value *GenerateCode(CharacterLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(IntegerLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(StringLiteralNode& node) override;
+    virtual llvm::Value *GenerateCode(TypeNode& node) override;
 
 private:
     void GenerateGlobalConstants();

@@ -81,6 +81,27 @@ void SemanticAnalysisVisitor::VisitLeave(ForStatementNode& node) {
     }
 }
 
+void SemanticAnalysisVisitor::VisitEnter(FunctionNode& node) {
+
+}
+void SemanticAnalysisVisitor::VisitLeave(FunctionNode& node) {
+
+}
+
+void SemanticAnalysisVisitor::VisitEnter(FunctionParameterNode& node) {
+    // Do nothing
+}
+void SemanticAnalysisVisitor::VisitLeave(FunctionParameterNode& node) {
+    // Do nothing
+}
+
+void SemanticAnalysisVisitor::VisitEnter(FunctionPrototypeNode& node) {
+
+}
+void SemanticAnalysisVisitor::VisitLeave(FunctionPrototypeNode& node) {
+
+}
+
 void SemanticAnalysisVisitor::VisitEnter(IfStatementNode& node) {
 }
 void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
@@ -142,6 +163,13 @@ void SemanticAnalysisVisitor::VisitLeave(ProgramNode& node) {
     // Do nothing
 }
 
+void SemanticAnalysisVisitor::VisitEnter(ReturnStatementNode& node) {
+
+}
+void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode& node) {
+
+}
+
 //--------------------------------------------------------------------------------------//
 //                                      Leaf nodes                                      //
 //--------------------------------------------------------------------------------------//
@@ -181,6 +209,9 @@ void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
 }
 void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
     node.SetType(std::make_unique<Type>(TypeEnum::STRING));
+}
+void SemanticAnalysisVisitor::Visit(TypeNode& node) {
+    
 }
 
 //--------------------------------------------------------------------------------------//

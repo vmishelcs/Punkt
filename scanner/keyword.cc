@@ -1,15 +1,21 @@
 #include "keyword.h"
 
 std::unordered_map<std::string, KeywordEnum> Keyword::dictionary = {
-    { "const", KeywordEnum::CONST },
-    { "else",  KeywordEnum::ELSE  },
-    { "false", KeywordEnum::FALSE },
-    { "for",   KeywordEnum::FOR   },
-    { "if",    KeywordEnum::IF    },
-    { "main",  KeywordEnum::MAIN  },
-    { "print", KeywordEnum::PRINT },
-    { "true",  KeywordEnum::TRUE  },
-    { "var",   KeywordEnum::VAR   },
+    { "bool",     KeywordEnum::BOOL     },
+    { "char",     KeywordEnum::CHAR     },
+    { "const",    KeywordEnum::CONST    },
+    { "else",     KeywordEnum::ELSE     },
+    { "false",    KeywordEnum::FALSE    },
+    { "for",      KeywordEnum::FOR      },
+    { "function", KeywordEnum::FUNCTION },
+    { "int",      KeywordEnum::INT      },
+    { "if",       KeywordEnum::IF       },
+    { "main",     KeywordEnum::MAIN     },
+    { "print",    KeywordEnum::PRINT    },
+    { "return",   KeywordEnum::RETURN   },
+    { "string",   KeywordEnum::STRING   },
+    { "true",     KeywordEnum::TRUE     },
+    { "var",      KeywordEnum::VAR      },
 };
 
 std::unordered_map<KeywordEnum, std::string> Keyword::reverse_dictionary = [] {

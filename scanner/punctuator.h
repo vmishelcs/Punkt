@@ -24,7 +24,8 @@ enum class PunctuatorEnum {
     CMP_G,
     CMP_L,
     CMP_GEQ,
-    CMP_LEQ
+    CMP_LEQ,
+    ARROW,
 };
 
 class Punctuator : public ReservedComponent {

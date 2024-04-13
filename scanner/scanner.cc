@@ -116,10 +116,17 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
         case ',':
         case '.':
         case '+':
-        case '-':
         case '*':
         case '/':
             buffer.push_back(lc.character);
+            break;
+
+        case '-':
+            buffer.push_back(lc.character);
+            if (input_stream->Peek().character == '>') {
+                // '->' (returns) punctuator
+                buffer.push_back(input_stream->Next().character);
+            }
             break;
 
         case '=':
