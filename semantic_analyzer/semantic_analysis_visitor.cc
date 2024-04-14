@@ -7,7 +7,8 @@
 
 #include "function_declaration_visitor.h"
 #include "semantic_analysis_visitor.h"
-#include "type.h"
+#include "types/base_type.h"
+#include "types/type.h"
 
 //--------------------------------------------------------------------------------------//
 //                                    Non-leaf nodes                                    //
@@ -18,31 +19,31 @@ void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode& node) {
         IdentifierNode *identifier_node = static_cast<IdentifierNode *>(target);
 
         // Make sure identifier is not classified with error type.
-        if (identifier_node->GetType()->EquivalentTo(TypeEnum::ERROR)) {
-            node.SetType(Type::CreateType(TypeEnum::ERROR));
+        if (identifier_node->GetType()->IsErrorType()) {
+            node.SetType(BaseType::CreateErrorType());
             return;
         }
 
         // Make sure identifier is mutable.
         if (!identifier_node->FindSymbolTableEntry().value().get().is_mutable) {
             AssignmentToImmutableTargetError(*identifier_node);
-            node.SetType(Type::CreateType(TypeEnum::ERROR));
+            node.SetType(BaseType::CreateErrorType());
             return;
         }
 
         auto new_value = node.GetChild(1);
 
         // Make sure we are assigning an equivalent type.
-        if (!identifier_node->GetType()->EquivalentTo(*new_value->GetType())) {
+        if (!identifier_node->GetType()->IsEquivalentTo(new_value->GetType())) {
             AssignmentTypeMismatchError(*identifier_node, *identifier_node->GetType(),
                     *new_value->GetType());
-            node.SetType(Type::CreateType(TypeEnum::ERROR));
+            node.SetType(BaseType::CreateErrorType());
             return;
         }
     }
     else {
         NonTargettableExpressionError(*target);
-        node.SetType(Type::CreateType(TypeEnum::ERROR));
+        node.SetType(BaseType::CreateErrorType());
     }
 }
 
@@ -63,7 +64,7 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
 
     Type *declaration_type = initializer->GetType();
 
-    identifier->SetType(Type::CreateType(*declaration_type));
+    identifier->SetType(declaration_type->CreateEquivalentType());
 
     // Note the use of identifier-owned Type pointer.
     DeclareInLocalScope(*identifier, is_mutable, identifier->GetType());
@@ -74,9 +75,13 @@ void SemanticAnalysisVisitor::VisitEnter(ForStatementNode& node) {
 }
 void SemanticAnalysisVisitor::VisitLeave(ForStatementNode& node) {
     // Make sure that the condition has boolean type.
-    if ( !(node.GetChild(1)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) ) {
+    Type *condition_type = node.GetChild(1)->GetType();
+    BaseType *b_condition_type = dynamic_cast<BaseType *>(condition_type);
+    
+    if (!b_condition_type || !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
         NonBooleanConditionError(node);
-        node.SetType(Type::CreateType(TypeEnum::ERROR));
+        node.SetType(BaseType::CreateErrorType());
+        return;
     }
 }
 
@@ -108,10 +113,14 @@ void SemanticAnalysisVisitor::VisitLeave(FunctionPrototypeNode& node) {
 }
 
 void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
-    // We make sure that the condition has boolean type.
-    if ( !(node.GetChild(0)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) ) {
+    // Make sure that the condition has boolean type.
+    Type *condition_type = node.GetChild(0)->GetType();
+    BaseType *b_condition_type = dynamic_cast<BaseType *>(condition_type);
+
+    if (!b_condition_type || !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
         NonBooleanConditionError(node);
-        node.SetType(Type::CreateType(TypeEnum::ERROR));
+        node.SetType(BaseType::CreateErrorType());
+        return;
     }
 }
 
@@ -120,7 +129,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
     for (auto child : node.GetChildren()) {
         Type *child_type = child->GetType();
         if (child_type->IsErrorType()) {
-            node.SetType(Type::CreateType(TypeEnum::ERROR));
+            node.SetType(BaseType::CreateErrorType());
             return;
         }
         child_types.push_back(child_type);
@@ -128,7 +137,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
 
     PunctuatorToken *punctuator_token = dynamic_cast<PunctuatorToken *>(node.GetToken());
     if (!punctuator_token) {
-        node.SetType(Type::CreateType(TypeEnum::ERROR));
+        node.SetType(BaseType::CreateErrorType());
         return;
     }
 
@@ -138,12 +147,12 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
     );
 
     if (signature) {
-        node.SetType(Type::CreateType(signature->GetOutputType()));
+        node.SetType(signature->GetOutputType()->CreateEquivalentType());
         node.SetCodeGenFunc(signature->GetCodeGenFunc());
     }
     else {
         InvalidOperandTypeError(node, child_types);
-        node.SetType(Type::CreateType(TypeEnum::ERROR));
+        node.SetType(BaseType::CreateErrorType());
     }
 }
 
@@ -163,7 +172,7 @@ void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode& node) {
 //                                      Leaf nodes                                      //
 //--------------------------------------------------------------------------------------//
 void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
-    node.SetType(Type::CreateType(TypeEnum::ERROR));
+    node.SetType(BaseType::CreateErrorType());
 }
 void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
     if (IsBeingDeclared(node) || IsParameterIdentifier(node)) {
@@ -181,26 +190,26 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
             node.GetToken()->GetLexeme(),
             node.GetToken()->GetLocation()
         );
-        node.SetType(Type::CreateType(TypeEnum::ERROR));
+        node.SetType(BaseType::CreateErrorType());
         // Note the use of identifier-owned Type pointer.
         DeclareInLocalScope(node, false, node.GetType());
     }
     else {
         const SymbolTableEntry& symbol_table_entry = symbol_table_entry_opt.value();
-        node.SetType(Type::CreateType(*symbol_table_entry.type));
+        node.SetType(symbol_table_entry.type->CreateEquivalentType());
     }
 }
 void SemanticAnalysisVisitor::Visit(BooleanLiteralNode& node) {
-    node.SetType(Type::CreateType(TypeEnum::BOOLEAN));
+    node.SetType(BaseType::CreateBooleanType());
 }
 void SemanticAnalysisVisitor::Visit(CharacterLiteralNode& node) {
-    node.SetType(Type::CreateType(TypeEnum::CHARACTER));
+    node.SetType(BaseType::CreateCharacterType());
 }
 void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
-    node.SetType(Type::CreateType(TypeEnum::INTEGER));
+    node.SetType(BaseType::CreateIntegerType());
 }
 void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
-    node.SetType(Type::CreateType(TypeEnum::STRING));
+    node.SetType(BaseType::CreateStringType());
 }
 void SemanticAnalysisVisitor::Visit(TypeNode& node) {
     // Perform semantic analysis only on type nodes that are NOT a part of a parameter, or DO NOT

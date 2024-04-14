@@ -8,7 +8,7 @@
 #include <llvm/IR/Value.h>
 
 #include <input_handler/text_location.h>
-#include <semantic_analyzer/type.h>
+#include <semantic_analyzer/types/type.h>
 
 struct SymbolTableEntry {
     const TextLocation& text_location;

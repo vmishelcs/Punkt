@@ -5,7 +5,8 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/TargetParser/Host.h>
 #include <logging/punkt_logger.h>
-#include <semantic_analyzer/type.h>
+#include <semantic_analyzer/types/base_type.h>
+#include <semantic_analyzer/types/type.h>
 
 #include "code_generation_visitor.h"
 
@@ -43,7 +44,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(AssignmentStatementNode& node) 
         auto new_value = node.GetChild(1)->GenerateCode(*this);
 
         // Store boolean values as 8-bit integers.
-        if (node.GetChild(1)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) {
+        BaseType *b_type = dynamic_cast<BaseType *>(node.GetChild(1)->GetType());
+        if (b_type && b_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
             new_value = builder->CreateZExt(new_value, llvm::Type::getInt8Ty(*context),
                     "zexttmp");
         }
@@ -70,7 +72,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     llvm::Value *initializer_value = node.GetChild(1)->GenerateCode(*this);
     
     // Store boolean values as 8-bit integers.
-    if (node.GetChild(1)->GetType()->EquivalentTo(TypeEnum::BOOLEAN)) {
+    BaseType *b_type = dynamic_cast<BaseType *>(node.GetChild(1)->GetType());
+    if (b_type && b_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
         initializer_value = builder->CreateZExt(initializer_value, llvm::Type::getInt8Ty(*context),
                 "zexttmp");
     }
@@ -279,7 +282,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
 
     // We call printf for each 'operand'
     for (auto child : node.GetChildren()) {
-        ret_value = PrintValue(child->GenerateCode(*this), *child->GetType());
+        ret_value = PrintValue(child->GenerateCode(*this), child->GetType());
     }
 
     // Print line feed once we are finished
@@ -365,46 +368,61 @@ void CodeGenerationVisitor::GeneratePrintfDeclaration() {
     }
 }
 
-void CodeGenerationVisitor::GeneratePrintfFmtStrings() {
+void CodeGenerationVisitor::GeneratePrintfFmtStringsForBaseTypes() {
     llvm::Value *fmt_str = nullptr;
 
-    if (fmt_str = GenerateFmtString(TypeEnum::CHARACTER, kCharFmtString), !fmt_str) {
+    if (fmt_str = GenerateFmtStringForBaseType(BaseTypeEnum::CHARACTER, kCharFmtString), !fmt_str) {
         CodeGenerationInternalError("failed to generate format string for CHARACTER type");
     }
     global_constants_table[kCharFmtString] = fmt_str;
 
-    if (fmt_str = GenerateFmtString(TypeEnum::INTEGER, kIntFmtString), !fmt_str) {
+    if (fmt_str = GenerateFmtStringForBaseType(BaseTypeEnum::INTEGER, kIntFmtString), !fmt_str) {
         CodeGenerationInternalError("failed to generate format string for INTEGER type");
     }
     global_constants_table[kIntFmtString] = fmt_str;
 
-    if (fmt_str = GenerateFmtString(TypeEnum::STRING, kStrFmtString), !fmt_str) {
+    if (fmt_str = GenerateFmtStringForBaseType(BaseTypeEnum::STRING, kStrFmtString), !fmt_str) {
         CodeGenerationInternalError("failed to generate format string for STRING type");
     }
     global_constants_table[kStrFmtString] = fmt_str;
 }
 
-llvm::Value *CodeGenerationVisitor::GenerateFmtString(TypeEnum type_enum, std::string fmt_str) {
-    return builder->CreateGlobalString(fmt_str, ".fmt_" + Type::GetTypeEnumString(type_enum), 0,
+llvm::Value *CodeGenerationVisitor::GenerateFmtStringForBaseType(BaseTypeEnum base_type_enum,
+        std::string fmt_str)
+{
+    return builder->CreateGlobalString(fmt_str, ".fmt_" + BaseType::GetEnumString(base_type_enum), 0,
             module.get());
 }
 
-llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(TypeEnum type_enum) {
+llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(Type *type) {
+    if (type->GetTypeEnum() == TypeEnum::BASE_TYPE) {
+        BaseType *base_type = dynamic_cast<BaseType *>(type);
+        if (!base_type) {
+            return CodeGenerationInternalError("failed to cast Type to BaseType");
+        }
+
+        return GetPrintfFmtStringForBaseType(base_type->GetBaseTypeEnum());
+    }
+    return CodeGenerationInternalError(
+            "CodeGenerationVisitor::GetPrintfFmtString not implemented for non-base types");
+}
+
+llvm::Value *CodeGenerationVisitor::GetPrintfFmtStringForBaseType(BaseTypeEnum base_type_enum) {
     const std::string *key = nullptr;
-    switch (type_enum) {
-        case TypeEnum::CHARACTER:
+    switch (base_type_enum) {
+        case BaseTypeEnum::CHARACTER:
             key = &kCharFmtString;
             break;
-        case TypeEnum::BOOLEAN:
-        case TypeEnum::INTEGER:
+        case BaseTypeEnum::BOOLEAN:
+        case BaseTypeEnum::INTEGER:
             key = &kIntFmtString;
             break;
-        case TypeEnum::STRING:
+        case BaseTypeEnum::STRING:
             key = &kStrFmtString;
             break;
         default:
             return CodeGenerationInternalError("unimplemented format string for type "
-                    + Type::GetTypeEnumString(type_enum));
+                    + BaseType::GetEnumString(base_type_enum));
     }
 
     if (!global_constants_table.contains(*key)) {
@@ -413,16 +431,7 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(TypeEnum type_enum) {
     return global_constants_table.at(*key);
 }
 
-llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(const Type& type) {
-    return GetPrintfFmtString(type.GetTypeEnum());
-}
-
-llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
-    return PrintValue(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), kLineFeedChar),
-            Type(TypeEnum::CHARACTER));
-}
-
-llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, const Type& type) {
+llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, Type *type) {
     llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
     if (!printf_func) {
         return CodeGenerationInternalError("unable to obtain llvm::Function pointer for printf");
@@ -439,14 +448,15 @@ llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, const Type& t
 
     // When printing booleans, we first truncate to 1-bit such that only the least significant bit
     // remains. Then we extend to 32 bits and print the boolean as an integer.
-    if (type == TypeEnum::BOOLEAN) {
+    BaseType *base_type = dynamic_cast<BaseType *>(type);
+    if (base_type && base_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
         auto truncated_value = builder->CreateTrunc(print_value, llvm::Type::getInt1Ty(*context),
                 "trunctmp");
         print_value = builder->CreateZExt(truncated_value, llvm::Type::getInt32Ty(*context),
                 "zexttmp");
     }
     // When printing characters, we sign-extend to 32 bits.
-    else if (type == TypeEnum::CHARACTER) {
+    else if (base_type && base_type->IsEquivalentTo(BaseTypeEnum::CHARACTER)) {
         print_value = builder->CreateSExt(print_value, llvm::Type::getInt32Ty(*context), "sexttmp");
     }
 
@@ -458,11 +468,17 @@ llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, const Type& t
     return builder->CreateCall(printf_func, printf_args, "printf_ret");
 }
 
+llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
+    auto temp_char_base_type = BaseType::Create(BaseTypeEnum::CHARACTER);
+    return PrintValue(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), kLineFeedChar),
+            temp_char_base_type.get());
+}
+
 //--------------------------------------------------------------------------------------//
 //                                Miscellaneous helpers                                 //
 //--------------------------------------------------------------------------------------//
 void CodeGenerationVisitor::GenerateGlobalConstants() {
-    GeneratePrintfFmtStrings();
+    GeneratePrintfFmtStringsForBaseTypes();
 }
 
 llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(llvm::Function *function,

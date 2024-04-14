@@ -7,6 +7,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <parse_node/parse_node_ir_visitor.h>
+#include <semantic_analyzer/types/base_type.h>
 
 class CodeGenerationVisitor : public ParseNodeIRVisitor {
 public:
@@ -44,12 +45,14 @@ private:
             const std::string& identifier_name, llvm::Type *llvm_type);
 
     void GeneratePrintfDeclaration();
-    void GeneratePrintfFmtStrings();
-    llvm::Value *GenerateFmtString(TypeEnum type_enum, std::string fmt_str);
-    llvm::Value *GetPrintfFmtString(TypeEnum type_enum);
-    llvm::Value *GetPrintfFmtString(const Type& type);
+    void GeneratePrintfFmtStringsForBaseTypes();
+    llvm::Value *GenerateFmtStringForBaseType(BaseTypeEnum base_type_enum, std::string fmt_str);
+
+    llvm::Value *GetPrintfFmtString(Type *type);
+    llvm::Value *GetPrintfFmtStringForBaseType(BaseTypeEnum base_type_enum);
+
+    llvm::Value *PrintValue(llvm::Value *value, Type *type);
     llvm::Value *PrintLineFeed();
-    llvm::Value *PrintValue(llvm::Value *value, const Type& type);
 
     llvm::Value *CodeGenerationInternalError(std::string error_msg);
 

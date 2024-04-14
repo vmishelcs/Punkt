@@ -5,7 +5,8 @@
 #include <parse_node/parse_node_visitor.h>
 #include <parse_node/parse_node.h>
 #include <scanner/keyword.h>
-#include <semantic_analyzer/type.h>
+#include <semantic_analyzer/types/base_type.h>
+#include <semantic_analyzer/types/type.h>
 #include <token/keyword_token.h>
 
 #include "type_node.h"
@@ -23,16 +24,16 @@ void TypeNode::InferOwnType() {
 
     switch (keyword_token->GetKeywordEnum()) {
         case KeywordEnum::BOOL:
-            SetType(Type::CreateType(TypeEnum::BOOLEAN));
+            SetType(BaseType::Create(BaseTypeEnum::BOOLEAN));
             break;
         case KeywordEnum::CHAR:
-            SetType(Type::CreateType(TypeEnum::CHARACTER));
+            SetType(BaseType::Create(BaseTypeEnum::CHARACTER));
             break;
         case KeywordEnum::INT:
-            SetType(Type::CreateType(TypeEnum::INTEGER));
+            SetType(BaseType::Create(BaseTypeEnum::INTEGER));
             break;
         case KeywordEnum::STRING:
-            SetType(Type::CreateType(TypeEnum::STRING));
+            SetType(BaseType::Create(BaseTypeEnum::STRING));
             break;
         default:
             PunktLogger::LogFatalInternalError("TypeNode keyword does not name a known type");

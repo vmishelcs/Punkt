@@ -7,9 +7,9 @@
 
 #include <llvm/IR/Value.h>
 
-#include <token/token.h>
-#include <semantic_analyzer/type.h>
+#include <semantic_analyzer/types/type.h>
 #include <symbol_table/scope.h>
+#include <token/token.h>
 
 // Forward-declare ParseNodeVisitor to avoid circular dependencies
 class ParseNodeVisitor;

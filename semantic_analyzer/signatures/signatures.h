@@ -11,9 +11,12 @@
 
 class Signatures {
 public:
-    // Returns a pointer to a const Signature object if the specified punctuator (i.e. operator)
-    // accepts the types compiled in the Type * vector. If no such signature exists, a nullptr is 
-    // returned.
+    /// @brief Checks if the specified punctuator has a signature that matches the provided input
+    /// types.
+    /// @param punctuator `PunctuatorEnum` describing a punctuator (i.e. operator).
+    /// @param types Operand types that the punctuator (or operator) should accept.
+    /// @return Pointer to a `Signature` object if there exists a punctuator that accepts the types
+    /// provided in the `types` vector. Otherwise, returns `nullptr`.
     static Signature const *AcceptingSignature(PunctuatorEnum punctuator,
             std::vector<Type *>& types);
 

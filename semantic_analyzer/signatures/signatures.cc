@@ -1,76 +1,86 @@
+#include <memory>
+
 #include <code_generator/operator_code_generator.h>
 
+#include "signature.h"
 #include "signatures.h"
+
+// Types used by signatures.
+static const std::unique_ptr<BaseType> kBaseTypeNull = BaseType::CreateNullType();
+static const std::unique_ptr<BaseType> kBaseTypeBoolean = BaseType::CreateBooleanType();
+static const std::unique_ptr<BaseType> kBaseTypeCharacter = BaseType::CreateCharacterType();
+static const std::unique_ptr<BaseType> kBaseTypeInteger = BaseType::CreateIntegerType();
+static const std::unique_ptr<BaseType> kBaseTypeString = BaseType::CreateStringType();
 
 std::unordered_map<PunctuatorEnum, std::vector<Signature>> Signatures::signature_map{
     {
         PunctuatorEnum::PLUS,
         {
-            Signature({Type(TypeEnum::INTEGER)}, Type(TypeEnum::INTEGER), OperatorCodeGenerator::UnaryNoOp),
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::INTEGER, OperatorCodeGenerator::IntegerAddCodeGenerator)
+            Signature({kBaseTypeInteger.get()}, kBaseTypeInteger.get(), OperatorCodeGenerator::UnaryNoOp),
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeInteger.get(), OperatorCodeGenerator::IntegerAddCodeGenerator)
         }
     },
     {
         PunctuatorEnum::MINUS,
         {
-            Signature({Type(TypeEnum::INTEGER)}, Type(TypeEnum::INTEGER), OperatorCodeGenerator::IntegerNegationCodeGenerator),
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::INTEGER, OperatorCodeGenerator::IntegerSubtractCodeGenerator)
+            Signature({kBaseTypeInteger.get()}, kBaseTypeInteger.get(), OperatorCodeGenerator::IntegerNegationCodeGenerator),
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeInteger.get(), OperatorCodeGenerator::IntegerSubtractCodeGenerator)
         }
     },
     {
         PunctuatorEnum::MULTIPLY,
         {
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::INTEGER, OperatorCodeGenerator::IntegerMultiplyCodeGenerator)
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeInteger.get(), OperatorCodeGenerator::IntegerMultiplyCodeGenerator)
         }
     },
     {
         PunctuatorEnum::DIVIDE,
         {
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::INTEGER, OperatorCodeGenerator::IntegerDivideCodeGenerator)
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeInteger.get(), OperatorCodeGenerator::IntegerDivideCodeGenerator)
         }
     },
     {
         PunctuatorEnum::CMP_EQ,
         {
-            Signature({Type(TypeEnum::BOOLEAN), Type(TypeEnum::BOOLEAN)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::BooleanCmpEqCodeGenerator),
-            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::CharacterCmpEQCodeGenerator),
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::IntegerCmpEQCodeGenerator),
+            Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::BooleanCmpEqCodeGenerator),
+            Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::CharacterCmpEQCodeGenerator),
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::IntegerCmpEQCodeGenerator),
         }
     },
     {
         PunctuatorEnum::CMP_NEQ,
         {
-            Signature({Type(TypeEnum::BOOLEAN), Type(TypeEnum::BOOLEAN)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::BooleanCmpNeqCodeGenerator),
-            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::CharacterCmpNEQCodeGenerator),
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::IntegerCmpNEQCodeGenerator),
+            Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::BooleanCmpNeqCodeGenerator),
+            Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::CharacterCmpNEQCodeGenerator),
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::IntegerCmpNEQCodeGenerator),
         }
     },
     {
         PunctuatorEnum::CMP_G,
         {
-            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::CharacterCmpGTCodeGenerator),
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::IntegerCmpGTCodeGenerator),
+            Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::CharacterCmpGTCodeGenerator),
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::IntegerCmpGTCodeGenerator),
         }
     },
     {
         PunctuatorEnum::CMP_L,
         {
-            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::CharacterCmpLTCodeGenerator),
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::IntegerCmpLTCodeGenerator),
+            Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::CharacterCmpLTCodeGenerator),
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::IntegerCmpLTCodeGenerator),
         }
     },
     {
         PunctuatorEnum::CMP_GEQ,
         {
-            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::CharacterCmpGEQCodeGenerator),
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::IntegerCmpGEQCodeGenerator),
+            Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::CharacterCmpGEQCodeGenerator),
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::IntegerCmpGEQCodeGenerator),
         }
     },
     {
         PunctuatorEnum::CMP_LEQ,
         {
-            Signature({Type(TypeEnum::CHARACTER), Type(TypeEnum::CHARACTER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::CharacterCmpLEQCodeGenerator),
-            Signature({Type(TypeEnum::INTEGER), Type(TypeEnum::INTEGER)}, TypeEnum::BOOLEAN, OperatorCodeGenerator::IntegerCmpLEQCodeGenerator),
+            Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::CharacterCmpLEQCodeGenerator),
+            Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()}, kBaseTypeBoolean.get(), OperatorCodeGenerator::IntegerCmpLEQCodeGenerator),
         }
     }
 };

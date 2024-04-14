@@ -1,10 +1,8 @@
 add_subdirectory(signatures)
-
-add_library(type type.cc)
+add_subdirectory(types)
 
 add_library(function_declaration_visitor function_declaration_visitor.cc)
 target_link_libraries(function_declaration_visitor
-    token
     parse_node
     type
     scope

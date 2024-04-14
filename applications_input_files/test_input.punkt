@@ -4,4 +4,7 @@ function myfunc<int x> -> int {
 
 main {
     # var x = f(1, 2).
+    if true {
+        print "deez.".
+    }
 }

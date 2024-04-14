@@ -1,5 +1,4 @@
 #include <logging/punkt_logger.h>
-#include <token/all_tokens.h>
 #include <parse_node/parse_node.h>
 #include <parse_node/parse_nodes/all_nodes.h>
 #include <symbol_table/scope.h>
@@ -23,16 +22,16 @@ void FunctionDeclarationVisitor::VisitLeave(FunctionParameterNode& node) {
         PunktLogger::LogFatalInternalError("FunctionParameterNode::GetTypeNode returned null");
     }
 
-    const Type& paremeter_type = *type_node->GetType();
+    Type *parameter_type = type_node->GetType();
 
-    node.SetType(Type::CreateType(paremeter_type));
+    node.SetType(parameter_type->CreateEquivalentType());
 
     IdentifierNode *identifier_node = node.GetIdentifierNode();
     if (!identifier_node) {
         PunktLogger::LogFatalInternalError("FunctionParameterNode::GetIdentifierNode "
                 "returned null");
     }
-    identifier_node->SetType(Type::CreateType(paremeter_type));
+    identifier_node->SetType(parameter_type->CreateEquivalentType());
 }
 
 void FunctionDeclarationVisitor::VisitEnter(FunctionPrototypeNode& node) {
