@@ -158,6 +158,8 @@ void XMLGeneratorVisitor::VisitLeave(FunctionParameterNode& node) {
 void XMLGeneratorVisitor::VisitEnter(FunctionPrototypeNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionPrototypeNode");
 
+    AddBasicParseNodeAttributes(*tag, node);
+
     OutputTag(*tag);
     ++depth;
 }

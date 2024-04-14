@@ -64,6 +64,8 @@ std::string BaseType::GetEnumString(BaseTypeEnum base_type_enum) {
             return "integer";
         case BaseTypeEnum::STRING:
             return "string";
+        case BaseTypeEnum::ERROR:
+            return "error";
         default:
             return (const char *)PunktLogger::LogFatalInternalError(
                     "unimplemented BaseType in BaseType::GetEnumString");

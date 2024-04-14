@@ -59,11 +59,10 @@ void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode& node) {
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
     bool is_mutable = KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
 
-    IdentifierNode *identifier = dynamic_cast<IdentifierNode *>(node.GetChild(0));
+    auto identifier = dynamic_cast<IdentifierNode *>(node.GetChild(0));
     auto initializer = node.GetChild(1);
 
     Type *declaration_type = initializer->GetType();
-
     identifier->SetType(declaration_type->CreateEquivalentType());
 
     // Note the use of identifier-owned Type pointer.
@@ -87,8 +86,7 @@ void SemanticAnalysisVisitor::VisitLeave(ForStatementNode& node) {
 
 void SemanticAnalysisVisitor::VisitEnter(FunctionNode& node) {
     // Declare the function identifier BEFORE entering the parameter scope; that is, first declare
-    // the function identifier, then create the parameter scope.
-
+    // the function identifier (in FunctionDeclarationVisitor), then create the parameter scope.
     CreateParameterScope(node);
 }
 void SemanticAnalysisVisitor::VisitLeave(FunctionNode& node) {
@@ -212,7 +210,7 @@ void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
     node.SetType(BaseType::CreateStringType());
 }
 void SemanticAnalysisVisitor::Visit(TypeNode& node) {
-    // Perform semantic analysis only on type nodes that are NOT a part of a parameter, or DO NOT
+    // Perform semantic analysis only on type nodes that are NOT a part of a parameter and DO NOT
     // specify a function return type.
     if (node.GetParent()->GetParseNodeType() == ParseNodeType::FUNCTION_PARAMETER_NODE
         || node.GetParent()->GetParseNodeType() == ParseNodeType::FUNCTION_PROTOTYPE_NODE) {

@@ -12,7 +12,6 @@ public:
 
     virtual void VisitLeave(FunctionParameterNode& node) override;
 
-    virtual void VisitEnter(FunctionPrototypeNode& node) override;
     virtual void VisitLeave(FunctionPrototypeNode& node) override;
 
     virtual void VisitEnter(ProgramNode& node) override;
@@ -23,6 +22,9 @@ public:
 private:
     // ---- Scoping --------------------------------------------------------------------------
     void CreateGlobalScope(ParseNode& node);
+
+    // ---- Miscellaneous helpers ------------------------------------------------------------
+    void DeclareFunction(IdentifierNode& node, Type *type);
 };
 
 #endif // FUNCTION_DECLARATION_VISITOR_H_

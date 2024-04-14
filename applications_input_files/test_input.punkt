@@ -1,10 +1,11 @@
-function myfunc<int x> -> int {
-    return x.
+function myfunc <int x, bool b> -> int {
+    if b {
+        return x.
+    }
+    return 0.
 } 
 
 main {
     # var x = f(1, 2).
-    if true {
-        print "deez.".
-    }
+    var x = 1.
 }

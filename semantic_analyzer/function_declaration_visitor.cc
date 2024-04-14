@@ -2,6 +2,7 @@
 #include <parse_node/parse_node.h>
 #include <parse_node/parse_nodes/all_nodes.h>
 #include <symbol_table/scope.h>
+#include <semantic_analyzer/types/lambda_type.h>
 
 #include "function_declaration_visitor.h"
 
@@ -13,7 +14,18 @@ void FunctionDeclarationVisitor::VisitEnter(FunctionNode& node) {
     
 }
 void FunctionDeclarationVisitor::VisitLeave(FunctionNode& node) {
-    
+    auto prototype_node = node.GetFunctionPrototypeNode();
+    if (!prototype_node) {
+        PunktLogger::LogFatalInternalError("FunctionNode::GetFunctionPrototypeNode returned null");
+    }
+
+    auto identifier_node = node.GetIdentifierNode();
+    if (!identifier_node) {
+        PunktLogger::LogFatalInternalError("FunctionNode::GetIdentifierNode returned null");
+    }
+    identifier_node->SetType(prototype_node->GetType()->CreateEquivalentType());
+
+    DeclareFunction(*identifier_node, identifier_node->GetType());
 }
 
 void FunctionDeclarationVisitor::VisitLeave(FunctionParameterNode& node) {
@@ -34,12 +46,12 @@ void FunctionDeclarationVisitor::VisitLeave(FunctionParameterNode& node) {
     identifier_node->SetType(parameter_type->CreateEquivalentType());
 }
 
-void FunctionDeclarationVisitor::VisitEnter(FunctionPrototypeNode& node) {
-    
-}
 void FunctionDeclarationVisitor::VisitLeave(FunctionPrototypeNode& node) {
-    
+    auto parameter_types = node.GetParameterTypes();
+    auto return_type = node.GetReturnType();
+    node.SetType(LambdaType::CreateLambdaType(parameter_types, return_type));
 }
+
 void FunctionDeclarationVisitor::VisitEnter(ProgramNode& node) {
     CreateGlobalScope(node);
 }
@@ -61,4 +73,17 @@ void FunctionDeclarationVisitor::Visit(TypeNode& node) {
 //--------------------------------------------------------------------------------------//
 void FunctionDeclarationVisitor::CreateGlobalScope(ParseNode& node) {
     node.SetScope(Scope::CreateGlobalScope());
+}
+
+//--------------------------------------------------------------------------------------//
+//                                Miscellaneous helpers                                 //
+//--------------------------------------------------------------------------------------//
+void FunctionDeclarationVisitor::DeclareFunction(IdentifierNode& node, Type *type) {
+    Scope *local_scope = node.GetLocalScope();
+    local_scope->Declare(
+        node.GetToken()->GetLexeme(),
+        node.GetToken()->GetLocation(),
+        /*is_mutable=*/true,
+        type
+    );
 }
