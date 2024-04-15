@@ -1,5 +1,6 @@
 #include <variant>
 
+#include <llvm/IR/Function.h>
 #include <llvm/IR/Instruction.h>
 #include <llvm/IR/Value.h>
 #include <llvm/IR/Verifier.h>
@@ -62,6 +63,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
     for (auto child : node.GetChildren()) {
         child->GenerateCode(*this);
     }
+
+    // GenerateCode(CodeBlockNode&) return value is not used.
     return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
@@ -83,15 +86,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
     llvm::AllocaInst *alloca_inst = CreateEntryBlockAlloca(parent_function,
             identifier_node->GetName(), initializer_value->getType());
 
-    auto symbol_table_entry_opt = identifier_node->FindSymbolTableEntry();
-    if (!symbol_table_entry_opt.has_value()) {
-        CodeGenerationInternalError("missing entry in symbol table for "
-                + identifier_node->ToString());
-    }
-    else {
-        SymbolTableEntry &symbol_table_entry = symbol_table_entry_opt.value();
-        symbol_table_entry.alloca = alloca_inst;
-    }
+    // Store alloca instruction in the symbol table to be used for loads.
+    identifier_node->SetLLVMAlloca(alloca_inst);
 
     builder->CreateStore(initializer_value, alloca_inst);
 
@@ -149,11 +145,26 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode& node) {
     // Any new code will be inserted in the 'afterloop' block.
     builder->SetInsertPoint(afterloop_block);
 
+    // GenerateCode(ForStatementNode&) return value is not used.
     return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionDefinitionNode& node) {
-    return nullptr;
+    auto identifier_node = node.GetIdentifierNode();
+    if (!identifier_node) {
+        return CodeGenerationInternalError("unable to find function definition identifier");
+    }
+
+    auto lambda_node = node.GetLambdaNode();
+    if (!lambda_node) {
+        return CodeGenerationInternalError("unable to find function definition lambda node");
+    }
+
+    auto function = static_cast<llvm::Function *>(lambda_node->GenerateCode(*this));
+    identifier_node->SetLLVMFunction(function);
+
+    // GenerateCode(FunctionDefinitionNode&) return value is not used.
+    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
@@ -202,18 +213,87 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
     parent_function->insert(parent_function->end(), merge_block);
     builder->SetInsertPoint(merge_block);
 
-    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));;
+    // GenerateCode(IfStatementNode&) return value is not used.
+    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode& node) {
-    return nullptr;
+    // Look up function in symbol table.
+    auto symbol_table_entry_opt = node.GetIdentifierNode()->FindSymbolTableEntry();
+    if (!symbol_table_entry_opt.has_value()) {
+        return CodeGenerationInternalError("missing symbol table entry for lambda");
+    }
+    auto callee_f = symbol_table_entry_opt.value().get().function;
+    if (!callee_f) {
+        return CodeGenerationInternalError("symbol table entry function pointer is null");
+    }
+
+    std::vector<llvm::Value *> arg_values;
+    for (const auto& arg : node.GetArgumentNodes()) {
+        arg_values.push_back(arg->GenerateCode(*this));
+    }
+
+    return builder->CreateCall(callee_f, arg_values);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
-    return nullptr;
+    std::vector<llvm::Type *> param_types;
+    std::vector<LambdaParameterNode *> param_nodes = node.GetParameterNodes();
+    param_types.reserve(param_nodes.size());
+
+    // Create a vector holding llvm::Type pointers describing the parameter types.
+    for (const auto& param_node : param_nodes) {
+        param_types.push_back(param_node->GetTypeNode()->GetLLVMType(*context));
+    }
+
+    // Create the function type.
+    auto function_type = llvm::FunctionType::get(
+            node.GetReturnTypeNode()->GetLLVMType(*context), param_types, false);
+
+    // Create the function.
+    auto function = llvm::Function::Create(
+            function_type, llvm::Function::ExternalLinkage, "", module.get());
+
+    // Set names for arguments.
+    unsigned i = 0;
+    for (auto &arg : function->args()) {
+        arg.setName(param_nodes[i]->GetIdentifierNode()->GetName());
+        ++i;
+    }
+
+    // Set up builder to generate function body.
+    auto function_entry_block = llvm::BasicBlock::Create(*context, "", function);
+    builder->SetInsertPoint(function_entry_block);
+
+    // Allocate memory for arguments.
+    i = 0;
+    for (auto &arg : function->args()) {
+        auto arg_identifier_node = param_nodes[i]->GetIdentifierNode();
+
+        // Create an alloca for this parameter.
+        llvm::AllocaInst *alloca = CreateEntryBlockAlloca(function, arg_identifier_node->GetName(),
+                arg.getType());
+
+        // Store alloca instruction in the symbol table.
+        arg_identifier_node->SetLLVMAlloca(alloca);
+
+        // Store initial value into the alloca.
+        builder->CreateStore(&arg, alloca);
+
+        ++i;
+    }
+
+    // Generate code for the function body.
+    node.GetLambdaBodyNode()->GenerateCode(*this);
+
+    // Validate generated code.
+    llvm::verifyFunction(*function);
+
+    return function;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaParameterNode& node) {
+    // GenerateCode(LambdaParameterNode&) is not used.
     return nullptr;
 }
 
@@ -282,17 +362,16 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode& node) {
-    llvm::Value *ret_value = nullptr;
-
     // We call printf for each 'operand'
     for (auto child : node.GetChildren()) {
-        ret_value = PrintValue(child->GenerateCode(*this), child->GetType());
+        PrintValue(child->GenerateCode(*this), child->GetType());
     }
 
-    // Print line feed once we are finished
-    ret_value = PrintLineFeed();
+    // Print line feed once we are finished.
+    PrintLineFeed();
 
-    return ret_value;
+    // GenerateCode(ProgramNode&) return value is not used.
+    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
@@ -300,15 +379,20 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
     
     GenerateGlobalConstants();
 
-    auto result = node.GetChild(0)->GenerateCode(*this);
+    // Generate code for each function of the program.
+    for (const auto& child : node.GetChildren()) {
+        child->GenerateCode(*this);
+    }
 
     llvm::verifyModule(*module);
 
-    return result;
+    // GenerateCode(ProgramNode&) return value is not used.
+    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode& node) {
-    return nullptr;
+    llvm::Value *ret_value = node.GetChild(0)->GenerateCode(*this);
+    return builder->CreateRet(ret_value);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
@@ -342,6 +426,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(TypeNode& node) {
+    // GenerateCode(TypeNode&) is not used.
     return nullptr;
 }
 

@@ -2,14 +2,15 @@
 #include <parse_node/parse_node_visitor.h>
 
 #include "lambda_node.h"
+#include "lambda_parameter_node.h"
 
 void LambdaNode::AddParameterNode(std::unique_ptr<ParseNode> parameter_node) {
-    this->parameter_nodes.push_back(parameter_node.get());
+    this->parameter_nodes.push_back(dynamic_cast<LambdaParameterNode *>(parameter_node.get()));
     this->AppendChild(std::move(parameter_node));
 }
 
 void LambdaNode::AddReturnTypeNode(std::unique_ptr<ParseNode> return_type_node) {
-    this->return_type_node = return_type_node.get();
+    this->return_type_node = dynamic_cast<TypeNode *>(return_type_node.get());
     this->AppendChild(std::move(return_type_node));
 }
 

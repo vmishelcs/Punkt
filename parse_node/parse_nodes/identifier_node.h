@@ -1,6 +1,7 @@
 #ifndef IDENTIFIER_NODE_H_
 #define IDENTIFIER_NODE_H_
 
+#include <llvm/IR/Function.h>
 #include <llvm/IR/Instruction.h>
 #include <llvm/IR/Value.h>
 
@@ -21,7 +22,8 @@ public:
 
     std::optional<std::reference_wrapper<SymbolTableEntry>> FindSymbolTableEntry();
 
-    // Type *FindType();
+    void SetLLVMAlloca(llvm::AllocaInst *alloca);
+    void SetLLVMFunction(llvm::Function *function);
     llvm::AllocaInst *FindAlloca();
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;

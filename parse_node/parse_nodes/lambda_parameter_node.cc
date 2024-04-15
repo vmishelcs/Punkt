@@ -1,8 +1,12 @@
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
 
+#include <logging/punkt_logger.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 #include <parse_node/parse_node.h>
+#include <semantic_analyzer/types/base_type.h>
 
 #include "lambda_parameter_node.h"
 

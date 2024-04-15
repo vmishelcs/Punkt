@@ -40,8 +40,26 @@ void TypeNode::InferOwnType() {
     }
 }
 
-std::string TypeNode::ToString() const {
-    return "TYPE NODE";
+llvm::Type *TypeNode::GetLLVMType(llvm::LLVMContext& context) const {
+    Type *type = GetType();
+    auto base_type = dynamic_cast<BaseType *>(type);
+    if (base_type) {
+        switch (base_type->GetBaseTypeEnum()) {
+            case BaseTypeEnum::BOOLEAN:
+                return llvm::Type::getInt8Ty(context);
+            case BaseTypeEnum::CHARACTER:
+                return llvm::Type::getInt8Ty(context);
+            case BaseTypeEnum::INTEGER:
+                return llvm::Type::getInt32Ty(context);
+            case BaseTypeEnum::STRING:
+                return llvm::PointerType::getUnqual(context);
+            default:
+                return (llvm::Type *)PunktLogger::LogFatalInternalError(
+                        "unimplemented BaseType in TypeNode::GetLLVMType");
+        }
+    }
+    return (llvm::Type *)PunktLogger::LogFatalInternalError(
+            "TypeNode::GetLLVMType implemented only for BaseType");
 }
 
 void TypeNode::Accept(ParseNodeVisitor& visitor) {

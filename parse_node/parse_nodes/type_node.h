@@ -3,6 +3,9 @@
 
 #include <string>
 
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Type.h>
+
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
@@ -20,8 +23,10 @@ public:
     bool DenotesReturnType() const {
         return GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_NODE;
     }
+    
+    llvm::Type *GetLLVMType(llvm::LLVMContext& context) const;
 
-    virtual std::string ToString() const override;
+    virtual std::string ToString() const override { return "TYPE NODE"; }
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 

@@ -20,10 +20,10 @@ public:
     virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) override;
     virtual llvm::Value *GenerateCode(ForStatementNode& node) override;
     virtual llvm::Value *GenerateCode(FunctionDefinitionNode& node) override;
-    virtual llvm::Value *GenerateCode(LambdaParameterNode& node) override;
     virtual llvm::Value *GenerateCode(IfStatementNode& node) override;
     virtual llvm::Value *GenerateCode(LambdaInvocationNode& node) override;
     virtual llvm::Value *GenerateCode(LambdaNode& node) override;
+    virtual llvm::Value *GenerateCode(LambdaParameterNode& node) override;
     virtual llvm::Value *GenerateCode(MainNode& node) override;
     virtual llvm::Value *GenerateCode(OperatorNode& node) override;
     virtual llvm::Value *GenerateCode(PrintStatementNode& node) override;

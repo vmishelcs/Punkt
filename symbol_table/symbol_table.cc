@@ -12,7 +12,8 @@ void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool
             .text_location = tl,
             .is_mutable = is_mutable,
             .type = type,
-            .alloca = nullptr
+            .alloca = nullptr,
+            .function = nullptr
         }});
     }
 }

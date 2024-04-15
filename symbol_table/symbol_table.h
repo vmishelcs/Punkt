@@ -6,6 +6,7 @@
 
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Value.h>
+#include <llvm/IR/Function.h>
 
 #include <input_handler/text_location.h>
 #include <semantic_analyzer/types/type.h>
@@ -15,6 +16,7 @@ struct SymbolTableEntry {
     bool is_mutable;
     Type *type;
     llvm::AllocaInst *alloca;
+    llvm::Function *function;
 };
 
 class SymbolTable {

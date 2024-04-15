@@ -1,3 +1,8 @@
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Instruction.h>
+#include <llvm/IR/Value.h>
+
+#include <logging/punkt_logger.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 #include <token/token.h>
@@ -43,6 +48,24 @@ std::optional<std::reference_wrapper<SymbolTableEntry>> IdentifierNode::FindSymb
         scope = scope->GetBaseScope();
     }
     return std::nullopt;
+}
+
+void IdentifierNode::SetLLVMAlloca(llvm::AllocaInst *alloca) {
+    auto symbol_table_entry_opt = FindSymbolTableEntry();
+    if (!symbol_table_entry_opt.has_value()) {
+        PunktLogger::LogFatalInternalError(
+                "could not find symbol table entry in IdentifierNode::SetLLVMAlloca");
+    }
+    symbol_table_entry_opt.value().get().alloca = alloca;
+}
+
+void IdentifierNode::SetLLVMFunction(llvm::Function *function) {
+    auto symbol_table_entry_opt = FindSymbolTableEntry();
+    if (!symbol_table_entry_opt.has_value()) {
+        PunktLogger::LogFatalInternalError(
+                "could not find symbol table entry in IdentifierNode::SetLLVMFunction");
+    }
+    symbol_table_entry_opt.value().get().function = function;
 }
 
 llvm::AllocaInst *IdentifierNode::FindAlloca() {

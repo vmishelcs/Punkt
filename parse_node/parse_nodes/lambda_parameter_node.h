@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
 
 #include <parse_node/parse_node.h>

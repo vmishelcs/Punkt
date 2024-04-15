@@ -29,8 +29,8 @@ public:
     /// to the end of the children vector field.
     void AddLambdaBodyNode(std::unique_ptr<ParseNode> lambda_body);
 
-    std::vector<ParseNode *> GetParameterNodes() { return parameter_nodes; }
-    ParseNode *GetReturnTypeNode() { return return_type_node; }
+    std::vector<LambdaParameterNode *> GetParameterNodes() { return parameter_nodes; }
+    TypeNode *GetReturnTypeNode() { return return_type_node; }
     ParseNode *GetLambdaBodyNode() { return lambda_body; }
 
     virtual std::string ToString() const override { return "LAMBDA NODE"; }
@@ -40,8 +40,8 @@ public:
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 
 private:
-    std::vector<ParseNode *> parameter_nodes;
-    ParseNode *return_type_node;
+    std::vector<LambdaParameterNode *> parameter_nodes;
+    TypeNode *return_type_node;
     ParseNode *lambda_body;
 };
 
