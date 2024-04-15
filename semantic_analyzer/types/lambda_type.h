@@ -30,7 +30,9 @@ public:
     bool AcceptsArgumentTypes(std::vector<Type *>& arg_types) const;
 
     int NumParameters() const { return parameter_types.size(); }
+
     std::vector<Type *> GetParameterTypes() const;
+    
     Type *GetReturnType() const { return return_type.get(); }
 
     /// @brief Check if this `LambdaType` is semantically equivalent to the `Type` pointed to by

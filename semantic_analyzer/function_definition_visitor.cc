@@ -68,10 +68,10 @@ void FunctionDefinitionVisitor::VisitEnter(ProgramNode& node) {
 //                                      Leaf nodes                                      //
 //--------------------------------------------------------------------------------------//
 void FunctionDefinitionVisitor::Visit(TypeNode& node) {
-    // Perform semantic analysis only on type nodes that are a part of a parameter or specify a
-    // return type.
-    if (node.GetParent()->GetParseNodeType() != ParseNodeType::LAMBDA_PARAMETER_NODE
-        && node.GetParent()->GetParseNodeType() != ParseNodeType::LAMBDA_NODE) {
+    // Perform semantic analysis only on TypeNodes that are a part of a parameter or specify a
+    // return type. Semantic analysis of TypeNodes that do not denote a parameter type or a return
+    // type is done in SemanticAnalysisVisitor::Visit(TypeNode&).
+    if (!node.DenotesParameterType() && !node.DenotesReturnType()) {
         return;
     }
 

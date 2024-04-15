@@ -13,6 +13,14 @@ public:
     /// @brief Set `Type` based on the token used to create this `TypeNode`.
     void InferOwnType();
 
+    bool DenotesParameterType() const {
+        return GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_PARAMETER_NODE;
+    }
+
+    bool DenotesReturnType() const {
+        return GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_NODE;
+    }
+
     virtual std::string ToString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
