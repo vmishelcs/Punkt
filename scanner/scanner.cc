@@ -25,7 +25,6 @@ bool Scanner::HasNext() const {
 std::unique_ptr<Token> Scanner::GetNextToken() {
     LocatedChar ch = this->input_stream->NextNonwhitespaceChar();
 
-    // TODO: Implement a way to read common escape sequences.
     if (ch.IsIdentifierStart()) {
         return ScanIdentifier(ch);
     }
@@ -183,6 +182,7 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char)
 
     LocatedChar next_char = input_stream->Peek();
     if (next_char.character != '\"') {
+        // TODO: Replace escape sequences with ASCII value.
         LexicalErrorExpectedDifferentCharacter('\"', next_char.location);
         return GetNextToken();
     }
