@@ -21,11 +21,11 @@ private:
     bool StartsProgram(Token& token);
     std::unique_ptr<ParseNode> ParseProgram();
 
-    bool StartsFunction(Token& token);
-    std::unique_ptr<ParseNode> ParseFunction();
+    bool StartsFunctionDefinition(Token& token);
+    std::unique_ptr<ParseNode> ParseFunctionDefinition();
 
-    bool StartsFunctionPrototype(Token& token);
-    std::unique_ptr<ParseNode> ParseFunctionPrototype();
+    bool StartsLambda(Token& token);
+    std::unique_ptr<ParseNode> ParseLambda();
 
     bool StartsMain(Token& token);
     std::unique_ptr<ParseNode> ParseMain();

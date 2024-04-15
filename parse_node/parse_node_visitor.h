@@ -18,20 +18,23 @@ public:
     virtual void VisitEnter(ForStatementNode& node) = 0;
     virtual void VisitLeave(ForStatementNode& node) = 0;
 
-    virtual void VisitEnter(FunctionNode& node) = 0;
-    virtual void VisitLeave(FunctionNode& node) = 0;
+    virtual void VisitEnter(FunctionDefinitionNode& node) = 0;
+    virtual void VisitLeave(FunctionDefinitionNode& node) = 0;
 
-    virtual void VisitEnter(FunctionParameterNode& node) = 0;
-    virtual void VisitLeave(FunctionParameterNode& node) = 0;
-
-    virtual void VisitEnter(FunctionPrototypeNode& node) = 0;
-    virtual void VisitLeave(FunctionPrototypeNode& node) = 0;
+    virtual void VisitEnter(LambdaParameterNode& node) = 0;
+    virtual void VisitLeave(LambdaParameterNode& node) = 0;
 
     virtual void VisitEnter(IfStatementNode& node) = 0;
     virtual void VisitLeave(IfStatementNode& node) = 0;
 
     virtual void VisitEnter(MainNode& node) = 0;
     virtual void VisitLeave(MainNode& node) = 0;
+
+    virtual void VisitEnter(LambdaInvocationNode& node) = 0;
+    virtual void VisitLeave(LambdaInvocationNode& node) = 0;
+
+    virtual void VisitEnter(LambdaNode& node) = 0;
+    virtual void VisitLeave(LambdaNode& node) = 0;
 
     virtual void VisitEnter(OperatorNode& node) = 0;
     virtual void VisitLeave(OperatorNode& node) = 0;
@@ -91,24 +94,17 @@ public:
         DefaultVisit(node);
     }
 
-    virtual void VisitEnter(FunctionNode& node) override {
+    virtual void VisitEnter(FunctionDefinitionNode& node) override {
         DefaultVisit(node);
     }
-    virtual void VisitLeave(FunctionNode& node) override {
-        DefaultVisit(node);
-    }
-
-    virtual void VisitEnter(FunctionParameterNode& node) override {
-        DefaultVisit(node);
-    }
-    virtual void VisitLeave(FunctionParameterNode& node) override {
+    virtual void VisitLeave(FunctionDefinitionNode& node) override {
         DefaultVisit(node);
     }
 
-    virtual void VisitEnter(FunctionPrototypeNode& node) override {
+    virtual void VisitEnter(LambdaParameterNode& node) override {
         DefaultVisit(node);
     }
-    virtual void VisitLeave(FunctionPrototypeNode& node) override {
+    virtual void VisitLeave(LambdaParameterNode& node) override {
         DefaultVisit(node);
     }
 
@@ -116,6 +112,20 @@ public:
         DefaultVisit(node);
     }
     virtual void VisitLeave(IfStatementNode& node) override {
+        DefaultVisit(node);
+    }
+
+    virtual void VisitEnter(LambdaInvocationNode& node) override {
+        DefaultVisit(node);
+    }
+    virtual void VisitLeave(LambdaInvocationNode& node) override {
+        DefaultVisit(node);
+    }
+
+    virtual void VisitEnter(LambdaNode& node) override {
+        DefaultVisit(node);
+    }
+    virtual void VisitLeave(LambdaNode& node) override {
         DefaultVisit(node);
     }
 

@@ -1,8 +1,10 @@
-#include <experimental/memory>
+#include <memory>
+#include <vector>
 
-#include <token/all_tokens.h>
-#include <parse_node/parse_nodes/all_nodes.h>
 #include <logging/punkt_logger.h>
+#include <parse_node/parse_nodes/all_nodes.h>
+#include <scanner/scanner.h>
+#include <token/all_tokens.h>
 
 #include "parser.h"
 
@@ -70,7 +72,7 @@ void Parser::Expect(PunctuatorEnum punctuator) {
 
 bool Parser::StartsProgram(Token& token) {
     return StartsMain(token)
-        || StartsFunction(token);
+        || StartsFunctionDefinition(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseProgram() {
     if (!StartsProgram(*now_reading)) {
@@ -80,8 +82,8 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
     std::unique_ptr<ProgramToken> program_token = std::make_unique<ProgramToken>();
     std::unique_ptr<ParseNode> program = std::make_unique<ProgramNode>(std::move(program_token));
 
-    while (StartsFunction(*now_reading)) {
-        auto function = ParseFunction();
+    while (StartsFunctionDefinition(*now_reading)) {
+        auto function = ParseFunctionDefinition();
         program->AppendChild(std::move(function));
     }
 
@@ -95,15 +97,15 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
     return program;
 }
 
-bool Parser::StartsFunction(Token& token) {
+bool Parser::StartsFunctionDefinition(Token& token) {
     return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::FUNCTION});
 }
-std::unique_ptr<ParseNode> Parser::ParseFunction() {
-    if (!StartsFunction(*now_reading)) {
+std::unique_ptr<ParseNode> Parser::ParseFunctionDefinition() {
+    if (!StartsFunctionDefinition(*now_reading)) {
         return SyntaxErrorUnexpectedToken("function");
     }
 
-    auto function = std::make_unique<FunctionNode>(std::move(now_reading));
+    auto function = std::make_unique<FunctionDefinitionNode>(std::move(now_reading));
 
     // Discard 'function' keyword.
     ReadToken();
@@ -114,44 +116,41 @@ std::unique_ptr<ParseNode> Parser::ParseFunction() {
     }
     function->AppendChild(std::move(function_id));
 
-    auto function_prototype = ParseFunctionPrototype();
-    function->AppendChild(std::move(function_prototype));
-
-    auto function_body = ParseCodeBlock();
-    function->AppendChild(std::move(function_body));
+    auto lambda = ParseLambda();
+    function->AppendChild(std::move(lambda));
 
     return function;
 }
 
-bool Parser::StartsFunctionPrototype(Token& token) {
+bool Parser::StartsLambda(Token& token) {
     return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_L});
 }
-std::unique_ptr<ParseNode> Parser::ParseFunctionPrototype() {
-    if (!StartsFunctionPrototype(*now_reading)) {
-        return SyntaxErrorUnexpectedToken("function prototype");
+std::unique_ptr<ParseNode> Parser::ParseLambda() {
+    if (!StartsLambda(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("lambda");
     }
 
     // Discard '<'.
     ReadToken();
 
-    auto prototype = std::make_unique<FunctionPrototypeNode>();
+    auto lambda_node = std::make_unique<LambdaNode>();
 
     // Parse parameters.
     if (StartsType(*now_reading)) {
         auto param_type = ParseType();
         auto param_id = ParseIdentifier();
-        auto parameter_node = FunctionParameterNode::CreateParameterNode(std::move(param_type),
+        auto parameter_node = LambdaParameterNode::CreateParameterNode(std::move(param_type),
                 std::move(param_id));
-        prototype->AppendChild(std::move(parameter_node));
+        lambda_node->AddParameterNode(std::move(parameter_node));
     }
     while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
         // Discard ','.
         ReadToken();
         auto param_type = ParseType();
         auto param_id = ParseIdentifier();
-        auto parameter_node = FunctionParameterNode::CreateParameterNode(std::move(param_type),
+        auto parameter_node = LambdaParameterNode::CreateParameterNode(std::move(param_type),
                 std::move(param_id));
-        prototype->AppendChild(std::move(parameter_node));
+        lambda_node->AddParameterNode(std::move(parameter_node));
     }
 
     // Expect closing '>'.
@@ -162,9 +161,13 @@ std::unique_ptr<ParseNode> Parser::ParseFunctionPrototype() {
 
     // Parse return type.
     auto return_type = ParseType();
-    prototype->AppendChild(std::move(return_type));
+    lambda_node->AddReturnTypeNode(std::move(return_type));
 
-    return prototype;
+    // Parse lambda body.
+    auto lambda_body = ParseCodeBlock();
+    lambda_node->AddLambdaBodyNode(std::move(lambda_body));
+
+    return lambda_node;
 }
 
 bool Parser::StartsMain(Token& token) {
@@ -683,9 +686,35 @@ std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
 
     auto identifier = std::make_unique<IdentifierNode>(std::move(now_reading));
 
+    // Read the identifier.
     ReadToken();
 
-    return identifier;
+    // If we are not parsing a function invocation, return the identifier node.
+    if (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+            {PunctuatorEnum::OPEN_PARENTHESIS})) {
+        return identifier;
+    }
+
+    Expect(PunctuatorEnum::OPEN_PARENTHESIS);
+
+    std::vector<std::unique_ptr<ParseNode>> args;
+    if (StartsExpression(*now_reading)) {
+        args.emplace_back(ParseExpression());
+
+        while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
+            // Discard ','.
+            ReadToken();
+
+            args.emplace_back(ParseExpression());
+        }
+    }
+
+    auto lambda_invocation = LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
+            std::move(identifier), std::move(args));
+
+    Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+
+    return lambda_invocation;
 }
 
 bool Parser::StartsBooleanLiteral(Token& token) {

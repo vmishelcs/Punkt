@@ -10,12 +10,13 @@ target_link_libraries(parse_node
     declaration_statement_node
     error_node
     for_statement_node
-    function_node
-    function_parameter_node
-    function_prototype_node
+    function_definition_node
     identifier_node
     if_statement_node
     integer_literal_node
+    lambda_invocation_node
+    lambda_node
+    lambda_parameter_node
     main_node
     nop_node
     operator_node

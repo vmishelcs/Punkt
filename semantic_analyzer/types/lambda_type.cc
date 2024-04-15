@@ -11,6 +11,22 @@ std::unique_ptr<LambdaType> LambdaType::CreateLambdaType(
     return std::make_unique<LambdaType>(parameter_types, return_type);
 }
 
+bool LambdaType::AcceptsArgumentTypes(std::vector<Type *>& arg_types) const {
+    // Make sure the number of arguments is the same.
+    if (arg_types.size() != this->parameter_types.size()) {
+        return false;
+    }
+
+    // Check that each argument is semantically equivalent.
+    for (unsigned i = 0, n = arg_types.size(); i < n; ++i) {
+        if (!parameter_types[i]->IsEquivalentTo(arg_types[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 LambdaType::LambdaType(std::vector<Type *> parameter_types, Type *return_type)
     : Type(TypeEnum::LAMBDA)
 {

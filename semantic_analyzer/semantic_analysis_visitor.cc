@@ -5,9 +5,9 @@
 #include <symbol_table/scope.h>
 #include <token/keyword_token.h>
 
-#include "function_declaration_visitor.h"
 #include "semantic_analysis_visitor.h"
 #include "types/base_type.h"
+#include "types/lambda_type.h"
 #include "types/type.h"
 
 //--------------------------------------------------------------------------------------//
@@ -48,7 +48,7 @@ void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode& node) {
 }
 
 void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode& node) {
-    if (node.GetParent()->GetParseNodeType() == ParseNodeType::FUNCTION_NODE) {
+    if (node.GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_NODE) {
         CreateProcedureScope(node);
     }
     else {
@@ -84,30 +84,10 @@ void SemanticAnalysisVisitor::VisitLeave(ForStatementNode& node) {
     }
 }
 
-void SemanticAnalysisVisitor::VisitEnter(FunctionNode& node) {
+void SemanticAnalysisVisitor::VisitEnter(FunctionDefinitionNode& node) {
     // Declare the function identifier BEFORE entering the parameter scope; that is, first declare
-    // the function identifier (in FunctionDeclarationVisitor), then create the parameter scope.
+    // the function identifier (in FunctionDefinitionVisitor), then create the parameter scope.
     CreateParameterScope(node);
-}
-void SemanticAnalysisVisitor::VisitLeave(FunctionNode& node) {
-
-}
-
-void SemanticAnalysisVisitor::VisitLeave(FunctionParameterNode& node) {
-    IdentifierNode *identifier_node = node.GetIdentifierNode();
-    if (!identifier_node) {
-        PunktLogger::LogFatalInternalError(
-                "FunctionParameterNode::GetIdentifierNode returned null");
-    }
-
-    DeclareInLocalScope(*identifier_node, /*is_mutable=*/true, identifier_node->GetType());
-}
-
-void SemanticAnalysisVisitor::VisitEnter(FunctionPrototypeNode& node) {
-
-}
-void SemanticAnalysisVisitor::VisitLeave(FunctionPrototypeNode& node) {
-
 }
 
 void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
@@ -120,6 +100,48 @@ void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
         node.SetType(BaseType::CreateErrorType());
         return;
     }
+}
+
+void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode& node) {
+    auto identifier_node = node.GetIdentifierNode();
+    if (!identifier_node) {
+        PunktLogger::LogFatalInternalError("LambdaInvocationNode::GetIdentifierNode returned null");
+    }
+
+    Type *type = identifier_node->GetType();
+    auto lambda_type = dynamic_cast<LambdaType *>(type);
+    if (!lambda_type) {
+        InvocationExpressionWithNonLambdaTypeError(*identifier_node);
+        node.SetType(BaseType::CreateErrorType());
+        return;
+    }
+
+    std::vector<ParseNode *> arg_nodes = node.GetArgumentNodes();
+    std::vector<Type *> arg_types;
+    arg_types.reserve(arg_nodes.size());
+    // Fill `arg_types` vector with corresponding types.
+    std::transform(arg_nodes.begin(), arg_nodes.end(), std::inserter(arg_types, arg_types.end()),
+            [](const auto& arg_node) { return arg_node->GetType(); });
+    
+    // Check that the lambda accepts the provided arguments.
+    if (!lambda_type->AcceptsArgumentTypes(arg_types)) {
+        LambdaDoesNotAcceptProvidedTypesError(*identifier_node);
+        node.SetType(BaseType::CreateErrorType());
+        return;
+    }
+
+    // This node's type is the return type of the lambda.
+    node.SetType(lambda_type->GetReturnType()->CreateEquivalentType());
+}
+
+void SemanticAnalysisVisitor::VisitLeave(LambdaParameterNode& node) {
+    IdentifierNode *identifier_node = node.GetIdentifierNode();
+    if (!identifier_node) {
+        PunktLogger::LogFatalInternalError(
+                "LambdaParameterNode::GetIdentifierNode returned null");
+    }
+
+    DeclareInLocalScope(*identifier_node, /*is_mutable=*/true, identifier_node->GetType());
 }
 
 void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
@@ -154,16 +176,22 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
     }
 }
 
-void SemanticAnalysisVisitor::VisitEnter(ProgramNode& node) {
-    FunctionDeclarationVisitor function_declaration_visitor;
-    node.Accept(function_declaration_visitor);
-}
-
-void SemanticAnalysisVisitor::VisitEnter(ReturnStatementNode& node) {
-
-}
 void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode& node) {
+    // Make sure this statement is returning an expression that is semantically equivalent to the
+    // lambda return type this this return statement is a part of.
+    Type *ret_expr_type = node.GetChild(0)->GetType();
 
+    LambdaNode *lambda_node = node.GetEnclosingLambdaNode();
+    auto lambda_type = dynamic_cast<LambdaType *>(lambda_node->GetType());
+    if (!lambda_type) {
+        PunktLogger::LogFatalInternalError("LambdaNode has non-lambda type");
+    }
+
+    if (!lambda_type->GetReturnType()->IsEquivalentTo(ret_expr_type)) {
+        IncompatibleReturnTypeError(node);
+        node.SetType(BaseType::CreateErrorType());
+        return;
+    }
 }
 
 //--------------------------------------------------------------------------------------//
@@ -175,9 +203,9 @@ void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
 void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
     if (IsBeingDeclared(node) || IsParameterIdentifier(node)) {
         // If an identifier is being declared, its semantic analysis is handled by either
-        // `VisitLeave(DeclarationStatementNode&)` or `VisitLeave(FunctionNode)`. If an identifier
-        // is part of a function parameter, its semantic analysis is handled by 
-        // `VisitLeave(FunctionParameterNode&)`.
+        // `VisitLeave(DeclarationStatementNode&)` or `VisitLeave(FunctionDefinitionNode)`.If an
+        // identifier is part of a function parameter, its semantic analysis is handled by 
+        // `VisitLeave(LambdaParameterNode&)`.
         return;
     }
 
@@ -211,9 +239,9 @@ void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
 }
 void SemanticAnalysisVisitor::Visit(TypeNode& node) {
     // Perform semantic analysis only on type nodes that are NOT a part of a parameter and DO NOT
-    // specify a function return type.
-    if (node.GetParent()->GetParseNodeType() == ParseNodeType::FUNCTION_PARAMETER_NODE
-        || node.GetParent()->GetParseNodeType() == ParseNodeType::FUNCTION_PROTOTYPE_NODE) {
+    // specify a lambda return type.
+    if (node.GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_PARAMETER_NODE
+        || node.GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_NODE) {
         return;
     }
 
@@ -237,10 +265,10 @@ bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {
     auto parent = node.GetParent();
     return (parent->GetChild(0) == &node)
         && (parent->GetParseNodeType() == ParseNodeType::DECLARATION_STATEMENT_NODE
-            || parent->GetParseNodeType() == ParseNodeType::FUNCTION_NODE);
+            || parent->GetParseNodeType() == ParseNodeType::FUNCTION_DEFINITION_NODE);
 }
 bool SemanticAnalysisVisitor::IsParameterIdentifier(IdentifierNode& node) {
-    return node.GetParent()->GetParseNodeType() == ParseNodeType::FUNCTION_PARAMETER_NODE;
+    return node.GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_PARAMETER_NODE;
 }
 
 //--------------------------------------------------------------------------------------//
@@ -301,5 +329,22 @@ void SemanticAnalysisVisitor::AssignmentTypeMismatchError(ParseNode& node, const
             const Type& value_type) {
     std::string message = "cannot assign \'" + value_type.ToString()
             + "\' value to a target of type \'" + target_type.ToString() + "\'.";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::InvocationExpressionWithNonLambdaTypeError(IdentifierNode& node) {
+    std::string message = "identifier \'" + node.GetName() + "\' at "
+            + node.GetToken()->GetLocation().ToString() + " has non-lambda type.";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::LambdaDoesNotAcceptProvidedTypesError(IdentifierNode& node) {
+    std::string message = "lambda \'" + node.GetName() + "\' does not accept the given arguments.";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::IncompatibleReturnTypeError(ReturnStatementNode& node) {
+    std::string message = "incompatible return type at "
+            + node.GetToken()->GetLocation().ToString();
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }

@@ -1,18 +1,17 @@
-#ifndef FUNCTION_DECLARATION_VISITOR_H_
-#define FUNCTION_DECLARATION_VISITOR_H_
+#ifndef FUNCTION_DEFINITION_VISITOR_H_
+#define FUNCTION_DEFINITION_VISITOR_H_
 
 #include <parse_node/parse_node_visitor.h>
 #include <parse_node/parse_nodes/all_nodes.h>
 
-class FunctionDeclarationVisitor : public DefaultParseNodeVisitor {
+class FunctionDefinitionVisitor : public DefaultParseNodeVisitor {
 public:
     // ---- Non-leaf nodes -------------------------------------------------------------------
-    virtual void VisitEnter(FunctionNode& node) override;
-    virtual void VisitLeave(FunctionNode& node) override;
+    virtual void VisitLeave(FunctionDefinitionNode& node) override;
 
-    virtual void VisitLeave(FunctionParameterNode& node) override;
+    virtual void VisitLeave(LambdaNode& node) override;
 
-    virtual void VisitLeave(FunctionPrototypeNode& node) override;
+    virtual void VisitLeave(LambdaParameterNode& node) override;
 
     virtual void VisitEnter(ProgramNode& node) override;
 
@@ -27,4 +26,4 @@ private:
     void DeclareFunction(IdentifierNode& node, Type *type);
 };
 
-#endif // FUNCTION_DECLARATION_VISITOR_H_
+#endif // FUNCTION_DEFINITION_VISITOR_H_

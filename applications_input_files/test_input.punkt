@@ -1,11 +1,18 @@
-function myfunc <int x, bool b> -> int {
-    if b {
-        return x.
+function fib<int n> -> int {
+    if n <= 0 {
+        return 0.
     }
-    return 0.
-} 
+    if n == 1 {
+        return 1.
+    }
+    if n == 2 {
+        return 1.
+    }
+
+    return fib(n - 1) + fib(n - 2).
+}
 
 main {
-    # var x = f(1, 2).
-    var x = 1.
+    const n = 10.
+    var nfib = fib(n).
 }

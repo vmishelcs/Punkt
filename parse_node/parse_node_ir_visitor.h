@@ -11,10 +11,11 @@ public:
     virtual llvm::Value *GenerateCode(CodeBlockNode& node) = 0;
     virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) = 0;
     virtual llvm::Value *GenerateCode(ForStatementNode& node) = 0;
-    virtual llvm::Value *GenerateCode(FunctionNode& node) = 0;
-    virtual llvm::Value *GenerateCode(FunctionParameterNode& node) = 0;
-    virtual llvm::Value *GenerateCode(FunctionPrototypeNode& node) = 0;
+    virtual llvm::Value *GenerateCode(FunctionDefinitionNode& node) = 0;
+    virtual llvm::Value *GenerateCode(LambdaParameterNode& node) = 0;
     virtual llvm::Value *GenerateCode(IfStatementNode& node) = 0;
+    virtual llvm::Value *GenerateCode(LambdaInvocationNode& node) = 0;
+    virtual llvm::Value *GenerateCode(LambdaNode& node) = 0;
     virtual llvm::Value *GenerateCode(MainNode& node) = 0;
     virtual llvm::Value *GenerateCode(OperatorNode& node) = 0;
     virtual llvm::Value *GenerateCode(PrintStatementNode& node) = 0;

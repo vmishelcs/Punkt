@@ -125,46 +125,16 @@ void XMLGeneratorVisitor::VisitLeave(ForStatementNode& node) {
     OutputTag(*tag);
 }
 
-void XMLGeneratorVisitor::VisitEnter(FunctionNode& node) {
-    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionNode");
+void XMLGeneratorVisitor::VisitEnter(FunctionDefinitionNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionDefinitionNode");
 
     AddBasicParseNodeAttributes(*tag, node);
 
     OutputTag(*tag);
     ++depth;
 }
-void XMLGeneratorVisitor::VisitLeave(FunctionNode& node) {
-    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("FunctionNode");
-
-    --depth;
-    OutputTag(*tag);
-}
-
-void XMLGeneratorVisitor::VisitEnter(FunctionParameterNode& node) {
-    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionParameterNode");
-
-    AddBasicParseNodeAttributes(*tag, node);
-
-    OutputTag(*tag);
-    ++depth;
-}
-void XMLGeneratorVisitor::VisitLeave(FunctionParameterNode& node) {
-    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("FunctionParameterNode");
-
-    --depth;
-    OutputTag(*tag);
-}
-
-void XMLGeneratorVisitor::VisitEnter(FunctionPrototypeNode& node) {
-    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("FunctionPrototypeNode");
-
-    AddBasicParseNodeAttributes(*tag, node);
-
-    OutputTag(*tag);
-    ++depth;
-}
-void XMLGeneratorVisitor::VisitLeave(FunctionPrototypeNode& node) {
-    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("FunctionPrototypeNode");
+void XMLGeneratorVisitor::VisitLeave(FunctionDefinitionNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("FunctionDefinitionNode");
 
     --depth;
     OutputTag(*tag);
@@ -181,6 +151,51 @@ void XMLGeneratorVisitor::VisitEnter(IfStatementNode& node) {
 void XMLGeneratorVisitor::VisitLeave(IfStatementNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("IfStatementNode");
     
+    --depth;
+    OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(LambdaInvocationNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("LambdaInvocationNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(LambdaInvocationNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("LambdaInvocationNode");
+    
+    --depth;
+    OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(LambdaNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("LambdaNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(LambdaNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("LambdaNode");
+    
+    --depth;
+    OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(LambdaParameterNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("LambdaParameterNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(LambdaParameterNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("LambdaParameterNode");
+
     --depth;
     OutputTag(*tag);
 }

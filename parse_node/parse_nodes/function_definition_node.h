@@ -4,21 +4,22 @@
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
-#include "function_prototype_node.h"
 #include "identifier_node.h"
+#include "lambda_node.h"
 
-class FunctionNode : public ParseNode {
+class FunctionDefinitionNode : public ParseNode {
 public:
-    FunctionNode(std::unique_ptr<Token> token);
+    FunctionDefinitionNode(std::unique_ptr<Token> token);
 
     IdentifierNode *GetIdentifierNode() const {
         return dynamic_cast<IdentifierNode *>(GetChild(0));
     }
-    FunctionPrototypeNode *GetFunctionPrototypeNode() const {
-        return dynamic_cast<FunctionPrototypeNode *>(GetChild(1));
+    
+    LambdaNode *GetLambdaNode() const {
+        return dynamic_cast<LambdaNode *>(GetChild(1));
     }
 
-    virtual std::string ToString() const override;
+    virtual std::string ToString() const override { return "FUNCTION DEFINITION NODE"; }
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 

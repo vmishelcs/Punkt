@@ -2,7 +2,6 @@
 #define LAMBDA_TYPE_H_
 
 #include <memory>
-#include <utility>
 #include <vector>
 
 #include "type.h"
@@ -23,6 +22,12 @@ public:
     static std::unique_ptr<LambdaType> CreateLambdaType(
             std::vector<Type *> parameter_types,
             Type *return_type);
+
+    /// @brief Checks that this `LambdaType` accepts the specified types as arguments.
+    /// @param arg_types A `vector` of types to check.
+    /// @return `true` if each `Type` specified by the `arg_types` vector is semantically equivalent
+    /// to the parameter types specified in this `LambdaType`.
+    bool AcceptsArgumentTypes(std::vector<Type *>& arg_types) const;
 
     int NumParameters() const { return parameter_types.size(); }
     std::vector<Type *> GetParameterTypes() const;

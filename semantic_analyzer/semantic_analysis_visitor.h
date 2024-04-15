@@ -15,21 +15,16 @@ public:
     virtual void VisitEnter(ForStatementNode& node) override;
     virtual void VisitLeave(ForStatementNode& node) override;
 
-    virtual void VisitEnter(FunctionNode& node) override;
-    virtual void VisitLeave(FunctionNode& node) override;
+    virtual void VisitEnter(FunctionDefinitionNode& node) override;
 
-    virtual void VisitLeave(FunctionParameterNode& node) override;
+    virtual void VisitLeave(LambdaInvocationNode& node) override;
 
-    virtual void VisitEnter(FunctionPrototypeNode& node) override;
-    virtual void VisitLeave(FunctionPrototypeNode& node) override;
+    virtual void VisitLeave(LambdaParameterNode& node) override;
 
     virtual void VisitLeave(IfStatementNode& node) override;
 
     virtual void VisitLeave(OperatorNode& node) override;
 
-    virtual void VisitEnter(ProgramNode& node) override;
-
-    virtual void VisitEnter(ReturnStatementNode& node) override;
     virtual void VisitLeave(ReturnStatementNode& node) override;
 
     // ---- Leaf nodes -----------------------------------------------------------------------
@@ -60,6 +55,9 @@ private:
     void AssignmentToImmutableTargetError(ParseNode& node);
     void AssignmentTypeMismatchError(ParseNode& node, const Type& target_type,
             const Type& value_type);
+    void InvocationExpressionWithNonLambdaTypeError(IdentifierNode& node);
+    void LambdaDoesNotAcceptProvidedTypesError(IdentifierNode& node);
+    void IncompatibleReturnTypeError(ReturnStatementNode& node);
 };
 
 #endif // SEMANTIC_ANALYSIS_VISITOR_H_

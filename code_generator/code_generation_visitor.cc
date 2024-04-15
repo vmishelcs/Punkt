@@ -62,7 +62,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
     for (auto child : node.GetChildren()) {
         child->GenerateCode(*this);
     }
-    return nullptr; // This method's return value is not used anywhere.
+    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node) {
@@ -152,15 +152,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode& node) {
     return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
-llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionNode& node) {
-    return nullptr;
-}
-
-llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionParameterNode& node) {
-    return nullptr;
-}
-
-llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionPrototypeNode& node) {
+llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionDefinitionNode& node) {
     return nullptr;
 }
 
@@ -211,6 +203,18 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
     builder->SetInsertPoint(merge_block);
 
     return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));;
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode& node) {
+    return nullptr;
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
+    return nullptr;
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaParameterNode& node) {
+    return nullptr;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {

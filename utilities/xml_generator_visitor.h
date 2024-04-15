@@ -53,17 +53,20 @@ public:
     virtual void VisitEnter(ForStatementNode& node) override;
     virtual void VisitLeave(ForStatementNode& node) override;
 
-    virtual void VisitEnter(FunctionNode& node) override;
-    virtual void VisitLeave(FunctionNode& node) override;
-
-    virtual void VisitEnter(FunctionParameterNode& node) override;
-    virtual void VisitLeave(FunctionParameterNode& node) override;
-
-    virtual void VisitEnter(FunctionPrototypeNode& node) override;
-    virtual void VisitLeave(FunctionPrototypeNode& node) override;
+    virtual void VisitEnter(FunctionDefinitionNode& node) override;
+    virtual void VisitLeave(FunctionDefinitionNode& node) override;
 
     virtual void VisitEnter(IfStatementNode& node) override;
     virtual void VisitLeave(IfStatementNode& node) override;
+
+    virtual void VisitEnter(LambdaInvocationNode& node) override;
+    virtual void VisitLeave(LambdaInvocationNode& node) override;
+
+    virtual void VisitEnter(LambdaNode& node) override;
+    virtual void VisitLeave(LambdaNode& node) override;
+    
+    virtual void VisitEnter(LambdaParameterNode& node) override;
+    virtual void VisitLeave(LambdaParameterNode& node) override;
 
     virtual void VisitEnter(MainNode& node) override;
     virtual void VisitLeave(MainNode& node) override;
