@@ -3,18 +3,26 @@
 #include "symbol_table.h"
 
 
-void SymbolTable::Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type) {
+void SymbolTable::Insert(const std::string& symbol,
+        const TextLocation& tl,
+        bool is_mutable,
+        Type *type,
+        SymbolType symbol_type)
+{
     if (Contains(symbol)) {
         SymbolRedefinitionError(symbol, tl);
     }
     else {
-        table.insert({symbol, {
-            .text_location = tl,
-            .is_mutable = is_mutable,
-            .type = type,
-            .alloca = nullptr,
-            .function = nullptr
-        }});
+        table.insert({std::string(symbol), 
+            {
+                .text_location = TextLocation(tl),
+                .is_mutable = is_mutable,
+                .type = type,
+                .symbol_type = symbol_type,
+                .alloca = nullptr,
+                .function = nullptr
+            }
+        });
     }
 }
 

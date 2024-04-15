@@ -94,6 +94,7 @@ void FunctionDefinitionVisitor::DeclareFunction(IdentifierNode& node, Type *type
         node.GetToken()->GetLexeme(),
         node.GetToken()->GetLocation(),
         /*is_mutable=*/false,
-        type
+        type,
+        SymbolType::FUNCTION
     );
 }

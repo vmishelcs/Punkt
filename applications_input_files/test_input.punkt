@@ -3,5 +3,6 @@ function f<int x, int y> -> int {
 }
 
 main {
+    print "hello world.".
     var x = f(2, 2).
 }

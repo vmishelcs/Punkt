@@ -33,6 +33,10 @@ public:
     TypeNode *GetReturnTypeNode() { return return_type_node; }
     ParseNode *GetLambdaBodyNode() { return lambda_body; }
 
+    bool IsAnonymous() const {
+        return GetParent()->GetParseNodeType() != ParseNodeType::FUNCTION_DEFINITION_NODE;
+    }
+
     virtual std::string ToString() const override { return "LAMBDA NODE"; }
 
     virtual void Accept(ParseNodeVisitor& visitor) override;

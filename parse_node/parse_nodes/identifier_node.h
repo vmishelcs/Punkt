@@ -24,7 +24,8 @@ public:
 
     void SetLLVMAlloca(llvm::AllocaInst *alloca);
     void SetLLVMFunction(llvm::Function *function);
-    llvm::AllocaInst *FindAlloca();
+    llvm::AllocaInst *FindLLVMAlloca();
+    llvm::Function *FindLLVMFunction();
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 

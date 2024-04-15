@@ -258,7 +258,8 @@ void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode& node, bool is_
         node.GetToken()->GetLexeme(),
         node.GetToken()->GetLocation(),
         is_mutable,
-        type
+        type,
+        SymbolType::VARIABLE
     );
 }
 bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {

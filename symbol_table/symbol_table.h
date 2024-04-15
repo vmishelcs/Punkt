@@ -11,17 +11,35 @@
 #include <input_handler/text_location.h>
 #include <semantic_analyzer/types/type.h>
 
+enum class SymbolType {
+    VARIABLE,
+    FUNCTION
+};
+
 struct SymbolTableEntry {
     const TextLocation& text_location;
     bool is_mutable;
     Type *type;
+    SymbolType symbol_type;
     llvm::AllocaInst *alloca;
     llvm::Function *function;
 };
 
 class SymbolTable {
 public:
-    void Insert(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type);
+    /// @brief Insert a variable into the symbol table.
+    /// @param symbol Identifier name representing the symbol.
+    /// @param tl Reference to a `TextLocation` object of the symbol.
+    /// @param is_mutable Determines whether the variable's value represented by the symbol can be
+    /// changed.
+    /// @param type Variable type.
+    /// @param symbol_type The type of symbol table entry (variable or function).
+    void Insert(const std::string& symbol,
+            const TextLocation& tl,
+            bool is_mutable,
+            Type *type,
+            SymbolType symbol_type);
+
     SymbolTableEntry& Get(const std::string& symbol);
 
     bool Contains(const std::string& symbol) const;

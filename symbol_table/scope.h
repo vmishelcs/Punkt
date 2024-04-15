@@ -23,7 +23,19 @@ public:
     std::unique_ptr<Scope> CreateProcedureScope();
     std::unique_ptr<Scope> CreateSubscope();
 
-    void Declare(const std::string& symbol, const TextLocation& tl, bool is_mutable, Type *type);
+    /// @brief Declare the symbol in this scope's symbol table.
+    /// @param symbol Identifier name representing the symbol.
+    /// @param tl Reference to a `TextLocation` object of the symbol.
+    /// @param is_mutable Determines whether the variable's value represented by the symbol can be
+    /// changed.
+    /// @param type Variable type.
+    /// @param symbol_type The type of symbol table entry (variable or function).
+    void Declare(const std::string& symbol,
+            const TextLocation& tl,
+            bool is_mutable,
+            Type *type,
+            SymbolType symbol_type);
+    
     bool Declares(const std::string& symbol);
 
     Scope *GetBaseScope() const;

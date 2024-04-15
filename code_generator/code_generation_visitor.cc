@@ -39,7 +39,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(AssignmentStatementNode& node) 
     auto target = node.GetChild(0);
     if (target->GetParseNodeType() == ParseNodeType::IDENTIFIER_NODE) {
         IdentifierNode *identifier = static_cast<IdentifierNode *>(target);
-        auto alloca_inst = identifier->FindAlloca();
+        auto alloca_inst = identifier->FindLLVMAlloca();
 
         // Generate code for new value.
         auto new_value = node.GetChild(1)->GenerateCode(*this);
@@ -218,22 +218,26 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode& node) {
-    // Look up function in symbol table.
-    auto symbol_table_entry_opt = node.GetIdentifierNode()->FindSymbolTableEntry();
-    if (!symbol_table_entry_opt.has_value()) {
-        return CodeGenerationInternalError("missing symbol table entry for lambda");
-    }
-    auto callee_f = symbol_table_entry_opt.value().get().function;
-    if (!callee_f) {
-        return CodeGenerationInternalError("symbol table entry function pointer is null");
-    }
+    // // Look up function in symbol table.
+    // auto symbol_table_entry_opt = node.GetIdentifierNode()->FindSymbolTableEntry();
+    // if (!symbol_table_entry_opt.has_value()) {
+    //     return CodeGenerationInternalError("missing symbol table entry for lambda");
+    // }
+    // auto callee_f = symbol_table_entry_opt.value().get().function;
+    // if (!callee_f) {
+    //     return CodeGenerationInternalError("symbol table entry function pointer is null");
+    // }
+
+    // This is risky... but it's what we must do for anonymous lambdas.
+    llvm::Function *callee_f = static_cast<llvm::Function *>
+            (node.GetIdentifierNode()->GenerateCode(*this));
 
     std::vector<llvm::Value *> arg_values;
     for (const auto& arg : node.GetArgumentNodes()) {
         arg_values.push_back(arg->GenerateCode(*this));
     }
 
-    return builder->CreateCall(callee_f, arg_values);
+    return builder->CreateCall(callee_f, arg_values, "calltmp");
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
@@ -252,7 +256,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
 
     // Create the function.
     auto function = llvm::Function::Create(
-            function_type, llvm::Function::ExternalLinkage, "", module.get());
+            function_type, llvm::Function::ExternalLinkage, "usrfunc", module.get());
 
     // Set names for arguments.
     unsigned i = 0;
@@ -261,8 +265,17 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
         ++i;
     }
 
+    // Check if this lambda is anonymous.
+    if (!node.IsAnonymous()) {
+        // If it is not anonymous, store the function signature in the identifier's symbol table
+        // entry.
+        auto func_def_node = static_cast<FunctionDefinitionNode *>(node.GetParent());
+        auto identifier_node = func_def_node->GetIdentifierNode();
+        identifier_node->SetLLVMFunction(function);
+    }
+
     // Set up builder to generate function body.
-    auto function_entry_block = llvm::BasicBlock::Create(*context, "", function);
+    auto function_entry_block = llvm::BasicBlock::Create(*context, "entry", function);
     builder->SetInsertPoint(function_entry_block);
 
     // Allocate memory for arguments.
@@ -311,7 +324,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
             kMainFunctionName,
             *module);
 
-    llvm::BasicBlock *entry_block = llvm::BasicBlock::Create(*context, "", main_func);
+    llvm::BasicBlock *entry_block = llvm::BasicBlock::Create(*context, "entry", main_func);
     builder->SetInsertPoint(entry_block);
 
     // Generate for 'main' code block
@@ -396,14 +409,38 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
-    // Search for an `alloca` in the symbol table.
-    auto alloca_instr = node.FindAlloca();
-    if (!alloca_instr) {
-        CodeGenerationInternalError("unable to find alloca instruction for "
-                + node.ToString() + " in symbol table");
+    // Look up the symbol table entry for this identifier.
+    auto symbol_table_entry_opt = node.FindSymbolTableEntry();
+    if (!symbol_table_entry_opt.has_value()) {
+         CodeGenerationInternalError("missing entry in symbol table for "
+                + node.ToString());
     }
+    
+    auto symbol_table_entry = symbol_table_entry_opt.value().get();
 
-    return builder->CreateLoad(alloca_instr->getAllocatedType(), alloca_instr, node.GetName());
+    llvm::AllocaInst *alloca_inst = nullptr;
+    llvm::Function *function = nullptr;
+    switch (symbol_table_entry.symbol_type) {
+        case SymbolType::VARIABLE:
+            alloca_inst = node.FindLLVMAlloca();
+            if (!alloca_inst) {
+                CodeGenerationInternalError("unable to find alloca for " + node.ToString());
+            }
+            return builder->CreateLoad(alloca_inst->getAllocatedType(), alloca_inst,
+                    node.GetName());
+
+        case SymbolType::FUNCTION:
+            function = node.FindLLVMFunction();
+            if (!function) {
+                CodeGenerationInternalError("function signature is not set for " + node.ToString());
+            }
+            return function;
+
+        default:
+            return (llvm::Value *)
+                    PunktLogger::LogFatalInternalError("unimplemented symbol type in "
+                    "CodeGenerationVisitor::GenerateCode(IdentifierNode&).");
+    }
 }
 
 //--------------------------------------------------------------------------------------//

@@ -68,12 +68,24 @@ void IdentifierNode::SetLLVMFunction(llvm::Function *function) {
     symbol_table_entry_opt.value().get().function = function;
 }
 
-llvm::AllocaInst *IdentifierNode::FindAlloca() {
+llvm::AllocaInst *IdentifierNode::FindLLVMAlloca() {
     std::string identifier = this->GetName();
     Scope *scope = this->GetLocalScope();
     while (scope) {
         if (scope->Declares(identifier) && scope->GetSymbolTableEntry(identifier).alloca) {
             return scope->GetSymbolTableEntry(identifier).alloca;
+        }
+        scope = scope->GetBaseScope();
+    }
+    return nullptr;
+}
+
+llvm::Function *IdentifierNode::FindLLVMFunction() {
+    std::string identifier = this->GetName();
+    Scope *scope = this->GetLocalScope();
+    while (scope) {
+        if (scope->Declares(identifier) && scope->GetSymbolTableEntry(identifier).function) {
+            return scope->GetSymbolTableEntry(identifier).function;
         }
         scope = scope->GetBaseScope();
     }
