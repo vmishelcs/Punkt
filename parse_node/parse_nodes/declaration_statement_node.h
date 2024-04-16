@@ -4,9 +4,16 @@
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
+#include "identifier_node.h"
+
 class DeclarationStatementNode : public ParseNode {
 public:
     DeclarationStatementNode(std::unique_ptr<Token> token);
+
+    IdentifierNode *GetIdentifierNode() const { 
+        return dynamic_cast<IdentifierNode *>(GetChild(0));
+    }
+    ParseNode *GetInitializer() const { return GetChild(1); }
 
     virtual std::string ToString() const override;
 

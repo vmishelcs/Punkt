@@ -22,20 +22,8 @@ void IdentifierNode::Accept(ParseNodeVisitor& visitor) {
     visitor.Visit(*this);
 }
 
-// Type *IdentifierNode::FindType() {
-//     std::string identifier = this->GetName();
-//     Scope *scope = this->GetLocalScope();
-//     while (scope) {
-//         if (scope->Declares(identifier) && scope->GetSymbolTableEntry(identifier).type) {
-//             return scope->GetSymbolTableEntry(identifier).type;
-//         }
-//         scope = scope->GetBaseScope();
-//     }
-//     return nullptr;
-// }
-
-std::optional<std::reference_wrapper<SymbolTableEntry>> IdentifierNode::FindSymbolTableEntry() {
-    std::string identifier = this->GetName();
+SymbolTableEntry *IdentifierNode::FindSymbolTableEntry() {
+    std::string identifier = GetName();
     Scope *scope = this->GetLocalScope();
     while (scope) {
         if (scope->Declares(identifier)) {
@@ -43,49 +31,23 @@ std::optional<std::reference_wrapper<SymbolTableEntry>> IdentifierNode::FindSymb
         }
         scope = scope->GetBaseScope();
     }
-    return std::nullopt;
+    return nullptr;
 }
 
 void IdentifierNode::SetLLVMAlloca(llvm::AllocaInst *alloca) {
-    auto symbol_table_entry_opt = FindSymbolTableEntry();
-    if (!symbol_table_entry_opt.has_value()) {
+    if (!symbol_table_entry) {
         PunktLogger::LogFatalInternalError(
-                "could not find symbol table entry in IdentifierNode::SetLLVMAlloca");
+                "unset symbol table entry in IdentifierNode::SetLLVMAlloca");
     }
-    symbol_table_entry_opt.value().get().alloca = alloca;
+    symbol_table_entry->alloca = alloca;
 }
 
 void IdentifierNode::SetLLVMFunction(llvm::Function *function) {
-    auto symbol_table_entry_opt = FindSymbolTableEntry();
-    if (!symbol_table_entry_opt.has_value()) {
+    if (!symbol_table_entry) {
         PunktLogger::LogFatalInternalError(
-                "could not find symbol table entry in IdentifierNode::SetLLVMFunction");
+                "unset symbol table entry in IdentifierNode::SetLLVMFunction");
     }
-    symbol_table_entry_opt.value().get().function = function;
-}
-
-llvm::AllocaInst *IdentifierNode::FindLLVMAlloca() {
-    std::string identifier = this->GetName();
-    Scope *scope = this->GetLocalScope();
-    while (scope) {
-        if (scope->Declares(identifier) && scope->GetSymbolTableEntry(identifier).alloca) {
-            return scope->GetSymbolTableEntry(identifier).alloca;
-        }
-        scope = scope->GetBaseScope();
-    }
-    return nullptr;
-}
-
-llvm::Function *IdentifierNode::FindLLVMFunction() {
-    std::string identifier = this->GetName();
-    Scope *scope = this->GetLocalScope();
-    while (scope) {
-        if (scope->Declares(identifier) && scope->GetSymbolTableEntry(identifier).function) {
-            return scope->GetSymbolTableEntry(identifier).function;
-        }
-        scope = scope->GetBaseScope();
-    }
-    return nullptr;
+    symbol_table_entry->function = function;
 }
 
 llvm::Value *IdentifierNode::GenerateCode(ParseNodeIRVisitor& visitor) {

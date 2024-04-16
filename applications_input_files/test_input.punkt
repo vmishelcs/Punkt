@@ -1,7 +1,7 @@
-function f <int f> -> int {
-	return f.
-}
-
 main {
-	print f(1).
+	var x = 1.
+	{
+		print x.
+		var x = 2.
+	}
 }

@@ -10,6 +10,7 @@ public:
 
     virtual void VisitEnter(CodeBlockNode& node) override;
 
+    virtual void VisitEnter(DeclarationStatementNode& node) override;
     virtual void VisitLeave(DeclarationStatementNode& node) override;
 
     virtual void VisitEnter(ForStatementNode& node) override;
@@ -38,7 +39,8 @@ public:
 
 private:
     // ---- Miscellaneous helpers ------------------------------------------------------------
-    void DeclareInLocalScope(IdentifierNode& node, bool is_mutable, Type *type);
+    void DeclareInLocalScope(IdentifierNode& node, bool is_mutable, Type *type,
+            SymbolType symbol_type);
     bool IsBeingDeclared(IdentifierNode& node);
     bool IsParameterIdentifier(IdentifierNode& node);
 
@@ -55,8 +57,8 @@ private:
     void AssignmentToImmutableTargetError(ParseNode& node);
     void AssignmentTypeMismatchError(ParseNode& node, const Type& target_type,
             const Type& value_type);
-    void InvocationExpressionWithNonLambdaTypeError(IdentifierNode& node);
-    void LambdaDoesNotAcceptProvidedTypesError(IdentifierNode& node);
+    void InvocationExpressionWithNonLambdaTypeError(ParseNode& node);
+    void LambdaDoesNotAcceptProvidedTypesError(ParseNode& node);
     void IncompatibleReturnTypeError(ReturnStatementNode& node);
 };
 

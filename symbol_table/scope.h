@@ -30,7 +30,8 @@ public:
     /// changed.
     /// @param type Variable type.
     /// @param symbol_type The type of symbol table entry (variable or function).
-    void Declare(const std::string& symbol,
+    /// @returns A pointer to the inserted `SymbolTableEntry`.
+    SymbolTableEntry *Declare(const std::string& symbol,
             const TextLocation& tl,
             bool is_mutable,
             Type *type,
@@ -40,7 +41,7 @@ public:
 
     Scope *GetBaseScope() const;
 
-    SymbolTableEntry& GetSymbolTableEntry(const std::string& symbol);
+    SymbolTableEntry *GetSymbolTableEntry(const std::string& symbol);
 
     ScopeType GetScopeType() const;
 

@@ -634,7 +634,8 @@ bool Parser::StartsAtomicExpression(Token& token) {
             || StartsBooleanLiteral(token)
             || StartsCharacterLiteral(token)
             || StartsIntegerLiteral(token)
-            || StartsStringLiteral(token);
+            || StartsStringLiteral(token)
+            || StartsLambda(token);
         
 }
 std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
@@ -655,6 +656,9 @@ std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
     }
     if (StartsStringLiteral(*now_reading)) {
         return ParseStringLiteral();
+    }
+    if (StartsLambdaLiteral(*now_reading)) {
+        return ParseLambdaLiteral();
     }
     return SyntaxErrorUnexpectedToken("atomic expression");
 }
@@ -689,7 +693,7 @@ std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
     // Read the identifier.
     ReadToken();
 
-    // If we are not parsing a function invocation, return the identifier node.
+    // If we are not parsing a lambda invocation, return the identifier node.
     if (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
             {PunctuatorEnum::OPEN_PARENTHESIS})) {
         return identifier;
@@ -771,13 +775,50 @@ std::unique_ptr<ParseNode> Parser::ParseStringLiteral() {
     return string_literal;
 }
 
+bool Parser::StartsLambdaLiteral(Token& token) {
+    return StartsLambda(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseLambdaLiteral() {
+    if (!StartsLambdaLiteral(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("lambda literal");
+    }
+
+    auto lambda_literal = ParseLambda();
+
+    // If we are not parsing a lambda invocation, return the lambda literal.
+    if (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+            {PunctuatorEnum::OPEN_PARENTHESIS})) {
+        return lambda_literal;
+    }
+
+    Expect(PunctuatorEnum::OPEN_PARENTHESIS);
+
+    std::vector<std::unique_ptr<ParseNode>> args;
+    if (StartsExpression(*now_reading)) {
+        args.emplace_back(ParseExpression());
+
+        while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
+            // Discard ','.
+            ReadToken();
+
+            args.emplace_back(ParseExpression());
+        }
+    }
+
+    auto lambda_invocation = LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
+            std::move(lambda_literal), std::move(args));
+
+    Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+
+    return lambda_invocation;
+}
+
 bool Parser::StartsType(Token& token) {
     return KeywordToken::IsTokenKeyword(&token, {
-        KeywordEnum::BOOL,
-        KeywordEnum::CHAR,
-        KeywordEnum::INT,
-        KeywordEnum::STRING
-    });
+            KeywordEnum::BOOL,
+            KeywordEnum::CHAR,
+            KeywordEnum::INT,
+            KeywordEnum::STRING });
 }
 std::unique_ptr<ParseNode> Parser::ParseType() {
     if (!StartsType(*now_reading)) {
@@ -788,6 +829,50 @@ std::unique_ptr<ParseNode> Parser::ParseType() {
     ReadToken();
     return type_node;
 }
+
+// bool Parser::StartsLambdaType(Token& token) {
+//     return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_L});
+// }
+// std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
+//     if (!StartsLambdaType(*now_reading)) {
+//         return SyntaxErrorUnexpectedToken("lambda type");
+//     }
+
+//     // Discard '<'.
+//     ReadToken();
+
+//     auto lambda_type = std::make_unique<LambdaTypeNode>();
+
+//     // Parse parameters.
+//     if (StartsType(*now_reading)) {
+//         auto param_type = ParseType();
+//         auto param_id = ParseIdentifier();
+//         auto parameter_node = LambdaParameterNode::CreateParameterNode(std::move(param_type),
+//                 std::move(param_id));
+//         lambda_type->AddParameterNode(std::move(parameter_node));
+//     }
+//     while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
+//         // Discard ','.
+//         ReadToken();
+//         auto param_type = ParseType();
+//         auto param_id = ParseIdentifier();
+//         auto parameter_node = LambdaParameterNode::CreateParameterNode(std::move(param_type),
+//                 std::move(param_id));
+//         lambda_type->AddParameterNode(std::move(parameter_node));
+//     }
+
+//     // Expect closing '>'.
+//     Expect(PunctuatorEnum::CMP_G);
+
+//     // Expect '->' before return type.
+//     Expect(PunctuatorEnum::ARROW);
+
+//     // Parse return type.
+//     auto return_type = ParseType();
+//     lambda_type->AddReturnTypeNode(std::move(return_type));
+
+//     return lambda_type;
+// }
 
 std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expected) {
     std::string message = "Unexpected token \'"

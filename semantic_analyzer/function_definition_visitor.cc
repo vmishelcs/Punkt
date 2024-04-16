@@ -89,11 +89,12 @@ void FunctionDefinitionVisitor::CreateGlobalScope(ParseNode& node) {
 //--------------------------------------------------------------------------------------//
 void FunctionDefinitionVisitor::DeclareFunction(IdentifierNode& node, Type *type) {
     Scope *local_scope = node.GetLocalScope();
-    local_scope->Declare(
+    SymbolTableEntry *symbol_table_entry = local_scope->Declare(
         node.GetToken()->GetLexeme(),
         node.GetToken()->GetLocation(),
         /*is_mutable=*/false,
         type,
-        SymbolType::FUNCTION
+        SymbolType::LAMBDA
     );
+    node.SetSymbolTableEntry(symbol_table_entry);
 }

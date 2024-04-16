@@ -34,7 +34,8 @@ public:
     ParseNode *GetLambdaBodyNode() { return lambda_body; }
 
     bool IsAnonymous() const {
-        return GetParent()->GetParseNodeType() != ParseNodeType::FUNCTION_DEFINITION_NODE;
+        return GetParent()->GetParseNodeType() != ParseNodeType::FUNCTION_DEFINITION_NODE
+            && GetParent()->GetParseNodeType() != ParseNodeType::DECLARATION_STATEMENT_NODE;
     }
 
     virtual std::string ToString() const override { return "LAMBDA NODE"; }

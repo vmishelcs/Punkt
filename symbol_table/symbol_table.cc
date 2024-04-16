@@ -1,9 +1,14 @@
+#include <cassert>
+#include <memory>
+#include <string>
+#include <unordered_map>
+
 #include <logging/punkt_logger.h>
 
 #include "symbol_table.h"
 
 
-void SymbolTable::Insert(const std::string& symbol,
+SymbolTableEntry *SymbolTable::Insert(const std::string& symbol,
         const TextLocation& tl,
         bool is_mutable,
         Type *type,
@@ -11,23 +16,24 @@ void SymbolTable::Insert(const std::string& symbol,
 {
     if (Contains(symbol)) {
         SymbolRedefinitionError(symbol, tl);
+        return nullptr;
     }
-    else {
-        table.insert({std::string(symbol), 
-            {
-                .text_location = TextLocation(tl),
-                .is_mutable = is_mutable,
-                .type = type,
-                .symbol_type = symbol_type,
-                .alloca = nullptr,
-                .function = nullptr
-            }
-        });
-    }
+
+    auto entry = std::make_unique<SymbolTableEntry>(
+            TextLocation(tl),
+            is_mutable,
+            type,
+            symbol_type,
+            nullptr,
+            nullptr
+    );
+    const auto& [it, inserted] = table.insert({std::string(symbol), std::move(entry)});
+    assert(inserted && "failed to insert new symbol table entry");
+    return it->second.get();
 }
 
-SymbolTableEntry& SymbolTable::Get(const std::string& symbol) {
-    return table.at(symbol);
+SymbolTableEntry *SymbolTable::Get(const std::string& symbol) {
+    return table[symbol].get();
 }
 
 bool SymbolTable::Contains(const std::string& symbol) const {
@@ -44,6 +50,6 @@ void SymbolTable::SymbolRedefinitionError(const std::string& symbol, const TextL
     std::string message = "Redefinition of symbol \'" + symbol + "\' at \n";
     message += ("\t" + tl.ToString() + "\n");
     message += ("previously defined at \n");
-    message += ("\t" + table.at(symbol).text_location.ToString());
+    message += ("\t" + table[symbol]->text_location.ToString());
     PunktLogger::Log(LogType::SYMBOL_TABLE, message);
 }

@@ -25,7 +25,7 @@ void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode& node) {
         }
 
         // Make sure identifier is mutable.
-        if (!identifier_node->FindSymbolTableEntry().value().get().is_mutable) {
+        if (!identifier_node->GetSymbolTableEntry()->is_mutable) {
             AssignmentToImmutableTargetError(*identifier_node);
             node.SetType(BaseType::CreateErrorType());
             return;
@@ -56,17 +56,53 @@ void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode& node) {
     }
 }
 
+void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode& node) {
+    bool is_mutable = KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
+
+    // Perform declaration here if the initializer is a lambda literal.
+    ParseNode *initializer = node.GetInitializer();
+    auto lambda_node = dynamic_cast<LambdaNode *>(initializer);
+    if (!lambda_node) {
+        return;
+    }
+
+    IdentifierNode *identifier = node.GetIdentifierNode();
+    if (!identifier) {
+        PunktLogger::LogFatalInternalError("VisitEnter(DeclarationStatementNode&): "
+                "incorrectly constructed declaration node.");
+    }
+
+    auto lambda_type = dynamic_cast<LambdaType *>(lambda_node->GetType());
+    if (!lambda_type) {
+        PunktLogger::LogFatalInternalError("VisitEnter(DeclarationStatementNode&): "
+                "LambdaNode has non-lambda type.");
+    }
+
+    identifier->SetType(lambda_type->CreateEquivalentType());
+    DeclareInLocalScope(*identifier, is_mutable, identifier->GetType(), SymbolType::LAMBDA);
+}
+
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
     bool is_mutable = KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
 
-    auto identifier = dynamic_cast<IdentifierNode *>(node.GetChild(0));
-    auto initializer = node.GetChild(1);
+    IdentifierNode *identifier = node.GetIdentifierNode();
+    if (!identifier) {
+        PunktLogger::LogFatalInternalError("VisitLeave(DeclarationStatementNode&): "
+                "incorrectly constructed declaration node.");
+    }
+    
+    ParseNode *initializer = node.GetInitializer();
+    if (dynamic_cast<LambdaNode *>(initializer)) {
+        // Declaration for variables that hold lambda literals is done in
+        // VisitEnter(DeclarationStatementNode&).
+        return;
+    }
 
     Type *declaration_type = initializer->GetType();
     identifier->SetType(declaration_type->CreateEquivalentType());
 
     // Note the use of identifier-owned Type pointer.
-    DeclareInLocalScope(*identifier, is_mutable, identifier->GetType());
+    DeclareInLocalScope(*identifier, is_mutable, identifier->GetType(), SymbolType::VARIABLE);
 }
 
 void SemanticAnalysisVisitor::VisitEnter(ForStatementNode& node) {
@@ -97,15 +133,12 @@ void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
 }
 
 void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode& node) {
-    auto identifier_node = node.GetIdentifierNode();
-    if (!identifier_node) {
-        PunktLogger::LogFatalInternalError("LambdaInvocationNode::GetIdentifierNode returned null");
-    }
+    ParseNode *callee_node = node.GetCalleeNode();
 
-    Type *type = identifier_node->GetType();
+    Type *type = callee_node->GetType();
     auto lambda_type = dynamic_cast<LambdaType *>(type);
     if (!lambda_type) {
-        InvocationExpressionWithNonLambdaTypeError(*identifier_node);
+        InvocationExpressionWithNonLambdaTypeError(*callee_node);
         node.SetType(BaseType::CreateErrorType());
         return;
     }
@@ -119,7 +152,7 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode& node) {
     
     // Check that the lambda accepts the provided arguments.
     if (!lambda_type->AcceptsArgumentTypes(arg_types)) {
-        LambdaDoesNotAcceptProvidedTypesError(*identifier_node);
+        LambdaDoesNotAcceptProvidedTypesError(*callee_node);
         node.SetType(BaseType::CreateErrorType());
         return;
     }
@@ -139,7 +172,8 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaParameterNode& node) {
                 "LambdaParameterNode::GetIdentifierNode returned null");
     }
 
-    DeclareInLocalScope(*identifier_node, /*is_mutable=*/true, identifier_node->GetType());
+    DeclareInLocalScope(*identifier_node, /*is_mutable=*/true, identifier_node->GetType(),
+            SymbolType::VARIABLE);
 }
 
 void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
@@ -207,20 +241,20 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
         return;
     }
 
-    auto symbol_table_entry_opt = node.FindSymbolTableEntry();
+    SymbolTableEntry *sym_table_entry = node.FindSymbolTableEntry();
 
-    if (!symbol_table_entry_opt.has_value()) {
+    if (!sym_table_entry) {
         SymbolTable::UndefinedSymbolReference(
             node.GetToken()->GetLexeme(),
             node.GetToken()->GetLocation()
         );
         node.SetType(BaseType::CreateErrorType());
         // Note the use of identifier-owned Type pointer.
-        DeclareInLocalScope(node, false, node.GetType());
+        DeclareInLocalScope(node, false, node.GetType(), SymbolType::VARIABLE);
     }
     else {
-        const SymbolTableEntry& symbol_table_entry = symbol_table_entry_opt.value();
-        node.SetType(symbol_table_entry.type->CreateEquivalentType());
+        node.SetType(sym_table_entry->type->CreateEquivalentType());
+        node.SetSymbolTableEntry(sym_table_entry);
     }
 }
 void SemanticAnalysisVisitor::Visit(BooleanLiteralNode& node) {
@@ -249,16 +283,18 @@ void SemanticAnalysisVisitor::Visit(TypeNode& node) {
 //--------------------------------------------------------------------------------------//
 //                                Miscellaneous helpers                                 //
 //--------------------------------------------------------------------------------------//
-void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode& node, bool is_mutable, Type *type)
+void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode& node, bool is_mutable, Type *type,
+        SymbolType symbol_type)
 {
     Scope *local_scope = node.GetLocalScope();
-    local_scope->Declare(
+    SymbolTableEntry *entry = local_scope->Declare(
         node.GetToken()->GetLexeme(),
         node.GetToken()->GetLocation(),
         is_mutable,
         type,
-        SymbolType::VARIABLE
+        symbol_type
     );
+    node.SetSymbolTableEntry(entry);
 }
 bool SemanticAnalysisVisitor::IsBeingDeclared(IdentifierNode& node) {
     auto parent = node.GetParent();
@@ -331,14 +367,14 @@ void SemanticAnalysisVisitor::AssignmentTypeMismatchError(ParseNode& node, const
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
-void SemanticAnalysisVisitor::InvocationExpressionWithNonLambdaTypeError(IdentifierNode& node) {
-    std::string message = "identifier \'" + node.GetName() + "\' at "
-            + node.GetToken()->GetLocation().ToString() + " has non-lambda type.";
+void SemanticAnalysisVisitor::InvocationExpressionWithNonLambdaTypeError(ParseNode& node) {
+    std::string message = "expression at " + node.GetToken()->GetLocation().ToString()
+            + " has non-lambda type.";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
-void SemanticAnalysisVisitor::LambdaDoesNotAcceptProvidedTypesError(IdentifierNode& node) {
-    std::string message = "lambda \'" + node.GetName() + "\' does not accept the given arguments.";
+void SemanticAnalysisVisitor::LambdaDoesNotAcceptProvidedTypesError(ParseNode& node) {
+    std::string message = "invalid arguments for lambda invocation.";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 

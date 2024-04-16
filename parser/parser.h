@@ -103,8 +103,14 @@ private:
     bool StartsStringLiteral(Token& token);
     std::unique_ptr<ParseNode> ParseStringLiteral();
 
+    bool StartsLambdaLiteral(Token& token);
+    std::unique_ptr<ParseNode> ParseLambdaLiteral();
+
     bool StartsType(Token& token);
     std::unique_ptr<ParseNode> ParseType();
+
+    bool StartsLambdaType(Token& token);
+    std::unique_ptr<ParseNode> ParseLambdaType();
 
     std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
     std::unique_ptr<ParseNode> GetSyntaxErrorNode();

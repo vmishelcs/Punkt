@@ -1,8 +1,9 @@
 #ifndef SYMBOL_TABLE_H_
 #define SYMBOL_TABLE_H_
 
-#include <unordered_map>
+#include <memory>
 #include <string>
+#include <unordered_map>
 
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Value.h>
@@ -13,11 +14,11 @@
 
 enum class SymbolType {
     VARIABLE,
-    FUNCTION
+    LAMBDA
 };
 
 struct SymbolTableEntry {
-    const TextLocation& text_location;
+    const TextLocation text_location;
     bool is_mutable;
     Type *type;
     SymbolType symbol_type;
@@ -34,13 +35,14 @@ public:
     /// changed.
     /// @param type Variable type.
     /// @param symbol_type The type of symbol table entry (variable or function).
-    void Insert(const std::string& symbol,
+    /// @returns A pointer to the newly inserted symbol table entry.
+    SymbolTableEntry *Insert(const std::string& symbol,
             const TextLocation& tl,
             bool is_mutable,
             Type *type,
             SymbolType symbol_type);
 
-    SymbolTableEntry& Get(const std::string& symbol);
+    SymbolTableEntry *Get(const std::string& symbol);
 
     bool Contains(const std::string& symbol) const;
 
@@ -49,7 +51,7 @@ public:
 private:
     void SymbolRedefinitionError(const std::string& symbol, const TextLocation& tl);
 
-    std::unordered_map<std::string, SymbolTableEntry> table;
+    std::unordered_map<std::string, std::unique_ptr<SymbolTableEntry>> table;
 };
 
 #endif // SYMBOL_TABLE_H_

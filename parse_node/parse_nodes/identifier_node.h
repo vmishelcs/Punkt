@@ -19,17 +19,23 @@ public:
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
-    std::optional<std::reference_wrapper<SymbolTableEntry>> FindSymbolTableEntry();
+    /// @brief Searches the parse tree symbol tables for the declaration of this identifier.
+    /// @return A pointer to the symbol table entry that declares this identifier.
+    SymbolTableEntry *FindSymbolTableEntry();
+
+    void SetSymbolTableEntry(SymbolTableEntry *symbol_table_entry) { 
+        this->symbol_table_entry = symbol_table_entry;
+    }
+    SymbolTableEntry *GetSymbolTableEntry() const { return symbol_table_entry; }
 
     void SetLLVMAlloca(llvm::AllocaInst *alloca);
     void SetLLVMFunction(llvm::Function *function);
-    llvm::AllocaInst *FindLLVMAlloca();
-    llvm::Function *FindLLVMFunction();
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
 
 private:
     std::string name;
+    SymbolTableEntry *symbol_table_entry;
 };
 
 #endif // IDENTIFIER_NODE_H_

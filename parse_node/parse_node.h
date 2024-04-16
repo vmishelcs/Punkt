@@ -70,8 +70,6 @@ public:
     void SetScope(std::unique_ptr<Scope> scope);
 
     Scope *GetLocalScope();
-    bool ScopeDeclares(const std::string& identifier);
-    SymbolTableEntry& GetDeclarationData(const std::string& identifier);
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) = 0;
 

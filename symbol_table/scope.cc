@@ -24,13 +24,13 @@ std::unique_ptr<Scope> Scope::CreateSubscope() {
     return std::make_unique<Scope>(ScopeType::SUBSCOPE, this);
 }
 
-void Scope::Declare(const std::string& symbol,
+SymbolTableEntry *Scope::Declare(const std::string& symbol,
         const TextLocation& tl,
         bool is_mutable,
         Type *type,
         SymbolType symbol_type)
 {
-    symbol_table.Insert(
+    return symbol_table.Insert(
         symbol,
         tl,
         is_mutable,
@@ -47,7 +47,7 @@ Scope *Scope::GetBaseScope() const {
     return base_scope;
 }
 
-SymbolTableEntry& Scope::GetSymbolTableEntry(const std::string& symbol) {
+SymbolTableEntry *Scope::GetSymbolTableEntry(const std::string& symbol) {
     return symbol_table.Get(symbol);
 }
 

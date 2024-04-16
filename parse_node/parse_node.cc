@@ -85,17 +85,6 @@ Scope *ParseNode::GetLocalScope() {
     return nullptr;
 }
 
-bool ParseNode::ScopeDeclares(const std::string& identifier) {
-    if (!HasScope()) {
-        return false;
-    }
-    return scope->Declares(identifier);
-}
-
-SymbolTableEntry& ParseNode::GetDeclarationData(const std::string& identifier) {
-    return scope->GetSymbolTableEntry(identifier);
-}
-
 void ParseNode::VisitChildren(ParseNodeVisitor& visitor) {
     for (auto& child : children) {
         child->Accept(visitor);

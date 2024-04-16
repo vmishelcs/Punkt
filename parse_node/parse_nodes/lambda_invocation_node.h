@@ -8,6 +8,7 @@
 #include <parse_node/parse_node.h>
 
 #include "identifier_node.h"
+#include "lambda_node.h"
 
 class LambdaInvocationNode : public ParseNode {
 public:
@@ -20,8 +21,8 @@ public:
         std::vector<std::unique_ptr<ParseNode>> args
     );
 
-    IdentifierNode *GetIdentifierNode() const {
-        return dynamic_cast<IdentifierNode *>(GetChild(0));
+    ParseNode *GetCalleeNode() const {
+        return GetChild(0);
     }
 
     std::vector<ParseNode *> GetArgumentNodes() const;
