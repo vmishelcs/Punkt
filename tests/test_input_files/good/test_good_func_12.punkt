@@ -1,0 +1,23 @@
+function func1 <int x> -> int {
+	return 2 * x.
+}
+
+function func2 <int x> -> int {
+	return 3 * x.
+}
+
+function func3 <int x> -> int {
+	return 4 * x.
+}
+
+function func4 <int x> -> int {
+	return 5 * x.
+}
+
+function func5 <int x> -> int {
+	return 6 * x.
+}
+
+main {
+	print func1(func2(func3(func4(func5(1))))).
+}

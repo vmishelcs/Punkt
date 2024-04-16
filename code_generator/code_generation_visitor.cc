@@ -44,19 +44,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(AssignmentStatementNode& node) 
         // Generate code for new value.
         auto new_value = node.GetChild(1)->GenerateCode(*this);
 
-        // Store boolean values as 8-bit integers.
-        BaseType *b_type = dynamic_cast<BaseType *>(node.GetChild(1)->GetType());
-        if (b_type && b_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
-            new_value = builder->CreateZExt(new_value, llvm::Type::getInt8Ty(*context),
-                    "zexttmp");
-        }
-
         builder->CreateStore(new_value, alloca_inst);
         return new_value;
     }
-    else {
-        return CodeGenerationInternalError("non-targettable expression in assingment statement");
-    }
+
+    return CodeGenerationInternalError("non-targettable expression in assingment statement");
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
@@ -73,13 +65,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
 
     // Generate code for initializer value.
     llvm::Value *initializer_value = node.GetChild(1)->GenerateCode(*this);
-    
-    // Store boolean values as 8-bit integers.
-    BaseType *b_type = dynamic_cast<BaseType *>(node.GetChild(1)->GetType());
-    if (b_type && b_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
-        initializer_value = builder->CreateZExt(initializer_value, llvm::Type::getInt8Ty(*context),
-                "zexttmp");
-    }
 
     // Allocate stack memory for variables in the entry block of the function.
     auto parent_function = builder->GetInsertBlock()->getParent();
@@ -218,16 +203,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode& node) {
-    // // Look up function in symbol table.
-    // auto symbol_table_entry_opt = node.GetIdentifierNode()->FindSymbolTableEntry();
-    // if (!symbol_table_entry_opt.has_value()) {
-    //     return CodeGenerationInternalError("missing symbol table entry for lambda");
-    // }
-    // auto callee_f = symbol_table_entry_opt.value().get().function;
-    // if (!callee_f) {
-    //     return CodeGenerationInternalError("symbol table entry function pointer is null");
-    // }
-
+    // TODO: Add check that node.GetIdentifierNode()->GenerateCode(*this) returns llvm::Function *.
     // This is risky... but it's what we must do for anonymous lambdas.
     llvm::Function *callee_f = static_cast<llvm::Function *>
             (node.GetIdentifierNode()->GenerateCode(*this));
@@ -252,7 +228,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
 
     // Create the function type.
     auto function_type = llvm::FunctionType::get(
-            node.GetReturnTypeNode()->GetLLVMType(*context), param_types, false);
+            node.GetReturnTypeNode()->GetLLVMType(*context), param_types, /*isVarArg=*/false);
 
     // Create the function.
     auto function = llvm::Function::Create(
@@ -281,7 +257,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
     // Allocate memory for arguments.
     i = 0;
     for (auto &arg : function->args()) {
-        auto arg_identifier_node = param_nodes[i]->GetIdentifierNode();
+        IdentifierNode *arg_identifier_node = param_nodes[i]->GetIdentifierNode();
 
         // Create an alloca for this parameter.
         llvm::AllocaInst *alloca = CreateEntryBlockAlloca(function, arg_identifier_node->GetName(),
@@ -315,8 +291,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
     llvm::Type *return_type = llvm::Type::getVoidTy(*context);
 
     // Main does not take any arguments
-    llvm::FunctionType *function_type = llvm::FunctionType::get(return_type,
-            /* IsVarArgs = */ false);
+    llvm::FunctionType *function_type = llvm::FunctionType::get(return_type, /*isVarArgs=*/false);
 
     // Create an LLVM::Function object
     llvm::Function *main_func = llvm::Function::Create(function_type,

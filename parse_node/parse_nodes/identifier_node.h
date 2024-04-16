@@ -13,8 +13,7 @@ class IdentifierNode : public ParseNode {
 public:
     IdentifierNode(std::unique_ptr<Token> token);
 
-    std::string GetName() const;
-    bool IsMutable() const;
+    const std::string& GetName() const { return name; }
 
     virtual std::string ToString() const override;
 
@@ -31,7 +30,6 @@ public:
 
 private:
     std::string name;
-    bool is_mutable;
 };
 
 #endif // IDENTIFIER_NODE_H_

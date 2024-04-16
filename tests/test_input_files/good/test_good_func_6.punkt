@@ -1,0 +1,12 @@
+function f <int a, int b, int c, int d, int e, int f, int g, int h> -> bool {
+	return a + b + c + d + e + f + g + h > 0.
+}
+
+function g <int a, int b, int c, int d, int e, int f, int g, int h, int i> -> bool {
+	return a + b + c + d + e + f + g + h + i > 0.
+}
+
+main {
+	print f(1, -1, 1, -1, 1, -1, 1, -1).
+	print g(1, -1, 1, -1, 1, -1, 1, -1, 1).
+}

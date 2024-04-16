@@ -54,8 +54,7 @@ void FunctionDefinitionVisitor::VisitLeave(LambdaParameterNode& node) {
 
     IdentifierNode *identifier_node = node.GetIdentifierNode();
     if (!identifier_node) {
-        PunktLogger::LogFatalInternalError("LambdaParameterNode::GetIdentifierNode "
-                "returned null");
+        PunktLogger::LogFatalInternalError("LambdaParameterNode::GetIdentifierNode returned null");
     }
     identifier_node->SetType(parameter_type->CreateEquivalentType());
 }

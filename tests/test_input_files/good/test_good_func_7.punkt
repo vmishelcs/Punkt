@@ -1,0 +1,21 @@
+function f <int x> -> bool {
+	{
+		const a = x.
+		{
+			const b = a.
+			{	
+				const c = b.
+				{
+					const d = c.
+					return x == 0.
+				}
+			}
+		}
+	}
+}
+
+main {
+	if f(0) {
+		print "ZERO!".
+	}
+}

@@ -1,0 +1,7 @@
+function mul_ints <int a, int b> -> int {
+	return a * b.
+}
+
+main {
+	print mul_ints(1 + 2 + 3 + 4, 5).
+}

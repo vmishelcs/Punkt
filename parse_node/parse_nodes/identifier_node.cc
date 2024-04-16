@@ -11,12 +11,8 @@
 
 IdentifierNode::IdentifierNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::IDENTIFIER_NODE, std::move(token))
-    , name(this->token->GetLexeme())
+    , name(std::string(this->token->GetLexeme()))
 {}
-
-std::string IdentifierNode::GetName() const {
-    return name;
-}
 
 std::string IdentifierNode::ToString() const {
     return "IDENTIFIER NODE: " + token->ToString();

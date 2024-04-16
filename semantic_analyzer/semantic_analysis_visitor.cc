@@ -84,12 +84,6 @@ void SemanticAnalysisVisitor::VisitLeave(ForStatementNode& node) {
     }
 }
 
-void SemanticAnalysisVisitor::VisitEnter(FunctionDefinitionNode& node) {
-    // Declare the function identifier BEFORE entering the parameter scope; that is, first declare
-    // the function identifier (in FunctionDefinitionVisitor), then create the parameter scope.
-    CreateParameterScope(node);
-}
-
 void SemanticAnalysisVisitor::VisitLeave(IfStatementNode& node) {
     // Make sure that the condition has boolean type.
     Type *condition_type = node.GetChild(0)->GetType();
@@ -132,6 +126,10 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode& node) {
 
     // This node's type is the return type of the lambda.
     node.SetType(lambda_type->GetReturnType()->CreateEquivalentType());
+}
+
+void SemanticAnalysisVisitor::VisitEnter(LambdaNode& node) {
+    CreateParameterScope(node);
 }
 
 void SemanticAnalysisVisitor::VisitLeave(LambdaParameterNode& node) {

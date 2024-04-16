@@ -1,0 +1,8 @@
+function printer <string str> -> int {
+	print str.
+	return 0.
+}
+
+main {
+	const ret = printer("Hello World!").
+}

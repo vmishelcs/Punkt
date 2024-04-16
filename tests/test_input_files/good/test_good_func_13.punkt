@@ -1,0 +1,10 @@
+function fac <int n> -> int {
+	if n == 1 {
+		return 1.
+	}
+	return n * fac(n - 1).
+}
+
+main {
+	print fac(12).
+}
