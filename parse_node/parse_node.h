@@ -5,6 +5,8 @@
 #include <vector>
 #include <optional>
 
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
 
 #include <semantic_analyzer/types/type.h>
@@ -32,13 +34,14 @@ enum class ParseNodeType {
     LAMBDA_INVOCATION_NODE,
     LAMBDA_NODE,
     LAMBDA_PARAMETER_NODE,
+    LAMBDA_TYPE_NODE,
     MAIN_NODE,
     OPERATOR_NODE,
     PRINT_STATEMENT_NODE,
     PROGRAM_NODE,
     RETURN_STATEMENT_NODE,
     STRING_LITERAL_NODE,
-    TYPE_NODE
+    BASE_TYPE_NODE
 };
 
 class ParseNode {
@@ -70,6 +73,8 @@ public:
     void SetScope(std::unique_ptr<Scope> scope);
 
     Scope *GetLocalScope();
+
+    llvm::Type *GetLLVMType(llvm::LLVMContext& context) const;
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) = 0;
 

@@ -30,24 +30,20 @@ void FunctionDefinitionVisitor::VisitLeave(FunctionDefinitionNode& node) {
 }
 
 void FunctionDefinitionVisitor::VisitLeave(LambdaNode& node) {
-    auto parameter_nodes = node.GetParameterNodes();
+    std::vector<LambdaParameterNode *> parameter_nodes = node.GetParameterNodes();
     std::vector<Type *> parameter_types;
     parameter_types.reserve(parameter_nodes.size());
     std::transform(parameter_nodes.begin(), parameter_nodes.end(),
             std::inserter(parameter_types, parameter_types.end()),
             [](const auto& param_node) { return param_node->GetType(); });
 
-    auto return_type_node = node.GetReturnTypeNode();
+    ParseNode *return_type_node = node.GetReturnTypeNode();
 
     node.SetType(LambdaType::CreateLambdaType(parameter_types, return_type_node->GetType()));
 }
 
 void FunctionDefinitionVisitor::VisitLeave(LambdaParameterNode& node) {
-    TypeNode *type_node = node.GetTypeNode();
-    if (!type_node) {
-        PunktLogger::LogFatalInternalError("LambdaParameterNode::GetTypeNode returned null");
-    }
-
+    ParseNode *type_node = node.GetTypeNode();
     Type *parameter_type = type_node->GetType();
 
     node.SetType(parameter_type->CreateEquivalentType());
@@ -59,6 +55,10 @@ void FunctionDefinitionVisitor::VisitLeave(LambdaParameterNode& node) {
     identifier_node->SetType(parameter_type->CreateEquivalentType());
 }
 
+void FunctionDefinitionVisitor::VisitLeave(LambdaTypeNode& node) {
+    node.SetType(node.InferOwnType());
+}
+
 void FunctionDefinitionVisitor::VisitEnter(ProgramNode& node) {
     CreateGlobalScope(node);
 }
@@ -66,15 +66,8 @@ void FunctionDefinitionVisitor::VisitEnter(ProgramNode& node) {
 //--------------------------------------------------------------------------------------//
 //                                      Leaf nodes                                      //
 //--------------------------------------------------------------------------------------//
-void FunctionDefinitionVisitor::Visit(TypeNode& node) {
-    // Perform semantic analysis only on TypeNodes that are a part of a parameter or specify a
-    // return type. Semantic analysis of TypeNodes that do not denote a parameter type or a return
-    // type is done in SemanticAnalysisVisitor::Visit(TypeNode&).
-    if (!node.DenotesParameterType() && !node.DenotesReturnType()) {
-        return;
-    }
-
-    node.InferOwnType();
+void FunctionDefinitionVisitor::Visit(BaseTypeNode& node) {
+    node.SetType(node.InferOwnType());
 }
 
 //--------------------------------------------------------------------------------------//

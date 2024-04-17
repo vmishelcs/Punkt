@@ -68,6 +68,9 @@ public:
     virtual void VisitEnter(LambdaParameterNode& node) override;
     virtual void VisitLeave(LambdaParameterNode& node) override;
 
+    virtual void VisitEnter(LambdaTypeNode& node) override;
+    virtual void VisitLeave(LambdaTypeNode& node) override;
+
     virtual void VisitEnter(MainNode& node) override;
     virtual void VisitLeave(MainNode& node) override;
 
@@ -91,7 +94,7 @@ public:
     virtual void Visit(CharacterLiteralNode& node) override;
     virtual void Visit(IntegerLiteralNode& node) override;
     virtual void Visit(StringLiteralNode& node) override;
-    virtual void Visit(TypeNode& node) override;
+    virtual void Visit(BaseTypeNode& node) override;
 
 private:
     int depth;

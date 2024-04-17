@@ -109,6 +109,9 @@ private:
     bool StartsType(Token& token);
     std::unique_ptr<ParseNode> ParseType();
 
+    bool StartsBaseType(Token& token);
+    std::unique_ptr<ParseNode> ParseBaseType();
+
     bool StartsLambdaType(Token& token);
     std::unique_ptr<ParseNode> ParseLambdaType();
 

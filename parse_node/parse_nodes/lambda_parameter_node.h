@@ -11,14 +11,13 @@
 #include <token/token.h>
 
 #include "identifier_node.h"
-#include "type_node.h"
 
 class LambdaParameterNode : public ParseNode {
 public:
     LambdaParameterNode() : ParseNode(ParseNodeType::LAMBDA_PARAMETER_NODE, nullptr) {}
 
-    TypeNode *GetTypeNode() const {
-        return dynamic_cast<TypeNode *>(GetChild(0));
+    ParseNode *GetTypeNode() const {
+        return GetChild(0);
     }
 
     IdentifierNode* GetIdentifierNode() const {

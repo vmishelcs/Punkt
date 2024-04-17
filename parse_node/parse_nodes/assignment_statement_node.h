@@ -8,6 +8,14 @@ class AssignmentStatementNode : public ParseNode {
 public:
     AssignmentStatementNode();
 
+    ParseNode *GetTargetNode() const {
+        return GetChild(0);
+    }
+
+    ParseNode *GetNewValueNode() const {
+        return GetChild(1);
+    }
+
     virtual std::string ToString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;

@@ -12,10 +12,11 @@ public:
     virtual llvm::Value *GenerateCode(DeclarationStatementNode& node) = 0;
     virtual llvm::Value *GenerateCode(ForStatementNode& node) = 0;
     virtual llvm::Value *GenerateCode(FunctionDefinitionNode& node) = 0;
-    virtual llvm::Value *GenerateCode(LambdaParameterNode& node) = 0;
     virtual llvm::Value *GenerateCode(IfStatementNode& node) = 0;
     virtual llvm::Value *GenerateCode(LambdaInvocationNode& node) = 0;
     virtual llvm::Value *GenerateCode(LambdaNode& node) = 0;
+    virtual llvm::Value *GenerateCode(LambdaParameterNode& node) = 0;
+    virtual llvm::Value *GenerateCode(LambdaTypeNode& node) = 0;
     virtual llvm::Value *GenerateCode(MainNode& node) = 0;
     virtual llvm::Value *GenerateCode(OperatorNode& node) = 0;
     virtual llvm::Value *GenerateCode(PrintStatementNode& node) = 0;
@@ -29,7 +30,7 @@ public:
     virtual llvm::Value *GenerateCode(CharacterLiteralNode& node) = 0;
     virtual llvm::Value *GenerateCode(IntegerLiteralNode& node) = 0;
     virtual llvm::Value *GenerateCode(StringLiteralNode& node) = 0;
-    virtual llvm::Value *GenerateCode(TypeNode& node) = 0;
+    virtual llvm::Value *GenerateCode(BaseTypeNode& node) = 0;
 };
 
 #endif // PARSE_NODE_IR_VISITOR_H_

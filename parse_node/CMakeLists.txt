@@ -4,6 +4,7 @@ add_library(parse_node parse_node.cc)
 
 target_link_libraries(parse_node
     assignment_statement_node
+    base_type_node
     boolean_literal_node
     character_literal_node
     code_block_node
@@ -17,6 +18,7 @@ target_link_libraries(parse_node
     lambda_invocation_node
     lambda_node
     lambda_parameter_node
+    lambda_type_node
     main_node
     nop_node
     operator_node
@@ -24,7 +26,6 @@ target_link_libraries(parse_node
     program_node
     return_statement_node
     string_literal_node
-    type_node
     type
     scope
     ${llvm_libs}

@@ -24,6 +24,7 @@ public:
     virtual llvm::Value *GenerateCode(LambdaInvocationNode& node) override;
     virtual llvm::Value *GenerateCode(LambdaNode& node) override;
     virtual llvm::Value *GenerateCode(LambdaParameterNode& node) override;
+    virtual llvm::Value *GenerateCode(LambdaTypeNode& node) override;
     virtual llvm::Value *GenerateCode(MainNode& node) override;
     virtual llvm::Value *GenerateCode(OperatorNode& node) override;
     virtual llvm::Value *GenerateCode(PrintStatementNode& node) override;
@@ -37,7 +38,7 @@ public:
     virtual llvm::Value *GenerateCode(CharacterLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(IntegerLiteralNode& node) override;
     virtual llvm::Value *GenerateCode(StringLiteralNode& node) override;
-    virtual llvm::Value *GenerateCode(TypeNode& node) override;
+    virtual llvm::Value *GenerateCode(BaseTypeNode& node) override;
 
 private:
     void GenerateGlobalConstants();

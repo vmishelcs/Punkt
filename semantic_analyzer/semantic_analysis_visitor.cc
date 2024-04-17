@@ -269,16 +269,6 @@ void SemanticAnalysisVisitor::Visit(IntegerLiteralNode& node) {
 void SemanticAnalysisVisitor::Visit(StringLiteralNode& node) {
     node.SetType(BaseType::CreateStringType());
 }
-void SemanticAnalysisVisitor::Visit(TypeNode& node) {
-    // Perform semantic analysis only on TypeNodes that are NOT a part of a parameter and DO NOT
-    // specify a lambda return type. Semantic analysis of TypeNodes that denote parameter types or
-    // return types is done in FunctionDefinitionVisitor::Visit(TypeNode&).
-    if (node.DenotesParameterType() || node.DenotesReturnType()) {
-        return;
-    }
-
-    node.InferOwnType();
-}
 
 //--------------------------------------------------------------------------------------//
 //                                Miscellaneous helpers                                 //

@@ -27,15 +27,6 @@ bool LambdaType::AcceptsArgumentTypes(std::vector<Type *>& arg_types) const {
     return true;
 }
 
-LambdaType::LambdaType(std::vector<Type *> parameter_types, Type *return_type)
-    : Type(TypeEnum::LAMBDA)
-{
-    for (const auto& param_type : parameter_types) {
-        this->parameter_types.push_back(param_type->CreateEquivalentType());
-    }
-    this->return_type = return_type->CreateEquivalentType();
-}
-
 std::vector<Type *> LambdaType::GetParameterTypes() const {
     std::vector<Type *> result;
     if (NumParameters() == 0) {
@@ -81,9 +72,17 @@ std::unique_ptr<Type> LambdaType::CreateEquivalentType() const {
 }
 
 std::string LambdaType::ToString() const {
-    std::string result = "<";
+    std::string result = "(";
     for (const auto& param_type : parameter_types) {
-        result += (param_type->ToString());
+        if (param_type->GetTypeEnum() == TypeEnum::LAMBDA)
+            // Wrap lambda types in parentheses for readability.
+            result.push_back('(');
+
+        result += param_type->ToString();
+        if (param_type->GetTypeEnum() == TypeEnum::LAMBDA)
+            // Wrap lambda types in parentheses for readability.
+            result.push_back(')');
+
         result += ", ";
     }
 
@@ -94,8 +93,26 @@ std::string LambdaType::ToString() const {
     }
     
 
-    result += "> -> ";
+    result += ") -> ";
+
+    if (return_type->GetTypeEnum() == TypeEnum::LAMBDA)
+        // Wrap lambda types in parentheses for readability.
+        result.push_back('(');
+
     result += return_type->ToString();
+
+    if (return_type->GetTypeEnum() == TypeEnum::LAMBDA)
+        // Wrap lambda types in parentheses for readability.
+        result.push_back(')');
     
     return result;
+}
+
+LambdaType::LambdaType(std::vector<Type *> parameter_types_to_copy, Type *return_type)
+    : Type(TypeEnum::LAMBDA)
+{
+    for (const auto& param_type : parameter_types_to_copy) {
+        this->parameter_types.push_back(param_type->CreateEquivalentType());
+    }
+    this->return_type = return_type->CreateEquivalentType();
 }

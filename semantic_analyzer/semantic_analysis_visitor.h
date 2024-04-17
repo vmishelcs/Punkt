@@ -35,7 +35,6 @@ public:
     virtual void Visit(CharacterLiteralNode& node) override;
     virtual void Visit(IntegerLiteralNode& node) override;
     virtual void Visit(StringLiteralNode& node) override;
-    virtual void Visit(TypeNode& node) override;
 
 private:
     // ---- Miscellaneous helpers ------------------------------------------------------------

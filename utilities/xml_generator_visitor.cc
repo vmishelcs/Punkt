@@ -200,6 +200,21 @@ void XMLGeneratorVisitor::VisitLeave(LambdaParameterNode& node) {
     OutputTag(*tag);
 }
 
+void XMLGeneratorVisitor::VisitEnter(LambdaTypeNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("LambdaTypeNode");
+
+    AddBasicParseNodeAttributes(*tag, node);
+
+    OutputTag(*tag);
+    ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(LambdaTypeNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("LambdaTypeNode");
+
+    --depth;
+    OutputTag(*tag);
+}
+
 void XMLGeneratorVisitor::VisitEnter(MainNode& node) {
     std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("MainNode");
 
@@ -333,8 +348,8 @@ void XMLGeneratorVisitor::Visit(StringLiteralNode& node) {
 
     OutputTag(*tag);
 }
-void XMLGeneratorVisitor::Visit(TypeNode& node) {
-    std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("TypeNode");
+void XMLGeneratorVisitor::Visit(BaseTypeNode& node) {
+    std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("BaseTypeNode");
 
     AddBasicParseNodeAttributes(*tag, node);
 

@@ -21,20 +21,23 @@ public:
     virtual void VisitEnter(FunctionDefinitionNode& node) = 0;
     virtual void VisitLeave(FunctionDefinitionNode& node) = 0;
 
-    virtual void VisitEnter(LambdaParameterNode& node) = 0;
-    virtual void VisitLeave(LambdaParameterNode& node) = 0;
-
     virtual void VisitEnter(IfStatementNode& node) = 0;
     virtual void VisitLeave(IfStatementNode& node) = 0;
-
-    virtual void VisitEnter(MainNode& node) = 0;
-    virtual void VisitLeave(MainNode& node) = 0;
 
     virtual void VisitEnter(LambdaInvocationNode& node) = 0;
     virtual void VisitLeave(LambdaInvocationNode& node) = 0;
 
     virtual void VisitEnter(LambdaNode& node) = 0;
     virtual void VisitLeave(LambdaNode& node) = 0;
+
+    virtual void VisitEnter(LambdaParameterNode& node) = 0;
+    virtual void VisitLeave(LambdaParameterNode& node) = 0;
+
+    virtual void VisitEnter(LambdaTypeNode& node) = 0;
+    virtual void VisitLeave(LambdaTypeNode& node) = 0;
+
+    virtual void VisitEnter(MainNode& node) = 0;
+    virtual void VisitLeave(MainNode& node) = 0;
 
     virtual void VisitEnter(OperatorNode& node) = 0;
     virtual void VisitLeave(OperatorNode& node) = 0;
@@ -56,7 +59,7 @@ public:
     virtual void Visit(CharacterLiteralNode& node) = 0;
     virtual void Visit(IntegerLiteralNode& node) = 0;
     virtual void Visit(StringLiteralNode& node) = 0;
-    virtual void Visit(TypeNode& node) = 0;
+    virtual void Visit(BaseTypeNode& node) = 0;
 };
 
 /// @brief A default implementation of the ParseNodeVisitor interface. Each `VisitEnter`, 
@@ -101,12 +104,6 @@ public:
         DefaultVisit(node);
     }
 
-    virtual void VisitEnter(LambdaParameterNode& node) override {
-        DefaultVisit(node);
-    }
-    virtual void VisitLeave(LambdaParameterNode& node) override {
-        DefaultVisit(node);
-    }
 
     virtual void VisitEnter(IfStatementNode& node) override {
         DefaultVisit(node);
@@ -126,6 +123,20 @@ public:
         DefaultVisit(node);
     }
     virtual void VisitLeave(LambdaNode& node) override {
+        DefaultVisit(node);
+    }
+
+    virtual void VisitEnter(LambdaParameterNode& node) override {
+        DefaultVisit(node);
+    }
+    virtual void VisitLeave(LambdaParameterNode& node) override {
+        DefaultVisit(node);
+    }
+    
+    virtual void VisitEnter(LambdaTypeNode& node) override {
+        DefaultVisit(node);
+    }
+    virtual void VisitLeave(LambdaTypeNode& node) override {
         DefaultVisit(node);
     }
 
@@ -186,7 +197,7 @@ public:
     virtual void Visit(StringLiteralNode& node) override {
         DefaultVisit(node);
     }
-    virtual void Visit(TypeNode& node) override {
+    virtual void Visit(BaseTypeNode& node) override {
         DefaultVisit(node);
     }
 

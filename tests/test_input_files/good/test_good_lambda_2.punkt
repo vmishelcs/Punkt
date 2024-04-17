@@ -1,0 +1,11 @@
+function awesome <int x> -> int {
+	return 1337 * x.
+}
+
+main {
+	const f = < <int> -> int g, int val > -> int {
+		return g(val).
+	}
+
+	var x = f(awesome, 1).
+}

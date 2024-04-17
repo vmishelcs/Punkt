@@ -10,7 +10,7 @@ void LambdaNode::AddParameterNode(std::unique_ptr<ParseNode> parameter_node) {
 }
 
 void LambdaNode::AddReturnTypeNode(std::unique_ptr<ParseNode> return_type_node) {
-    this->return_type_node = dynamic_cast<TypeNode *>(return_type_node.get());
+    this->return_type_node = return_type_node.get();
     this->AppendChild(std::move(return_type_node));
 }
 

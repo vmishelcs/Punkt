@@ -13,10 +13,12 @@ public:
 
     virtual void VisitLeave(LambdaParameterNode& node) override;
 
+    virtual void VisitLeave(LambdaTypeNode& node) override;
+
     virtual void VisitEnter(ProgramNode& node) override;
 
     // ---- Leaf nodes -----------------------------------------------------------------------
-    virtual void Visit(TypeNode& node) override;
+    virtual void Visit(BaseTypeNode& node) override;
 
 private:
     // ---- Scoping --------------------------------------------------------------------------
