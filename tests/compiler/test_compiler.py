@@ -569,3 +569,7 @@ class TestCompiler(object):
     def test_good_lambda_5(self):
         actual_output_path = self.run_compiler_good()
         self.output_matches(actual_output_path)
+
+    def test_good_lambda_6(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
