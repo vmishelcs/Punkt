@@ -75,12 +75,12 @@ std::string LambdaType::ToString() const {
     std::string result = "(";
     for (const auto& param_type : parameter_types) {
         if (param_type->GetTypeEnum() == TypeEnum::LAMBDA)
-            // Wrap lambda types in parentheses for readability.
+            // Wrap lambda types in brackets for readability.
             result.push_back('(');
 
         result += param_type->ToString();
         if (param_type->GetTypeEnum() == TypeEnum::LAMBDA)
-            // Wrap lambda types in parentheses for readability.
+            // Wrap lambda types in brackets for readability.
             result.push_back(')');
 
         result += ", ";
@@ -96,13 +96,13 @@ std::string LambdaType::ToString() const {
     result += ") -> ";
 
     if (return_type->GetTypeEnum() == TypeEnum::LAMBDA)
-        // Wrap lambda types in parentheses for readability.
+        // Wrap lambda types in brackets for readability.
         result.push_back('(');
 
     result += return_type->ToString();
 
     if (return_type->GetTypeEnum() == TypeEnum::LAMBDA)
-        // Wrap lambda types in parentheses for readability.
+        // Wrap lambda types in brackets for readability.
         result.push_back(')');
     
     return result;

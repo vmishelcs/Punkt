@@ -1,0 +1,7 @@
+main {
+	const h = <> -> <int>->int {
+		return <int>-> { return 0. }.
+	}.
+
+	var x = h().
+}

@@ -1,19 +1,7 @@
 main {
-	var f = <bool add> -> <int, int> -> int {
-		
-		if add {
-			return <int a, int b> -> int {
-				return a + b.
-			}.
-		}
-
-		return <int a, int b> -> int {
-			return a - b.
-		}.
-
+	const h = <> -> <int> -> int {
+		return <int a> -> int { return 0. }.
 	}.
 
-	var add_f = f(true).
-
-	var sub_f = f(false).
+	var x = h().
 }
