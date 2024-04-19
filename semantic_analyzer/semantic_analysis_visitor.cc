@@ -72,11 +72,7 @@ void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode& node) {
                 "incorrectly constructed declaration node.");
     }
 
-    auto lambda_type = dynamic_cast<LambdaType *>(lambda_node->GetType());
-    if (!lambda_type) {
-        PunktLogger::LogFatalInternalError("VisitEnter(DeclarationStatementNode&): "
-                "LambdaNode has non-lambda type.");
-    }
+    auto lambda_type = static_cast<LambdaType *>(lambda_node->GetType());
 
     identifier->SetType(lambda_type->CreateEquivalentType());
     DeclareInLocalScope(*identifier, is_mutable, identifier->GetType(), SymbolType::LAMBDA);

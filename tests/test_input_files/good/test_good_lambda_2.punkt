@@ -3,9 +3,9 @@ function awesome <int x> -> int {
 }
 
 main {
-	const f = < <int> -> int g, int val > -> int {
-		return g(val).
-	}
+	const apply_func_to_arg = < <int> -> int func, int arg > -> int {
+		return func(arg).
+	}.
 
-	var x = f(awesome, 1).
+	print apply_func_to_arg(awesome, 1).
 }

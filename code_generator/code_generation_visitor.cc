@@ -69,6 +69,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
 
     // Generate code for initializer value.
     llvm::Value *initializer_value = node.GetInitializer()->GenerateCode(*this);
+    if (dynamic_cast<LambdaNode *>(node.GetInitializer())) {
+        // If the initializer value is a lambda node, all declaration codegen has already been done
+        // in the `GenerateCode(LambdaNode&)` method.
+        return initializer_value;
+    }
 
     SymbolTableEntry *sym_table_entry = identifier_node->GetSymbolTableEntry();
     if (!sym_table_entry) {
@@ -144,21 +149,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionDefinitionNode& node) {
-    auto identifier_node = node.GetIdentifierNode();
-    if (!identifier_node) {
-        return CodeGenerationInternalError("unable to find function definition identifier");
-    }
-
-    auto lambda_node = node.GetLambdaNode();
-    if (!lambda_node) {
-        return CodeGenerationInternalError("unable to find function definition lambda node");
-    }
-
-    auto function = static_cast<llvm::Function *>(lambda_node->GenerateCode(*this));
-    identifier_node->SetLLVMFunction(function);
-
-    // GenerateCode(FunctionDefinitionNode&) return value is not used.
-    return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
+    // We merely call on the lambda node to generate its code. We store the function's address at
+    // the identifier's symbol table entry in the `GenerateCode(LambdaNode&)` method.
+    return node.GetLambdaNode()->GenerateCode(*this);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
@@ -222,7 +215,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode& node) {
     }
 
     if (auto function = llvm::dyn_cast<llvm::Function>(callee_value)) {
-        return builder->CreateCall(function, arg_values);
+        return builder->CreateCall(function, arg_values, "calltmp");
     }
 
     // In order to call a function using its pointer, we need to construct the function type and
@@ -230,7 +223,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode& node) {
     auto function_type = llvm::FunctionType::get(
         node.GetLLVMType(*context), arg_types, /*isVarArg=*/false);
 
-    return builder->CreateCall(function_type, callee_value, arg_values);
+    return builder->CreateCall(function_type, callee_value, arg_values, "calltmp");
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
@@ -266,16 +259,17 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
     if (!node.IsAnonymous()) {
         // If it is not anonymous, store the function signature in the identifier's symbol table
         // entry.
-        if (node.GetParent()->GetParseNodeType() == ParseNodeType::FUNCTION_DEFINITION_NODE) {
-            auto func_def_node = dynamic_cast<FunctionDefinitionNode *>(node.GetParent());
-            IdentifierNode *identifier_node = func_def_node->GetIdentifierNode();
-            identifier_node->SetLLVMFunction(function);
+        IdentifierNode *identifier_node = nullptr;
+        if (auto func_def_node = dynamic_cast<FunctionDefinitionNode *>(node.GetParent())) {
+            identifier_node = static_cast<IdentifierNode *>(func_def_node->GetIdentifierNode());
         }
-        else /* ParseNodeType is DECLARATION_STATEMENT_NODE */ {
+        else /* parent is a DeclarationStatementNode */ {
             auto decl_node = dynamic_cast<DeclarationStatementNode *>(node.GetParent());
-            IdentifierNode *identifier_node = decl_node->GetIdentifierNode();
-            identifier_node->SetLLVMFunction(function);
+            identifier_node = decl_node->GetIdentifierNode();
         }
+
+        SymbolTableEntry *sym_table_entry = identifier_node->GetSymbolTableEntry();
+        sym_table_entry->function = function;
     }
 
     // In case we are generating lambda variable code, save the current insert block.
@@ -427,6 +421,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {
     if (!sym_table_entry) {
          CodeGenerationInternalError("missing entry in symbol table for "
                 + node.ToString());
+    }
+
+    if (sym_table_entry->symbol_type == SymbolType::LAMBDA) {
+        return sym_table_entry->function;
     }
 
     llvm::AllocaInst *alloca_inst = sym_table_entry->alloca;

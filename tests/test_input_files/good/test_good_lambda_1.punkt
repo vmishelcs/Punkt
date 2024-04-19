@@ -16,4 +16,7 @@ main {
 	var add_f = f(true).
 
 	var sub_f = f(false).
+
+	print add_f(2, 2).
+	print sub_f(2, 2).
 }

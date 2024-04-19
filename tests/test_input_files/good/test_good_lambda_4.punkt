@@ -1,0 +1,8 @@
+function f <> -> int {
+	return 0.
+}
+
+main {
+	var g = f.
+	print g().
+}

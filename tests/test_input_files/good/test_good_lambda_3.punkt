@@ -1,7 +1,9 @@
 main {
-	const h = <> -> <int>->int {
-		return <int>-> { return 0. }.
+	const h = <> -> <int> -> int {
+		return <int a> -> int { return a. }.
 	}.
 
-	var x = h().
+	var g = h().
+	var x = g(0).
+	print x.
 }

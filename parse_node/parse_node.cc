@@ -2,8 +2,9 @@
 #include <llvm/IR/Type.h>
 
 #include <logging/punkt_logger.h>
-#include <semantic_analyzer/types/type.h>
 #include <semantic_analyzer/types/base_type.h>
+#include <semantic_analyzer/types/lambda_type.h>
+#include <semantic_analyzer/types/type.h>
 
 #include "parse_node.h"
 #include "parse_node_visitor.h"
@@ -110,8 +111,12 @@ llvm::Type *ParseNode::GetLLVMType(llvm::LLVMContext& context) const {
                         "unimplemented BaseType in ParseNode::GetLLVMType");
         }
     }
+    auto lambda_type = dynamic_cast<LambdaType *>(type);
+    if (lambda_type) {
+        return llvm::PointerType::getUnqual(context);
+    }
     return (llvm::Type *)PunktLogger::LogFatalInternalError(
-            "ParseNode::GetLLVMType implemented only for BaseType");
+            "ParseNode::GetLLVMType implemented only for BaseType and LambdaType");
 }
 
 void ParseNode::VisitChildren(ParseNodeVisitor& visitor) {
