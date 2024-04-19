@@ -694,31 +694,10 @@ std::unique_ptr<ParseNode> Parser::ParseIdentifier() {
     ReadToken();
 
     // If we are not parsing a lambda invocation, return the identifier node.
-    if (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-            {PunctuatorEnum::OPEN_PARENTHESIS})) {
+    if (!StartsLambdaInvocation(*now_reading)) {
         return identifier;
     }
-
-    Expect(PunctuatorEnum::OPEN_PARENTHESIS);
-
-    std::vector<std::unique_ptr<ParseNode>> args;
-    if (StartsExpression(*now_reading)) {
-        args.emplace_back(ParseExpression());
-
-        while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
-            // Discard ','.
-            ReadToken();
-
-            args.emplace_back(ParseExpression());
-        }
-    }
-
-    auto lambda_invocation = LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
-            std::move(identifier), std::move(args));
-
-    Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
-
-    return lambda_invocation;
+    return ParseLambdaInvocation(std::move(identifier));
 }
 
 bool Parser::StartsBooleanLiteral(Token& token) {
@@ -786,31 +765,37 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaLiteral() {
     auto lambda_literal = ParseLambda();
 
     // If we are not parsing a lambda invocation, return the lambda literal.
-    if (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-            {PunctuatorEnum::OPEN_PARENTHESIS})) {
+    if (!StartsLambdaInvocation(*now_reading)) {
         return lambda_literal;
     }
+    return ParseLambdaInvocation(std::move(lambda_literal));
 
-    Expect(PunctuatorEnum::OPEN_PARENTHESIS);
 
-    std::vector<std::unique_ptr<ParseNode>> args;
-    if (StartsExpression(*now_reading)) {
-        args.emplace_back(ParseExpression());
+    // if (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+    //         {PunctuatorEnum::OPEN_PARENTHESIS})) {
+    //     return lambda_literal;
+    // }
 
-        while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
-            // Discard ','.
-            ReadToken();
+    // Expect(PunctuatorEnum::OPEN_PARENTHESIS);
 
-            args.emplace_back(ParseExpression());
-        }
-    }
+    // std::vector<std::unique_ptr<ParseNode>> args;
+    // if (StartsExpression(*now_reading)) {
+    //     args.emplace_back(ParseExpression());
 
-    auto lambda_invocation = LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
-            std::move(lambda_literal), std::move(args));
+    //     while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
+    //         // Discard ','.
+    //         ReadToken();
 
-    Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+    //         args.emplace_back(ParseExpression());
+    //     }
+    // }
 
-    return lambda_invocation;
+    // auto lambda_invocation = LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
+    //         std::move(lambda_literal), std::move(args));
+
+    // Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+
+    // return lambda_invocation;
 }
 
 bool Parser::StartsType(Token& token) {
@@ -877,6 +862,42 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
     lambda_type_node->AddReturnTypeNode(std::move(return_type));
 
     return lambda_type_node;
+}
+
+bool Parser::StartsLambdaInvocation(Token& token) {
+    return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::OPEN_PARENTHESIS});
+}
+std::unique_ptr<ParseNode> Parser::ParseLambdaInvocation(std::unique_ptr<ParseNode> lambda) {
+    if (!StartsLambdaInvocation(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("lambda invocation");
+    }
+
+    std::unique_ptr<ParseNode> lambda_invocation = std::move(lambda);
+    do {
+        lambda = std::move(lambda_invocation);
+        Expect(PunctuatorEnum::OPEN_PARENTHESIS);
+
+        std::vector<std::unique_ptr<ParseNode>> args;
+        if (StartsExpression(*now_reading)) {
+            args.emplace_back(ParseExpression());
+
+            while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+                    {PunctuatorEnum::SEPARATOR}))
+            {
+                // Discard ','.
+                ReadToken();
+
+                args.emplace_back(ParseExpression());
+            }
+        }
+
+        lambda_invocation = LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
+                std::move(lambda), std::move(args));
+
+        Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+    } while (StartsLambdaInvocation(*now_reading));
+
+    return lambda_invocation;
 }
 
 std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(std::string expected) {

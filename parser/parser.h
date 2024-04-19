@@ -115,6 +115,9 @@ private:
     bool StartsLambdaType(Token& token);
     std::unique_ptr<ParseNode> ParseLambdaType();
 
+    bool StartsLambdaInvocation(Token& token);
+    std::unique_ptr<ParseNode> ParseLambdaInvocation(std::unique_ptr<ParseNode> lambda);
+
     std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
     std::unique_ptr<ParseNode> GetSyntaxErrorNode();
 
