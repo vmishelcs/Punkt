@@ -100,7 +100,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(DeclarationStatementNode& node)
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode& node) {
     // Emit code for the loop initializer.
-    node.GetChild(0)->GenerateCode(*this);
+    node.GetLoopInitializerNode()->GenerateCode(*this);
 
     auto parent_function = builder->GetInsertBlock()->getParent();
 
@@ -121,7 +121,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode& node) {
     builder->SetInsertPoint(condition_block);
 
     // Check if the condition to enter the loop is satisfied.
-    auto end_condition = node.GetChild(1)->GenerateCode(*this);
+    auto end_condition = node.GetEndConditionNode()->GenerateCode(*this);
     end_condition = builder->CreateTrunc(end_condition, llvm::Type::getInt1Ty(*context),
             "trunctmp");
     builder->CreateCondBr(end_condition, loop_block, afterloop_block);
@@ -133,14 +133,21 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode& node) {
     builder->SetInsertPoint(loop_block);
 
     // Emit loop body.
-    node.GetChild(3)->GenerateCode(*this);
+    node.GetLoopBodyNode()->GenerateCode(*this);
 
-    // Emit code for the step value, appending it to the end of the loop body.
-    node.GetChild(2)->GenerateCode(*this);
+    // Get an updated pointer to the loop_block.
+    loop_block = builder->GetInsertBlock();
 
-    // Create an unconditional branch to the start of the loop, where we check if the condition to
-    // continue looping is true/false.
-    builder->CreateBr(condition_block);
+    // Check if the loop block ends in a block terminator.
+    llvm::Instruction *loop_block_last_inst = loop_block->getTerminator();
+    if (!loop_block_last_inst || !loop_block_last_inst->isTerminator()) {
+        // Emit code for the step value, appending it to the end of the loop body.
+        node.GetStepValueNode()->GenerateCode(*this);
+
+        // Create an unconditional branch to the start of the loop, where we check if the condition
+        // to continue looping is true/false.
+        builder->CreateBr(condition_block);
+    }
     
     // Append the 'afterloop' block after the 'loop' block. We jump to this block if the loop
     // condition fails.
@@ -160,11 +167,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionDefinitionNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
-    llvm::Value *condition = node.GetChild(0)->GenerateCode(*this);
+    llvm::Value *condition = node.GetConditionNode()->GenerateCode(*this);
     if (!condition) {
         return CodeGenerationInternalError("failed generating condition for if-statement");
     }
-    // Truncate condition to make sure it has LLVM type `i8`.
+    // Truncate condition to make sure it has LLVM type `i1`.
     condition = builder->CreateTrunc(condition, llvm::Type::getInt1Ty(*context), "trunctmp");
 
     auto parent_function = builder->GetInsertBlock()->getParent();
@@ -187,18 +194,35 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode& node) {
 
     // Emit 'then' block.
     builder->SetInsertPoint(then_block);
-    node.GetChild(1)->GenerateCode(*this);
-    // Create a break statement to merge control flow.
-    builder->CreateBr(merge_block);
+    node.GetThenBlockNode()->GenerateCode(*this);
+
+    // Get an updated pointer to 'then' block.
+    then_block = builder->GetInsertBlock();
+
+    // Check if 'then' block ends in a block terminator.
+    llvm::Instruction *then_block_last_inst = then_block->getTerminator();
+    if (!then_block_last_inst || !then_block_last_inst->isTerminator()) {
+        // Insert a break statement to merge control flow if the 'then' block has no block
+        // terminator.
+        builder->CreateBr(merge_block);
+    }
 
     if (node.HasElseBlock()) {
         // Emit 'else' block.
         parent_function->insert(parent_function->end(), else_block);
         builder->SetInsertPoint(else_block);
-        node.GetChild(2)->GenerateCode(*this);
-        // Create a break statement to merge control flow.
-        builder->CreateBr(merge_block);
+        node.GetElseBlockNode()->GenerateCode(*this);
+
+        // Get an updated pointer to 'else' block.
         else_block = builder->GetInsertBlock();
+
+        // Check if 'else' block ends in a block terminator.
+        llvm::Instruction *else_block_last_inst = else_block->getTerminator();
+        if (!else_block_last_inst || !else_block_last_inst->isTerminator()) {
+            // Insert a break statement to merge control flow if the 'else' block has no block
+            // terminator.
+            builder->CreateBr(merge_block);
+        }
     }
 
     // Emit 'merge' block.
@@ -317,25 +341,33 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
     // Generate code for the function body.
     node.GetLambdaBodyNode()->GenerateCode(*this);
 
-    // Create a new basic block for the trap state in case no return statement is provided.
-    auto trap_bb = llvm::BasicBlock::Create(*context, "trap", function);
-    builder->CreateBr(trap_bb);
-    builder->SetInsertPoint(trap_bb);
+    // Get the final basic block of the function.
+    llvm::BasicBlock *last_bb = builder->GetInsertBlock();
 
-    BaseType *return_base_type = dynamic_cast<BaseType *>(node.GetReturnTypeNode()->GetType());
-    if (return_base_type && return_base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
-        // For void lambdas, place an implicit return statement at the end of the lambda body.
-        builder->CreateRetVoid();
-    } else {
-        // Create a call to a "trap" intrinsic in case no return statement is provided.
-        llvm::Function *trap_intrinsic = llvm::Intrinsic::getDeclaration(module.get(),
-                llvm::Intrinsic::trap);
-        builder->CreateCall(trap_intrinsic);
-        builder->CreateUnreachable();
+    // Check if the last instruction of the block is a terminator.
+    llvm::Instruction *last_instruction = last_bb->getTerminator();
+    if (!last_instruction || !last_instruction->isTerminator()) {
+        // If there is no last instruction, or if the last instruction is not a block terminator,
+        // we need to insert a terminator here.
+        BaseType *return_base_type = dynamic_cast<BaseType *>(node.GetReturnTypeNode()->GetType());
+        if (return_base_type && return_base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+            // For void lambdas, place an implicit return statement at the end of the lambda body.
+            builder->CreateRetVoid();
+        }
+        else {
+            // Otherwise, create a "trap" intrinsic.
+            // Create a call to a "trap" intrinsic in case no return statement is provided.
+            llvm::Function *trap_intrinsic = llvm::Intrinsic::getDeclaration(module.get(),
+                    llvm::Intrinsic::trap);
+            builder->CreateCall(trap_intrinsic);
+            builder->CreateUnreachable();
+        }
     }
 
     // Validate generated code.
-    llvm::verifyFunction(*function);
+    if (llvm::verifyFunction(*function, &llvm::errs())) {
+        return CodeGenerationInternalError("generated IR is invalid.");
+    }
 
     // Restore builder insert point after generating lambda.
     builder->SetInsertPoint(builder_insert_point_save);
@@ -371,10 +403,17 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
     // Generate main code block.
     node.GetChild(0)->GenerateCode(*this);
 
-    // Main always returns 0.
-    builder->CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0));
+    llvm::BasicBlock *last_main_bb = builder->GetInsertBlock();
+    // Check if the last instruction of the block is a terminator.
+    llvm::Instruction *last_instruction = last_main_bb->getTerminator();
+    if (!last_instruction || !last_instruction->isTerminator()) {
+        // Main always returns 0.
+        builder->CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0));
+    }
 
-    llvm::verifyFunction(*main_func);
+    if (llvm::verifyFunction(*main_func, &llvm::errs())) {
+        return CodeGenerationInternalError("generated IR is invalid.");
+    }
 
     return main_func;
 }
@@ -438,7 +477,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
         child->GenerateCode(*this);
     }
 
-    llvm::verifyModule(*module);
+    if (llvm::verifyModule(*module, &llvm::errs())) {
+        return CodeGenerationInternalError("generated IR is invalid.");
+    }
 
     // GenerateCode(ProgramNode&) return value is not used.
     return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));

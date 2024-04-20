@@ -1,7 +1,15 @@
-function f <> -> void {
-	print "hello".
-}
-
 main {
-	call g()().
+    if true {
+        if true {
+            if true {
+                if true {
+                    if true {
+                        if true {
+                            print false.
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

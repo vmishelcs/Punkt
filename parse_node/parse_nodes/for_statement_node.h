@@ -9,6 +9,11 @@ class ForStatementNode : public ParseNode {
 public:
     ForStatementNode(std::unique_ptr<Token> token);
 
+    ParseNode *GetLoopInitializerNode() const { return GetChild(0); }
+    ParseNode *GetEndConditionNode() const { return GetChild(1); }
+    ParseNode *GetStepValueNode() const { return GetChild(2); }
+    ParseNode *GetLoopBodyNode() const { return GetChild(3); }
+
     virtual std::string ToString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;

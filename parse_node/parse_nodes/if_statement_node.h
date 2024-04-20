@@ -9,6 +9,10 @@ class IfStatementNode : public ParseNode {
 public:
     IfStatementNode(std::unique_ptr<Token> token);
 
+    ParseNode *GetConditionNode() const { return GetChild(0); }
+    ParseNode *GetThenBlockNode() const { return GetChild(1); }
+    ParseNode *GetElseBlockNode() const { return GetChild(2); }
+
     bool HasElseBlock() const;
 
     virtual std::string ToString() const override;
