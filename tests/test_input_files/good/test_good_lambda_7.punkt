@@ -1,0 +1,16 @@
+function gcd <int a, int b> -> int {
+	for , a != b, {
+		if a > b {
+			a = a - b.
+		} else {
+			b = b - a.
+		}
+	}
+	return a.
+}
+
+main {
+	print gcd(17, 13).
+	print gcd(5, 25).
+	print gcd(1071, 462).
+}

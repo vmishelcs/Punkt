@@ -20,6 +20,8 @@ std::unique_ptr<Type> BaseTypeNode::InferOwnType() const {
     }
 
     switch (keyword_token->GetKeywordEnum()) {
+        case KeywordEnum::VOID:
+            return BaseType::Create(BaseTypeEnum::VOID);
         case KeywordEnum::BOOL:
             return BaseType::Create(BaseTypeEnum::BOOLEAN);
         case KeywordEnum::CHAR:

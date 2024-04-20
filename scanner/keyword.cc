@@ -8,14 +8,15 @@ std::unordered_map<std::string, KeywordEnum> Keyword::dictionary = {
     { "false",    KeywordEnum::FALSE    },
     { "for",      KeywordEnum::FOR      },
     { "function", KeywordEnum::FUNCTION },
-    { "int",      KeywordEnum::INT      },
     { "if",       KeywordEnum::IF       },
+    { "int",      KeywordEnum::INT      },
     { "main",     KeywordEnum::MAIN     },
     { "print",    KeywordEnum::PRINT    },
     { "return",   KeywordEnum::RETURN   },
     { "string",   KeywordEnum::STRING   },
     { "true",     KeywordEnum::TRUE     },
     { "var",      KeywordEnum::VAR      },
+    { "void",     KeywordEnum::VOID     },
 };
 
 std::unordered_map<KeywordEnum, std::string> Keyword::reverse_dictionary = [] {

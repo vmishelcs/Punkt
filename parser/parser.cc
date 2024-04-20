@@ -464,6 +464,12 @@ std::unique_ptr<ParseNode> Parser::ParseReturnStatement() {
     // Discard 'return'.
     ReadToken();
 
+    if (!StartsExpression(*now_reading)) {
+        // Void functions do not return a value.
+        Expect(PunctuatorEnum::TERMINATOR);
+        return return_statement;
+    }
+
     auto return_value = ParseExpression();
     return_statement->AppendChild(std::move(return_value));
 
@@ -769,33 +775,6 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaLiteral() {
         return lambda_literal;
     }
     return ParseLambdaInvocation(std::move(lambda_literal));
-
-
-    // if (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-    //         {PunctuatorEnum::OPEN_PARENTHESIS})) {
-    //     return lambda_literal;
-    // }
-
-    // Expect(PunctuatorEnum::OPEN_PARENTHESIS);
-
-    // std::vector<std::unique_ptr<ParseNode>> args;
-    // if (StartsExpression(*now_reading)) {
-    //     args.emplace_back(ParseExpression());
-
-    //     while (PunctuatorToken::IsTokenPunctuator(now_reading.get(), {PunctuatorEnum::SEPARATOR})) {
-    //         // Discard ','.
-    //         ReadToken();
-
-    //         args.emplace_back(ParseExpression());
-    //     }
-    // }
-
-    // auto lambda_invocation = LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
-    //         std::move(lambda_literal), std::move(args));
-
-    // Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
-
-    // return lambda_invocation;
 }
 
 bool Parser::StartsType(Token& token) {
@@ -813,6 +792,7 @@ std::unique_ptr<ParseNode> Parser::ParseType() {
 
 bool Parser::StartsBaseType(Token& token) {
     return KeywordToken::IsTokenKeyword(&token, {
+            KeywordEnum::VOID,
             KeywordEnum::BOOL,
             KeywordEnum::CHAR,
             KeywordEnum::INT,

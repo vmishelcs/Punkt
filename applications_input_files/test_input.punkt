@@ -1,11 +1,8 @@
-main {
-	var f = <int x> -> <int, int> -> <int, int, int> -> int {
-		return <int x, int y> -> <int, int, int> -> int {
-			return <int x, int y, int z> -> int {
-				return x + y + z.
-			}.
-		}.
-	}.
+function f <int x> -> void {
+	return 5.
+}
 
-	print f(1)(1, 2)(1, 2, 3).
+main {
+	var x = f(0).
+	return .
 }

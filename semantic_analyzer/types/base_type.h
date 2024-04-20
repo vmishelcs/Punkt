@@ -7,7 +7,7 @@
 #include "type.h"
 
 enum class BaseTypeEnum {
-    NULL_TYPE,
+    VOID,
     BOOLEAN,
     CHARACTER,
     INTEGER,
@@ -25,9 +25,9 @@ public:
     static std::unique_ptr<BaseType> Create(BaseTypeEnum base_type_enum);
 
     /// @brief Create a `unique_ptr<BaseType>` pointing to a `BaseType` object that represents a
-    /// null type.
-    /// @return `unique_ptr<BaseType>` representing null type.
-    static std::unique_ptr<BaseType> CreateNullType();
+    /// void type.
+    /// @return `unique_ptr<BaseType>` representing void type.
+    static std::unique_ptr<BaseType> CreateVoidType();
 
     /// @brief Create a `unique_ptr<BaseType>` pointing to a `BaseType` object that represents a
     /// boolean type.

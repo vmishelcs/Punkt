@@ -6,7 +6,7 @@
 #include "signatures.h"
 
 // Types used by signatures.
-static const std::unique_ptr<BaseType> kBaseTypeNull = BaseType::CreateNullType();
+static const std::unique_ptr<BaseType> kBaseTypeNull = BaseType::CreateVoidType();
 static const std::unique_ptr<BaseType> kBaseTypeBoolean = BaseType::CreateBooleanType();
 static const std::unique_ptr<BaseType> kBaseTypeCharacter = BaseType::CreateCharacterType();
 static const std::unique_ptr<BaseType> kBaseTypeInteger = BaseType::CreateIntegerType();

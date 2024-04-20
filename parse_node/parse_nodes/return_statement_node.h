@@ -10,10 +10,16 @@ class ReturnStatementNode : public ParseNode {
 public:
     ReturnStatementNode(std::unique_ptr<Token> token);
 
-    /// @brief Get the `LambdaNode` that represents the enclosing lambda.
-    /// @return `LambdaNode` pointer representing the lambda from which this return statement is
-    /// returning from.
-    LambdaNode *GetEnclosingLambdaNode() const;
+    /// @brief Get the node that represents the return value of this statement.
+    /// @return Pointer to the node that represents the return value of this statement.
+    ParseNode *GetReturnValueNode() const {
+        return GetChild(0);
+    }
+
+    /// @brief Get the node that represents the enclosing function of this return statement.
+    /// @return Pointer to the node that represents the enclosing function; this can be a
+    /// `LambdaNode` or a `MainNode`. This method returns `nullptr` if no such node could be found.
+    ParseNode *GetEnclosingFunctionNode() const;
 
     virtual std::string ToString() const override;
 

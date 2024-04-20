@@ -26,6 +26,9 @@ private:
 
     // ---- Miscellaneous helpers ------------------------------------------------------------
     void DeclareFunction(IdentifierNode& node, Type *type);
+
+    // ---- Error reporting ------------------------------------------------------------------
+    void VoidParameterTypeError(ParseNode& type_node);
 };
 
 #endif // FUNCTION_DEFINITION_VISITOR_H_

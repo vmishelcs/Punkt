@@ -12,24 +12,18 @@ ReturnStatementNode::ReturnStatementNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::RETURN_STATEMENT_NODE, std::move(token))
 {}
 
-LambdaNode *ReturnStatementNode::GetEnclosingLambdaNode() const {
-    // TODO: Think about what to do if the return statement is inside of 'main'.
+ParseNode *ReturnStatementNode::GetEnclosingFunctionNode() const {
     ParseNode *parse_node = GetParent();
-    while (parse_node && parse_node->GetParseNodeType() != ParseNodeType::LAMBDA_NODE) {
+    while (parse_node) {
+        if (parse_node->GetParseNodeType() == ParseNodeType::LAMBDA_NODE)
+            return parse_node;
+        if (parse_node->GetParseNodeType() == ParseNodeType::MAIN_NODE)
+            return parse_node;
+
         parse_node = parse_node->GetParent();
     }
 
-    if (!parse_node) {
-        PunktLogger::LogFatalInternalError("return statement does not have enclosing lambda");
-    }
-
-    auto lambda_node = dynamic_cast<LambdaNode *>(parse_node);
-    if (!lambda_node) {
-        PunktLogger::LogFatalInternalError(
-                "failed casting ParseNode with ParseNodeType == LAMBDA_NODE to LambdaNode");
-    }
-
-    return lambda_node;
+    return nullptr;
 }
 
 std::string ReturnStatementNode::ToString() const {

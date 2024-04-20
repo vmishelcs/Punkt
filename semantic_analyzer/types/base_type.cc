@@ -6,8 +6,8 @@ std::unique_ptr<BaseType> BaseType::Create(BaseTypeEnum base_type_enum) {
     return std::make_unique<BaseType>(base_type_enum);
 }
 
-std::unique_ptr<BaseType> BaseType::CreateNullType() {
-    return Create(BaseTypeEnum::NULL_TYPE);
+std::unique_ptr<BaseType> BaseType::CreateVoidType() {
+    return Create(BaseTypeEnum::VOID);
 }
 
 std::unique_ptr<BaseType> BaseType::CreateBooleanType() {
@@ -54,8 +54,8 @@ BaseType::BaseType(BaseTypeEnum base_type_enum)
 
 std::string BaseType::GetEnumString(BaseTypeEnum base_type_enum) {
     switch (base_type_enum) {
-        case BaseTypeEnum::NULL_TYPE:
-            return "null";
+        case BaseTypeEnum::VOID:
+            return "void";
         case BaseTypeEnum::BOOLEAN:
             return "boolean";
         case BaseTypeEnum::CHARACTER:

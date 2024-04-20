@@ -205,19 +205,40 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
 }
 
 void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode& node) {
-    // Make sure this statement is returning an expression that is semantically equivalent to the
-    // lambda return type this this return statement is a part of.
-    Type *ret_expr_type = node.GetChild(0)->GetType();
-
-    LambdaNode *lambda_node = node.GetEnclosingLambdaNode();
-    auto lambda_type = dynamic_cast<LambdaType *>(lambda_node->GetType());
-    if (!lambda_type) {
-        PunktLogger::LogFatalInternalError("LambdaNode has non-lambda type");
+    ParseNode *enclosing_function = node.GetEnclosingFunctionNode();
+    if (!enclosing_function) {
+        ReturnStatementOutsideOfFunctionError(node);
+        return;
     }
 
-    if (!lambda_type->GetReturnType()->IsEquivalentTo(ret_expr_type)) {
+    if (enclosing_function->GetParseNodeType() == ParseNodeType::MAIN_NODE) {
+        // We do not allow returning values from main.
+        if (node.NumChildren() > 0) {
+            MainReturnStatementReturnsValueError(node);
+        }
+        return;
+    }
+
+    // Otherwise, the enclosing function must be a lambda.
+    auto lambda = static_cast<LambdaNode *>(enclosing_function);
+
+    // Make sure this statement is return a value that is semantically equivalent to the return
+    // type of the enclosing lambda.
+    Type *lambda_return_type = lambda->GetReturnTypeNode()->GetType();
+
+    // If the enclosing lambda is declared as returning void, the return statement must not return
+    // a value.
+    if (auto base_type = dynamic_cast<BaseType *>(lambda_return_type);
+        base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+        if (node.NumChildren() > 0) {
+            ReturnStatementReturnsValueFromVoidLambdaError(node);
+        }
+        return;
+    }
+
+    Type *return_value_type = node.GetReturnValueNode()->GetType();
+    if (!lambda_return_type->IsEquivalentTo(return_value_type)) {
         IncompatibleReturnTypeError(node);
-        node.SetType(BaseType::CreateErrorType());
         return;
     }
 }
@@ -231,7 +252,7 @@ void SemanticAnalysisVisitor::Visit(ErrorNode& node) {
 void SemanticAnalysisVisitor::Visit(IdentifierNode& node) {
     if (IsBeingDeclared(node) || IsParameterIdentifier(node)) {
         // If an identifier is being declared, its semantic analysis is handled by either
-        // `VisitLeave(DeclarationStatementNode&)` or `VisitLeave(FunctionDefinitionNode)`.If an
+        // `VisitLeave(DeclarationStatementNode&)` or `VisitLeave(FunctionDefinitionNode)`. If an
         // identifier is part of a function parameter, its semantic analysis is handled by 
         // `VisitLeave(LambdaParameterNode&)`.
         return;
@@ -324,13 +345,13 @@ void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::v
 
 void SemanticAnalysisVisitor::NonBooleanConditionError(IfStatementNode& node) {
     std::string message = "if-statement at " + node.GetToken()->GetLocation().ToString()
-            + " has non-boolean condition.";
+            + " has non-boolean condition";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
 void SemanticAnalysisVisitor::NonBooleanConditionError(ForStatementNode& node) {
     std::string message = "for-statement at " + node.GetToken()->GetLocation().ToString()
-            + " has non-boolean condition.";
+            + " has non-boolean condition";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
@@ -342,25 +363,45 @@ void SemanticAnalysisVisitor::NonTargettableExpressionError(ParseNode& node) {
 
 void SemanticAnalysisVisitor::AssignmentToImmutableTargetError(ParseNode& node) {
     std::string message = "variable at " + node.GetToken()->GetLocation().ToString()
-            + " is immutable.";
+            + " is immutable";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
 void SemanticAnalysisVisitor::AssignmentTypeMismatchError(ParseNode& node, const Type& target_type,
             const Type& value_type) {
     std::string message = "cannot assign \'" + value_type.ToString()
-            + "\' value to a target of type \'" + target_type.ToString() + "\'.";
+            + "\' value to a target of type \'" + target_type.ToString() + "\'";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
 void SemanticAnalysisVisitor::InvocationExpressionWithNonLambdaTypeError(ParseNode& node) {
     std::string message = "expression at " + node.GetToken()->GetLocation().ToString()
-            + " has non-lambda type.";
+            + " has non-lambda type";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
 void SemanticAnalysisVisitor::LambdaDoesNotAcceptProvidedTypesError(ParseNode& node) {
-    std::string message = "invalid arguments for lambda invocation.";
+    std::string message = "invalid arguments for lambda invocation";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::ReturnStatementOutsideOfFunctionError(ReturnStatementNode& node) {
+    std::string message = "return statement outside of function at "
+            + node.GetToken()->GetLocation().ToString();
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::MainReturnStatementReturnsValueError(ReturnStatementNode& node) {
+    std::string message = "cannot return value from main at "
+            + node.GetToken()->GetLocation().ToString();
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::ReturnStatementReturnsValueFromVoidLambdaError(
+        ReturnStatementNode& node)
+{
+    std::string message = "return statement at " + node.GetToken()->GetLocation().ToString()
+            + " cannot return a value because the enclosing lambda is declared to return void";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 

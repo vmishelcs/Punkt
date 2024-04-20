@@ -58,6 +58,9 @@ private:
             const Type& value_type);
     void InvocationExpressionWithNonLambdaTypeError(ParseNode& node);
     void LambdaDoesNotAcceptProvidedTypesError(ParseNode& node);
+    void ReturnStatementOutsideOfFunctionError(ReturnStatementNode& node);
+    void MainReturnStatementReturnsValueError(ReturnStatementNode& node);
+    void ReturnStatementReturnsValueFromVoidLambdaError(ReturnStatementNode& node);
     void IncompatibleReturnTypeError(ReturnStatementNode& node);
 };
 

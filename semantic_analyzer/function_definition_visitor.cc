@@ -4,8 +4,9 @@
 #include <logging/punkt_logger.h>
 #include <parse_node/parse_node.h>
 #include <parse_node/parse_nodes/all_nodes.h>
-#include <symbol_table/scope.h>
+#include <semantic_analyzer/types/base_type.h>
 #include <semantic_analyzer/types/lambda_type.h>
+#include <symbol_table/scope.h>
 
 #include "function_definition_visitor.h"
 
@@ -45,6 +46,14 @@ void FunctionDefinitionVisitor::VisitLeave(LambdaNode& node) {
 void FunctionDefinitionVisitor::VisitLeave(LambdaParameterNode& node) {
     ParseNode *type_node = node.GetTypeNode();
     Type *parameter_type = type_node->GetType();
+
+    if (auto parameter_base_type = dynamic_cast<BaseType *>(parameter_type);
+            parameter_base_type->GetBaseTypeEnum() == BaseTypeEnum::VOID) {
+        // Parameter types cannot be void.
+        VoidParameterTypeError(*type_node);
+        node.SetType(BaseType::CreateErrorType());
+        return;
+    }
 
     node.SetType(parameter_type->CreateEquivalentType());
 
@@ -90,4 +99,13 @@ void FunctionDefinitionVisitor::DeclareFunction(IdentifierNode& node, Type *type
         SymbolType::LAMBDA
     );
     node.SetSymbolTableEntry(symbol_table_entry);
+}
+
+//--------------------------------------------------------------------------------------//
+//                                   Error reporting                                    //
+//--------------------------------------------------------------------------------------//
+void FunctionDefinitionVisitor::VoidParameterTypeError(ParseNode& type_node) {
+    std::string message = "parameter cannot have void type at "
+            + type_node.GetToken()->GetLocation().ToString(); 
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }

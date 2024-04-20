@@ -23,6 +23,7 @@ enum class KeywordEnum {
     STRING,
     TRUE,
     VAR,
+    VOID,
 };
 
 class Keyword : public ReservedComponent {
