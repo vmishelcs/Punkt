@@ -63,8 +63,8 @@ private:
             const Type& value_type);
     void PrintingVoidTypeError(PrintStatementNode& node);
     void PrintingLambdaTypeError(PrintStatementNode& node);
-    void InvocationExpressionWithNonLambdaTypeError(ParseNode& node);
-    void LambdaDoesNotAcceptProvidedTypesError(ParseNode& node);
+    void InvocationExpressionWithNonLambdaTypeError();
+    void LambdaDoesNotAcceptProvidedTypesError();
     void ReturnStatementOutsideOfFunctionError(ReturnStatementNode& node);
     void MainReturnStatementReturnsValueError(ReturnStatementNode& node);
     void ReturnStatementReturnsValueFromVoidLambdaError(ReturnStatementNode& node);

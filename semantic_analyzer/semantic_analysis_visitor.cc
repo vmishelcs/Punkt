@@ -151,7 +151,7 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode& node) {
     Type *type = callee_node->GetType();
     auto lambda_type = dynamic_cast<LambdaType *>(type);
     if (!lambda_type) {
-        InvocationExpressionWithNonLambdaTypeError(*callee_node);
+        InvocationExpressionWithNonLambdaTypeError();
         node.SetType(BaseType::CreateErrorType());
         return;
     }
@@ -165,7 +165,7 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode& node) {
     
     // Check that the lambda accepts the provided arguments.
     if (!lambda_type->AcceptsArgumentTypes(arg_types)) {
-        LambdaDoesNotAcceptProvidedTypesError(*callee_node);
+        LambdaDoesNotAcceptProvidedTypesError();
         node.SetType(BaseType::CreateErrorType());
         return;
     }
@@ -426,13 +426,12 @@ void SemanticAnalysisVisitor::PrintingLambdaTypeError(PrintStatementNode& node) 
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
-void SemanticAnalysisVisitor::InvocationExpressionWithNonLambdaTypeError(ParseNode& node) {
-    std::string message = "expression at " + node.GetToken()->GetLocation().ToString()
-            + " has non-lambda type";
+void SemanticAnalysisVisitor::InvocationExpressionWithNonLambdaTypeError() {
+    std::string message = "invocation with non-lambda type";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
-void SemanticAnalysisVisitor::LambdaDoesNotAcceptProvidedTypesError(ParseNode& node) {
+void SemanticAnalysisVisitor::LambdaDoesNotAcceptProvidedTypesError() {
     std::string message = "invalid arguments for lambda invocation ";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }

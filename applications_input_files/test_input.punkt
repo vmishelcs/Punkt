@@ -1,8 +1,7 @@
-function f <int x> -> void {
-	print x.
-	return.
+function f <> -> void {
+	print "hello".
 }
 
 main {
-	call f(0).
+	call g()().
 }

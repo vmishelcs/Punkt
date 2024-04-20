@@ -1,6 +1,7 @@
 #include <variant>
 
 #include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalValue.h>
 #include <llvm/IR/Instruction.h>
 #include <llvm/IR/Value.h>
 #include <llvm/IR/Verifier.h>
@@ -315,6 +316,23 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {
 
     // Generate code for the function body.
     node.GetLambdaBodyNode()->GenerateCode(*this);
+
+    // Create a new basic block for the trap state in case no return statement is provided.
+    auto trap_bb = llvm::BasicBlock::Create(*context, "trap", function);
+    builder->CreateBr(trap_bb);
+    builder->SetInsertPoint(trap_bb);
+
+    BaseType *return_base_type = dynamic_cast<BaseType *>(node.GetReturnTypeNode()->GetType());
+    if (return_base_type && return_base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+        // For void lambdas, place an implicit return statement at the end of the lambda body.
+        builder->CreateRetVoid();
+    } else {
+        // Create a call to a "trap" intrinsic in case no return statement is provided.
+        llvm::Function *trap_intrinsic = llvm::Intrinsic::getDeclaration(module.get(),
+                llvm::Intrinsic::trap);
+        builder->CreateCall(trap_intrinsic);
+        builder->CreateUnreachable();
+    }
 
     // Validate generated code.
     llvm::verifyFunction(*function);
