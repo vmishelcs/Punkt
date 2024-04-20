@@ -2,6 +2,7 @@
 
 std::unordered_map<std::string, KeywordEnum> Keyword::dictionary = {
     { "bool",     KeywordEnum::BOOL     },
+    { "call",     KeywordEnum::CALL     },
     { "char",     KeywordEnum::CHAR     },
     { "const",    KeywordEnum::CONST    },
     { "else",     KeywordEnum::ELSE     },

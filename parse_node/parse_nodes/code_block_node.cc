@@ -1,3 +1,5 @@
+#include <llvm/IR/Value.h>
+
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 

@@ -44,6 +44,9 @@ public:
     virtual void VisitEnter(AssignmentStatementNode& node) override;
     virtual void VisitLeave(AssignmentStatementNode& node) override;
 
+    virtual void VisitEnter(CallStatementNode& node) override;
+    virtual void VisitLeave(CallStatementNode& node) override;
+
     virtual void VisitEnter(CodeBlockNode& node) override;
     virtual void VisitLeave(CodeBlockNode& node) override;
 

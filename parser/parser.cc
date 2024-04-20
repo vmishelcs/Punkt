@@ -195,6 +195,7 @@ bool Parser::StartsStatement(Token& token) {
         || StartsAssignment(token)
         || StartsIfStatement(token)
         || StartsForStatement(token)
+        || StartsCallStatement(token)
         || StartsPrintStatement(token)
         || StartsReturnStatement(token);
 }
@@ -213,6 +214,9 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
     }
     if (StartsForStatement(*now_reading)) {
         return ParseForStatement();
+    }
+    if (StartsCallStatement(*now_reading)) {
+        return ParseCallStatement();
     }
     if (StartsPrintStatement(*now_reading)) {
         return ParsePrintStatement();
@@ -406,6 +410,37 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
     for_statement->AppendChild(std::move(loop_body));
 
     return for_statement;
+}
+
+bool Parser::StartsCallStatement(Token& token) {
+    return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::CALL});
+}
+std::unique_ptr<ParseNode> Parser::ParseCallStatement() {
+    if (!StartsCallStatement(*now_reading)) {
+        return SyntaxErrorUnexpectedToken("call statement");
+    }
+
+    auto call_statement = std::make_unique<CallStatementNode>(std::move(now_reading));
+
+    // Discard 'call' token.
+    ReadToken();
+
+    std::unique_ptr<ParseNode> lambda_invocation = nullptr;
+    if (StartsIdentifier(*now_reading)) {
+        lambda_invocation = ParseIdentifier();
+    }
+    else if (StartsLambdaLiteral(*now_reading)) {
+        lambda_invocation = ParseLambdaLiteral();
+    }
+    else {
+        return SyntaxErrorUnexpectedToken("lambda invocation");
+    }
+
+    call_statement->AppendChild(std::move(lambda_invocation));
+
+    Expect(PunctuatorEnum::TERMINATOR);
+
+    return call_statement;
 }
 
 bool Parser::StartsPrintStatement(Token& token) {

@@ -1,6 +1,7 @@
 add_library(assignment_statement_node assignment_statement_node.cc)
 add_library(base_type_node base_type_node.cc)
 add_library(boolean_literal_node boolean_literal_node.cc)
+add_library(call_statement_node call_statement_node.cc)
 add_library(character_literal_node character_literal_node.cc)
 add_library(code_block_node code_block_node.cc)
 add_library(declaration_statement_node declaration_statement_node.cc)

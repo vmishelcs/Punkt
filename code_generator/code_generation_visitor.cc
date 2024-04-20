@@ -51,6 +51,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(AssignmentStatementNode& node) 
     return CodeGenerationInternalError("non-targettable expression in assignment statement");
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(CallStatementNode& node) {
+    return node.GetLambdaInvocationNode()->GenerateCode(*this);
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode& node) {
     for (auto child : node.GetChildren()) {
         child->GenerateCode(*this);
@@ -214,8 +218,18 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode& node) {
         arg_types.push_back(arg->GetLLVMType(*context));
     }
 
+    Type *return_type = node.GetType();
+
+    // Check if invocation returns void.
+    bool returns_void = false;
+    auto return_base_type = dynamic_cast<BaseType *>(return_type);
+    if (return_base_type && return_base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+        returns_void = true;
+    }
+
     if (auto function = llvm::dyn_cast<llvm::Function>(callee_value)) {
-        return builder->CreateCall(function, arg_values, "calltmp");
+        // Void instructions cannot have a name.
+        return builder->CreateCall(function, arg_values, returns_void ? "" : "calltmp");
     }
 
     // In order to call a function using its pointer, we need to construct the function type and
@@ -223,7 +237,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode& node) {
     auto function_type = llvm::FunctionType::get(
         node.GetLLVMType(*context), arg_types, /*isVarArg=*/false);
 
-    return builder->CreateCall(function_type, callee_value, arg_values, "calltmp");
+    // Void instructions cannot have a name.
+    return builder->CreateCall(function_type, callee_value, arg_values,
+            returns_void ? "" : "calltmp");
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode& node) {

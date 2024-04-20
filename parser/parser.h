@@ -52,6 +52,9 @@ private:
     bool StartsForStatement(Token& token);
     std::unique_ptr<ParseNode> ParseForStatement();
 
+    bool StartsCallStatement(Token& token);
+    std::unique_ptr<ParseNode> ParseCallStatement();
+
     bool StartsPrintStatement(Token& token);
     std::unique_ptr<ParseNode> ParsePrintStatement(bool expect_terminator = true);
 

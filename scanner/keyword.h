@@ -9,6 +9,7 @@
 
 enum class KeywordEnum {
     BOOL,
+    CALL,
     CHAR,
     CONST,
     ELSE,

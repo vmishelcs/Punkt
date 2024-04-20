@@ -8,6 +8,8 @@ public:
     // ---- Non-leaf nodes -------------------------------------------------------------------
     virtual void VisitLeave(AssignmentStatementNode& node) override;
 
+    virtual void VisitLeave(CallStatementNode& node) override;
+
     virtual void VisitEnter(CodeBlockNode& node) override;
 
     virtual void VisitEnter(DeclarationStatementNode& node) override;
@@ -67,6 +69,7 @@ private:
     void MainReturnStatementReturnsValueError(ReturnStatementNode& node);
     void ReturnStatementReturnsValueFromVoidLambdaError(ReturnStatementNode& node);
     void IncompatibleReturnTypeError(ReturnStatementNode& node);
+    void CallWithoutFunctionInvocationError(CallStatementNode& node);
 };
 
 #endif // SEMANTIC_ANALYSIS_VISITOR_H_

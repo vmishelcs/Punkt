@@ -1,6 +1,8 @@
 #ifndef CHARACTER_LITERAL_NODE_H_
 #define CHARACTER_LITERAL_NODE_H_
 
+#include <llvm/IR/Value.h>
+
 #include <parse_node/parse_node.h>
 
 class CharacterLiteralNode : public ParseNode {

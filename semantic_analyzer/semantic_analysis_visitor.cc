@@ -47,6 +47,14 @@ void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode& node) {
     }
 }
 
+void SemanticAnalysisVisitor::VisitLeave(CallStatementNode& node) {
+    if (!node.GetLambdaInvocationNode()) {
+        // Call statement must be followed by a lambda invocation.
+        CallWithoutFunctionInvocationError(node);
+        return;
+    }
+}
+
 void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode& node) {
     if (node.GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_NODE) {
         CreateProcedureScope(node);
@@ -154,14 +162,9 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode& node) {
     // Fill `arg_types` vector with corresponding types.
     std::transform(arg_nodes.begin(), arg_nodes.end(), std::inserter(arg_types, arg_types.end()),
             [](const auto& arg_node) { return arg_node->GetType(); });
-
-    for (const auto& type : arg_types) {
-        std::cout << type->ToString() << '\n';
-    }
     
     // Check that the lambda accepts the provided arguments.
     if (!lambda_type->AcceptsArgumentTypes(arg_types)) {
-        std::cout << lambda_type->ToString() << '\n';
         LambdaDoesNotAcceptProvidedTypesError(*callee_node);
         node.SetType(BaseType::CreateErrorType());
         return;
@@ -456,6 +459,12 @@ void SemanticAnalysisVisitor::ReturnStatementReturnsValueFromVoidLambdaError(
 
 void SemanticAnalysisVisitor::IncompatibleReturnTypeError(ReturnStatementNode& node) {
     std::string message = "incompatible return type at "
+            + node.GetToken()->GetLocation().ToString();
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::CallWithoutFunctionInvocationError(CallStatementNode& node) {
+    std::string message = "call statement without function invocation at "
             + node.GetToken()->GetLocation().ToString();
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }

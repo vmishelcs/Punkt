@@ -4,6 +4,7 @@
 #include "assignment_statement_node.h"
 #include "base_type_node.h"
 #include "boolean_literal_node.h"
+#include "call_statement_node.h"
 #include "character_literal_node.h"
 #include "code_block_node.h"
 #include "declaration_statement_node.h"
