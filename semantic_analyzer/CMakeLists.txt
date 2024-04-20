@@ -1,8 +1,8 @@
 add_subdirectory(signatures)
 add_subdirectory(types)
 
-add_library(function_definition_visitor function_definition_visitor.cc)
-target_link_libraries(function_definition_visitor
+add_library(semantic_analysis_preprocessor semantic_analysis_preprocessor.cc)
+target_link_libraries(semantic_analysis_preprocessor
     parse_node
     type
     scope
@@ -18,6 +18,6 @@ target_link_libraries(semantic_analysis_visitor
 
 add_library(semantic_analyzer semantic_analyzer.cc)
 target_link_libraries(semantic_analyzer
-    function_definition_visitor
+    semantic_analysis_preprocessor
     semantic_analysis_visitor
 )

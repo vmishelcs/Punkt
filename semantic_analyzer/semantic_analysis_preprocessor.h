@@ -1,10 +1,10 @@
-#ifndef FUNCTION_DEFINITION_VISITOR_H_
-#define FUNCTION_DEFINITION_VISITOR_H_
+#ifndef SEMANTIC_ANALYSIS_PREPROCESSOR_H_
+#define SEMANTIC_ANALYSIS_PREPROCESSOR_H_
 
 #include <parse_node/parse_node_visitor.h>
 #include <parse_node/parse_nodes/all_nodes.h>
 
-class FunctionDefinitionVisitor : public DefaultParseNodeVisitor {
+class SemanticAnalysisPreprocessor : public DefaultParseNodeVisitor {
 public:
     // ---- Non-leaf nodes -------------------------------------------------------------------
     virtual void VisitLeave(FunctionDefinitionNode& node) override;
@@ -31,4 +31,4 @@ private:
     void VoidParameterTypeError(ParseNode& type_node);
 };
 
-#endif // FUNCTION_DEFINITION_VISITOR_H_
+#endif // SEMANTIC_ANALYSIS_PREPROCESSOR_H_

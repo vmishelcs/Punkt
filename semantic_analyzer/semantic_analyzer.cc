@@ -1,4 +1,4 @@
-#include "function_definition_visitor.h"
+#include "semantic_analysis_preprocessor.h"
 #include "semantic_analysis_visitor.h"
 #include "semantic_analyzer.h"
 
@@ -12,7 +12,7 @@ SemanticAnalyzer::SemanticAnalyzer(std::unique_ptr<ParseNode> ast)
 {}
 
 std::unique_ptr<ParseNode> SemanticAnalyzer::BeginSemanticAnalysis() {
-    FunctionDefinitionVisitor function_declaration_visitor;
+    SemanticAnalysisPreprocessor function_declaration_visitor;
     ast->Accept(function_declaration_visitor);
 
     SemanticAnalysisVisitor semantic_analysis_visitor;
