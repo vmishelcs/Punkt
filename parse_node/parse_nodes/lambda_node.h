@@ -9,7 +9,12 @@
 
 class LambdaNode : public ParseNode {
 public:
-    LambdaNode() : ParseNode(ParseNodeType::LAMBDA_NODE, nullptr) {}
+    LambdaNode()
+        : ParseNode(ParseNodeType::LAMBDA_NODE, nullptr)
+        , parameter_nodes()
+        , return_type_node(nullptr)
+        , lambda_body(nullptr)
+    {}
 
     /// @brief Attach the specified `ParseNode` to `this` node to represent a parameter.
     /// @param parameter_node A `ParseNode` representing a lambda parameter.

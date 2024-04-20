@@ -100,7 +100,6 @@ class TestCompiler(object):
                 line_num += 1
                 col_num = 1
 
-
     
     def test_good_empty_main_1(self):
         actual_output_path = self.run_compiler_good()
@@ -512,7 +511,7 @@ class TestCompiler(object):
     
     def test_good_func_6(self):
         actual_output_path = self.run_compiler_good()
-        self.output_matches(actual_output_path) 
+        self.output_matches(actual_output_path)
     
     def test_good_func_7(self):
         actual_output_path = self.run_compiler_good()
@@ -547,6 +546,10 @@ class TestCompiler(object):
         self.output_matches(actual_output_path)
 
     def test_good_func_15(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_func_16(self):
         actual_output_path = self.run_compiler_good()
         self.output_matches(actual_output_path)
 

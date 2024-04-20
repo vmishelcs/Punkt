@@ -15,6 +15,8 @@ class LambdaTypeNode : public ParseNode {
 public:
     LambdaTypeNode(std::unique_ptr<Token> token)
         : ParseNode(ParseNodeType::LAMBDA_TYPE_NODE, std::move(token))
+        , parameter_type_nodes()
+        , return_type_node(nullptr)
     {}
 
     /// @brief Attach the specified `ParseNode` to `this` node to represent a parameter type.

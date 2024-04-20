@@ -8,7 +8,10 @@
 
 class ReturnStatementNode : public ParseNode {
 public:
-    ReturnStatementNode(std::unique_ptr<Token> token);
+    ReturnStatementNode(std::unique_ptr<Token> token)
+        : ParseNode(ParseNodeType::RETURN_STATEMENT_NODE, std::move(token))
+        , enclosing_function_node(nullptr)
+    {}
 
     /// @brief Get the node that represents the return value of this statement.
     /// @return Pointer to the node that represents the return value of this statement.

@@ -8,10 +8,6 @@
 #include "lambda_node.h"
 #include "return_statement_node.h"
 
-ReturnStatementNode::ReturnStatementNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::RETURN_STATEMENT_NODE, std::move(token))
-{}
-
 ParseNode *ReturnStatementNode::GetEnclosingFunctionNode() {
     if (enclosing_function_node) {
         return enclosing_function_node;

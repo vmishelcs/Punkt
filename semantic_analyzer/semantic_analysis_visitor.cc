@@ -154,9 +154,14 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode& node) {
     // Fill `arg_types` vector with corresponding types.
     std::transform(arg_nodes.begin(), arg_nodes.end(), std::inserter(arg_types, arg_types.end()),
             [](const auto& arg_node) { return arg_node->GetType(); });
+
+    for (const auto& type : arg_types) {
+        std::cout << type->ToString() << '\n';
+    }
     
     // Check that the lambda accepts the provided arguments.
     if (!lambda_type->AcceptsArgumentTypes(arg_types)) {
+        std::cout << lambda_type->ToString() << '\n';
         LambdaDoesNotAcceptProvidedTypesError(*callee_node);
         node.SetType(BaseType::CreateErrorType());
         return;
@@ -425,7 +430,7 @@ void SemanticAnalysisVisitor::InvocationExpressionWithNonLambdaTypeError(ParseNo
 }
 
 void SemanticAnalysisVisitor::LambdaDoesNotAcceptProvidedTypesError(ParseNode& node) {
-    std::string message = "invalid arguments for lambda invocation";
+    std::string message = "invalid arguments for lambda invocation ";
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 
