@@ -319,13 +319,13 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaTypeNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
-    // Main always returns void
-    llvm::Type *return_type = llvm::Type::getVoidTy(*context);
+    // Main always returns int (always returns 0).
+    llvm::Type *return_type = llvm::Type::getInt32Ty(*context);
 
-    // Main does not take any arguments
+    // Main does not take any arguments.
     llvm::FunctionType *function_type = llvm::FunctionType::get(return_type, /*isVarArgs=*/false);
 
-    // Create an LLVM::Function object
+    // Create an function object for main.
     llvm::Function *main_func = llvm::Function::Create(function_type,
             llvm::Function::ExternalLinkage,
             kMainFunctionName,
@@ -334,11 +334,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode& node) {
     llvm::BasicBlock *entry_block = llvm::BasicBlock::Create(*context, "entry", main_func);
     builder->SetInsertPoint(entry_block);
 
-    // Generate for 'main' code block
+    // Generate main code block.
     node.GetChild(0)->GenerateCode(*this);
 
-    // Main always returns void
-    builder->CreateRetVoid();
+    // Main always returns 0.
+    builder->CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0));
 
     llvm::verifyFunction(*main_func);
 
@@ -411,8 +411,20 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode& node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode& node) {
-    llvm::Value *ret_value = node.GetChild(0)->GenerateCode(*this);
-    return builder->CreateRet(ret_value);
+    ParseNode *enclosing_function = node.GetEnclosingFunctionNode();
+
+    if (enclosing_function->GetParseNodeType() == ParseNodeType::MAIN_NODE) {
+        // We always return 0 from main.
+        return builder->CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0));
+    }
+
+    if (!node.GetReturnValueNode()) {
+        // Return void if no return value is specified.
+        return builder->CreateRetVoid();
+    }
+
+    llvm::Value *return_value = node.GetReturnValueNode()->GenerateCode(*this);
+    return builder->CreateRet(return_value);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode& node) {

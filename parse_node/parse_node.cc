@@ -30,6 +30,9 @@ ParseNode *ParseNode::GetParent() const {
 }
 
 ParseNode *ParseNode::GetChild(unsigned i) const {
+    if (children.size() <= i) {
+        return nullptr;
+    }
     return children[i].get();
 }
 
@@ -98,6 +101,8 @@ llvm::Type *ParseNode::GetLLVMType(llvm::LLVMContext& context) const {
     auto base_type = dynamic_cast<BaseType *>(type);
     if (base_type) {
         switch (base_type->GetBaseTypeEnum()) {
+            case BaseTypeEnum::VOID:
+                return llvm::Type::getVoidTy(context);
             case BaseTypeEnum::BOOLEAN:
                 return llvm::Type::getInt8Ty(context);
             case BaseTypeEnum::CHARACTER:

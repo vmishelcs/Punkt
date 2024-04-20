@@ -19,13 +19,16 @@ public:
     /// @brief Get the node that represents the enclosing function of this return statement.
     /// @return Pointer to the node that represents the enclosing function; this can be a
     /// `LambdaNode` or a `MainNode`. This method returns `nullptr` if no such node could be found.
-    ParseNode *GetEnclosingFunctionNode() const;
+    ParseNode *GetEnclosingFunctionNode();
 
     virtual std::string ToString() const override;
 
     virtual void Accept(ParseNodeVisitor& visitor) override;
 
     virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+
+private:
+    ParseNode *enclosing_function_node;
 };
 
 #endif // RETURN_STATEMENT_NODE_H_

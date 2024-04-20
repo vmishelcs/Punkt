@@ -26,6 +26,8 @@ public:
 
     virtual void VisitLeave(OperatorNode& node) override;
 
+    virtual void VisitLeave(PrintStatementNode& node) override;
+
     virtual void VisitLeave(ReturnStatementNode& node) override;
 
     // ---- Leaf nodes -----------------------------------------------------------------------
@@ -49,6 +51,7 @@ private:
     void CreateSubscope(ParseNode& node);
 
     // ---- Error reporting ------------------------------------------------------------------
+    void DeclarationOfVarWithVoidTypeError(DeclarationStatementNode& node);
     void InvalidOperandTypeError(OperatorNode& node, std::vector<Type*>& types);
     void NonBooleanConditionError(IfStatementNode& node);
     void NonBooleanConditionError(ForStatementNode& node);
@@ -56,6 +59,8 @@ private:
     void AssignmentToImmutableTargetError(ParseNode& node);
     void AssignmentTypeMismatchError(ParseNode& node, const Type& target_type,
             const Type& value_type);
+    void PrintingVoidTypeError(PrintStatementNode& node);
+    void PrintingLambdaTypeError(PrintStatementNode& node);
     void InvocationExpressionWithNonLambdaTypeError(ParseNode& node);
     void LambdaDoesNotAcceptProvidedTypesError(ParseNode& node);
     void ReturnStatementOutsideOfFunctionError(ReturnStatementNode& node);

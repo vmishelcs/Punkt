@@ -12,18 +12,24 @@ ReturnStatementNode::ReturnStatementNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::RETURN_STATEMENT_NODE, std::move(token))
 {}
 
-ParseNode *ReturnStatementNode::GetEnclosingFunctionNode() const {
-    ParseNode *parse_node = GetParent();
-    while (parse_node) {
-        if (parse_node->GetParseNodeType() == ParseNodeType::LAMBDA_NODE)
-            return parse_node;
-        if (parse_node->GetParseNodeType() == ParseNodeType::MAIN_NODE)
-            return parse_node;
+ParseNode *ReturnStatementNode::GetEnclosingFunctionNode() {
+    if (enclosing_function_node) {
+        return enclosing_function_node;
+    }
+    
+    enclosing_function_node = GetParent();
+    while (enclosing_function_node) {
+        if (enclosing_function_node->GetParseNodeType() == ParseNodeType::LAMBDA_NODE) {
+            return enclosing_function_node;
+        }
+        if (enclosing_function_node->GetParseNodeType() == ParseNodeType::MAIN_NODE) {
+            return enclosing_function_node;
+        }
 
-        parse_node = parse_node->GetParent();
+        enclosing_function_node = enclosing_function_node->GetParent();
     }
 
-    return nullptr;
+    return enclosing_function_node;
 }
 
 std::string ReturnStatementNode::ToString() const {

@@ -95,6 +95,15 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode& node) {
     }
 
     Type *declaration_type = initializer->GetType();
+    
+    // Make sure we are not declaring variables with void type.
+    auto b_declaration_type = dynamic_cast<BaseType *>(declaration_type);
+    if (b_declaration_type && b_declaration_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+        DeclarationOfVarWithVoidTypeError(node);
+        identifier->SetType(BaseType::CreateErrorType());
+        return;
+    }
+
     identifier->SetType(declaration_type->CreateEquivalentType());
 
     // Note the use of identifier-owned Type pointer.
@@ -204,6 +213,24 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode& node) {
     }
 }
 
+void SemanticAnalysisVisitor::VisitLeave(PrintStatementNode& node) {
+    // Print only non-void, non-lambda types.
+    for (const auto& p_node : node.GetChildren()) {
+        Type *p_node_type = p_node->GetType();
+
+        if (p_node_type->GetTypeEnum() == TypeEnum::LAMBDA) {
+            PrintingLambdaTypeError(node);
+            return;
+        }
+
+        auto base_type = dynamic_cast<BaseType *>(p_node_type);
+        if (base_type && base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+            PrintingVoidTypeError(node);
+            return;
+        }
+    }
+}
+
 void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode& node) {
     ParseNode *enclosing_function = node.GetEnclosingFunctionNode();
     if (!enclosing_function) {
@@ -222,20 +249,19 @@ void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode& node) {
     // Otherwise, the enclosing function must be a lambda.
     auto lambda = static_cast<LambdaNode *>(enclosing_function);
 
-    // Make sure this statement is return a value that is semantically equivalent to the return
-    // type of the enclosing lambda.
     Type *lambda_return_type = lambda->GetReturnTypeNode()->GetType();
 
     // If the enclosing lambda is declared as returning void, the return statement must not return
     // a value.
-    if (auto base_type = dynamic_cast<BaseType *>(lambda_return_type);
-        base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
-        if (node.NumChildren() > 0) {
+    auto lambda_return_b_type = dynamic_cast<BaseType *>(lambda_return_type);
+    if (lambda_return_b_type && lambda_return_b_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+        if (node.NumChildren() > 0)
             ReturnStatementReturnsValueFromVoidLambdaError(node);
-        }
         return;
     }
 
+    // Make sure this statement is return a value that is semantically equivalent to the return
+    // type of the enclosing lambda.
     Type *return_value_type = node.GetReturnValueNode()->GetType();
     if (!lambda_return_type->IsEquivalentTo(return_value_type)) {
         IncompatibleReturnTypeError(node);
@@ -332,6 +358,12 @@ void SemanticAnalysisVisitor::CreateSubscope(ParseNode& node) {
 //--------------------------------------------------------------------------------------//
 //                                    Error handling                                    //
 //--------------------------------------------------------------------------------------//
+void SemanticAnalysisVisitor::DeclarationOfVarWithVoidTypeError(DeclarationStatementNode& node) {
+    std::string message = "variable declared with type void at "
+            + node.GetToken()->GetLocation().ToString();
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
 void SemanticAnalysisVisitor::InvalidOperandTypeError(OperatorNode& node, std::vector<Type*>& types)
 {
     std::string message = "operator \'" + node.GetToken()->GetLexeme() + "\' not defined for [";
@@ -371,6 +403,18 @@ void SemanticAnalysisVisitor::AssignmentTypeMismatchError(ParseNode& node, const
             const Type& value_type) {
     std::string message = "cannot assign \'" + value_type.ToString()
             + "\' value to a target of type \'" + target_type.ToString() + "\'";
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::PrintingVoidTypeError(PrintStatementNode& node) {
+    std::string message = "cannot print void type value at "
+            + node.GetToken()->GetLocation().ToString();
+    PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::PrintingLambdaTypeError(PrintStatementNode& node) {
+    std::string message = "cannot print lambda type value at "
+            + node.GetToken()->GetLocation().ToString();
     PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
 

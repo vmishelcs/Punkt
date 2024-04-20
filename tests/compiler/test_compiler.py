@@ -70,7 +70,7 @@ class TestCompiler(object):
         assert ir_output_path.exists(), "IR output was not generated."
 
         exe_output_path = self.get_exe_output_file_path()
-        subprocess.run(["clang-15", ir_output_path, "-o", exe_output_path])
+        subprocess.run(["clang", ir_output_path, "-o", exe_output_path])
         assert exe_output_path.exists(), "executable file was not generated."
 
         actual_output_path = self.get_actual_output_file_path()

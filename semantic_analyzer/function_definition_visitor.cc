@@ -47,8 +47,8 @@ void FunctionDefinitionVisitor::VisitLeave(LambdaParameterNode& node) {
     ParseNode *type_node = node.GetTypeNode();
     Type *parameter_type = type_node->GetType();
 
-    if (auto parameter_base_type = dynamic_cast<BaseType *>(parameter_type);
-            parameter_base_type->GetBaseTypeEnum() == BaseTypeEnum::VOID) {
+    auto parameter_base_type = dynamic_cast<BaseType *>(parameter_type);
+    if (parameter_base_type && parameter_base_type->GetBaseTypeEnum() == BaseTypeEnum::VOID) {
         // Parameter types cannot be void.
         VoidParameterTypeError(*type_node);
         node.SetType(BaseType::CreateErrorType());
