@@ -13,13 +13,12 @@ void PunktLogger::Log(LogType log_type, std::string message) {
 }
 
 void PunktLogger::LogFatal(std::string message) {
-    std::cerr << "\u001b[31mERROR\u001b[0m: " << message
-            << "\ncompilation terminated." << std::endl;
+    std::cerr << "ERROR: " << message << "\ncompilation terminated." << std::endl;
     std::exit(1);
 }
 
 void *PunktLogger::LogFatalInternalError(std::string message) {
-    std::cerr << "\u001b[31minteral error\u001b[0m: " << message << std::endl;
+    std::cerr << "interal error: " << message << std::endl;
     std::exit(1);
 
     return nullptr;
@@ -66,9 +65,7 @@ void PunktLogger::Logger::LogMessage(std::string message) {
 
 void PunktLogger::Logger::PrintLogMessage(const std::string &message) {
     std::string logger_type_string = ToString();
-    std::cerr << "\u001b[31mERROR\u001b[0m: "
-            << "\u001b[33m" << logger_type_string
-            << "\u001b[0m: " << message << std::endl;
+    std::cerr << "ERROR: " << logger_type_string << ": " << message << std::endl;
 }
 
 PunktLogger::PunktLogger() {
