@@ -1,11 +1,11 @@
-from punkt_compile_test_helper import PunktCompileTestHelper
+from tests.compiler.punkt_compiler_test_helper import PunktCompilerTestHelper
 
 
 class TestEmptyMain(object):
     """ Empty 'main' function test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_empty_main_1(self):
         try:
@@ -47,7 +47,7 @@ class TestDeclarationStmt(object):
     """ General declaration statement test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_decl_1(self):
         try:
@@ -194,7 +194,7 @@ class TestVarDecl(object):
     """ Mutable variable test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_var_decl_1(self):
         try:
@@ -257,7 +257,7 @@ class TestIdentifiers(object):
     """ Identifiers test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_identifiers_1(self):
         try:
@@ -285,7 +285,7 @@ class TestExpressions(object):
     """ General expression test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_expression_1(self):
         try:
@@ -348,7 +348,7 @@ class TestCodeBlock(object):
     """ Code block test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_code_block_1(self):
         try:
@@ -411,7 +411,7 @@ class TestIntOps(object):
     """ Integer operations test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_int_ops_1(self):
         try:
@@ -467,7 +467,7 @@ class TestStrDecl(object):
     """ String declaration test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_str_decl_1(self):
         try:
@@ -516,7 +516,7 @@ class TestComments(object):
     """ Comment test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_comment_1(self):
         try:
@@ -586,7 +586,7 @@ class TestFunction(object):
     """ General function test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_func_1(self):
         try:
@@ -705,7 +705,7 @@ class TestLambda(object):
     """ Lambda test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_lambda_1(self):
         try:
@@ -754,7 +754,7 @@ class TestIfStmt(object):
     """ If statement test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_if_stmt_1(self):
         try:
@@ -817,7 +817,7 @@ class TestForStmt(object):
     """ For statement test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_for_stmt_1(self):
         try:
@@ -929,7 +929,7 @@ class TestReturnStmt(object):
     """ Return statement test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_return_stmt_1(self):
         try:
@@ -999,7 +999,7 @@ class TestCallStmt(object):
     """ Call statement test suite. """
 
     def setup_class(self):
-        self._compile_helper = PunktCompileTestHelper()
+        self._compile_helper = PunktCompilerTestHelper()
 
     def test_good_call_stmt_1(self):
         try:

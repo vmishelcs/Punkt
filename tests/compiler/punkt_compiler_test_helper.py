@@ -6,7 +6,7 @@ import filecmp
 from pathlib import Path
 
 
-class PunktCompileTestHelper(object):
+class PunktCompilerTestHelper(object):
     """ A class to mimic Punkt compilation and executable launching. """
 
     def __init__(self):
