@@ -129,6 +129,24 @@ void XMLGeneratorVisitor::VisitLeave(DeclarationStatementNode &node) {
   OutputTag(*tag);
 }
 
+void XMLGeneratorVisitor::VisitEnter(ExpressionStatementNode &node) {
+  std::unique_ptr<XMLTag> tag =
+      XMLTag::CreateStartTag("ExpressionStatementNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+  tag->AddAttribute("mutable",
+                    node.GetToken()->GetLexeme() == "var" ? "true" : "false");
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(ExpressionStatementNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("ExpressionStatementNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
 void XMLGeneratorVisitor::VisitEnter(ForStatementNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("ForStatementNode");
 

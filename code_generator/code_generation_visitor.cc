@@ -82,6 +82,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(
+    ExpressionStatementNode &node) {
+  return nullptr;
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(
     DeclarationStatementNode &node) {
   if (WasPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.

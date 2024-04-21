@@ -1,6 +1,7 @@
 #ifndef FUNCTION_DECLARATION_NODE_H_
 #define FUNCTION_DECLARATION_NODE_H_
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 

@@ -51,6 +51,9 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
   virtual void VisitEnter(DeclarationStatementNode &node) override;
   virtual void VisitLeave(DeclarationStatementNode &node) override;
 
+  virtual void VisitEnter(ExpressionStatementNode &node) override;
+  virtual void VisitLeave(ExpressionStatementNode &node) override;
+
   virtual void VisitEnter(ForStatementNode &node) override;
   virtual void VisitLeave(ForStatementNode &node) override;
 
