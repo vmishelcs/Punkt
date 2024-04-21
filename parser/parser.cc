@@ -9,14 +9,11 @@
 #include <vector>
 
 std::unique_ptr<ParseNode> Parser::Parse(fs::path file_path) {
-  std::unique_ptr<Scanner> scanner = std::make_unique<Scanner>(file_path);
+  auto scanner = std::make_unique<Scanner>(file_path);
   Parser parser(std::move(scanner));
-  auto ast = parser.ParseProgram();
+  std::unique_ptr<ParseNode> ast = parser.ParseProgram();
 
-  // TODO: This cast causes an exception on bad input.
-  // Example:
-  // main { else {} }
-  ProgramNode *program_node = dynamic_cast<ProgramNode *>(ast.get());
+  auto program_node = dynamic_cast<ProgramNode *>(ast.get());
   if (!program_node) {
     return parser.GetSyntaxErrorNode();
   }
@@ -82,10 +79,8 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
     return SyntaxErrorUnexpectedToken("well defined program start");
   }
 
-  std::unique_ptr<ProgramToken> program_token =
-      std::make_unique<ProgramToken>();
-  std::unique_ptr<ParseNode> program =
-      std::make_unique<ProgramNode>(std::move(program_token));
+  auto program_token = std::make_unique<ProgramToken>();
+  auto program = std::make_unique<ProgramNode>(std::move(program_token));
 
   while (StartsFunctionDefinition(*now_reading)) {
     auto function = ParseFunctionDefinition();
@@ -116,13 +111,13 @@ std::unique_ptr<ParseNode> Parser::ParseFunctionDefinition() {
   // Discard 'function' keyword.
   ReadToken();
 
-  auto function_id = ParseIdentifier();
+  std::unique_ptr<ParseNode> function_id = ParseIdentifier();
   if (!function_id) {
     return SyntaxErrorUnexpectedToken("function identifier");
   }
   function->AppendChild(std::move(function_id));
 
-  auto lambda = ParseLambda();
+  std::unique_ptr<ParseNode> lambda = ParseLambda();
   function->AppendChild(std::move(lambda));
 
   return function;
@@ -143,8 +138,8 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
 
   // Parse parameters.
   if (StartsType(*now_reading)) {
-    auto param_type = ParseType();
-    auto param_id = ParseIdentifier();
+    std::unique_ptr<ParseNode> param_type = ParseType();
+    std::unique_ptr<ParseNode> param_id = ParseIdentifier();
     auto parameter_node = LambdaParameterNode::CreateParameterNode(
         std::move(param_type), std::move(param_id));
     lambda_node->AddParameterNode(std::move(parameter_node));
@@ -153,8 +148,8 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
                                             {PunctuatorEnum::SEPARATOR})) {
     // Discard ','.
     ReadToken();
-    auto param_type = ParseType();
-    auto param_id = ParseIdentifier();
+    std::unique_ptr<ParseNode> param_type = ParseType();
+    std::unique_ptr<ParseNode> param_id = ParseIdentifier();
     auto parameter_node = LambdaParameterNode::CreateParameterNode(
         std::move(param_type), std::move(param_id));
     lambda_node->AddParameterNode(std::move(parameter_node));
@@ -185,8 +180,7 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
     return SyntaxErrorUnexpectedToken("main");
   }
 
-  std::unique_ptr<ParseNode> main =
-      std::make_unique<MainNode>(std::move(now_reading));
+  auto main = std::make_unique<MainNode>(std::move(now_reading));
 
   ReadToken();
 
@@ -241,8 +235,7 @@ std::unique_ptr<ParseNode> Parser::ParseCodeBlock() {
     return SyntaxErrorUnexpectedToken("code block");
   }
 
-  std::unique_ptr<ParseNode> code_block =
-      std::make_unique<CodeBlockNode>(std::move(now_reading));
+  auto code_block = std::make_unique<CodeBlockNode>(std::move(now_reading));
 
   ReadToken();
 
@@ -270,11 +263,11 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
 
   ReadToken();
 
-  auto identifier = ParseIdentifier();
+  std::unique_ptr<ParseNode> identifier = ParseIdentifier();
 
   Expect(PunctuatorEnum::EQUAL);
 
-  auto initializer = ParseExpression();
+  std::unique_ptr<ParseNode> initializer = ParseExpression();
 
   if (expect_terminator) {
     Expect(PunctuatorEnum::TERMINATOR);
@@ -296,12 +289,12 @@ std::unique_ptr<ParseNode> Parser::ParseAssignment(bool expect_terminator) {
 
   auto assignment = std::make_unique<AssignmentStatementNode>();
 
-  auto target = ParseTargettableExpression();
+  std::unique_ptr<ParseNode> target = ParseTargettableExpression();
   assignment->AppendChild(std::move(target));
 
   Expect(PunctuatorEnum::EQUAL);
 
-  auto new_value = ParseExpression();
+  std::unique_ptr<ParseNode> new_value = ParseExpression();
   assignment->AppendChild(std::move(new_value));
 
   if (expect_terminator) {
@@ -339,9 +332,9 @@ std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
 
   ReadToken();
 
-  auto condition = ParseExpression();
+  std::unique_ptr<ParseNode> condition = ParseExpression();
 
-  auto then_block = ParseCodeBlock();
+  std::unique_ptr<ParseNode> then_block = ParseCodeBlock();
 
   if_statement->AppendChild(std::move(condition));
   if_statement->AppendChild(std::move(then_block));
@@ -354,7 +347,7 @@ std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
   if (StartsElseBlock(*now_reading)) {
     ReadToken();
 
-    auto else_block = ParseCodeBlock();
+    std::unique_ptr<ParseNode> else_block = ParseCodeBlock();
 
     if_statement->AppendChild(std::move(else_block));
   }
@@ -412,7 +405,7 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   for_statement->AppendChild(std::move(increment));
 
   // Append loop body.
-  auto loop_body = ParseCodeBlock();
+  std::unique_ptr<ParseNode> loop_body = ParseCodeBlock();
   for_statement->AppendChild(std::move(loop_body));
 
   return for_statement;
@@ -512,7 +505,7 @@ std::unique_ptr<ParseNode> Parser::ParseReturnStatement() {
     return return_statement;
   }
 
-  auto return_value = ParseExpression();
+  std::unique_ptr<ParseNode> return_value = ParseExpression();
   return_statement->AppendChild(std::move(return_value));
 
   Expect(PunctuatorEnum::TERMINATOR);
@@ -550,7 +543,7 @@ std::unique_ptr<ParseNode> Parser::ParseEqualityExpression() {
     return SyntaxErrorUnexpectedToken("equality expression");
   }
 
-  auto lhs = ParseComparisonExpression();
+  std::unique_ptr<ParseNode> lhs = ParseComparisonExpression();
 
   while (PunctuatorToken::IsTokenPunctuator(
       now_reading.get(), {PunctuatorEnum::CMP_EQ, PunctuatorEnum::CMP_NEQ})) {
@@ -559,7 +552,7 @@ std::unique_ptr<ParseNode> Parser::ParseEqualityExpression() {
 
     ReadToken();
 
-    auto rhs = ParseComparisonExpression();
+    std::unique_ptr<ParseNode> rhs = ParseComparisonExpression();
 
     equality_operator->AppendChild(std::move(lhs));
     equality_operator->AppendChild(std::move(rhs));
@@ -577,7 +570,7 @@ std::unique_ptr<ParseNode> Parser::ParseComparisonExpression() {
     return SyntaxErrorUnexpectedToken("comparison expression");
   }
 
-  auto lhs = ParseAdditiveExpression();
+  std::unique_ptr<ParseNode> lhs = ParseAdditiveExpression();
 
   while (PunctuatorToken::IsTokenPunctuator(
       &(*now_reading), {PunctuatorEnum::CMP_GT, PunctuatorEnum::CMP_LT,
@@ -587,7 +580,7 @@ std::unique_ptr<ParseNode> Parser::ParseComparisonExpression() {
 
     ReadToken();
 
-    auto rhs = ParseAdditiveExpression();
+    std::unique_ptr<ParseNode> rhs = ParseAdditiveExpression();
 
     comparison_operator->AppendChild(std::move(lhs));
     comparison_operator->AppendChild(std::move(rhs));
@@ -809,7 +802,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaLiteral() {
     return SyntaxErrorUnexpectedToken("lambda literal");
   }
 
-  auto lambda_literal = ParseLambda();
+  std::unique_ptr<ParseNode> lambda_literal = ParseLambda();
 
   // If we are not parsing a lambda invocation, return the lambda literal.
   if (!StartsLambdaInvocation(*now_reading)) {
