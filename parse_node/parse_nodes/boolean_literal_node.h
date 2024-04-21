@@ -6,20 +6,20 @@
 #include <token/token.h>
 
 class BooleanLiteralNode : public ParseNode {
-public:
-    BooleanLiteralNode(std::unique_ptr<Token> token);
-    BooleanLiteralNode(bool value);
+ public:
+  BooleanLiteralNode(std::unique_ptr<Token> token);
+  BooleanLiteralNode(bool value);
 
-    bool GetValue() const;
+  bool GetValue() const;
 
-    virtual std::string ToString() const override;
+  virtual std::string ToString() const override;
 
-    virtual void Accept(ParseNodeVisitor& visitor) override;
+  virtual void Accept(ParseNodeVisitor& visitor) override;
 
-    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+  virtual llvm::Value* GenerateCode(ParseNodeIRVisitor& visitor) override;
 
-private:
-    bool value;
+ private:
+  bool value;
 };
 
-#endif // BOOLEAN_LITERAL_NODE_H_
+#endif  // BOOLEAN_LITERAL_NODE_H_

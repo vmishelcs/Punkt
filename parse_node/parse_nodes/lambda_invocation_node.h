@@ -1,37 +1,36 @@
 #ifndef LAMBDA_INVOCATION_NODE_H_
 #define LAMBDA_INVOCATION_NODE_H_
 
+#include <parse_node/parse_node.h>
+
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <parse_node/parse_node.h>
 
 #include "identifier_node.h"
 #include "lambda_node.h"
 
 class LambdaInvocationNode : public ParseNode {
-public:
-    LambdaInvocationNode()
-        : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, nullptr) 
-    {}
+ public:
+  LambdaInvocationNode()
+      : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, nullptr) {}
 
-    static std::unique_ptr<LambdaInvocationNode> CreateLambdaInvocationNodeWithArguments(
-        std::unique_ptr<ParseNode> identifier,
-        std::vector<std::unique_ptr<ParseNode>> args
-    );
+  static std::unique_ptr<LambdaInvocationNode>
+  CreateLambdaInvocationNodeWithArguments(
+      std::unique_ptr<ParseNode> identifier,
+      std::vector<std::unique_ptr<ParseNode>> args);
 
-    ParseNode *GetCalleeNode() const {
-        return GetChild(0);
-    }
+  ParseNode *GetCalleeNode() const { return GetChild(0); }
 
-    std::vector<ParseNode *> GetArgumentNodes() const;
+  std::vector<ParseNode *> GetArgumentNodes() const;
 
-    virtual std::string ToString() const override { return "LAMBDA INVOCATION NODE"; }
+  virtual std::string ToString() const override {
+    return "LAMBDA INVOCATION NODE";
+  }
 
-    virtual void Accept(ParseNodeVisitor& visitor) override;
+  virtual void Accept(ParseNodeVisitor &visitor) override;
 
-    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+  virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 };
 
-#endif // LAMBDA_INVOCATION_NODE_H_
+#endif  // LAMBDA_INVOCATION_NODE_H_

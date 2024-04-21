@@ -4,20 +4,20 @@
 #include <parse_node/parse_node.h>
 
 class ProgramNode : public ParseNode {
-public:
-    ProgramNode(std::unique_ptr<Token> token);
+ public:
+  ProgramNode(std::unique_ptr<Token> token);
 
-    std::string GetModuleID() const;
-    void SetModuleID(const std::string module_id);
-    
-    virtual std::string ToString() const override;
+  std::string GetModuleID() const;
+  void SetModuleID(const std::string module_id);
 
-    virtual void Accept(ParseNodeVisitor& visitor) override;
-    
-    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+  virtual std::string ToString() const override;
 
-private:
-    std::string module_id;
+  virtual void Accept(ParseNodeVisitor& visitor) override;
+
+  virtual llvm::Value* GenerateCode(ParseNodeIRVisitor& visitor) override;
+
+ private:
+  std::string module_id;
 };
 
-#endif // PROGRAM_NODE_H_
+#endif  // PROGRAM_NODE_H_

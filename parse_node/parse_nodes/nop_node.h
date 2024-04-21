@@ -5,14 +5,14 @@
 #include <token/token.h>
 
 class NopNode : public ParseNode {
-public:
-    NopNode();
+ public:
+  NopNode();
 
-    virtual std::string ToString() const override;
+  virtual std::string ToString() const override;
 
-    virtual void Accept(ParseNodeVisitor& visitor) override;
+  virtual void Accept(ParseNodeVisitor& visitor) override;
 
-    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+  virtual llvm::Value* GenerateCode(ParseNodeIRVisitor& visitor) override;
 };
 
-#endif // NOP_NODE_H_
+#endif  // NOP_NODE_H_

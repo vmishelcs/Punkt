@@ -7,19 +7,19 @@
 #include "input_handler.h"
 
 class LocatedCharStream {
-public:
-	LocatedCharStream(fs::path file_path);
+ public:
+  LocatedCharStream(fs::path file_path);
 
-	LocatedChar Next();
-	LocatedChar NextNonwhitespaceChar();
-	LocatedChar Peek() const;
-	void PutBack(LocatedChar ch);
+  LocatedChar Next();
+  LocatedChar NextNonwhitespaceChar();
+  LocatedChar Peek() const;
+  void PutBack(LocatedChar ch);
 
-	bool HasNext() const;
+  bool HasNext() const;
 
-private:
-	std::unique_ptr<InputHandler> input_handler;
-	LocatedChar next_char;
+ private:
+  std::unique_ptr<InputHandler> input_handler;
+  LocatedChar next_char;
 };
 
-#endif // LOCATED_CHAR_STREAM_H_
+#endif  // LOCATED_CHAR_STREAM_H_

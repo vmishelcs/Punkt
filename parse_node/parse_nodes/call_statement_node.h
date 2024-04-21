@@ -1,29 +1,29 @@
 #ifndef CALL_STATEMENT_NODE_H_
 #define CALL_STATEMENT_NODE_H_
 
-#include <memory>
-
 #include <llvm/IR/Value.h>
-
 #include <parse_node/parse_node.h>
+
+#include <memory>
 
 #include "lambda_invocation_node.h"
 
 class CallStatementNode : public ParseNode {
-public:
-    CallStatementNode(std::unique_ptr<Token> token)
-        : ParseNode(ParseNodeType::CALL_STATEMENT_NODE, std::move(token))
-    {}
+ public:
+  CallStatementNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::CALL_STATEMENT_NODE, std::move(token)) {}
 
-    LambdaInvocationNode *GetLambdaInvocationNode() const {
-        return dynamic_cast<LambdaInvocationNode *>(GetChild(0));
-    }
+  LambdaInvocationNode *GetLambdaInvocationNode() const {
+    return dynamic_cast<LambdaInvocationNode *>(GetChild(0));
+  }
 
-    virtual std::string ToString() const override { return "CALL STATEMENT NODE"; }
+  virtual std::string ToString() const override {
+    return "CALL STATEMENT NODE";
+  }
 
-    virtual void Accept(ParseNodeVisitor& visitor) override;
+  virtual void Accept(ParseNodeVisitor &visitor) override;
 
-    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+  virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 };
 
-#endif // CALL_STATEMENT_NODE_H_
+#endif  // CALL_STATEMENT_NODE_H_

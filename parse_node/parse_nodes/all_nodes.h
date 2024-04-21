@@ -26,4 +26,4 @@
 #include "return_statement_node.h"
 #include "string_literal_node.h"
 
-#endif // ALL_NODES_H_
+#endif  // ALL_NODES_H_
