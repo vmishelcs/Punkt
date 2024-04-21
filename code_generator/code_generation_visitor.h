@@ -44,6 +44,14 @@ public:
 private:
     void GenerateGlobalConstants();
 
+    bool WasPreviousInstructionBlockTerminator() {
+        llvm::Instruction *last_instruction = builder->GetInsertBlock()->getTerminator();
+        if (last_instruction && last_instruction->isTerminator()) {
+            return true;
+        }
+        return false;
+    }
+
     llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *function,
             const std::string& identifier_name, llvm::Type *llvm_type);
 

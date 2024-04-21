@@ -1,0 +1,24 @@
+function returns_bool <> -> bool {
+	return true.
+}
+
+function returns_char <> -> char {
+	return 'a'.
+}
+
+function returns_int <> -> int {
+	return 0.
+}
+
+function returns_string <> -> string {
+	return "abc".
+}
+
+main {
+	call returns_bool().
+	call returns_char().
+	call returns_int().
+	call returns_string().
+	print "we good".
+}
+

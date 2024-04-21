@@ -1,0 +1,93 @@
+function a <> -> void {
+	return.
+	for var i = 0, i < 1, i = i + 1 {
+		var x = 0.
+		if true {
+			var x = 0.
+		} else {
+			var x = 0.
+		}
+		x = 0.
+	}
+	var x = 0.
+}
+
+function b <> -> void {
+	var x = 0.
+	for var i = 0, i < 1, i = i + 1 {
+		return.
+		if true {
+			var x = 0.
+		} else {
+			var x = 0.
+		}
+		var x = 0.
+	}
+	x = 0.
+}
+
+function c <> -> void {
+	var x = 0.
+	for var i = 0, i < 1, i = i + 1 {
+		var x = 0.
+		if true {
+			return.
+		} else {
+			var x = 0.
+		}
+		x = 0.
+	}
+	x = 0.
+}
+
+function d <> -> void {
+	var x = 0.
+	for var i = 0, i < 1, i = i + 1 {
+		var x = 0.
+		if true {
+			var x = 0.
+		} else {
+			return.
+		}
+		x = 0.
+	}
+	x = 0.
+}
+
+function e <> -> void {
+	var x = 0.
+	for var i = 0, i < 1, i = i + 1 {
+		var x = 0.
+		if true {
+			var x = 0.
+		} else {
+			var x = 0.
+		}
+		return.
+	}
+	x = 0.
+}
+
+function f <> -> void {
+	var x = 0.
+	for var i = 0, i < 1, i = i + 1 {
+		var x = 0.
+		if true {
+			var x = 0.
+		} else {
+			var x = 0.
+		}
+		x = 0.
+	}
+	return.
+}
+
+main {
+	call a().
+	call b().
+	call c().
+	call d().
+	call e().
+	call f().
+	print "good".
+}

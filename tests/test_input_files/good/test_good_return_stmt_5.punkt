@@ -1,0 +1,26 @@
+function a <> -> void {
+	for var i = 0, i < 1, i = i + 1 {
+		return.
+	}
+}
+
+function b <> -> void {
+	for var i = 0, i < 1, i = i + 1 {
+		
+	}
+	return.
+}
+
+function c <> -> void {
+	for var i = 0, i < 1, i = i + 1 {
+		return.
+	}
+	return.
+}
+
+main {
+	call a().
+	call b().
+	call c().
+	print "good".
+}

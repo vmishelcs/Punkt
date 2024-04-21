@@ -1,0 +1,4 @@
+main {
+	print "returning...".
+	return.
+}
