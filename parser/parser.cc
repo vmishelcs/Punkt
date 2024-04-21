@@ -204,9 +204,12 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
   if (StartsDeclaration(*now_reading)) {
     return ParseDeclaration();
   }
-  if (StartsAssignment(*now_reading)) {
-    return ParseAssignment();
+  if (StartsExpressionStatement(*now_reading)) {
+    return ParseExpressionStatement();
   }
+  // if (StartsAssignment(*now_reading)) {
+  //   return ParseAssignment();
+  // }
   if (StartsIfStatement(*now_reading)) {
     return ParseIfStatement();
   }
@@ -277,6 +280,27 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
   declaration->AppendChild(std::move(initializer));
 
   return declaration;
+}
+
+bool Parser::StartsExpressionStatement(Token &token) {
+  return StartsExpression(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseExpressionStatement(
+    bool expect_terminator) {
+  if (!StartsExpressionStatement(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("expression statement");
+  }
+
+  auto expr_stmt_node = std::make_unique<ExpressionStatementNode>();
+  std::unique_ptr<ParseNode> expr = ParseExpression();
+
+  expr_stmt_node->AppendChild(std::move(expr));
+
+  if (expect_terminator) {
+    Expect(PunctuatorEnum::TERMINATOR);
+  }
+
+  return expr_stmt_node;
 }
 
 bool Parser::StartsAssignment(Token &token) {
@@ -514,25 +538,38 @@ std::unique_ptr<ParseNode> Parser::ParseReturnStatement() {
 }
 
 bool Parser::StartsExpression(Token &token) {
-  return StartsBooleanExpression(token);
+  return StartsAssignmentExpression(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseExpression() {
   if (!StartsExpression(*now_reading)) {
     return SyntaxErrorUnexpectedToken("expression");
   }
 
-  return ParseBooleanExpression();
+  return ParseAssignmentExpression();
 }
 
-bool Parser::StartsBooleanExpression(Token &token) {
+bool Parser::StartsAssignmentExpression(Token &token) {
   return StartsEqualityExpression(token);
 }
-std::unique_ptr<ParseNode> Parser::ParseBooleanExpression() {
-  if (!StartsEqualityExpression(*now_reading)) {
-    return SyntaxErrorUnexpectedToken("boolean expression");
+std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
+  if (!StartsAssignmentExpression(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("assignment expression");
   }
 
-  return ParseEqualityExpression();
+  std::unique_ptr<ParseNode> target = ParseEqualityExpression();
+
+  if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+                                         {PunctuatorEnum::EQUAL})) {
+    auto assign_op = std::make_unique<OperatorNode>(std::move(now_reading));
+    ReadToken();
+    std::unique_ptr<ParseNode> new_value = ParseEqualityExpression();
+
+    assign_op->AppendChild(std::move(target));
+    assign_op->AppendChild(std::move(new_value));
+    return assign_op;
+  }
+
+  return target;
 }
 
 bool Parser::StartsEqualityExpression(Token &token) {

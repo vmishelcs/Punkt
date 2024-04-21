@@ -11,6 +11,7 @@ target_link_libraries(parse_node
     code_block_node
     declaration_statement_node
     error_node
+    expression_statement_node
     for_statement_node
     function_definition_node
     identifier_node

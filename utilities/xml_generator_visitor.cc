@@ -134,8 +134,6 @@ void XMLGeneratorVisitor::VisitEnter(ExpressionStatementNode &node) {
       XMLTag::CreateStartTag("ExpressionStatementNode");
 
   AddBasicParseNodeAttributes(*tag, node);
-  tag->AddAttribute("mutable",
-                    node.GetToken()->GetLexeme() == "var" ? "true" : "false");
 
   OutputTag(*tag);
   ++depth;

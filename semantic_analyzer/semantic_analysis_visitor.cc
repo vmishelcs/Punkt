@@ -198,6 +198,8 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaParameterNode &node) {
 
 void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   std::vector<Type *> child_types;
+  child_types.reserve(node.NumChildren());
+
   for (auto child : node.GetChildren()) {
     Type *child_type = child->GetType();
     if (child_type->IsErrorType()) {
@@ -207,13 +209,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
     child_types.push_back(child_type);
   }
 
-  PunctuatorToken *punctuator_token =
-      dynamic_cast<PunctuatorToken *>(node.GetToken());
-  if (!punctuator_token) {
-    node.SetType(BaseType::CreateErrorType());
-    return;
-  }
-
+  auto punctuator_token = static_cast<PunctuatorToken *>(node.GetToken());
   auto signature = Signatures::AcceptingSignature(
       punctuator_token->GetPunctuatorEnum(), child_types);
 

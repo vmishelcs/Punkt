@@ -36,8 +36,15 @@ class Parser {
   bool StartsCodeBlock(Token &token);
   std::unique_ptr<ParseNode> ParseCodeBlock();
 
+  /// declarationStatement ::- `var` identifierToken `=` expression.
+  ///                       |  `const` identifierToken `=` expression.
   bool StartsDeclaration(Token &token);
   std::unique_ptr<ParseNode> ParseDeclaration(bool expect_terminator = true);
+
+  /// expressionStatement ::- expression.
+  bool StartsExpressionStatement(Token &token);
+  std::unique_ptr<ParseNode> ParseExpressionStatement(
+      bool expect_terminator = true);
 
   bool StartsAssignment(Token &token);
   std::unique_ptr<ParseNode> ParseAssignment(bool expect_terminator = true);
@@ -68,18 +75,27 @@ class Parser {
   bool StartsExpression(Token &token);
   std::unique_ptr<ParseNode> ParseExpression();
 
-  bool StartsBooleanExpression(Token &token);
-  std::unique_ptr<ParseNode> ParseBooleanExpression();
+  /// `=` Simple assignment
+  /// `+=` `-=` Assignment by addition and subtraction (not implemented)
+  /// `*=` `/=` `%=` Assignment by multiplication, division, and modulus (not
+  /// implemented)
+  bool StartsAssignmentExpression(Token &token);
+  std::unique_ptr<ParseNode> ParseAssignmentExpression();
 
+  /// `==` `!=` Relational equality and inequality
   bool StartsEqualityExpression(Token &token);
   std::unique_ptr<ParseNode> ParseEqualityExpression();
 
+  /// `<` `<=` Relational less than and less than or equal to
+  /// `>` `>=` Relational greater than and greater than or equal to
   bool StartsComparisonExpression(Token &token);
   std::unique_ptr<ParseNode> ParseComparisonExpression();
 
+  /// `+` `-` Addition and subtraction
   bool StartsAdditiveExpression(Token &token);
   std::unique_ptr<ParseNode> ParseAdditiveExpression();
 
+  /// `*` `/` `%` Multiplication, division, and modulus (not implemented)
   bool StartsMultiplicativeExpression(Token &token);
   std::unique_ptr<ParseNode> ParseMultiplicativeExpression();
 
