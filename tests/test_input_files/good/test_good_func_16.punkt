@@ -1,0 +1,11 @@
+function all_params <bool a, char b, int c, string d> -> bool {
+	print a.
+	print b.
+	print c.
+	print d.
+	return true.
+}
+
+main {
+	const ret = all_params(true, 'x', 5, "abc").
+}

@@ -5,14 +5,18 @@
 #include <token/token.h>
 
 class AssignmentStatementNode : public ParseNode {
-public:
-    AssignmentStatementNode();
+ public:
+  AssignmentStatementNode();
 
-    virtual std::string ToString() const override;
+  ParseNode *GetTargetNode() const { return GetChild(0); }
 
-    virtual void Accept(ParseNodeVisitor& visitor) override;
+  ParseNode *GetNewValueNode() const { return GetChild(1); }
 
-    virtual llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+  virtual std::string ToString() const override;
+
+  virtual void Accept(ParseNodeVisitor &visitor) override;
+
+  virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 };
 
-#endif // ASSIGNMENT_STATEMENT_NODE_H_
+#endif  // ASSIGNMENT_STATEMENT_NODE_H_

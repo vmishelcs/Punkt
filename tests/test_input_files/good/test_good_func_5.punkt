@@ -1,0 +1,11 @@
+function cow <int a, int b, int c, int d> -> int {
+	const e = a.
+	const f = e + b.
+	const g = e + f + c.
+	const h = e + f + g + d.
+	return h.
+}
+
+main {
+	print cow(1, 2, 3, 4).
+}

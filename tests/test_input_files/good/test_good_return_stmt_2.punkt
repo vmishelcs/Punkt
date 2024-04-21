@@ -1,0 +1,7 @@
+function f <> -> void {
+	return.
+}
+
+main {
+	call f().
+}

@@ -1,0 +1,8 @@
+function f <int x> -> void {
+	print x.
+	return.
+}
+
+main {
+	call f(0).
+}

@@ -1,0 +1,22 @@
+main {
+	var f = <bool add> -> <int, int> -> int {
+		
+		if add {
+			return <int a, int b> -> int {
+				return a + b.
+			}.
+		}
+
+		return <int a, int b> -> int {
+			return a - b.
+		}.
+
+	}.
+
+	var add_f = f(true).
+
+	var sub_f = f(false).
+
+	print add_f(2, 2).
+	print sub_f(2, 2).
+}

@@ -1,0 +1,11 @@
+function awesome <int x> -> int {
+	return 1337 * x.
+}
+
+main {
+	const apply_func_to_arg = < <int> -> int func, int arg > -> int {
+		return func(arg).
+	}.
+
+	print apply_func_to_arg(awesome, 1).
+}

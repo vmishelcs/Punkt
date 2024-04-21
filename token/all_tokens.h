@@ -11,4 +11,4 @@
 #include "punctuator_token.h"
 #include "string_literal_token.h"
 
-#endif // ALL_TOKENS_H_
+#endif  // ALL_TOKENS_H_

@@ -70,7 +70,7 @@ class TestCompiler(object):
         assert ir_output_path.exists(), "IR output was not generated."
 
         exe_output_path = self.get_exe_output_file_path()
-        subprocess.run(["clang-15", ir_output_path, "-o", exe_output_path])
+        subprocess.run(["clang", ir_output_path, "-o", exe_output_path])
         assert exe_output_path.exists(), "executable file was not generated."
 
         actual_output_path = self.get_actual_output_file_path()
@@ -99,7 +99,6 @@ class TestCompiler(object):
             if char_ac == '\n':
                 line_num += 1
                 col_num = 1
-
 
     
     def test_good_empty_main_1(self):
@@ -487,5 +486,137 @@ class TestCompiler(object):
         self.output_matches(actual_output_path)
 
     def test_good_for_stmt_15(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_func_1(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_func_2(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path) 
+
+    def test_good_func_3(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path) 
+
+    def test_good_func_4(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_func_5(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path) 
+    
+    def test_good_func_6(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_func_7(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_func_8(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_func_9(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_func_10(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+    
+    def test_good_func_11(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_func_12(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_func_13(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_func_14(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_func_15(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_func_16(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_lambda_1(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_lambda_2(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_lambda_3(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_lambda_4(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_lambda_5(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_lambda_6(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_call_stmt_1(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_call_stmt_2(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_1(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_2(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_3(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_4(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_5(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_6(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_7(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_8(self):
+        actual_output_path = self.run_compiler_good()
+        self.output_matches(actual_output_path)
+
+    def test_good_return_stmt_9(self):
         actual_output_path = self.run_compiler_good()
         self.output_matches(actual_output_path)

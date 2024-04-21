@@ -4,16 +4,16 @@
 #include <parse_node/parse_node.h>
 
 class StringLiteralNode : public ParseNode {
-public:
-    StringLiteralNode(std::unique_ptr<Token> token);
+ public:
+  StringLiteralNode(std::unique_ptr<Token> token);
 
-    std::string GetValue() const;
+  std::string GetValue() const;
 
-    virtual std::string ToString() const override;
+  virtual std::string ToString() const override;
 
-    virtual void Accept(ParseNodeVisitor& visitor) override;
+  virtual void Accept(ParseNodeVisitor &visitor) override;
 
-    llvm::Value *GenerateCode(ParseNodeIRVisitor& visitor) override;
+  llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 };
 
-#endif // STRING_LITERAL_NODE_H_
+#endif  // STRING_LITERAL_NODE_H_

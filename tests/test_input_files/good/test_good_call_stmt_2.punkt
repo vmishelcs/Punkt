@@ -1,0 +1,7 @@
+function g <> -> <> -> void {
+	return <> -> void { print "Hello world". return. }.
+}
+
+main {
+	call g()().
+}

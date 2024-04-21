@@ -1,0 +1,15 @@
+function f <int x> -> int {
+	return 2 * x.
+}
+
+function g <int x> -> int {
+	return 2 * f(x).
+}
+
+function h <int x> -> int {
+	return 2 * g(x).
+}
+
+main {
+	print h(1).
+}

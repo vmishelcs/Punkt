@@ -1,0 +1,11 @@
+function f <int x> -> <int, int> -> <int, int, int> -> int {
+	return <int x, int y> -> <int, int, int> -> int {
+		return <int x, int y, int z> -> int {
+			return x + y + z.
+		}.
+	}.
+}
+
+main {
+	print f(1)(1, 2)(1, 2, 3).
+}

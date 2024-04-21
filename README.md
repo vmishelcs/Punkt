@@ -6,15 +6,15 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 
 |Token type|REGEX|
 |----------|-----|
-| Keywords | `const` `else` `for` `if` `main` `print` `var` |
-| Identifier |[ `_` `a`-`z`  `A`-`Z` ] [ `_` `a`-`z` `A`-`Z` `0`-`9` ]<sup>*</sup> |
-| Boolean literal | `true` `false` |
-| Character literal | **\'** \<printable-char\> **\'** | 
-| Integer literal | [ `0`-`9` ]<sup>+</sup> |
-| String literal | **\"**[ ^ `"` `\n` ]<sup>*</sup>**\"** |
+| *keyword* | `bool` `call` `char` `const` `else` `for` `function` `if` `int` `main` `print` `return` `string` `var` `void` |
+| *identifier* |[ `_` `a`-`z`  `A`-`Z` ] [ `_` `a`-`z` `A`-`Z` `0`-`9` ]<sup>*</sup> |
+| *booleanLiteral* | `true` `false` |
+| *characterLiteral* | **\'** \<printable-char\> **\'** | 
+| *integerLiteral* | [ `0`-`9` ]<sup>+</sup> |
+| *stringLiteral* | **\"**[ ^ `"` `\n` ]<sup>*</sup>**\"** |
 | Arithmetic operators | `+` `-` `*` `/` |
 | Comparison operators | `==` `!=` `>` `>=` `<` `<=` |
-| Punctuators | `{` `}` `(` `)` `=` `.` `,` |
+| Punctuators | `{` `}` `(` `)` `=` `.` `,` `<` `>` `->` |
 
 ## Grammar
 
@@ -22,3 +22,4 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 
 * Comments start with `#` and continue until either the next `#` or the end of the line.
 * Maximum identifier length is 32 characters.
+* Non-void functions with no return statement cause a runtime error.
