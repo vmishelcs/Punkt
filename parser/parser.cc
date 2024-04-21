@@ -609,7 +609,7 @@ std::unique_ptr<ParseNode> Parser::ParseAdditiveExpression() {
 
   while (PunctuatorToken::IsTokenPunctuator(
       now_reading.get(), {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
-    std::unique_ptr<ParseNode> additive_operator =
+    auto additive_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
     ReadToken();
@@ -636,7 +636,7 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
 
   while (PunctuatorToken::IsTokenPunctuator(
       now_reading.get(), {PunctuatorEnum::MULTIPLY, PunctuatorEnum::DIVIDE})) {
-    std::unique_ptr<ParseNode> multiplicative_operator =
+    auto multiplicative_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
     ReadToken();
@@ -663,7 +663,7 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
 
   if (PunctuatorToken::IsTokenPunctuator(
           now_reading.get(), {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
-    std::unique_ptr<ParseNode> unary_operator =
+    auto unary_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
     ReadToken();
@@ -783,7 +783,7 @@ std::unique_ptr<ParseNode> Parser::ParseIntegerLiteral() {
     return SyntaxErrorUnexpectedToken("integer literal");
   }
 
-  std::unique_ptr<ParseNode> integer_literal =
+  auto integer_literal =
       std::make_unique<IntegerLiteralNode>(std::move(now_reading));
   ReadToken();
   return integer_literal;
@@ -797,7 +797,7 @@ std::unique_ptr<ParseNode> Parser::ParseStringLiteral() {
     return SyntaxErrorUnexpectedToken("string literal");
   }
 
-  std::unique_ptr<StringLiteralNode> string_literal =
+  auto string_literal =
       std::make_unique<StringLiteralNode>(std::move(now_reading));
   ReadToken();
   return string_literal;
@@ -932,8 +932,7 @@ std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(
 }
 
 std::unique_ptr<ParseNode> Parser::GetSyntaxErrorNode() {
-  std::unique_ptr<ParseNode> error =
-      std::make_unique<ErrorNode>(std::move(now_reading));
+  auto error = std::make_unique<ErrorNode>(std::move(now_reading));
   ReadToken();
   return error;
 }
