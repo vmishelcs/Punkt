@@ -15,10 +15,8 @@
 //                                    Non-leaf nodes //
 //--------------------------------------------------------------------------------------//
 void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode &node) {
-  auto target = node.GetChild(0);
-  if (target->GetParseNodeType() == ParseNodeType::IDENTIFIER_NODE) {
-    IdentifierNode *identifier_node = static_cast<IdentifierNode *>(target);
-
+  ParseNode *target = node.GetTargetNode();
+  if (auto identifier_node = dynamic_cast<IdentifierNode *>(target)) {
     // Make sure identifier is not classified with error type.
     if (identifier_node->GetType()->IsErrorType()) {
       node.SetType(BaseType::CreateErrorType());
