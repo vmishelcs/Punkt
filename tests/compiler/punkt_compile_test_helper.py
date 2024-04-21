@@ -35,10 +35,10 @@ class PunktCompileTestHelper(object):
                 self._punkt_project_dir, "tests", "test_output_files", "ir_output"
             )
         )
+        # Remove any old executable output.
+        # for file in os.scandir(self._ir_output_directory):
+        #     os.unlink(file)
         self._ir_output_directory.mkdir(parents=True, exist_ok=True)
-        # Remove any old IR output.
-        for file in os.scandir(self._ir_output_directory):
-            os.unlink(file)
 
         # Locate or create the executable output directory.
         self._exe_output_directory = Path(
@@ -48,8 +48,8 @@ class PunktCompileTestHelper(object):
         )
         self._exe_output_directory.mkdir(parents=True, exist_ok=True)
         # Remove any old executable output.
-        for file in os.scandir(self._exe_output_directory):
-            os.unlink(file)
+        # for file in os.scandir(self._exe_output_directory):
+        #     os.unlink(file)
 
         # Locate or create the program output directory.
         self._actual_output_directory = Path(
@@ -58,13 +58,12 @@ class PunktCompileTestHelper(object):
                 "tests",
                 "test_output_files",
                 "actual",
-                "compiler",
             )
         )
         self._actual_output_directory.mkdir(parents=True, exist_ok=True)
         # Remove any old program output.
-        for file in os.scandir(self._actual_output_directory):
-            os.unlink(file)
+        # for file in os.scandir(self._actual_output_directory):
+        #     os.unlink(file)
 
         # Locate the expected output directory.
         self._expected_output_directory = Path(
@@ -72,8 +71,7 @@ class PunktCompileTestHelper(object):
                 self._punkt_project_dir,
                 "tests",
                 "test_output_files",
-                "expected",
-                "compiler",
+                "expected"
             )
         )
         assert (
@@ -147,6 +145,9 @@ class PunktCompileTestHelper(object):
             )
 
         ir_output_path = self._get_ir_output_path()
+        # Remove old IR output.
+        if ir_output_path.exists():
+            os.unlink(ir_output_path)
         subprocess.run([self._compiler_path, input_file_path,
                         "-o", ir_output_path], text=True)
         if not ir_output_path.exists():
@@ -155,15 +156,21 @@ class PunktCompileTestHelper(object):
             )
 
         exe_output_path = self._get_exe_output_path()
+        # Remove old executable output.
+        if exe_output_path.exists():
+            os.unlink(exe_output_path)
         subprocess.run(["clang-18", ir_output_path, "-o",
                         exe_output_path], text=True)
         if not exe_output_path.exists():
             raise RuntimeError(
-                "Program executable " +
-                str(ir_output_path) + " was not generated."
+                "Program executable file " +
+                str(exe_output_path) + " was not generated."
             )
 
         actual_output_path = self._get_program_actual_output_path()
+        # Remove old program output.
+        if actual_output_path.exists():
+            os.unlink(actual_output_path)
         with open(actual_output_path, "w") as outfile:
             subprocess.run(exe_output_path, stdout=outfile)
         if not actual_output_path.exists():
