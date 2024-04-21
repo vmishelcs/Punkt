@@ -20,7 +20,7 @@ class PunctuatorBuffer {
 
   std::string ToString() const {
     std::string result;
-    for (const LocatedChar& ch : buffer) {
+    for (const LocatedChar &ch : buffer) {
       result.push_back(ch.character);
     }
     return result;

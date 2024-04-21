@@ -86,7 +86,7 @@ class ParseNode {
  private:
   ParseNodeType node_type;
   ParseNode *parent;
-  std::vector<std::unique_ptr<ParseNode>> children;
+  std::vector<std::unique_ptr<ParseNode> > children;
   std::unique_ptr<Type> type;  // Type that describes this node, if any
   std::unique_ptr<Scope>
       scope;  // Scope created by this node; not every node creates a scope

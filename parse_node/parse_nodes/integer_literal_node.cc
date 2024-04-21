@@ -8,8 +8,8 @@ IntegerLiteralNode::IntegerLiteralNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::INTEGER_LITERAL_NODE, std::move(token)) {}
 
 int IntegerLiteralNode::GetValue() const {
-  IntegerLiteralToken& integer_literal_token =
-      dynamic_cast<IntegerLiteralToken&>(*(this->token));
+  IntegerLiteralToken &integer_literal_token =
+      dynamic_cast<IntegerLiteralToken &>(*(this->token));
   return integer_literal_token.GetValue();
 }
 
@@ -17,10 +17,10 @@ std::string IntegerLiteralNode::ToString() const {
   return "INTEGER LITERAL NODE: " + token->ToString();
 }
 
-void IntegerLiteralNode::Accept(ParseNodeVisitor& visitor) {
+void IntegerLiteralNode::Accept(ParseNodeVisitor &visitor) {
   visitor.Visit(*this);
 }
 
-llvm::Value* IntegerLiteralNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *IntegerLiteralNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

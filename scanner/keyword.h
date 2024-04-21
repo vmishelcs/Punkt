@@ -29,7 +29,7 @@ enum class KeywordEnum {
 class Keyword : public ReservedComponent {
  public:
   Keyword(std::string lexeme);
-  Keyword(Keyword&& keyword);
+  Keyword(Keyword &&keyword);
 
   KeywordEnum GetKeywordEnum() const;
 

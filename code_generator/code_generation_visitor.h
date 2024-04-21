@@ -73,7 +73,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
 
   std::unique_ptr<llvm::LLVMContext> context;
   std::unique_ptr<llvm::Module> module;
-  std::unique_ptr<llvm::IRBuilder<>> builder;
+  std::unique_ptr<llvm::IRBuilder<> > builder;
 
   std::map<std::string, llvm::Value *> global_constants_table;
 };

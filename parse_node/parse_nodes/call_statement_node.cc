@@ -4,12 +4,12 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-void CallStatementNode::Accept(ParseNodeVisitor& visitor) {
+void CallStatementNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* CallStatementNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *CallStatementNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

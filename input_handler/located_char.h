@@ -17,7 +17,7 @@ struct LocatedChar {
               unsigned int column)
       : character(c), location(file_name, line, column) {}
 
-  LocatedChar(const LocatedChar& lc)
+  LocatedChar(const LocatedChar &lc)
       : character(lc.character), location(lc.location) {}
 
   bool IsWhitespace() const { return isspace(character); }
@@ -43,19 +43,19 @@ struct LocatedChar {
   static LocatedChar NULL_CHAR;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const LocatedChar& lc) {
+inline std::ostream &operator<<(std::ostream &os, const LocatedChar &lc) {
   os << lc.character << " (" << lc.location << ")";
   return os;
 }
 
-inline bool operator==(const LocatedChar& left, const LocatedChar& right) {
+inline bool operator==(const LocatedChar &left, const LocatedChar &right) {
   return left.character == right.character &&
          left.location.file_name == right.location.file_name &&
          left.location.line == right.location.line &&
          left.location.column == right.location.column;
 }
 
-inline bool operator!=(const LocatedChar& left, const LocatedChar& right) {
+inline bool operator!=(const LocatedChar &left, const LocatedChar &right) {
   return !(left == right);
 }
 

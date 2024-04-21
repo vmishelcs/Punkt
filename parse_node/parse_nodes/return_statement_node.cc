@@ -9,7 +9,7 @@
 
 #include "lambda_node.h"
 
-ParseNode* ReturnStatementNode::GetEnclosingFunctionNode() {
+ParseNode *ReturnStatementNode::GetEnclosingFunctionNode() {
   if (enclosing_function_node) {
     return enclosing_function_node;
   }
@@ -35,12 +35,12 @@ std::string ReturnStatementNode::ToString() const {
   return "RETURN STATEMENT NODE: " + token->ToString();
 }
 
-void ReturnStatementNode::Accept(ParseNodeVisitor& visitor) {
+void ReturnStatementNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* ReturnStatementNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *ReturnStatementNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

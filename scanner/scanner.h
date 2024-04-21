@@ -22,7 +22,7 @@ class Scanner {
   std::unique_ptr<Token> ScanCharacter(LocatedChar first_char);
   std::unique_ptr<Token> ScanString(LocatedChar first_char);
 
-  void ReadStringLiteral(std::string& buffer);
+  void ReadStringLiteral(std::string &buffer);
 
   bool IsEndOfInput(LocatedChar ch);
 

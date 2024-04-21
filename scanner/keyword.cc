@@ -14,7 +14,7 @@ std::unordered_map<std::string, KeywordEnum> Keyword::dictionary = {
 
 std::unordered_map<KeywordEnum, std::string> Keyword::reverse_dictionary = [] {
   std::unordered_map<KeywordEnum, std::string> result;
-  for (const auto& [key, value] : dictionary) {
+  for (const auto &[key, value] : dictionary) {
     result[value] = key;
   }
   return result;
@@ -24,7 +24,7 @@ Keyword::Keyword(std::string lexeme) : ReservedComponent(lexeme) {
   this->keyword_enum = dictionary.at(lexeme);
 }
 
-Keyword::Keyword(Keyword&& keyword) : ReservedComponent(std::move(keyword)) {
+Keyword::Keyword(Keyword &&keyword) : ReservedComponent(std::move(keyword)) {
   this->keyword_enum = std::move(keyword.keyword_enum);
 }
 

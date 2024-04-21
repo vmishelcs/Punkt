@@ -31,7 +31,7 @@ std::unordered_map<std::string, PunctuatorEnum> Punctuator::dictionary = {
 std::unordered_map<PunctuatorEnum, std::string> Punctuator::reverse_dictionary =
     [] {
       std::unordered_map<PunctuatorEnum, std::string> result;
-      for (const auto& [key, value] : dictionary) {
+      for (const auto &[key, value] : dictionary) {
         result[value] = key;
       }
       return result;
@@ -44,11 +44,11 @@ std::unordered_map<std::string, int> Punctuator::num_punctuators_with_prefix =
        * Inspired by:
        * https://stackoverflow.com/questions/76942081/creating-a-static-unordered-set-from-keys-of-a-static-unordered-map
        */
-      std::vector<std::vector<std::string>> prefixes_per_punctuator;
+      std::vector<std::vector<std::string> > prefixes_per_punctuator;
       std::transform(
           dictionary.begin(), dictionary.end(),
           std::inserter(prefixes_per_punctuator, prefixes_per_punctuator.end()),
-          [](auto&& entry) {
+          [](auto &&entry) {
             std::vector<std::string> prefixes =
                 GetAllPrefixesForPunctuator(entry.first);
             return prefixes;
@@ -72,7 +72,7 @@ Punctuator::Punctuator(std::string lexeme) : ReservedComponent(lexeme) {
   this->punctuator_enum = find_result->second;
 }
 
-Punctuator::Punctuator(Punctuator&& punctuator)
+Punctuator::Punctuator(Punctuator &&punctuator)
     : ReservedComponent(std::move(punctuator)) {
   this->punctuator_enum = std::move(punctuator.punctuator_enum);
 }

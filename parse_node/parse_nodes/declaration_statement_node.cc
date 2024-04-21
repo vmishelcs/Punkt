@@ -11,13 +11,13 @@ std::string DeclarationStatementNode::ToString() const {
   return "DECLARATION STATEMENT NODE: " + token->ToString();
 }
 
-void DeclarationStatementNode::Accept(ParseNodeVisitor& visitor) {
+void DeclarationStatementNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* DeclarationStatementNode::GenerateCode(
-    ParseNodeIRVisitor& visitor) {
+llvm::Value *DeclarationStatementNode::GenerateCode(
+    ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

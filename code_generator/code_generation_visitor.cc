@@ -30,7 +30,7 @@ using code_gen_func_type_2_operand =
 CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
     : context(std::make_unique<llvm::LLVMContext>()),
       module(std::make_unique<llvm::Module>(module_id, *context)),
-      builder(std::make_unique<llvm::IRBuilder<>>(*context)) {
+      builder(std::make_unique<llvm::IRBuilder<> >(*context)) {
   std::string target_triple = llvm::sys::getDefaultTargetTriple();
   module->setTargetTriple(target_triple);
 }
@@ -144,8 +144,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
   // Create a basic block for the loop exit.
   auto afterloop_block = llvm::BasicBlock::Create(*context, "afterloop");
 
-  // Insert an explicit fall-through from the current block (before the loop) to
-  // the loop condition block.
+  // Insert an explicit fall-through from the current block (before the loop)
+  // to the loop condition block.
   builder->CreateBr(condition_block);
 
   // Now we are inserting instructions into the loop condition block.
@@ -172,11 +172,12 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
   // Check if the loop block ends in a block terminator.
   llvm::Instruction *loop_block_last_inst = loop_block->getTerminator();
   if (!loop_block_last_inst || !loop_block_last_inst->isTerminator()) {
-    // Emit code for the step value, appending it to the end of the loop body.
+    // Emit code for the step value, appending it to the end of the loop
+    // body.
     node.GetStepValueNode()->GenerateCode(*this);
 
-    // Create an unconditional branch to the start of the loop, where we check
-    // if the condition to continue looping is true/false.
+    // Create an unconditional branch to the start of the loop, where we
+    // check if the condition to continue looping is true/false.
     builder->CreateBr(condition_block);
   }
 
@@ -241,8 +242,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode &node) {
   // Check if 'then' block ends in a block terminator.
   llvm::Instruction *then_block_last_inst = then_block->getTerminator();
   if (!then_block_last_inst || !then_block_last_inst->isTerminator()) {
-    // Insert a break statement to merge control flow if the 'then' block has no
-    // block terminator.
+    // Insert a break statement to merge control flow if the 'then' block has
+    // no block terminator.
     builder->CreateBr(merge_block);
   }
 
@@ -258,8 +259,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode &node) {
     // Check if 'else' block ends in a block terminator.
     llvm::Instruction *else_block_last_inst = else_block->getTerminator();
     if (!else_block_last_inst || !else_block_last_inst->isTerminator()) {
-      // Insert a break statement to merge control flow if the 'else' block has
-      // no block terminator.
+      // Insert a break statement to merge control flow if the 'else' block
+      // has no block terminator.
       builder->CreateBr(merge_block);
     }
   }
@@ -313,15 +314,16 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
   std::vector<LambdaParameterNode *> param_nodes = node.GetParameterNodes();
   param_types.reserve(param_nodes.size());
 
-  // Create a vector holding llvm::Type pointers describing the parameter types.
+  // Create a vector holding llvm::Type pointers describing the parameter
+  // types.
   for (const auto &param_node : param_nodes) {
     param_types.push_back(param_node->GetTypeNode()->GetLLVMType(*context));
   }
 
   // Create the function type.
-  auto function_type =
-      llvm::FunctionType::get(node.GetReturnTypeNode()->GetLLVMType(*context),
-                              param_types, /*isVarArg=*/false);
+  auto function_type = llvm::FunctionType::get(
+      node.GetReturnTypeNode()->GetLLVMType(*context), param_types,
+      /*isVarArg=*/false);
 
   // Functions have external linkage, lambdas have private linkage.
   llvm::GlobalValue::LinkageTypes linkage_type =
@@ -341,14 +343,15 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
 
   // Check if this lambda is anonymous.
   if (!node.IsAnonymous()) {
-    // If it is not anonymous, store the function signature in the identifier's
-    // symbol table entry.
+    // If it is not anonymous, store the function signature in the
+    // identifier's symbol table entry.
     IdentifierNode *identifier_node = nullptr;
     if (auto func_def_node =
             dynamic_cast<FunctionDefinitionNode *>(node.GetParent())) {
       identifier_node =
           static_cast<IdentifierNode *>(func_def_node->GetIdentifierNode());
-    } else /* parent is a DeclarationStatementNode */ {
+    } else /* parent is a DeclarationStatementNode */
+    {
       auto decl_node =
           dynamic_cast<DeclarationStatementNode *>(node.GetParent());
       identifier_node = decl_node->GetIdentifierNode();
@@ -400,8 +403,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
         dynamic_cast<BaseType *>(node.GetReturnTypeNode()->GetType());
     if (return_base_type &&
         return_base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
-      // For void lambdas, place an implicit return statement at the end of the
-      // lambda body.
+      // For void lambdas, place an implicit return statement at the end of
+      // the lambda body.
       builder->CreateRetVoid();
     } else {
       // Otherwise, create a "trap" intrinsic.
@@ -729,9 +732,9 @@ llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, Type *type) {
 
   auto print_value = value;
 
-  // When printing booleans, we first truncate to 1-bit such that only the least
-  // significant bit remains. Then we extend to 32 bits and print the boolean as
-  // an integer.
+  // When printing booleans, we first truncate to 1-bit such that only the
+  // least significant bit remains. Then we extend to 32 bits and print the
+  // boolean as an integer.
   BaseType *base_type = dynamic_cast<BaseType *>(type);
   if (base_type && base_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
     auto truncated_value = builder->CreateTrunc(

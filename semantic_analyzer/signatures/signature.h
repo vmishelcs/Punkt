@@ -35,8 +35,8 @@ class Signature {
   /// @param input_types List of `Type` pointers specifying signature input
   /// types.
   /// @param output_type `Type` pointer specifying signature output type.
-  /// @param fp Function pointer to a code generation function with 2 parameters
-  /// for `llvm::Value *`.
+  /// @param fp Function pointer to a code generation function with 2
+  /// parameters for `llvm::Value *`.
   Signature(std::initializer_list<Type *> input_types, Type *output_type,
             llvm::Value *(*fp)(llvm::LLVMContext *context, llvm::IRBuilder<> *,
                                llvm::Value *, llvm::Value *));
@@ -53,8 +53,9 @@ class Signature {
   std::vector<Type *> input_types;
   Type *output_type;
 
-  // This field holds a variant of code generator function (e.g. a function that
-  // generates integer addition code) to be used during IR generation stage.
+  // This field holds a variant of code generator function (e.g. a function
+  // that generates integer addition code) to be used during IR generation
+  // stage.
   code_gen_function_variant func_variant;
 };
 

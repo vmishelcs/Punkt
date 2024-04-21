@@ -11,7 +11,7 @@
 std::unique_ptr<LambdaInvocationNode>
 LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
     std::unique_ptr<ParseNode> identifier,
-    std::vector<std::unique_ptr<ParseNode>> args) {
+    std::vector<std::unique_ptr<ParseNode> > args) {
   auto lambda_invocation = std::make_unique<LambdaInvocationNode>();
   lambda_invocation->AppendChild(std::move(identifier));
 

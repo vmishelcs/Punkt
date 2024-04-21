@@ -18,7 +18,7 @@ static const std::unique_ptr<BaseType> kBaseTypeInteger =
 static const std::unique_ptr<BaseType> kBaseTypeString =
     BaseType::CreateStringType();
 
-std::unordered_map<PunctuatorEnum, std::vector<Signature>>
+std::unordered_map<PunctuatorEnum, std::vector<Signature> >
     Signatures::signature_map{
         {PunctuatorEnum::PLUS,
          {Signature({kBaseTypeInteger.get()}, kBaseTypeInteger.get(),
@@ -101,10 +101,10 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature>>
                        OperatorCodeGenerator::IntegerCmpLEQCodeGenerator),
          }}};
 
-Signature const* Signatures::AcceptingSignature(PunctuatorEnum punctuator,
-                                                std::vector<Type*>& types) {
-  const auto& signatures = signature_map.at(punctuator);
-  for (const Signature& signature : signatures) {
+Signature const *Signatures::AcceptingSignature(PunctuatorEnum punctuator,
+                                                std::vector<Type *> &types) {
+  const auto &signatures = signature_map.at(punctuator);
+  for (const Signature &signature : signatures) {
     if (signature.Accepts(types)) {
       return &signature;
     }

@@ -12,18 +12,18 @@
 class PunctuatorScanner {
  public:
   static std::unique_ptr<PunctuatorToken> Scan(
-      LocatedChar first_char, std::unique_ptr<LocatedCharStream>& input_stream);
+      LocatedChar first_char, std::unique_ptr<LocatedCharStream> &input_stream);
 
  private:
   PunctuatorScanner(LocatedChar first_char,
-                    std::unique_ptr<LocatedCharStream>& input_stream)
+                    std::unique_ptr<LocatedCharStream> &input_stream)
       : scanned(first_char), input_stream(input_stream) {}
 
   std::unique_ptr<PunctuatorToken> ScanPunctuator();
   void FindLatestValidPunctuator();
 
   PunctuatorBuffer scanned;
-  std::unique_ptr<LocatedCharStream>& input_stream;
+  std::unique_ptr<LocatedCharStream> &input_stream;
 };
 
 #endif  // PUNCTUATOR_SCANNER_H_

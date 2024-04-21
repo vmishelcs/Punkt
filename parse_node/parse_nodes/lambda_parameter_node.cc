@@ -17,12 +17,12 @@ std::unique_ptr<LambdaParameterNode> LambdaParameterNode::CreateParameterNode(
   return function_parameter_node;
 }
 
-void LambdaParameterNode::Accept(ParseNodeVisitor& visitor) {
+void LambdaParameterNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* LambdaParameterNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *LambdaParameterNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

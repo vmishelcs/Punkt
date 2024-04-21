@@ -20,8 +20,8 @@ class ReturnStatementNode : public ParseNode {
   /// @brief Get the node that represents the enclosing function of this return
   /// statement.
   /// @return Pointer to the node that represents the enclosing function; this
-  /// can be a `LambdaNode` or a `MainNode`. This method returns `nullptr` if no
-  /// such node could be found.
+  /// can be a `LambdaNode` or a `MainNode`. This method returns `nullptr` if
+  /// no such node could be found.
   ParseNode *GetEnclosingFunctionNode();
 
   virtual std::string ToString() const override;

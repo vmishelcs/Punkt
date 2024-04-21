@@ -6,19 +6,19 @@
 
 #include "type.h"
 
-/// @brief This class is used to denote Punkt lambda types. Functions and lambda
-/// variables are given the lambda type, consisting of a list of parameter
-/// types, and a return type. For example, a lambda type of `<integer, bool> ->
-/// integer` describes a lambda that takes two parameters (one integer value and
-/// one boolean value), and returns an integer value.
+/// @brief This class is used to denote Punkt lambda types. Functions and
+/// lambda variables are given the lambda type, consisting of a list of
+/// parameter types, and a return type. For example, a lambda type of
+/// `<integer, bool> -> integer` describes a lambda that takes two parameters
+/// (one integer value and one boolean value), and returns an integer value.
 class LambdaType : public Type {
  public:
   /// @brief Create a `unique_ptr<LambdaType>` object specified by given
   /// parameter types and return type.
   /// @param parameter_types A `vector` of `Type` pointers describing the
   /// parameters of the `LambdaType`.
-  /// @param return_type A pointer to a `Type` object describing the return type
-  /// of the `LambdaType`.
+  /// @param return_type A pointer to a `Type` object describing the return
+  /// type of the `LambdaType`.
   /// @return A `unique_ptr<LambdaType>` object.
   static std::unique_ptr<LambdaType> CreateLambdaType(
       std::vector<Type *> parameter_types, Type *return_type);
@@ -37,8 +37,8 @@ class LambdaType : public Type {
 
   Type *GetReturnType() const { return return_type.get(); }
 
-  /// @brief Check if this `LambdaType` is semantically equivalent to the `Type`
-  /// pointed to by `other_type`.
+  /// @brief Check if this `LambdaType` is semantically equivalent to the
+  /// `Type` pointed to by `other_type`.
   /// @param type_enum `Type` pointer to be checked for semantic equality.
   /// @return `true` if this type is semantically equivalent to the `Type`
   /// specified by the
@@ -57,7 +57,7 @@ class LambdaType : public Type {
   LambdaType(std::vector<Type *> parameter_types, Type *return_type);
 
  private:
-  std::vector<std::unique_ptr<Type>> parameter_types;
+  std::vector<std::unique_ptr<Type> > parameter_types;
   std::unique_ptr<Type> return_type;
 };
 

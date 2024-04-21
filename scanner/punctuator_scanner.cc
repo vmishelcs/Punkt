@@ -1,7 +1,7 @@
 #include "punctuator_scanner.h"
 
 std::unique_ptr<PunctuatorToken> PunctuatorScanner::Scan(
-    LocatedChar first_char, std::unique_ptr<LocatedCharStream>& input_stream) {
+    LocatedChar first_char, std::unique_ptr<LocatedCharStream> &input_stream) {
   PunctuatorScanner punctuator_scanner(first_char, input_stream);
   return punctuator_scanner.ScanPunctuator();
 }

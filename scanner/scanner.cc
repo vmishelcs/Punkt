@@ -203,7 +203,7 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char) {
                                               buffer);
 }
 
-void Scanner::ReadStringLiteral(std::string& buffer) {
+void Scanner::ReadStringLiteral(std::string &buffer) {
   // Take a peek at the next character after double-quotes (")
   LocatedChar ch = input_stream->Peek();
 

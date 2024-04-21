@@ -20,7 +20,8 @@ class IdentifierNode : public ParseNode {
 
   /// @brief Searches the parse tree symbol tables for the declaration of this
   /// identifier.
-  /// @return A pointer to the symbol table entry that declares this identifier.
+  /// @return A pointer to the symbol table entry that declares this
+  /// identifier.
   SymbolTableEntry *FindSymbolTableEntry();
 
   void SetSymbolTableEntry(SymbolTableEntry *symbol_table_entry) {

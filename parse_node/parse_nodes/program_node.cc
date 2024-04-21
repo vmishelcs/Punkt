@@ -16,12 +16,12 @@ std::string ProgramNode::ToString() const {
   return "PROGRAM NODE: " + token->ToString();
 }
 
-void ProgramNode::Accept(ParseNodeVisitor& visitor) {
+void ProgramNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* ProgramNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *ProgramNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

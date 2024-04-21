@@ -8,12 +8,12 @@
 FunctionDefinitionNode::FunctionDefinitionNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::FUNCTION_DEFINITION_NODE, std::move(token)) {}
 
-void FunctionDefinitionNode::Accept(ParseNodeVisitor& visitor) {
+void FunctionDefinitionNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* FunctionDefinitionNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *FunctionDefinitionNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

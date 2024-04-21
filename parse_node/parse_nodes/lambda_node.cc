@@ -7,7 +7,7 @@
 
 void LambdaNode::AddParameterNode(std::unique_ptr<ParseNode> parameter_node) {
   this->parameter_nodes.push_back(
-      dynamic_cast<LambdaParameterNode*>(parameter_node.get()));
+      dynamic_cast<LambdaParameterNode *>(parameter_node.get()));
   this->AppendChild(std::move(parameter_node));
 }
 
@@ -22,12 +22,12 @@ void LambdaNode::AddLambdaBodyNode(std::unique_ptr<ParseNode> lambda_body) {
   this->AppendChild(std::move(lambda_body));
 }
 
-void LambdaNode::Accept(ParseNodeVisitor& visitor) {
+void LambdaNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* LambdaNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *LambdaNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

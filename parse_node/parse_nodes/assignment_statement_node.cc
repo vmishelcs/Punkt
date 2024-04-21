@@ -11,13 +11,13 @@ std::string AssignmentStatementNode::ToString() const {
   return "ASSIGNMENT STATEMENT NODE";
 }
 
-void AssignmentStatementNode::Accept(ParseNodeVisitor& visitor) {
+void AssignmentStatementNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* AssignmentStatementNode::GenerateCode(
-    ParseNodeIRVisitor& visitor) {
+llvm::Value *AssignmentStatementNode::GenerateCode(
+    ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

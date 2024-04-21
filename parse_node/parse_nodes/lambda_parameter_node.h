@@ -16,10 +16,10 @@ class LambdaParameterNode : public ParseNode {
   LambdaParameterNode()
       : ParseNode(ParseNodeType::LAMBDA_PARAMETER_NODE, nullptr) {}
 
-  ParseNode* GetTypeNode() const { return GetChild(0); }
+  ParseNode *GetTypeNode() const { return GetChild(0); }
 
-  IdentifierNode* GetIdentifierNode() const {
-    return dynamic_cast<IdentifierNode*>(GetChild(1));
+  IdentifierNode *GetIdentifierNode() const {
+    return dynamic_cast<IdentifierNode *>(GetChild(1));
   }
 
   static std::unique_ptr<LambdaParameterNode> CreateParameterNode(
@@ -29,9 +29,9 @@ class LambdaParameterNode : public ParseNode {
     return "LAMBDA PARAMETER NODE";
   }
 
-  virtual void Accept(ParseNodeVisitor& visitor) override;
+  virtual void Accept(ParseNodeVisitor &visitor) override;
 
-  virtual llvm::Value* GenerateCode(ParseNodeIRVisitor& visitor) override;
+  virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 };
 
 #endif  // LAMBDA_PARAMETER_NODE_H_

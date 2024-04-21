@@ -7,64 +7,64 @@ class ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(AssignmentStatementNode& node) = 0;
-  virtual void VisitLeave(AssignmentStatementNode& node) = 0;
+  virtual void VisitEnter(AssignmentStatementNode &node) = 0;
+  virtual void VisitLeave(AssignmentStatementNode &node) = 0;
 
-  virtual void VisitEnter(CallStatementNode& node) = 0;
-  virtual void VisitLeave(CallStatementNode& node) = 0;
+  virtual void VisitEnter(CallStatementNode &node) = 0;
+  virtual void VisitLeave(CallStatementNode &node) = 0;
 
-  virtual void VisitEnter(CodeBlockNode& node) = 0;
-  virtual void VisitLeave(CodeBlockNode& node) = 0;
+  virtual void VisitEnter(CodeBlockNode &node) = 0;
+  virtual void VisitLeave(CodeBlockNode &node) = 0;
 
-  virtual void VisitEnter(DeclarationStatementNode& node) = 0;
-  virtual void VisitLeave(DeclarationStatementNode& node) = 0;
+  virtual void VisitEnter(DeclarationStatementNode &node) = 0;
+  virtual void VisitLeave(DeclarationStatementNode &node) = 0;
 
-  virtual void VisitEnter(ForStatementNode& node) = 0;
-  virtual void VisitLeave(ForStatementNode& node) = 0;
+  virtual void VisitEnter(ForStatementNode &node) = 0;
+  virtual void VisitLeave(ForStatementNode &node) = 0;
 
-  virtual void VisitEnter(FunctionDefinitionNode& node) = 0;
-  virtual void VisitLeave(FunctionDefinitionNode& node) = 0;
+  virtual void VisitEnter(FunctionDefinitionNode &node) = 0;
+  virtual void VisitLeave(FunctionDefinitionNode &node) = 0;
 
-  virtual void VisitEnter(IfStatementNode& node) = 0;
-  virtual void VisitLeave(IfStatementNode& node) = 0;
+  virtual void VisitEnter(IfStatementNode &node) = 0;
+  virtual void VisitLeave(IfStatementNode &node) = 0;
 
-  virtual void VisitEnter(LambdaInvocationNode& node) = 0;
-  virtual void VisitLeave(LambdaInvocationNode& node) = 0;
+  virtual void VisitEnter(LambdaInvocationNode &node) = 0;
+  virtual void VisitLeave(LambdaInvocationNode &node) = 0;
 
-  virtual void VisitEnter(LambdaNode& node) = 0;
-  virtual void VisitLeave(LambdaNode& node) = 0;
+  virtual void VisitEnter(LambdaNode &node) = 0;
+  virtual void VisitLeave(LambdaNode &node) = 0;
 
-  virtual void VisitEnter(LambdaParameterNode& node) = 0;
-  virtual void VisitLeave(LambdaParameterNode& node) = 0;
+  virtual void VisitEnter(LambdaParameterNode &node) = 0;
+  virtual void VisitLeave(LambdaParameterNode &node) = 0;
 
-  virtual void VisitEnter(LambdaTypeNode& node) = 0;
-  virtual void VisitLeave(LambdaTypeNode& node) = 0;
+  virtual void VisitEnter(LambdaTypeNode &node) = 0;
+  virtual void VisitLeave(LambdaTypeNode &node) = 0;
 
-  virtual void VisitEnter(MainNode& node) = 0;
-  virtual void VisitLeave(MainNode& node) = 0;
+  virtual void VisitEnter(MainNode &node) = 0;
+  virtual void VisitLeave(MainNode &node) = 0;
 
-  virtual void VisitEnter(OperatorNode& node) = 0;
-  virtual void VisitLeave(OperatorNode& node) = 0;
+  virtual void VisitEnter(OperatorNode &node) = 0;
+  virtual void VisitLeave(OperatorNode &node) = 0;
 
-  virtual void VisitEnter(PrintStatementNode& node) = 0;
-  virtual void VisitLeave(PrintStatementNode& node) = 0;
+  virtual void VisitEnter(PrintStatementNode &node) = 0;
+  virtual void VisitLeave(PrintStatementNode &node) = 0;
 
-  virtual void VisitEnter(ProgramNode& node) = 0;
-  virtual void VisitLeave(ProgramNode& node) = 0;
+  virtual void VisitEnter(ProgramNode &node) = 0;
+  virtual void VisitLeave(ProgramNode &node) = 0;
 
-  virtual void VisitEnter(ReturnStatementNode& node) = 0;
-  virtual void VisitLeave(ReturnStatementNode& node) = 0;
+  virtual void VisitEnter(ReturnStatementNode &node) = 0;
+  virtual void VisitLeave(ReturnStatementNode &node) = 0;
 
   // ---- Leaf nodes
   // -----------------------------------------------------------------------
-  virtual void Visit(ErrorNode& node) = 0;
-  virtual void Visit(NopNode& node) = 0;
-  virtual void Visit(IdentifierNode& node) = 0;
-  virtual void Visit(BooleanLiteralNode& node) = 0;
-  virtual void Visit(CharacterLiteralNode& node) = 0;
-  virtual void Visit(IntegerLiteralNode& node) = 0;
-  virtual void Visit(StringLiteralNode& node) = 0;
-  virtual void Visit(BaseTypeNode& node) = 0;
+  virtual void Visit(ErrorNode &node) = 0;
+  virtual void Visit(NopNode &node) = 0;
+  virtual void Visit(IdentifierNode &node) = 0;
+  virtual void Visit(BooleanLiteralNode &node) = 0;
+  virtual void Visit(CharacterLiteralNode &node) = 0;
+  virtual void Visit(IntegerLiteralNode &node) = 0;
+  virtual void Visit(StringLiteralNode &node) = 0;
+  virtual void Visit(BaseTypeNode &node) = 0;
 };
 
 /// @brief A default implementation of the ParseNodeVisitor interface. Each
@@ -76,109 +76,109 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(AssignmentStatementNode& node) override {
+  virtual void VisitEnter(AssignmentStatementNode &node) override {
     DefaultVisit(node);
   }
-  virtual void VisitLeave(AssignmentStatementNode& node) override {
-    DefaultVisit(node);
-  }
-
-  virtual void VisitEnter(CallStatementNode& node) override {
-    DefaultVisit(node);
-  }
-  virtual void VisitLeave(CallStatementNode& node) override {
+  virtual void VisitLeave(AssignmentStatementNode &node) override {
     DefaultVisit(node);
   }
 
-  virtual void VisitEnter(CodeBlockNode& node) override { DefaultVisit(node); }
-  virtual void VisitLeave(CodeBlockNode& node) override { DefaultVisit(node); }
-
-  virtual void VisitEnter(DeclarationStatementNode& node) override {
+  virtual void VisitEnter(CallStatementNode &node) override {
     DefaultVisit(node);
   }
-  virtual void VisitLeave(DeclarationStatementNode& node) override {
+  virtual void VisitLeave(CallStatementNode &node) override {
     DefaultVisit(node);
   }
 
-  virtual void VisitEnter(ForStatementNode& node) override {
+  virtual void VisitEnter(CodeBlockNode &node) override { DefaultVisit(node); }
+  virtual void VisitLeave(CodeBlockNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(DeclarationStatementNode &node) override {
     DefaultVisit(node);
   }
-  virtual void VisitLeave(ForStatementNode& node) override {
+  virtual void VisitLeave(DeclarationStatementNode &node) override {
     DefaultVisit(node);
   }
 
-  virtual void VisitEnter(FunctionDefinitionNode& node) override {
+  virtual void VisitEnter(ForStatementNode &node) override {
     DefaultVisit(node);
   }
-  virtual void VisitLeave(FunctionDefinitionNode& node) override {
-    DefaultVisit(node);
-  }
-
-  virtual void VisitEnter(IfStatementNode& node) override {
-    DefaultVisit(node);
-  }
-  virtual void VisitLeave(IfStatementNode& node) override {
+  virtual void VisitLeave(ForStatementNode &node) override {
     DefaultVisit(node);
   }
 
-  virtual void VisitEnter(LambdaInvocationNode& node) override {
+  virtual void VisitEnter(FunctionDefinitionNode &node) override {
     DefaultVisit(node);
   }
-  virtual void VisitLeave(LambdaInvocationNode& node) override {
-    DefaultVisit(node);
-  }
-
-  virtual void VisitEnter(LambdaNode& node) override { DefaultVisit(node); }
-  virtual void VisitLeave(LambdaNode& node) override { DefaultVisit(node); }
-
-  virtual void VisitEnter(LambdaParameterNode& node) override {
-    DefaultVisit(node);
-  }
-  virtual void VisitLeave(LambdaParameterNode& node) override {
+  virtual void VisitLeave(FunctionDefinitionNode &node) override {
     DefaultVisit(node);
   }
 
-  virtual void VisitEnter(LambdaTypeNode& node) override { DefaultVisit(node); }
-  virtual void VisitLeave(LambdaTypeNode& node) override { DefaultVisit(node); }
-
-  virtual void VisitEnter(MainNode& node) override { DefaultVisit(node); }
-  virtual void VisitLeave(MainNode& node) override { DefaultVisit(node); }
-
-  virtual void VisitEnter(OperatorNode& node) override { DefaultVisit(node); }
-  virtual void VisitLeave(OperatorNode& node) override { DefaultVisit(node); }
-
-  virtual void VisitEnter(PrintStatementNode& node) override {
+  virtual void VisitEnter(IfStatementNode &node) override {
     DefaultVisit(node);
   }
-  virtual void VisitLeave(PrintStatementNode& node) override {
+  virtual void VisitLeave(IfStatementNode &node) override {
     DefaultVisit(node);
   }
 
-  virtual void VisitEnter(ProgramNode& node) override { DefaultVisit(node); }
-  virtual void VisitLeave(ProgramNode& node) override { DefaultVisit(node); }
-
-  virtual void VisitEnter(ReturnStatementNode& node) override {
+  virtual void VisitEnter(LambdaInvocationNode &node) override {
     DefaultVisit(node);
   }
-  virtual void VisitLeave(ReturnStatementNode& node) override {
+  virtual void VisitLeave(LambdaInvocationNode &node) override {
+    DefaultVisit(node);
+  }
+
+  virtual void VisitEnter(LambdaNode &node) override { DefaultVisit(node); }
+  virtual void VisitLeave(LambdaNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(LambdaParameterNode &node) override {
+    DefaultVisit(node);
+  }
+  virtual void VisitLeave(LambdaParameterNode &node) override {
+    DefaultVisit(node);
+  }
+
+  virtual void VisitEnter(LambdaTypeNode &node) override { DefaultVisit(node); }
+  virtual void VisitLeave(LambdaTypeNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(MainNode &node) override { DefaultVisit(node); }
+  virtual void VisitLeave(MainNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(OperatorNode &node) override { DefaultVisit(node); }
+  virtual void VisitLeave(OperatorNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(PrintStatementNode &node) override {
+    DefaultVisit(node);
+  }
+  virtual void VisitLeave(PrintStatementNode &node) override {
+    DefaultVisit(node);
+  }
+
+  virtual void VisitEnter(ProgramNode &node) override { DefaultVisit(node); }
+  virtual void VisitLeave(ProgramNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(ReturnStatementNode &node) override {
+    DefaultVisit(node);
+  }
+  virtual void VisitLeave(ReturnStatementNode &node) override {
     DefaultVisit(node);
   }
 
   // ---- Leaf nodes
   // -----------------------------------------------------------------------
-  virtual void Visit(ErrorNode& node) override { DefaultVisit(node); }
-  virtual void Visit(NopNode& node) override { DefaultVisit(node); }
-  virtual void Visit(IdentifierNode& node) override { DefaultVisit(node); }
-  virtual void Visit(BooleanLiteralNode& node) override { DefaultVisit(node); }
-  virtual void Visit(CharacterLiteralNode& node) override {
+  virtual void Visit(ErrorNode &node) override { DefaultVisit(node); }
+  virtual void Visit(NopNode &node) override { DefaultVisit(node); }
+  virtual void Visit(IdentifierNode &node) override { DefaultVisit(node); }
+  virtual void Visit(BooleanLiteralNode &node) override { DefaultVisit(node); }
+  virtual void Visit(CharacterLiteralNode &node) override {
     DefaultVisit(node);
   }
-  virtual void Visit(IntegerLiteralNode& node) override { DefaultVisit(node); }
-  virtual void Visit(StringLiteralNode& node) override { DefaultVisit(node); }
-  virtual void Visit(BaseTypeNode& node) override { DefaultVisit(node); }
+  virtual void Visit(IntegerLiteralNode &node) override { DefaultVisit(node); }
+  virtual void Visit(StringLiteralNode &node) override { DefaultVisit(node); }
+  virtual void Visit(BaseTypeNode &node) override { DefaultVisit(node); }
 
  private:
-  void DefaultVisit(ParseNode& node) {}
+  void DefaultVisit(ParseNode &node) {}
 };
 
 #endif  // PARSE_NODE_VISITOR_H_

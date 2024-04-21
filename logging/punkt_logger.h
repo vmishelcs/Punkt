@@ -15,9 +15,9 @@ class PunktLogger {
   PunktLogger(const PunktLogger &) = delete;
   void operator=(const PunktLogger &) = delete;
 
-  // Logs an error for the Punkt programmer. The 'log_type' parameter is used to
-  // display which compilation step encountered the error (e.g. SCANNER, PARSER,
-  // SYMBOL_TABLE, etc).
+  // Logs an error for the Punkt programmer. The 'log_type' parameter is used
+  // to display which compilation step encountered the error (e.g. SCANNER,
+  // PARSER, SYMBOL_TABLE, etc).
   static void Log(LogType log_type, std::string message);
 
   // Logs a fatal error for the Punkt programmer. This should be used to user
@@ -26,8 +26,8 @@ class PunktLogger {
   static void LogFatal(std::string message);
 
   /// @brief For logging internal errors within the compiler. This should only
-  /// be used in unrecoverable situations (e.g. error during code generation) as
-  /// this will crash the program.
+  /// be used in unrecoverable situations (e.g. error during code generation)
+  /// as this will crash the program.
   static void *LogFatalInternalError(std::string message);
 
   // Returns true if there are user-facing compilation errors.
@@ -55,7 +55,7 @@ class PunktLogger {
   static std::unique_ptr<PunktLogger> instance;
   static PunktLogger *GetInstance();
 
-  std::map<LogType, std::unique_ptr<Logger>> loggers;
+  std::map<LogType, std::unique_ptr<Logger> > loggers;
 };
 
 #endif  // PUNKT_LOGGER_H_

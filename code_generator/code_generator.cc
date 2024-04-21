@@ -17,7 +17,7 @@ CodeGenerator::CodeGenerator(std::unique_ptr<ParseNode> decorated_ast,
       output_file_path(output_file_path) {}
 
 void CodeGenerator::WriteIRToOutputFile() {
-  ProgramNode& program_node = dynamic_cast<ProgramNode&>(*decorated_ast);
+  ProgramNode &program_node = dynamic_cast<ProgramNode &>(*decorated_ast);
   CodeGenerationVisitor code_generation_visitor(program_node.GetModuleID());
 
   decorated_ast->GenerateCode(code_generation_visitor);

@@ -18,7 +18,7 @@ class LambdaInvocationNode : public ParseNode {
   static std::unique_ptr<LambdaInvocationNode>
   CreateLambdaInvocationNodeWithArguments(
       std::unique_ptr<ParseNode> identifier,
-      std::vector<std::unique_ptr<ParseNode>> args);
+      std::vector<std::unique_ptr<ParseNode> > args);
 
   ParseNode *GetCalleeNode() const { return GetChild(0); }
 

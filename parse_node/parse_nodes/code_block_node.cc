@@ -11,12 +11,12 @@ std::string CodeBlockNode::ToString() const {
   return "CODE BLOCK NODE: " + token->ToString();
 }
 
-void CodeBlockNode::Accept(ParseNodeVisitor& visitor) {
+void CodeBlockNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* CodeBlockNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *CodeBlockNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

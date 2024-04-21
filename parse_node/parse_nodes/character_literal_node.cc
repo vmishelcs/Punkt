@@ -9,8 +9,8 @@ CharacterLiteralNode::CharacterLiteralNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::CHARACTER_LITERAL_NODE, std::move(token)) {}
 
 char CharacterLiteralNode::GetValue() const {
-  CharacterLiteralToken& character_literal_token =
-      dynamic_cast<CharacterLiteralToken&>(*(this->token));
+  CharacterLiteralToken &character_literal_token =
+      dynamic_cast<CharacterLiteralToken &>(*(this->token));
   return character_literal_token.GetValue();
 }
 
@@ -18,10 +18,10 @@ std::string CharacterLiteralNode::ToString() const {
   return "CHARACTER LITERAL NODE: " + token->ToString();
 }
 
-void CharacterLiteralNode::Accept(ParseNodeVisitor& visitor) {
+void CharacterLiteralNode::Accept(ParseNodeVisitor &visitor) {
   visitor.Visit(*this);
 }
 
-llvm::Value* CharacterLiteralNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *CharacterLiteralNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

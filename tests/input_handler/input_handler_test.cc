@@ -8,7 +8,7 @@
 
 class InputHandlerTest : public ::testing::Test {
  protected:
-  void ReadFileIntoBuffer(fs::path& file_path, std::string& buffer) {
+  void ReadFileIntoBuffer(fs::path &file_path, std::string &buffer) {
     std::ifstream file(file_path);
     char c = 0;
     while (file >> std::noskipws >> c) {
@@ -109,7 +109,7 @@ TEST_F(InputHandlerTest, TestLargeInput) {
   }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

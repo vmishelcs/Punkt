@@ -6,7 +6,7 @@
 class ReservedComponent {
  public:
   ReservedComponent(std::string lexeme) : lexeme(lexeme) {}
-  ReservedComponent(ReservedComponent&& reserved_component)
+  ReservedComponent(ReservedComponent &&reserved_component)
       : lexeme(std::move(reserved_component.lexeme)) {}
 
   std::string GetLexeme() const { return lexeme; }

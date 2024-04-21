@@ -7,7 +7,7 @@
 struct TextLocation {
   TextLocation(std::string file_name, int line, int column)
       : file_name(file_name), line(line), column(column) {}
-  TextLocation(const TextLocation& tl)
+  TextLocation(const TextLocation &tl)
       : file_name(tl.file_name), line(tl.line), column(tl.column) {}
 
   std::string ToString() const {
@@ -21,7 +21,7 @@ struct TextLocation {
   int column;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const TextLocation& tl) {
+inline std::ostream &operator<<(std::ostream &os, const TextLocation &tl) {
   os << tl.file_name << ":" << tl.line << ":" << tl.column;
   return os;
 }

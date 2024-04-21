@@ -16,10 +16,10 @@ enum class SymbolType { VARIABLE, LAMBDA };
 struct SymbolTableEntry {
   const TextLocation text_location;
   bool is_mutable;
-  Type* type;
+  Type *type;
   SymbolType symbol_type;
-  llvm::AllocaInst* alloca;
-  llvm::Function* function;
+  llvm::AllocaInst *alloca;
+  llvm::Function *function;
 };
 
 class SymbolTable {
@@ -32,21 +32,21 @@ class SymbolTable {
   /// @param type Variable type.
   /// @param symbol_type The type of symbol table entry (variable or function).
   /// @returns A pointer to the newly inserted symbol table entry.
-  SymbolTableEntry* Insert(const std::string& symbol, const TextLocation& tl,
-                           bool is_mutable, Type* type, SymbolType symbol_type);
+  SymbolTableEntry *Insert(const std::string &symbol, const TextLocation &tl,
+                           bool is_mutable, Type *type, SymbolType symbol_type);
 
-  SymbolTableEntry* Get(const std::string& symbol);
+  SymbolTableEntry *Get(const std::string &symbol);
 
-  bool Contains(const std::string& symbol) const;
+  bool Contains(const std::string &symbol) const;
 
-  static void UndefinedSymbolReference(const std::string& symbol,
-                                       const TextLocation& tl);
+  static void UndefinedSymbolReference(const std::string &symbol,
+                                       const TextLocation &tl);
 
  private:
-  void SymbolRedefinitionError(const std::string& symbol,
-                               const TextLocation& tl);
+  void SymbolRedefinitionError(const std::string &symbol,
+                               const TextLocation &tl);
 
-  std::unordered_map<std::string, std::unique_ptr<SymbolTableEntry>> table;
+  std::unordered_map<std::string, std::unique_ptr<SymbolTableEntry> > table;
 };
 
 #endif  // SYMBOL_TABLE_H_

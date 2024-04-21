@@ -33,7 +33,7 @@ enum class PunctuatorEnum {
 class Punctuator : public ReservedComponent {
  public:
   Punctuator(std::string lexeme);
-  Punctuator(Punctuator&& punctuator);
+  Punctuator(Punctuator &&punctuator);
 
   PunctuatorEnum GetPunctuatorEnum() const;
 

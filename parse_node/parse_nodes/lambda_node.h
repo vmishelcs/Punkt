@@ -18,22 +18,25 @@ class LambdaNode : public ParseNode {
   /// @brief Attach the specified `ParseNode` to `this` node to represent a
   /// parameter.
   /// @param parameter_node A `ParseNode` representing a lambda parameter.
-  /// @warning This method attaches its argument using `ParseNode::AppendChild`,
-  /// appending it to the end of the children vector field.
+  /// @warning This method attaches its argument using
+  /// `ParseNode::AppendChild`, appending it to the end of the children vector
+  /// field.
   void AddParameterNode(std::unique_ptr<ParseNode> parameter_node);
 
   /// @brief Attach the specified `ParseNode` to `this` node to represent a
   /// return type.
   /// @param parameter_node A `ParseNode` representing a lambda return type.
-  /// @warning This method attaches its argument using `ParseNode::AppendChild`,
-  /// appending it to the end of the children vector field.
+  /// @warning This method attaches its argument using
+  /// `ParseNode::AppendChild`, appending it to the end of the children vector
+  /// field.
   void AddReturnTypeNode(std::unique_ptr<ParseNode> return_type_node);
 
   /// @brief Attach the specified `ParseNode` to `this` node to represent a
   /// lambda body.
   /// @param parameter_node A `ParseNode` representing a lambda body.
-  /// @warning This method attaches its argument using `ParseNode::AppendChild`,
-  /// appending it to the end of the children vector field.
+  /// @warning This method attaches its argument using
+  /// `ParseNode::AppendChild`, appending it to the end of the children vector
+  /// field.
   void AddLambdaBodyNode(std::unique_ptr<ParseNode> lambda_body);
 
   std::vector<LambdaParameterNode *> GetParameterNodes() {

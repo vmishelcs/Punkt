@@ -11,8 +11,8 @@
 
 class Signatures {
  public:
-  /// @brief Checks if the specified punctuator has a signature that matches the
-  /// provided input types.
+  /// @brief Checks if the specified punctuator has a signature that matches
+  /// the provided input types.
   /// @param punctuator `PunctuatorEnum` describing a punctuator (i.e.
   /// operator).
   /// @param types Operand types that the punctuator (or operator) should
@@ -24,7 +24,7 @@ class Signatures {
                                              std::vector<Type *> &types);
 
  private:
-  static std::unordered_map<PunctuatorEnum, std::vector<Signature>>
+  static std::unordered_map<PunctuatorEnum, std::vector<Signature> >
       signature_map;
 };
 

@@ -12,9 +12,9 @@ class CharacterLiteralNode : public ParseNode {
 
   virtual std::string ToString() const override;
 
-  virtual void Accept(ParseNodeVisitor& visitor) override;
+  virtual void Accept(ParseNodeVisitor &visitor) override;
 
-  virtual llvm::Value* GenerateCode(ParseNodeIRVisitor& visitor) override;
+  virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 };
 
 #endif  // CHARACTER_LITERAL_NODE_H_

@@ -67,11 +67,11 @@ class BaseType : public Type {
   ///         specified `BaseTypeEnum`, `false` otherwise.
   bool IsEquivalentTo(BaseTypeEnum base_type_enum) const;
 
-  /// @brief Checks if this `BaseType` is equivalent to the `Type` pointed to by
-  /// `other_type`.
+  /// @brief Checks if this `BaseType` is equivalent to the `Type` pointed to
+  /// by `other_type`.
   /// @param other_type `Type` pointer.
-  /// @return `true` if this type is semantically equivalent to the type pointed
-  /// to by
+  /// @return `true` if this type is semantically equivalent to the type
+  /// pointed to by
   ///         `other_type`, `false` otherwise.
   virtual bool IsEquivalentTo(Type *other_type) const override;
 

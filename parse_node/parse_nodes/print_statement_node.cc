@@ -10,12 +10,12 @@ std::string PrintStatementNode::ToString() const {
   return "PRINT STATEMENT NODE: " + token->ToString();
 }
 
-void PrintStatementNode::Accept(ParseNodeVisitor& visitor) {
+void PrintStatementNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* PrintStatementNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *PrintStatementNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

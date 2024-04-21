@@ -12,12 +12,12 @@ std::string ForStatementNode::ToString() const {
   return "FOR STATEMENT NODE: " + token->ToString();
 }
 
-void ForStatementNode::Accept(ParseNodeVisitor& visitor) {
+void ForStatementNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* ForStatementNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *ForStatementNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

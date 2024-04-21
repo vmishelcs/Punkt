@@ -10,12 +10,12 @@ std::string MainNode::ToString() const {
   return "MAIN NODE: " + token->ToString();
 }
 
-void MainNode::Accept(ParseNodeVisitor& visitor) {
+void MainNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);
   visitor.VisitLeave(*this);
 }
 
-llvm::Value* MainNode::GenerateCode(ParseNodeIRVisitor& visitor) {
+llvm::Value *MainNode::GenerateCode(ParseNodeIRVisitor &visitor) {
   return visitor.GenerateCode(*this);
 }

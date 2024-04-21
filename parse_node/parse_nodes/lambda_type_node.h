@@ -20,8 +20,8 @@ class LambdaTypeNode : public ParseNode {
   /// @brief Attach the specified `ParseNode` to `this` node to represent a
   /// parameter type.
   /// @param parameter_node A `ParseNode` representing a lambda parameter type.
-  /// @warning This method attaches its argument using `ParseNode::AppendChild`,
-  /// appending it to the end of the children vector.
+  /// @warning This method attaches its argument using
+  /// `ParseNode::AppendChild`, appending it to the end of the children vector.
   void AddParameterTypeNode(std::unique_ptr<ParseNode> parameter_type_node) {
     parameter_type_nodes.push_back(parameter_type_node.get());
     AppendChild(std::move(parameter_type_node));
@@ -30,8 +30,8 @@ class LambdaTypeNode : public ParseNode {
   /// @brief Attach the specified `ParseNode` to `this` node to represent a
   /// return type.
   /// @param parameter_node A `ParseNode` representing a lambda return type.
-  /// @warning This method attaches its argument using `ParseNode::AppendChild`,
-  /// appending it to the end of the children vector.
+  /// @warning This method attaches its argument using
+  /// `ParseNode::AppendChild`, appending it to the end of the children vector.
   void AddReturnTypeNode(std::unique_ptr<ParseNode> return_type_node) {
     this->return_type_node = return_type_node.get();
     AppendChild(std::move(return_type_node));
