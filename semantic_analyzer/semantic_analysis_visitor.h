@@ -5,8 +5,7 @@
 
 class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
  public:
-  // ---- Non-leaf nodes
-  // -------------------------------------------------------------------
+  // ---- Non-leaf nodes -------------------------------------------------------
   virtual void VisitLeave(AssignmentStatementNode &node) override;
 
   virtual void VisitLeave(CallStatementNode &node) override;
@@ -33,8 +32,7 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
 
   virtual void VisitLeave(ReturnStatementNode &node) override;
 
-  // ---- Leaf nodes
-  // -----------------------------------------------------------------------
+  // ---- Leaf nodes -----------------------------------------------------------
   virtual void Visit(ErrorNode &node) override;
   virtual void Visit(IdentifierNode &node) override;
   virtual void Visit(BooleanLiteralNode &node) override;
@@ -43,21 +41,18 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
   virtual void Visit(StringLiteralNode &node) override;
 
  private:
-  // ---- Miscellaneous helpers
-  // ------------------------------------------------------------
+  // ---- Miscellaneous helpers ------------------------------------------------
   void DeclareInLocalScope(IdentifierNode &node, bool is_mutable, Type *type,
                            SymbolType symbol_type);
   bool IsBeingDeclared(IdentifierNode &node);
   bool IsParameterIdentifier(IdentifierNode &node);
 
-  // ---- Scoping
-  // --------------------------------------------------------------------------
+  // ---- Scoping --------------------------------------------------------------
   void CreateParameterScope(ParseNode &node);
   void CreateProcedureScope(ParseNode &node);
   void CreateSubscope(ParseNode &node);
 
-  // ---- Error reporting
-  // ------------------------------------------------------------------
+  // ---- Error reporting ------------------------------------------------------
   void DeclarationOfVarWithVoidTypeError(DeclarationStatementNode &node);
   void InvalidOperandTypeError(OperatorNode &node, std::vector<Type *> &types);
   void NonBooleanConditionError(IfStatementNode &node);

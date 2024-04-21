@@ -129,7 +129,7 @@ std::unique_ptr<ParseNode> Parser::ParseFunctionDefinition() {
 }
 
 bool Parser::StartsLambda(Token &token) {
-  return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_L});
+  return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_LT});
 }
 std::unique_ptr<ParseNode> Parser::ParseLambda() {
   if (!StartsLambda(*now_reading)) {
@@ -161,7 +161,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
   }
 
   // Expect closing '>'.
-  Expect(PunctuatorEnum::CMP_G);
+  Expect(PunctuatorEnum::CMP_GT);
 
   // Expect '->' before return type.
   Expect(PunctuatorEnum::ARROW);
@@ -580,7 +580,7 @@ std::unique_ptr<ParseNode> Parser::ParseComparisonExpression() {
   auto lhs = ParseAdditiveExpression();
 
   while (PunctuatorToken::IsTokenPunctuator(
-      &(*now_reading), {PunctuatorEnum::CMP_G, PunctuatorEnum::CMP_L,
+      &(*now_reading), {PunctuatorEnum::CMP_GT, PunctuatorEnum::CMP_LT,
                         PunctuatorEnum::CMP_GEQ, PunctuatorEnum::CMP_LEQ})) {
     auto comparison_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
@@ -847,7 +847,7 @@ std::unique_ptr<ParseNode> Parser::ParseBaseType() {
 }
 
 bool Parser::StartsLambdaType(Token &token) {
-  return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_L});
+  return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_LT});
 }
 std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
   if (!StartsLambdaType(*now_reading)) {
@@ -872,7 +872,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
   }
 
   // Expect closing '>'.
-  Expect(PunctuatorEnum::CMP_G);
+  Expect(PunctuatorEnum::CMP_GT);
 
   // Expect '->' before return type.
   Expect(PunctuatorEnum::ARROW);

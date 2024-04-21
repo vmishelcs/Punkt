@@ -36,7 +36,7 @@ CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
 }
 
 void CodeGenerationVisitor::WriteIRToFD(int fd) {
-  llvm::raw_fd_ostream ir_ostream(fd, /* shouldClose = */ false);
+  llvm::raw_fd_ostream ir_ostream(fd, /*shouldClose=*/false);
   module->print(ir_ostream, nullptr);
 }
 
@@ -586,9 +586,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
                              node.GetName());
 }
 
-//--------------------------------------------------------------------------------------//
-//                            Code generation for constants //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                        Code generation for literals                        *
+ ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(BooleanLiteralNode &node) {
   return llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context),
                                 (int)node.GetValue());
@@ -613,15 +613,18 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
   return nullptr;
 }
 
+/******************************************************************************
+ *                            NOP code generation                             *
+ ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
   return builder->CreateAdd(
       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0), "nop");
 }
 
-//--------------------------------------------------------------------------------------//
-//                               Print statement helpers //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                              Printing helpers                              *
+ ******************************************************************************/
 void CodeGenerationVisitor::GeneratePrintfDeclaration() {
   // Create a vector for parameters
   std::vector<llvm::Type *> parameters(1,
@@ -764,9 +767,9 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
       temp_char_base_type.get());
 }
 
-//--------------------------------------------------------------------------------------//
-//                                Miscellaneous helpers //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                           Miscellaneous helpers                            *
+ ******************************************************************************/
 void CodeGenerationVisitor::GenerateGlobalConstants() {
   GeneratePrintfFmtStringsForBaseTypes();
 }
@@ -779,9 +782,9 @@ llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(
   return tmp_builder.CreateAlloca(llvm_type, nullptr, identifier_name);
 }
 
-//--------------------------------------------------------------------------------------//
-//                                    Error handling //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                               Error handling                               *
+ ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode &node) {
   return CodeGenerationInternalError("encountered ErrorNode " +
                                      node.ToString());

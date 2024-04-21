@@ -6,8 +6,7 @@
 
 class SemanticAnalysisPreprocessor : public DefaultParseNodeVisitor {
  public:
-  // ---- Non-leaf nodes
-  // -------------------------------------------------------------------
+  // ---- Non-leaf nodes -------------------------------------------------------
   virtual void VisitLeave(FunctionDefinitionNode &node) override;
 
   virtual void VisitLeave(LambdaNode &node) override;
@@ -18,21 +17,17 @@ class SemanticAnalysisPreprocessor : public DefaultParseNodeVisitor {
 
   virtual void VisitEnter(ProgramNode &node) override;
 
-  // ---- Leaf nodes
-  // -----------------------------------------------------------------------
+  // ---- Leaf nodes -----------------------------------------------------------
   virtual void Visit(BaseTypeNode &node) override;
 
  private:
-  // ---- Scoping
-  // --------------------------------------------------------------------------
+  // ---- Scoping --------------------------------------------------------------
   void CreateGlobalScope(ParseNode &node);
 
-  // ---- Miscellaneous helpers
-  // ------------------------------------------------------------
+  // ---- Miscellaneous helpers ------------------------------------------------
   void DeclareFunction(IdentifierNode &node, Type *type);
 
-  // ---- Error reporting
-  // ------------------------------------------------------------------
+  // ---- Error reporting ------------------------------------------------------
   void VoidParameterTypeError(ParseNode &type_node);
 };
 

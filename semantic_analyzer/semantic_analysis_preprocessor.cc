@@ -10,9 +10,9 @@
 #include <algorithm>
 #include <iterator>
 
-//--------------------------------------------------------------------------------------//
-//                                    Non-leaf nodes //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                               Non-leaf nodes                               *
+ ******************************************************************************/
 void SemanticAnalysisPreprocessor::VisitLeave(FunctionDefinitionNode &node) {
   auto lambda_node = node.GetLambdaNode();
   if (!lambda_node) {
@@ -75,23 +75,23 @@ void SemanticAnalysisPreprocessor::VisitEnter(ProgramNode &node) {
   CreateGlobalScope(node);
 }
 
-//--------------------------------------------------------------------------------------//
-//                                      Leaf nodes //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                                 Leaf nodes                                 *
+ ******************************************************************************/
 void SemanticAnalysisPreprocessor::Visit(BaseTypeNode &node) {
   node.SetType(node.InferOwnType());
 }
 
-//--------------------------------------------------------------------------------------//
-//                                       Scoping //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                                  Scoping                                   *
+ ******************************************************************************/
 void SemanticAnalysisPreprocessor::CreateGlobalScope(ParseNode &node) {
   node.SetScope(Scope::CreateGlobalScope());
 }
 
-//--------------------------------------------------------------------------------------//
-//                                Miscellaneous helpers //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                           Miscellaneous helpers                            *
+ ******************************************************************************/
 void SemanticAnalysisPreprocessor::DeclareFunction(IdentifierNode &node,
                                                    Type *type) {
   Scope *local_scope = node.GetLocalScope();
@@ -101,9 +101,9 @@ void SemanticAnalysisPreprocessor::DeclareFunction(IdentifierNode &node,
   node.SetSymbolTableEntry(symbol_table_entry);
 }
 
-//--------------------------------------------------------------------------------------//
-//                                   Error reporting //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                              Error reporting                               *
+ ******************************************************************************/
 void SemanticAnalysisPreprocessor::VoidParameterTypeError(
     ParseNode &type_node) {
   std::string message = "parameter cannot have void type at " +

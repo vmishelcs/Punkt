@@ -1,5 +1,5 @@
-add_library(operator_code_generator operator_code_generator.cc)
-target_link_libraries(operator_code_generator
+add_library(operator_codegen operator_codegen.cc)
+target_link_libraries(operator_codegen
     ${llvm_libs}
 )
 

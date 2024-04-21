@@ -11,9 +11,9 @@
 #include "types/lambda_type.h"
 #include "types/type.h"
 
-//--------------------------------------------------------------------------------------//
-//                                    Non-leaf nodes //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                               Non-leaf nodes                               *
+ ******************************************************************************/
 void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode &node) {
   ParseNode *target = node.GetTargetNode();
   if (auto identifier_node = dynamic_cast<IdentifierNode *>(target)) {
@@ -283,9 +283,9 @@ void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode &node) {
   }
 }
 
-//--------------------------------------------------------------------------------------//
-//                                      Leaf nodes //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                                 Leaf nodes                                 *
+ ******************************************************************************/
 void SemanticAnalysisVisitor::Visit(ErrorNode &node) {
   node.SetType(BaseType::CreateErrorType());
 }
@@ -325,9 +325,9 @@ void SemanticAnalysisVisitor::Visit(StringLiteralNode &node) {
   node.SetType(BaseType::CreateStringType());
 }
 
-//--------------------------------------------------------------------------------------//
-//                                Miscellaneous helpers //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                           Miscellaneous helpers                            *
+ ******************************************************************************/
 void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode &node,
                                                   bool is_mutable, Type *type,
                                                   SymbolType symbol_type) {
@@ -350,9 +350,9 @@ bool SemanticAnalysisVisitor::IsParameterIdentifier(IdentifierNode &node) {
          ParseNodeType::LAMBDA_PARAMETER_NODE;
 }
 
-//--------------------------------------------------------------------------------------//
-//                                       Scoping //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                                  Scoping                                   *
+ ******************************************************************************/
 void SemanticAnalysisVisitor::CreateParameterScope(ParseNode &node) {
   Scope *local_scope = node.GetLocalScope();
   node.SetScope(local_scope->CreateParameterScope());
@@ -366,9 +366,9 @@ void SemanticAnalysisVisitor::CreateSubscope(ParseNode &node) {
   node.SetScope(local_scope->CreateSubscope());
 }
 
-//--------------------------------------------------------------------------------------//
-//                                    Error handling //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                               Error handling                               *
+ ******************************************************************************/
 void SemanticAnalysisVisitor::DeclarationOfVarWithVoidTypeError(
     DeclarationStatementNode &node) {
   std::string message = "variable declared with type void at " +
