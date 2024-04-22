@@ -209,6 +209,17 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
     child_types.push_back(child_type);
   }
 
+  // If this operator node represents assignment, make sure the left-hand side
+  // is a targettable expression.
+  if (PunctuatorToken::IsTokenPunctuator(node.GetToken(),
+                                         {PunctuatorEnum::EQUAL})) {
+    if (!dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
+      NonTargettableExpressionError(node);
+      node.SetType(BaseType::CreateErrorType());
+      return;
+    }
+  }
+
   auto punctuator_token = static_cast<PunctuatorToken *>(node.GetToken());
   auto signature = Signatures::AcceptingSignature(
       punctuator_token->GetPunctuatorEnum(), child_types);
@@ -220,6 +231,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
     InvalidOperandTypeError(node, child_types);
     node.SetType(BaseType::CreateErrorType());
   }
+  signature->ResetArbitraryTypes();
 }
 
 void SemanticAnalysisVisitor::VisitLeave(PrintStatementNode &node) {

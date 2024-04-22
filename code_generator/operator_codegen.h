@@ -7,71 +7,77 @@
 
 namespace operator_codegen {
 
+// ---- Assignment -------------------------------------------------------------
+llvm::Value *AssignmentCodegen(llvm::LLVMContext *context,
+                               llvm::IRBuilder<> *builder, llvm::Value *target,
+                               llvm::Value *new_value);
+
+// ---- NOP --------------------------------------------------------------------
 llvm::Value *UnaryNop(llvm::LLVMContext *context, llvm::IRBuilder<> *builder,
                       llvm::Value *operand);
 
-// ---- Booleans -------------------------------------------------------------
-llvm::Value *BooleanCmpEQCodeGenerator(llvm::LLVMContext *context,
-                                       llvm::IRBuilder<> *builder,
-                                       llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *BooleanCmpNEQCodeGenerator(llvm::LLVMContext *context,
-                                        llvm::IRBuilder<> *builder,
-                                        llvm::Value *lhs, llvm::Value *rhs);
+// ---- Booleans ---------------------------------------------------------------
+llvm::Value *BooleanCmpEQCodegen(llvm::LLVMContext *context,
+                                 llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                 llvm::Value *rhs);
+llvm::Value *BooleanCmpNEQCodegen(llvm::LLVMContext *context,
+                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                  llvm::Value *rhs);
 
-// ---- Characters -----------------------------------------------------------
-llvm::Value *CharacterCmpEQCodeGenerator(llvm::LLVMContext *context,
-                                         llvm::IRBuilder<> *builder,
-                                         llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *CharacterCmpNEQCodeGenerator(llvm::LLVMContext *context,
-                                          llvm::IRBuilder<> *builder,
-                                          llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *CharacterCmpGTCodeGenerator(llvm::LLVMContext *context,
-                                         llvm::IRBuilder<> *builder,
-                                         llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *CharacterCmpLTCodeGenerator(llvm::LLVMContext *context,
-                                         llvm::IRBuilder<> *builder,
-                                         llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *CharacterCmpGEQCodeGenerator(llvm::LLVMContext *context,
-                                          llvm::IRBuilder<> *builder,
-                                          llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *CharacterCmpLEQCodeGenerator(llvm::LLVMContext *context,
-                                          llvm::IRBuilder<> *builder,
-                                          llvm::Value *lhs, llvm::Value *rhs);
+// ---- Characters -------------------------------------------------------------
+llvm::Value *CharacterCmpEQCodegen(llvm::LLVMContext *context,
+                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                   llvm::Value *rhs);
+llvm::Value *CharacterCmpNEQCodegen(llvm::LLVMContext *context,
+                                    llvm::IRBuilder<> *builder,
+                                    llvm::Value *lhs, llvm::Value *rhs);
+llvm::Value *CharacterCmpGTCodegen(llvm::LLVMContext *context,
+                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                   llvm::Value *rhs);
+llvm::Value *CharacterCmpLTCodegen(llvm::LLVMContext *context,
+                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                   llvm::Value *rhs);
+llvm::Value *CharacterCmpGEQCodegen(llvm::LLVMContext *context,
+                                    llvm::IRBuilder<> *builder,
+                                    llvm::Value *lhs, llvm::Value *rhs);
+llvm::Value *CharacterCmpLEQCodegen(llvm::LLVMContext *context,
+                                    llvm::IRBuilder<> *builder,
+                                    llvm::Value *lhs, llvm::Value *rhs);
 
-// ---- Integers -------------------------------------------------------------
-llvm::Value *IntegerNegationCodeGenerator(llvm::LLVMContext *context,
-                                          llvm::IRBuilder<> *builder,
-                                          llvm::Value *operand);
-llvm::Value *IntegerAddCodeGenerator(llvm::LLVMContext *context,
-                                     llvm::IRBuilder<> *builder,
-                                     llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerSubtractCodeGenerator(llvm::LLVMContext *context,
-                                          llvm::IRBuilder<> *builder,
-                                          llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerMultiplyCodeGenerator(llvm::LLVMContext *context,
-                                          llvm::IRBuilder<> *builder,
-                                          llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerDivideCodeGenerator(llvm::LLVMContext *context,
-                                        llvm::IRBuilder<> *builder,
-                                        llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerCmpEQCodeGenerator(llvm::LLVMContext *context,
-                                       llvm::IRBuilder<> *builder,
-                                       llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerCmpNEQCodeGenerator(llvm::LLVMContext *context,
-                                        llvm::IRBuilder<> *builder,
-                                        llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerCmpGTCodeGenerator(llvm::LLVMContext *context,
-                                       llvm::IRBuilder<> *builder,
-                                       llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerCmpLTCodeGenerator(llvm::LLVMContext *context,
-                                       llvm::IRBuilder<> *builder,
-                                       llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerCmpGEQCodeGenerator(llvm::LLVMContext *context,
-                                        llvm::IRBuilder<> *builder,
-                                        llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerCmpLEQCodeGenerator(llvm::LLVMContext *context,
-                                        llvm::IRBuilder<> *builder,
-                                        llvm::Value *lhs, llvm::Value *rhs);
+// ---- Integers ---------------------------------------------------------------
+llvm::Value *IntegerNegationCodegen(llvm::LLVMContext *context,
+                                    llvm::IRBuilder<> *builder,
+                                    llvm::Value *operand);
+llvm::Value *IntegerAddCodegen(llvm::LLVMContext *context,
+                               llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                               llvm::Value *rhs);
+llvm::Value *IntegerSubtractCodegen(llvm::LLVMContext *context,
+                                    llvm::IRBuilder<> *builder,
+                                    llvm::Value *lhs, llvm::Value *rhs);
+llvm::Value *IntegerMultiplyCodegen(llvm::LLVMContext *context,
+                                    llvm::IRBuilder<> *builder,
+                                    llvm::Value *lhs, llvm::Value *rhs);
+llvm::Value *IntegerDivideCodegen(llvm::LLVMContext *context,
+                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                  llvm::Value *rhs);
+llvm::Value *IntegerCmpEQCodegen(llvm::LLVMContext *context,
+                                 llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                 llvm::Value *rhs);
+llvm::Value *IntegerCmpNEQCodegen(llvm::LLVMContext *context,
+                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                  llvm::Value *rhs);
+llvm::Value *IntegerCmpGTCodegen(llvm::LLVMContext *context,
+                                 llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                 llvm::Value *rhs);
+llvm::Value *IntegerCmpLTCodegen(llvm::LLVMContext *context,
+                                 llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                 llvm::Value *rhs);
+llvm::Value *IntegerCmpGEQCodegen(llvm::LLVMContext *context,
+                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                  llvm::Value *rhs);
+llvm::Value *IntegerCmpLEQCodegen(llvm::LLVMContext *context,
+                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                  llvm::Value *rhs);
 
 };  // namespace operator_codegen
 

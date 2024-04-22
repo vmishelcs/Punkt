@@ -43,7 +43,7 @@ class LambdaType : public Type {
   /// @return `true` if this type is semantically equivalent to the `Type`
   /// specified by the
   ///         pointer `other_type`, `false` otherwise.
-  virtual bool IsEquivalentTo(Type *other_type) const override;
+  virtual bool IsEquivalentTo(Type *other_type) override;
 
   /// @brief Creates a `unique_ptr` to a `Lambda` object that is semantically
   /// equivalent to `this`.

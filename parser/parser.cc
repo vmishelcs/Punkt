@@ -193,7 +193,7 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
 
 bool Parser::StartsStatement(Token &token) {
   return StartsCodeBlock(token) || StartsDeclaration(token) ||
-         StartsAssignment(token) || StartsIfStatement(token) ||
+         StartsExpressionStatement(token) || StartsIfStatement(token) ||
          StartsForStatement(token) || StartsCallStatement(token) ||
          StartsPrintStatement(token) || StartsReturnStatement(token);
 }
@@ -303,30 +303,30 @@ std::unique_ptr<ParseNode> Parser::ParseExpressionStatement(
   return expr_stmt_node;
 }
 
-bool Parser::StartsAssignment(Token &token) {
-  return StartsTargettableExpression(token);
-}
-std::unique_ptr<ParseNode> Parser::ParseAssignment(bool expect_terminator) {
-  if (!StartsAssignment(*now_reading)) {
-    return SyntaxErrorUnexpectedToken("assignment statement");
-  }
+// bool Parser::StartsAssignment(Token &token) {
+//   return StartsTargettableExpression(token);
+// }
+// std::unique_ptr<ParseNode> Parser::ParseAssignment(bool expect_terminator) {
+//   if (!StartsAssignment(*now_reading)) {
+//     return SyntaxErrorUnexpectedToken("assignment statement");
+//   }
 
-  auto assignment = std::make_unique<AssignmentStatementNode>();
+//   auto assignment = std::make_unique<AssignmentStatementNode>();
 
-  std::unique_ptr<ParseNode> target = ParseTargettableExpression();
-  assignment->AppendChild(std::move(target));
+//   std::unique_ptr<ParseNode> target = ParseTargettableExpression();
+//   assignment->AppendChild(std::move(target));
 
-  Expect(PunctuatorEnum::EQUAL);
+//   Expect(PunctuatorEnum::EQUAL);
 
-  std::unique_ptr<ParseNode> new_value = ParseExpression();
-  assignment->AppendChild(std::move(new_value));
+//   std::unique_ptr<ParseNode> new_value = ParseExpression();
+//   assignment->AppendChild(std::move(new_value));
 
-  if (expect_terminator) {
-    Expect(PunctuatorEnum::TERMINATOR);
-  }
+//   if (expect_terminator) {
+//     Expect(PunctuatorEnum::TERMINATOR);
+//   }
 
-  return assignment;
-}
+//   return assignment;
+// }
 
 bool Parser::StartsTargettableExpression(Token &token) {
   return StartsIdentifier(token) || StartsParenthesizedExpression(token);
@@ -397,8 +397,8 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   std::unique_ptr<ParseNode> init = nullptr;
   if (StartsDeclaration(*now_reading)) {
     init = ParseDeclaration(/* expect_terminator = */ false);
-  } else if (StartsAssignment(*now_reading)) {
-    init = ParseAssignment(/* expect_terminator = */ false);
+  } else if (StartsAssignmentExpression(*now_reading)) {
+    init = ParseAssignmentExpression();
   } else {
     init = std::make_unique<NopNode>();
   }
@@ -421,8 +421,8 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   // Append a loop increment node. If no increment is specified, a noop is
   // appended.
   std::unique_ptr<ParseNode> increment = nullptr;
-  if (StartsAssignment(*now_reading)) {
-    increment = ParseAssignment(/* expect_terminator = */ false);
+  if (StartsAssignmentExpression(*now_reading)) {
+    increment = ParseAssignmentExpression();
   } else {
     increment = std::make_unique<NopNode>();
   }

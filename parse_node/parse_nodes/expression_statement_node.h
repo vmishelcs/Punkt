@@ -9,6 +9,8 @@ class ExpressionStatementNode : public ParseNode {
   ExpressionStatementNode()
       : ParseNode(ParseNodeType::EXPRESSION_STATEMENT_NODE, nullptr) {}
 
+  ParseNode *GetExpression() const { return GetChild(0); }
+
   virtual std::string ToString() const override {
     return "EXPRESSION STATEMENT NODE";
   }

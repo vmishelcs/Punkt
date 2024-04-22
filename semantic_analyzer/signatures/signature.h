@@ -47,7 +47,15 @@ class Signature {
   // Returns a variant to a code generator function.
   code_gen_function_variant GetCodeGenFunc() const;
 
-  bool Accepts(std::vector<Type *> &types) const;
+  /// @brief Checks if this signature accepts the specified types as inputs.
+  /// @param types A vector of `Type` pointers representing Punkt types.
+  /// @return `true` if this signature accepts the specified types, `false`
+  /// otherwise.
+  bool Accepts(std::vector<Type *> &types);
+
+  /// @brief Reset any `ArbitraryType` objects that this signature may hold to
+  /// have no set type.
+  void ResetArbitraryTypes();
 
  private:
   std::vector<Type *> input_types;

@@ -8,6 +8,8 @@
 #include <parse_node/parse_node_visitor.h>
 #include <token/token.h>
 
+#include "operator_node.h"
+
 IdentifierNode::IdentifierNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::IDENTIFIER_NODE, std::move(token)),
       name(std::string(this->token->GetLexeme())),
@@ -29,6 +31,16 @@ SymbolTableEntry *IdentifierNode::FindSymbolTableEntry() {
     scope = scope->GetBaseScope();
   }
   return nullptr;
+}
+
+bool IdentifierNode::IsAssignmentTarget() const {
+  ParseNode *parent = GetParent();
+  auto op_node = dynamic_cast<OperatorNode *>(parent);
+  if (op_node && PunctuatorToken::IsTokenPunctuator(op_node->GetToken(),
+                                                    {PunctuatorEnum::EQUAL})) {
+    return true;
+  }
+  return false;
 }
 
 void IdentifierNode::SetLLVMAlloca(llvm::AllocaInst *alloca) {

@@ -9,6 +9,7 @@
 
 #include "signature.h"
 
+// TODO: Make this a namespace instead of a class.
 class Signatures {
  public:
   /// @brief Checks if the specified punctuator has a signature that matches
@@ -20,8 +21,8 @@ class Signatures {
   /// @return Pointer to a `Signature` object if there exists a punctuator that
   /// accepts the types provided in the `types` vector. Otherwise, returns
   /// `nullptr`.
-  static Signature const *AcceptingSignature(PunctuatorEnum punctuator,
-                                             std::vector<Type *> &types);
+  static Signature *AcceptingSignature(PunctuatorEnum punctuator,
+                                       std::vector<Type *> &types);
 
  private:
   static std::unordered_map<PunctuatorEnum, std::vector<Signature> >

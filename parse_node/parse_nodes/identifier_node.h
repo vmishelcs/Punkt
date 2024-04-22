@@ -29,6 +29,11 @@ class IdentifierNode : public ParseNode {
   }
   SymbolTableEntry *GetSymbolTableEntry() const { return symbol_table_entry; }
 
+  /// @brief Checks if this node is a target of an assignment operation.
+  /// @return `true` if this identifer is a target of an assignment operation,
+  /// `false` otherwise.
+  bool IsAssignmentTarget() const;
+
   void SetLLVMAlloca(llvm::AllocaInst *alloca);
   void SetLLVMFunction(llvm::Function *function);
 

@@ -10,6 +10,7 @@
 #include <logging/punkt_logger.h>
 #include <semantic_analyzer/types/base_type.h>
 #include <semantic_analyzer/types/type.h>
+#include <token/punctuator_token.h>
 
 #include <variant>
 
@@ -83,7 +84,15 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode &node) {
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(
     ExpressionStatementNode &node) {
-  return nullptr;
+  if (WasPreviousInstructionBlockTerminator()) {
+    // No more instructions in this basic block.
+    return nullptr;
+  }
+
+  node.GetExpressionNode()->GenerateCode(*this);
+
+  // GenerateCode(ExpressionStatementNode&) return value is not used.
+  return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(
@@ -587,12 +596,19 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
   if (!alloca_inst) {
     CodeGenerationInternalError("unable to find alloca for " + node.ToString());
   }
+
+  // Return llvm::AllocaInst pointer if we are targetting this identifier.
+  if (node.IsAssignmentTarget()) {
+    return alloca_inst;
+  }
+
+  // Return identifier value otherwise.
   return builder->CreateLoad(alloca_inst->getAllocatedType(), alloca_inst,
                              node.GetName());
 }
 
 /******************************************************************************
- *                        Code generation for literals                        *
+ *                        Code generation for literals *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(BooleanLiteralNode &node) {
   return llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context),
@@ -619,7 +635,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
 }
 
 /******************************************************************************
- *                            NOP code generation                             *
+ *                            NOP code generation *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
   return builder->CreateAdd(
@@ -628,7 +644,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
 }
 
 /******************************************************************************
- *                              Printing helpers                              *
+ *                              Printing helpers *
  ******************************************************************************/
 void CodeGenerationVisitor::GeneratePrintfDeclaration() {
   // Create a vector for parameters
@@ -693,7 +709,8 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(Type *type) {
     return GetPrintfFmtStringForBaseType(base_type->GetBaseTypeEnum());
   }
   return CodeGenerationInternalError(
-      "CodeGenerationVisitor::GetPrintfFmtString not implemented for non-base "
+      "CodeGenerationVisitor::GetPrintfFmtString not implemented for "
+      "non-base "
       "types");
 }
 
@@ -773,7 +790,7 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
 }
 
 /******************************************************************************
- *                           Miscellaneous helpers                            *
+ *                           Miscellaneous helpers *
  ******************************************************************************/
 void CodeGenerationVisitor::GenerateGlobalConstants() {
   GeneratePrintfFmtStringsForBaseTypes();
@@ -788,7 +805,7 @@ llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(
 }
 
 /******************************************************************************
- *                               Error handling                               *
+ *                               Error handling *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode &node) {
   return CodeGenerationInternalError("encountered ErrorNode " +
