@@ -580,6 +580,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode &node) {
   return builder->CreateRet(return_value);
 }
 
+/******************************************************************************
+ *                      Code generation for identifiers                       *
+ ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
   // Look up the symbol table entry for this identifier.
   auto sym_table_entry = node.GetSymbolTableEntry();

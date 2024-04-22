@@ -520,6 +520,7 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
 
   std::unique_ptr<ParseNode> target = ParseEqualityExpression();
 
+  // Parsing regular assignment (=).
   if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
                                          {PunctuatorEnum::EQUAL})) {
     auto assign_op = std::make_unique<OperatorNode>(std::move(now_reading));
@@ -530,6 +531,38 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
     assign_op->AppendChild(std::move(new_value));
     return assign_op;
   }
+
+  /*
+
+  // Parsing add-assignment (+=).
+  if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+                                         {PunctuatorEnum::ADD_ASSIGN})) {
+    // Discard the '+=' token.
+    ReadToken();
+
+    // TODO: Create a copy of the `target` node here:
+    // std::unique_ptr<ParseNode> lhs = target->CreateCopy();
+
+    // Create a token to represent assignment.
+    PunctuatorToken assign_token("=", now_reading->GetLocation());
+    // Create assignment operator node.
+    auto assign_op = std::make_unique<OperatorNode>(std::move(assign_token));
+    // Place the target node on the left of the assignment operator.
+    assign_op->AppendChild(std::move(target));
+
+    // Create a token to represent addition.
+    PunctuatorToken plus_token("+", now_reading->GetLocation());
+    // Create addition operator node.
+    auto add_op = std::make_unique<OperatorNode>(std::move(plus_token));
+    // Append the left-hand side operand.
+    add_op->AppendChild(std::move(lhs));
+    // Parse the right operand of addition.
+    std::unique_ptr<ParseNode> rhs = ParseEqualityExpression();
+    // Append the right-hand side operand.
+    add_op->AppendChild(std::move(rhs));
+  }
+
+  */
 
   return target;
 }

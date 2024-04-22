@@ -33,7 +33,7 @@ class Token {
     return os;
   }
 
- private:
+ protected:
   std::string lexeme;
   TextLocation location;
   TokenType token_type;

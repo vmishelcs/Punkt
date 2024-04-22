@@ -12,6 +12,9 @@ class PunctuatorToken : public Token {
       : Token(lexeme, location, TokenType::PUNCTUATOR),
         punctuator(std::move(punctuator)) {}
 
+  PunctuatorToken(std::string lexeme, TextLocation location)
+      : Token(lexeme, location, TokenType::PUNCTUATOR), punctuator(lexeme) {}
+
   virtual std::string ToString() const override {
     std::string result = "PUNCTUATOR, \'" + this->GetLexeme() + "\'";
     return result;
