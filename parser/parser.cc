@@ -303,44 +303,6 @@ std::unique_ptr<ParseNode> Parser::ParseExpressionStatement(
   return expr_stmt_node;
 }
 
-// bool Parser::StartsAssignment(Token &token) {
-//   return StartsTargettableExpression(token);
-// }
-// std::unique_ptr<ParseNode> Parser::ParseAssignment(bool expect_terminator) {
-//   if (!StartsAssignment(*now_reading)) {
-//     return SyntaxErrorUnexpectedToken("assignment statement");
-//   }
-
-//   auto assignment = std::make_unique<AssignmentStatementNode>();
-
-//   std::unique_ptr<ParseNode> target = ParseTargettableExpression();
-//   assignment->AppendChild(std::move(target));
-
-//   Expect(PunctuatorEnum::EQUAL);
-
-//   std::unique_ptr<ParseNode> new_value = ParseExpression();
-//   assignment->AppendChild(std::move(new_value));
-
-//   if (expect_terminator) {
-//     Expect(PunctuatorEnum::TERMINATOR);
-//   }
-
-//   return assignment;
-// }
-
-bool Parser::StartsTargettableExpression(Token &token) {
-  return StartsIdentifier(token) || StartsParenthesizedExpression(token);
-}
-std::unique_ptr<ParseNode> Parser::ParseTargettableExpression() {
-  if (StartsParenthesizedExpression(*now_reading)) {
-    return ParseParenthesizedExpression();
-  }
-  if (StartsIdentifier(*now_reading)) {
-    return ParseIdentifier();
-  }
-  return SyntaxErrorUnexpectedToken("targettable expression");
-}
-
 bool Parser::StartsIfStatement(Token &token) {
   return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::IF});
 }

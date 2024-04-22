@@ -46,13 +46,6 @@ class Parser {
   std::unique_ptr<ParseNode> ParseExpressionStatement(
       bool expect_terminator = true);
 
-  //   bool StartsAssignment(Token &token);
-  //   std::unique_ptr<ParseNode> ParseAssignment(bool expect_terminator =
-  //   true);
-
-  bool StartsTargettableExpression(Token &token);
-  std::unique_ptr<ParseNode> ParseTargettableExpression();
-
   bool StartsIfStatement(Token &token);
   bool StartsElseBlock(Token &token);
   std::unique_ptr<ParseNode> ParseIfStatement();
