@@ -57,7 +57,7 @@ class PunktCompilerTestHelper(object):
                 self._punkt_project_dir,
                 "tests",
                 "test_output_files",
-                "actual",
+                "program_output",
             )
         )
         self._actual_output_directory.mkdir(parents=True, exist_ok=True)
@@ -71,7 +71,7 @@ class PunktCompilerTestHelper(object):
                 self._punkt_project_dir,
                 "tests",
                 "test_output_files",
-                "expected"
+                "expected_program_output"
             )
         )
         assert (

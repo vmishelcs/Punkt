@@ -1,3 +1,4 @@
 main {
-    x = 5.
+    var f = <> -> void { print "hello world!". }.
+    f().
 }
