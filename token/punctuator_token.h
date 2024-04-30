@@ -8,16 +8,16 @@
 class PunctuatorToken : public Token {
  public:
   PunctuatorToken(std::string lexeme, TextLocation location,
-                  Punctuator punctuator_enum)
+                  Punctuator punctuator)
       : Token(lexeme, location, TokenType::PUNCTUATOR),
-        punctuator_enum(punctuator_enum) {}
+        punctuator(punctuator) {}
 
   virtual std::string ToString() const override {
     std::string result = "PUNCTUATOR, \'" + this->GetLexeme() + "\'";
     return result;
   }
 
-  Punctuator GetPunctuatorEnum() const { return punctuator_enum; }
+  Punctuator GetPunctuator() const { return punctuator; }
 
   static bool IsTokenPunctuator(Token *token,
                                 std::initializer_list<Punctuator> punctuators) {
@@ -27,7 +27,7 @@ class PunctuatorToken : public Token {
     }
 
     for (const auto &punctuator : punctuators) {
-      if (punctuator_token->GetPunctuatorEnum() == punctuator) {
+      if (punctuator_token->GetPunctuator() == punctuator) {
         return true;
       }
     }
@@ -35,7 +35,7 @@ class PunctuatorToken : public Token {
   }
 
  private:
-  Punctuator punctuator_enum;
+  Punctuator punctuator;
 };
 
 #endif  // PUNCTUATOR_TOKEN_H_

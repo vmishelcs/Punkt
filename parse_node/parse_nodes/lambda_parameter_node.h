@@ -13,17 +13,14 @@
 
 class LambdaParameterNode : public ParseNode {
  public:
-  LambdaParameterNode()
-      : ParseNode(ParseNodeType::LAMBDA_PARAMETER_NODE, nullptr) {}
+  LambdaParameterNode(TextLocation text_location)
+      : ParseNode(ParseNodeType::LAMBDA_PARAMETER_NODE, text_location) {}
 
   ParseNode *GetTypeNode() const { return GetChild(0); }
 
   IdentifierNode *GetIdentifierNode() const {
     return dynamic_cast<IdentifierNode *>(GetChild(1));
   }
-
-  static std::unique_ptr<LambdaParameterNode> CreateParameterNode(
-      std::unique_ptr<ParseNode> type, std::unique_ptr<ParseNode> identifier);
 
   virtual std::string ToString() const override {
     return "LAMBDA PARAMETER NODE";

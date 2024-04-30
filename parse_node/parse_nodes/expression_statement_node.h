@@ -6,8 +6,8 @@
 
 class ExpressionStatementNode : public ParseNode {
  public:
-  ExpressionStatementNode()
-      : ParseNode(ParseNodeType::EXPRESSION_STATEMENT_NODE, nullptr) {}
+  ExpressionStatementNode(TextLocation text_location)
+      : ParseNode(ParseNodeType::EXPRESSION_STATEMENT_NODE, text_location) {}
 
   ParseNode *GetExpressionNode() const { return GetChild(0); }
 

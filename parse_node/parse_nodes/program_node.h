@@ -5,7 +5,8 @@
 
 class ProgramNode : public ParseNode {
  public:
-  ProgramNode(std::unique_ptr<Token> token);
+  ProgramNode(TextLocation text_location)
+      : ParseNode(ParseNodeType::PROGRAM_NODE, text_location) {}
 
   std::string GetModuleID() const;
   void SetModuleID(const std::string module_id);

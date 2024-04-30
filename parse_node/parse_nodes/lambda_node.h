@@ -9,8 +9,8 @@
 
 class LambdaNode : public ParseNode {
  public:
-  LambdaNode()
-      : ParseNode(ParseNodeType::LAMBDA_NODE, nullptr),
+  LambdaNode(TextLocation text_location)
+      : ParseNode(ParseNodeType::LAMBDA_NODE, text_location),
         parameter_nodes(),
         return_type_node(nullptr),
         lambda_body(nullptr) {}

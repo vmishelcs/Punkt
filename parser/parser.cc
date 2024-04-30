@@ -61,7 +61,7 @@ void Parser::Expect(Punctuator punctuator) {
 
   PunctuatorToken &punctuator_token =
       dynamic_cast<PunctuatorToken &>(*now_reading);
-  if (punctuator_token.GetPunctuatorEnum() != punctuator) {
+  if (punctuator_token.GetPunctuator() != punctuator) {
     SyntaxErrorUnexpectedToken(
         "\'" + punctuator_utils::GetPunctuatorLexeme(punctuator) + "\'");
     ReadToken();
@@ -79,8 +79,7 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
     return SyntaxErrorUnexpectedToken("well defined program start");
   }
 
-  auto program_token = std::make_unique<ProgramToken>();
-  auto program = std::make_unique<ProgramNode>(std::move(program_token));
+  auto program = std::make_unique<ProgramNode>(now_reading->GetLocation());
 
   while (StartsFunctionDefinition(*now_reading)) {
     auto function = ParseFunctionDefinition();
@@ -131,27 +130,31 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
     return SyntaxErrorUnexpectedToken("lambda");
   }
 
+  auto lambda_node = std::make_unique<LambdaNode>(now_reading->GetLocation());
+
   // Discard '<'.
   ReadToken();
 
-  auto lambda_node = std::make_unique<LambdaNode>();
-
   // Parse parameters.
   if (StartsType(*now_reading)) {
+    auto parameter_node =
+        std::make_unique<LambdaParameterNode>(now_reading->GetLocation());
     std::unique_ptr<ParseNode> param_type = ParseType();
     std::unique_ptr<ParseNode> param_id = ParseIdentifier();
-    auto parameter_node = LambdaParameterNode::CreateParameterNode(
-        std::move(param_type), std::move(param_id));
+    parameter_node->AppendChild(std::move(param_type));
+    parameter_node->AppendChild(std::move(param_id));
     lambda_node->AddParameterNode(std::move(parameter_node));
   }
   while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
                                             {Punctuator::SEPARATOR})) {
     // Discard ','.
     ReadToken();
+    auto parameter_node =
+        std::make_unique<LambdaParameterNode>(now_reading->GetLocation());
     std::unique_ptr<ParseNode> param_type = ParseType();
     std::unique_ptr<ParseNode> param_id = ParseIdentifier();
-    auto parameter_node = LambdaParameterNode::CreateParameterNode(
-        std::move(param_type), std::move(param_id));
+    parameter_node->AppendChild(std::move(param_type));
+    parameter_node->AppendChild(std::move(param_id));
     lambda_node->AddParameterNode(std::move(parameter_node));
   }
 
@@ -290,7 +293,9 @@ std::unique_ptr<ParseNode> Parser::ParseExpressionStatement(
     return SyntaxErrorUnexpectedToken("expression statement");
   }
 
-  auto expr_stmt_node = std::make_unique<ExpressionStatementNode>();
+  auto expr_stmt_node =
+      std::make_unique<ExpressionStatementNode>(now_reading->GetLocation());
+
   std::unique_ptr<ParseNode> expr = ParseExpression();
 
   expr_stmt_node->AppendChild(std::move(expr));
@@ -361,7 +366,7 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   } else if (StartsAssignmentExpression(*now_reading)) {
     init = ParseAssignmentExpression();
   } else {
-    init = std::make_unique<NopNode>();
+    init = std::make_unique<NopNode>(now_reading->GetLocation());
   }
   for_statement->AppendChild(std::move(init));
 
@@ -385,7 +390,7 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   if (StartsAssignmentExpression(*now_reading)) {
     increment = ParseAssignmentExpression();
   } else {
-    increment = std::make_unique<NopNode>();
+    increment = std::make_unique<NopNode>(now_reading->GetLocation());
   }
   for_statement->AppendChild(std::move(increment));
 
@@ -936,9 +941,17 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaInvocation(
       }
     }
 
+    // Create lambda invocation node.
     lambda_invocation =
-        LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
-            std::move(lambda), std::move(args));
+        std::make_unique<LambdaInvocationNode>(now_reading->GetLocation());
+
+    // Append lambda that is to be invoked.
+    lambda_invocation->AppendChild(std::move(lambda));
+
+    // Append lambda invocation arguments.
+    for (unsigned i = 0, n = args.size(); i < n; ++i) {
+      lambda_invocation->AppendChild(std::move(args.at(i)));
+    }
 
     Expect(Punctuator::CLOSE_PARENTHESIS);
   } while (StartsLambdaInvocation(*now_reading));

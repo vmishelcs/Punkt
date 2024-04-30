@@ -12,13 +12,8 @@
 
 class LambdaInvocationNode : public ParseNode {
  public:
-  LambdaInvocationNode()
-      : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, nullptr) {}
-
-  static std::unique_ptr<LambdaInvocationNode>
-  CreateLambdaInvocationNodeWithArguments(
-      std::unique_ptr<ParseNode> identifier,
-      std::vector<std::unique_ptr<ParseNode> > args);
+  LambdaInvocationNode(TextLocation text_location)
+      : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, text_location) {}
 
   ParseNode *GetCalleeNode() const { return GetChild(0); }
 

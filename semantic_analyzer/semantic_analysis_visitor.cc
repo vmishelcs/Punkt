@@ -222,7 +222,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
 
   auto punctuator_token = static_cast<PunctuatorToken *>(node.GetToken());
   auto signature = Signatures::AcceptingSignature(
-      punctuator_token->GetPunctuatorEnum(), child_types);
+      punctuator_token->GetPunctuator(), child_types);
 
   if (signature) {
     node.SetType(signature->GetOutputType()->CreateEquivalentType());

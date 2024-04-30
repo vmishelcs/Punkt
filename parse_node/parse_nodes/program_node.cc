@@ -3,9 +3,6 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-ProgramNode::ProgramNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::PROGRAM_NODE, std::move(token)) {}
-
 std::string ProgramNode::GetModuleID() const { return module_id; }
 
 void ProgramNode::SetModuleID(const std::string module_id) {

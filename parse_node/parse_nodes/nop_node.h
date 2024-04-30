@@ -6,9 +6,10 @@
 
 class NopNode : public ParseNode {
  public:
-  NopNode();
+  NopNode(TextLocation text_location)
+      : ParseNode(ParseNodeType::FOR_STATEMENT_NODE, text_location) {}
 
-  virtual std::string ToString() const override;
+  virtual std::string ToString() const override { return "NOP NODE"; }
 
   virtual void Accept(ParseNodeVisitor &visitor) override;
 

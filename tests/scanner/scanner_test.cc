@@ -123,7 +123,7 @@ TEST_F(ScannerTest, TestScanPunctuatorsSimple) {
     ASSERT_EQ(token->GetLexeme(), strings[i]);
     ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
     punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
-    ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), punctuator_enums[i]);
+    ASSERT_EQ(punctuator_token->GetPunctuator(), punctuator_enums[i]);
   }
 
   for (int i = 0; i < num_scanned_punctuators; ++i) {
@@ -131,7 +131,7 @@ TEST_F(ScannerTest, TestScanPunctuatorsSimple) {
     ASSERT_EQ(token->GetLexeme(), std::string(1, strings[10][i]));
     ASSERT_EQ(token->GetTokenType(), TokenType::PUNCTUATOR);
     punctuator_token = std::dynamic_pointer_cast<PunctuatorToken>(token);
-    ASSERT_EQ(punctuator_token->GetPunctuatorEnum(), punctuator_enums[i]);
+    ASSERT_EQ(punctuator_token->GetPunctuator(), punctuator_enums[i]);
   }
 }
 
