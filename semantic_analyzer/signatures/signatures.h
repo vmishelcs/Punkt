@@ -9,7 +9,7 @@
 
 #include "signature.h"
 
-// TODO: Make this a namespace instead of a class.
+// TODO: This doesn't need to be a class.
 class Signatures {
  public:
   /// @brief Checks if the specified punctuator has a signature that matches
