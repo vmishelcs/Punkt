@@ -4,7 +4,6 @@
 #include <token/all_tokens.h>
 
 #include "keyword.h"
-#include "punctuator_scanner.h"
 
 static const size_t kMaxIdentifierLength = 32;
 
@@ -153,9 +152,10 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
     default:
       PunktLogger::LogFatalInternalError("unexpected punctuator character");
   }
+
+  Punctuator punctuator_enum = punctuator_utils::GetPunctuatorEnum(buffer);
   return std::make_unique<PunctuatorToken>(buffer, first_char.location,
-                                           Punctuator(buffer));
-  // return PunctuatorScanner::Scan(first_char, input_stream);
+                                           punctuator_enum);
 }
 
 std::unique_ptr<Token> Scanner::ScanCharacter(LocatedChar first_char) {

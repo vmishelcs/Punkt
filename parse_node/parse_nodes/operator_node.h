@@ -22,7 +22,7 @@ class OperatorNode : public ParseNode {
  public:
   OperatorNode(std::unique_ptr<Token> token);
 
-  inline PunctuatorEnum GetPunctuatorEnum() { return punctuator_enum; }
+  inline Punctuator GetPunctuatorEnum() { return punctuator_enum; }
 
   inline void SetCodeGenFunc(code_gen_function_variant f) { this->f = f; }
   inline code_gen_function_variant GetCodeGenFunc() { return f; }
@@ -34,7 +34,7 @@ class OperatorNode : public ParseNode {
   virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 
  private:
-  PunctuatorEnum punctuator_enum;
+  Punctuator punctuator_enum;
   code_gen_function_variant f;
 };
 

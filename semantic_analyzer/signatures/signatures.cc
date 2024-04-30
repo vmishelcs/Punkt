@@ -21,39 +21,39 @@ static const std::unique_ptr<BaseType> kBaseTypeInteger =
 static const std::unique_ptr<BaseType> kBaseTypeString =
     BaseType::CreateStringType();
 
-std::unordered_map<PunctuatorEnum, std::vector<Signature> >
+std::unordered_map<Punctuator, std::vector<Signature> >
     Signatures::signature_map{
         // =
-        {PunctuatorEnum::EQUAL,
+        {Punctuator::EQUAL,
          {Signature({kArbitraryTypeT.get(), kArbitraryTypeT.get()},
                     kArbitraryTypeT.get(),
                     operator_codegen::AssignmentCodegen)}},
         // +
-        {PunctuatorEnum::PLUS,
+        {Punctuator::PLUS,
          {Signature({kBaseTypeInteger.get()}, kBaseTypeInteger.get(),
                     operator_codegen::UnaryNop),
           Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                     kBaseTypeInteger.get(),
                     operator_codegen::IntegerAddCodegen)}},
         // -
-        {PunctuatorEnum::MINUS,
+        {Punctuator::MINUS,
          {Signature({kBaseTypeInteger.get()}, kBaseTypeInteger.get(),
                     operator_codegen::IntegerNegationCodegen),
           Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                     kBaseTypeInteger.get(),
                     operator_codegen::IntegerSubtractCodegen)}},
         // *
-        {PunctuatorEnum::MULTIPLY,
+        {Punctuator::MULTIPLY,
          {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                     kBaseTypeInteger.get(),
                     operator_codegen::IntegerMultiplyCodegen)}},
         // /
-        {PunctuatorEnum::DIVIDE,
+        {Punctuator::DIVIDE,
          {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                     kBaseTypeInteger.get(),
                     operator_codegen::IntegerDivideCodegen)}},
         // ==
-        {PunctuatorEnum::CMP_EQ,
+        {Punctuator::CMP_EQ,
          {
              Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
                        kBaseTypeBoolean.get(),
@@ -66,7 +66,7 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature> >
                        operator_codegen::IntegerCmpEQCodegen),
          }},
         // !=
-        {PunctuatorEnum::CMP_NEQ,
+        {Punctuator::CMP_NEQ,
          {
              Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
                        kBaseTypeBoolean.get(),
@@ -79,7 +79,7 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature> >
                        operator_codegen::IntegerCmpNEQCodegen),
          }},
         // >
-        {PunctuatorEnum::CMP_GT,
+        {Punctuator::CMP_GT,
          {
              Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
                        kBaseTypeBoolean.get(),
@@ -89,7 +89,7 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature> >
                        operator_codegen::IntegerCmpGTCodegen),
          }},
         // <
-        {PunctuatorEnum::CMP_LT,
+        {Punctuator::CMP_LT,
          {
              Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
                        kBaseTypeBoolean.get(),
@@ -99,7 +99,7 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature> >
                        operator_codegen::IntegerCmpLTCodegen),
          }},
         // >=
-        {PunctuatorEnum::CMP_GEQ,
+        {Punctuator::CMP_GEQ,
          {
              Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
                        kBaseTypeBoolean.get(),
@@ -109,7 +109,7 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature> >
                        operator_codegen::IntegerCmpGEQCodegen),
          }},
         // <=
-        {PunctuatorEnum::CMP_LEQ,
+        {Punctuator::CMP_LEQ,
          {
              Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
                        kBaseTypeBoolean.get(),
@@ -119,7 +119,7 @@ std::unordered_map<PunctuatorEnum, std::vector<Signature> >
                        operator_codegen::IntegerCmpLEQCodegen),
          }}};
 
-Signature *Signatures::AcceptingSignature(PunctuatorEnum punctuator,
+Signature *Signatures::AcceptingSignature(Punctuator punctuator,
                                           std::vector<Type *> &types) {
   std::vector<Signature> &signatures = signature_map.at(punctuator);
   for (Signature &signature : signatures) {

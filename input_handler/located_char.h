@@ -31,7 +31,7 @@ struct LocatedChar {
   bool IsNumberStart() const { return isdigit(character); }
   bool IsDigit() const { return isdigit(character); }
   bool IsPunctuatorStart() const {
-    return Punctuator::PunctuatorsWithPrefix(std::string(1, character)) > 0;
+    return punctuator_utils::StartsPunctuator(character);
   }
   bool IsStringStart() const { return character == '\"'; }
   bool IsCharacterStart() const { return character == '\''; }

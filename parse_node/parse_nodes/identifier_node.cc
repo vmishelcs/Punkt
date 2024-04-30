@@ -37,7 +37,7 @@ bool IdentifierNode::IsAssignmentTarget() const {
   ParseNode *parent = GetParent();
   auto op_node = dynamic_cast<OperatorNode *>(parent);
   if (op_node && PunctuatorToken::IsTokenPunctuator(op_node->GetToken(),
-                                                    {PunctuatorEnum::EQUAL})) {
+                                                    {Punctuator::EQUAL})) {
     return true;
   }
   return false;

@@ -51,10 +51,10 @@ void Parser::Expect(KeywordEnum keyword) {
   ReadToken();
 }
 
-void Parser::Expect(PunctuatorEnum punctuator) {
+void Parser::Expect(Punctuator punctuator) {
   if (now_reading->GetTokenType() != TokenType::PUNCTUATOR) {
     SyntaxErrorUnexpectedToken(
-        "\'" + Punctuator::ForPunctuatorEnum(punctuator) + "\'");
+        "\'" + punctuator_utils::GetPunctuatorLexeme(punctuator) + "\'");
     ReadToken();
     return;
   }
@@ -63,7 +63,7 @@ void Parser::Expect(PunctuatorEnum punctuator) {
       dynamic_cast<PunctuatorToken &>(*now_reading);
   if (punctuator_token.GetPunctuatorEnum() != punctuator) {
     SyntaxErrorUnexpectedToken(
-        "\'" + Punctuator::ForPunctuatorEnum(punctuator) + "\'");
+        "\'" + punctuator_utils::GetPunctuatorLexeme(punctuator) + "\'");
     ReadToken();
     return;
   }
@@ -124,7 +124,7 @@ std::unique_ptr<ParseNode> Parser::ParseFunctionDefinition() {
 }
 
 bool Parser::StartsLambda(Token &token) {
-  return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_LT});
+  return PunctuatorToken::IsTokenPunctuator(&token, {Punctuator::CMP_LT});
 }
 std::unique_ptr<ParseNode> Parser::ParseLambda() {
   if (!StartsLambda(*now_reading)) {
@@ -145,7 +145,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
     lambda_node->AddParameterNode(std::move(parameter_node));
   }
   while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                            {PunctuatorEnum::SEPARATOR})) {
+                                            {Punctuator::SEPARATOR})) {
     // Discard ','.
     ReadToken();
     std::unique_ptr<ParseNode> param_type = ParseType();
@@ -156,10 +156,10 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
   }
 
   // Expect closing '>'.
-  Expect(PunctuatorEnum::CMP_GT);
+  Expect(Punctuator::CMP_GT);
 
   // Expect '->' before return type.
-  Expect(PunctuatorEnum::ARROW);
+  Expect(Punctuator::ARROW);
 
   // Parse return type.
   std::unique_ptr<ParseNode> return_type = ParseType();
@@ -230,8 +230,7 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
 }
 
 bool Parser::StartsCodeBlock(Token &token) {
-  return PunctuatorToken::IsTokenPunctuator(&token,
-                                            {PunctuatorEnum::OPEN_BRACE});
+  return PunctuatorToken::IsTokenPunctuator(&token, {Punctuator::OPEN_BRACE});
 }
 std::unique_ptr<ParseNode> Parser::ParseCodeBlock() {
   if (!StartsCodeBlock(*now_reading)) {
@@ -247,7 +246,7 @@ std::unique_ptr<ParseNode> Parser::ParseCodeBlock() {
     code_block->AppendChild(std::move(statement));
   }
 
-  Expect(PunctuatorEnum::CLOSE_BRACE);
+  Expect(Punctuator::CLOSE_BRACE);
 
   return code_block;
 }
@@ -268,12 +267,12 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
 
   std::unique_ptr<ParseNode> identifier = ParseIdentifier();
 
-  Expect(PunctuatorEnum::EQUAL);
+  Expect(Punctuator::EQUAL);
 
   std::unique_ptr<ParseNode> initializer = ParseExpression();
 
   if (expect_terminator) {
-    Expect(PunctuatorEnum::TERMINATOR);
+    Expect(Punctuator::TERMINATOR);
   }
 
   declaration->AppendChild(std::move(identifier));
@@ -297,7 +296,7 @@ std::unique_ptr<ParseNode> Parser::ParseExpressionStatement(
   expr_stmt_node->AppendChild(std::move(expr));
 
   if (expect_terminator) {
-    Expect(PunctuatorEnum::TERMINATOR);
+    Expect(Punctuator::TERMINATOR);
   }
 
   return expr_stmt_node;
@@ -366,7 +365,7 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   }
   for_statement->AppendChild(std::move(init));
 
-  Expect(PunctuatorEnum::SEPARATOR);
+  Expect(Punctuator::SEPARATOR);
 
   // Append a loop condition node. If no condition is specified, condition is
   // always true.
@@ -378,7 +377,7 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   }
   for_statement->AppendChild(std::move(condition));
 
-  Expect(PunctuatorEnum::SEPARATOR);
+  Expect(Punctuator::SEPARATOR);
 
   // Append a loop increment node. If no increment is specified, a noop is
   // appended.
@@ -422,7 +421,7 @@ std::unique_ptr<ParseNode> Parser::ParseCallStatement() {
 
   call_statement->AppendChild(std::move(lambda_invocation));
 
-  Expect(PunctuatorEnum::TERMINATOR);
+  Expect(Punctuator::TERMINATOR);
 
   return call_statement;
 }
@@ -443,7 +442,7 @@ std::unique_ptr<ParseNode> Parser::ParsePrintStatement(bool expect_terminator) {
   print_statement = ParsePrintExpressionList(std::move(print_statement));
 
   if (expect_terminator) {
-    Expect(PunctuatorEnum::TERMINATOR);
+    Expect(Punctuator::TERMINATOR);
   }
 
   return print_statement;
@@ -462,9 +461,9 @@ std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(
   }
 
   while (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                             {PunctuatorEnum::TERMINATOR}) &&
+                                             {Punctuator::TERMINATOR}) &&
          !now_reading->IsEOF()) {
-    Expect(PunctuatorEnum::SEPARATOR);
+    Expect(Punctuator::SEPARATOR);
     std::unique_ptr<ParseNode> expression = ParseExpression();
     print_statement->AppendChild(std::move(expression));
   }
@@ -487,14 +486,14 @@ std::unique_ptr<ParseNode> Parser::ParseReturnStatement() {
 
   if (!StartsExpression(*now_reading)) {
     // Void functions do not return a value.
-    Expect(PunctuatorEnum::TERMINATOR);
+    Expect(Punctuator::TERMINATOR);
     return return_statement;
   }
 
   std::unique_ptr<ParseNode> return_value = ParseExpression();
   return_statement->AppendChild(std::move(return_value));
 
-  Expect(PunctuatorEnum::TERMINATOR);
+  Expect(Punctuator::TERMINATOR);
 
   return return_statement;
 }
@@ -522,7 +521,7 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
 
   // Parsing regular assignment (=).
   if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                         {PunctuatorEnum::EQUAL})) {
+                                         {Punctuator::EQUAL})) {
     auto assign_op = std::make_unique<OperatorNode>(std::move(now_reading));
     ReadToken();
     std::unique_ptr<ParseNode> new_value = ParseEqualityExpression();
@@ -536,7 +535,7 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
 
   // Parsing add-assignment (+=).
   if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                         {PunctuatorEnum::ADD_ASSIGN})) {
+                                         {Punctuator::ADD_ASSIGN})) {
     // Discard the '+=' token.
     ReadToken();
 
@@ -578,7 +577,7 @@ std::unique_ptr<ParseNode> Parser::ParseEqualityExpression() {
   std::unique_ptr<ParseNode> lhs = ParseComparisonExpression();
 
   while (PunctuatorToken::IsTokenPunctuator(
-      now_reading.get(), {PunctuatorEnum::CMP_EQ, PunctuatorEnum::CMP_NEQ})) {
+      now_reading.get(), {Punctuator::CMP_EQ, Punctuator::CMP_NEQ})) {
     auto equality_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -605,8 +604,8 @@ std::unique_ptr<ParseNode> Parser::ParseComparisonExpression() {
   std::unique_ptr<ParseNode> lhs = ParseAdditiveExpression();
 
   while (PunctuatorToken::IsTokenPunctuator(
-      &(*now_reading), {PunctuatorEnum::CMP_GT, PunctuatorEnum::CMP_LT,
-                        PunctuatorEnum::CMP_GEQ, PunctuatorEnum::CMP_LEQ})) {
+      &(*now_reading), {Punctuator::CMP_GT, Punctuator::CMP_LT,
+                        Punctuator::CMP_GEQ, Punctuator::CMP_LEQ})) {
     auto comparison_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -633,7 +632,7 @@ std::unique_ptr<ParseNode> Parser::ParseAdditiveExpression() {
   std::unique_ptr<ParseNode> left = ParseMultiplicativeExpression();
 
   while (PunctuatorToken::IsTokenPunctuator(
-      now_reading.get(), {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
+      now_reading.get(), {Punctuator::PLUS, Punctuator::MINUS})) {
     auto additive_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -660,7 +659,7 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
   std::unique_ptr<ParseNode> left = ParseUnaryExpression();
 
   while (PunctuatorToken::IsTokenPunctuator(
-      now_reading.get(), {PunctuatorEnum::MULTIPLY, PunctuatorEnum::DIVIDE})) {
+      now_reading.get(), {Punctuator::MULTIPLY, Punctuator::DIVIDE})) {
     auto multiplicative_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -678,7 +677,7 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
 
 bool Parser::StartsUnaryExpression(Token &token) {
   return PunctuatorToken::IsTokenPunctuator(
-             &token, {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS}) ||
+             &token, {Punctuator::PLUS, Punctuator::MINUS}) ||
          StartsAtomicExpression(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
@@ -687,7 +686,7 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
   }
 
   if (PunctuatorToken::IsTokenPunctuator(
-          now_reading.get(), {PunctuatorEnum::PLUS, PunctuatorEnum::MINUS})) {
+          now_reading.get(), {Punctuator::PLUS, Punctuator::MINUS})) {
     auto unary_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -736,18 +735,18 @@ std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
 
 bool Parser::StartsParenthesizedExpression(Token &token) {
   return PunctuatorToken::IsTokenPunctuator(&token,
-                                            {PunctuatorEnum::OPEN_PARENTHESIS});
+                                            {Punctuator::OPEN_PARENTHESIS});
 }
 std::unique_ptr<ParseNode> Parser::ParseParenthesizedExpression() {
   if (!StartsParenthesizedExpression(*now_reading)) {
     return SyntaxErrorUnexpectedToken("parenthesized expression");
   }
 
-  Expect(PunctuatorEnum::OPEN_PARENTHESIS);
+  Expect(Punctuator::OPEN_PARENTHESIS);
 
   std::unique_ptr<ParseNode> expression = ParseExpression();
 
-  Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+  Expect(Punctuator::CLOSE_PARENTHESIS);
 
   return expression;
 }
@@ -872,7 +871,7 @@ std::unique_ptr<ParseNode> Parser::ParseBaseType() {
 }
 
 bool Parser::StartsLambdaType(Token &token) {
-  return PunctuatorToken::IsTokenPunctuator(&token, {PunctuatorEnum::CMP_LT});
+  return PunctuatorToken::IsTokenPunctuator(&token, {Punctuator::CMP_LT});
 }
 std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
   if (!StartsLambdaType(*now_reading)) {
@@ -889,7 +888,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
     lambda_type_node->AddParameterTypeNode(std::move(param_type));
   }
   while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                            {PunctuatorEnum::SEPARATOR})) {
+                                            {Punctuator::SEPARATOR})) {
     // Discard ','.
     ReadToken();
     std::unique_ptr<ParseNode> param_type = ParseType();
@@ -897,10 +896,10 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
   }
 
   // Expect closing '>'.
-  Expect(PunctuatorEnum::CMP_GT);
+  Expect(Punctuator::CMP_GT);
 
   // Expect '->' before return type.
-  Expect(PunctuatorEnum::ARROW);
+  Expect(Punctuator::ARROW);
 
   // Parse return type.
   std::unique_ptr<ParseNode> return_type = ParseType();
@@ -911,7 +910,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
 
 bool Parser::StartsLambdaInvocation(Token &token) {
   return PunctuatorToken::IsTokenPunctuator(&token,
-                                            {PunctuatorEnum::OPEN_PARENTHESIS});
+                                            {Punctuator::OPEN_PARENTHESIS});
 }
 std::unique_ptr<ParseNode> Parser::ParseLambdaInvocation(
     std::unique_ptr<ParseNode> lambda) {
@@ -922,14 +921,14 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaInvocation(
   std::unique_ptr<ParseNode> lambda_invocation = std::move(lambda);
   do {
     lambda = std::move(lambda_invocation);
-    Expect(PunctuatorEnum::OPEN_PARENTHESIS);
+    Expect(Punctuator::OPEN_PARENTHESIS);
 
     std::vector<std::unique_ptr<ParseNode> > args;
     if (StartsExpression(*now_reading)) {
       args.emplace_back(ParseExpression());
 
       while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                                {PunctuatorEnum::SEPARATOR})) {
+                                                {Punctuator::SEPARATOR})) {
         // Discard ','.
         ReadToken();
 
@@ -941,7 +940,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaInvocation(
         LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
             std::move(lambda), std::move(args));
 
-    Expect(PunctuatorEnum::CLOSE_PARENTHESIS);
+    Expect(Punctuator::CLOSE_PARENTHESIS);
   } while (StartsLambdaInvocation(*now_reading));
 
   return lambda_invocation;

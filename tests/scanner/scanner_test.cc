@@ -105,17 +105,17 @@ TEST_F(ScannerTest, TestScanPunctuatorsSimple) {
   std::shared_ptr<Token> token = nullptr;
   std::shared_ptr<PunctuatorToken> punctuator_token = nullptr;
   int num_scanned_punctuators = 10;
-  std::vector<PunctuatorEnum> punctuator_enums = {
-      PunctuatorEnum::OPEN_BRACE,
-      PunctuatorEnum::CLOSE_BRACE,
-      PunctuatorEnum::OPEN_PARENTHESIS,
-      PunctuatorEnum::CLOSE_PARENTHESIS,
-      PunctuatorEnum::TERMINATOR,
-      PunctuatorEnum::EQUAL,
-      PunctuatorEnum::PLUS,
-      PunctuatorEnum::MINUS,
-      PunctuatorEnum::MULTIPLY,
-      PunctuatorEnum::DIVIDE,
+  std::vector<Punctuator> punctuator_enums = {
+      Punctuator::OPEN_BRACE,
+      Punctuator::CLOSE_BRACE,
+      Punctuator::OPEN_PARENTHESIS,
+      Punctuator::CLOSE_PARENTHESIS,
+      Punctuator::TERMINATOR,
+      Punctuator::EQUAL,
+      Punctuator::PLUS,
+      Punctuator::MINUS,
+      Punctuator::MULTIPLY,
+      Punctuator::DIVIDE,
   };
 
   for (int i = 0; i < num_scanned_punctuators; ++i) {

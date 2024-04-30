@@ -1,13 +1,9 @@
 #ifndef PUNCTUATOR_H_
 #define PUNCTUATOR_H_
 
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
+#include <string>
 
-#include "reserved_component.h"
-
-enum class PunctuatorEnum {
+enum class Punctuator {
   OPEN_BRACE,
   CLOSE_BRACE,
   OPEN_PARENTHESIS,
@@ -29,33 +25,26 @@ enum class PunctuatorEnum {
   CMP_LT,
   CMP_GEQ,
   CMP_LEQ,
-  LANGLE,
-  RANGLE,
   ARROW,
 };
 
-class Punctuator : public ReservedComponent {
- public:
-  Punctuator(std::string lexeme);
-  Punctuator(Punctuator &&punctuator);
+namespace punctuator_utils {
 
-  PunctuatorEnum GetPunctuatorEnum() const;
+/// @brief Checks if a provided character starts a punctuator.
+/// @param ch `char` to check if it starts a punctuator.
+/// @return `true` if `ch` starts a punctuator, `false` otherwise.
+bool StartsPunctuator(char ch);
 
-  static bool IsPunctuator(std::string buffer);
-  static bool IsPunctuatorChar(char c);
-  static int PunctuatorsWithPrefix(std::string prefix);
-  static PunctuatorEnum ForLexeme(std::string buffer);
-  static std::string ForPunctuatorEnum(PunctuatorEnum punctuator_enum);
+/// @brief Get a `Punctuator` corresponding to the provided string.
+/// @param lexeme String representation of a punctuator.
+/// @return `Punctuator` representation of the punctuator.
+Punctuator GetPunctuatorEnum(const std::string &lexeme);
 
- private:
-  static std::vector<std::string> GetAllPrefixesForPunctuator(
-      std::string punctuator_lexeme);
+/// @brief Get a string representation of the provided punctuator.
+/// @param punctuator_enum `Punctuator` representation of a punctuator.
+/// @return String representation of the punctuator.
+std::string GetPunctuatorLexeme(Punctuator punctuator_enum);
 
-  static std::unordered_map<std::string, PunctuatorEnum> dictionary;
-  static std::unordered_map<PunctuatorEnum, std::string> reverse_dictionary;
-  static std::unordered_map<std::string, int> num_punctuators_with_prefix;
-
-  PunctuatorEnum punctuator_enum;
-};
+};  // namespace punctuator_utils
 
 #endif  // PUNCTUATOR_H_

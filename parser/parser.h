@@ -16,7 +16,7 @@ class Parser {
   void ReadToken();
 
   void Expect(KeywordEnum keyword);
-  void Expect(PunctuatorEnum punctuator);
+  void Expect(Punctuator punctuator);
 
   bool StartsProgram(Token &token);
   std::unique_ptr<ParseNode> ParseProgram();
