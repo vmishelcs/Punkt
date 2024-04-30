@@ -20,15 +20,15 @@ std::unique_ptr<Type> BaseTypeNode::InferOwnType() const {
   }
 
   switch (keyword_token->GetKeywordEnum()) {
-    case KeywordEnum::VOID:
+    case Keyword::VOID:
       return BaseType::Create(BaseTypeEnum::VOID);
-    case KeywordEnum::BOOL:
+    case Keyword::BOOL:
       return BaseType::Create(BaseTypeEnum::BOOLEAN);
-    case KeywordEnum::CHAR:
+    case Keyword::CHAR:
       return BaseType::Create(BaseTypeEnum::CHARACTER);
-    case KeywordEnum::INT:
+    case Keyword::INT:
       return BaseType::Create(BaseTypeEnum::INTEGER);
-    case KeywordEnum::STRING:
+    case Keyword::STRING:
       return BaseType::Create(BaseTypeEnum::STRING);
     default:
       PunktLogger::LogFatalInternalError(

@@ -63,15 +63,13 @@ std::unique_ptr<Token> Scanner::ScanIdentifier(LocatedChar first_char) {
     ch = input_stream->Peek();
   }
 
-  if (Keyword::IsKeyword(buffer)) {
-    if (Keyword::ForLexeme(buffer) == KeywordEnum::TRUE ||
-        Keyword::ForLexeme(buffer) == KeywordEnum::FALSE) {
-      return std::make_unique<BooleanLiteralToken>(
-          buffer, first_char.location,
-          Keyword::ForLexeme(buffer) == KeywordEnum::TRUE);
+  if (keyword_utils::IsKeyword(buffer)) {
+    Keyword keyword = keyword_utils::GetKeywordEnum(buffer);
+    if (keyword == Keyword::TRUE || keyword == Keyword::FALSE) {
+      return std::make_unique<BooleanLiteralToken>(buffer, first_char.location,
+                                                   keyword == Keyword::TRUE);
     }
-    return std::make_unique<KeywordToken>(buffer, first_char.location,
-                                          Keyword(buffer));
+    return std::make_unique<KeywordToken>(buffer, first_char.location, keyword);
   }
 
   if (buffer.size() > kMaxIdentifierLength) {

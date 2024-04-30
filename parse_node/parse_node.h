@@ -50,13 +50,13 @@ class ParseNode {
   ParseNode(ParseNodeType node_type, TextLocation &text_location);
   ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token);
 
-  /// @brief Creates a deep copy of this node.
+  /// @brief Creates a copy of the subtree defined by this node.
   /// @return A `unique_ptr` to a `ParseNode` object that is an independent copy
-  /// of this node.
+  /// of this node, along with an independent copy of any descendants.
   /// @warning This method does not initialize any semantic information (e.g.
   /// type, scope, etc) of the returned copy. Hence, this method should only be
   /// used by the parser.
-  std::unique_ptr<ParseNode> CreateCopy();
+  virtual std::unique_ptr<ParseNode> CreateCopy();
 
   ParseNodeType GetParseNodeType() const { return node_type; }
 

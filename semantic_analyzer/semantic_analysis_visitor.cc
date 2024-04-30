@@ -63,7 +63,7 @@ void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode &node) {
 
 void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode &node) {
   bool is_mutable =
-      KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
+      KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
 
   // Perform declaration here if the initializer is a lambda literal.
   ParseNode *initializer = node.GetInitializer();
@@ -88,7 +88,7 @@ void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode &node) {
 
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode &node) {
   bool is_mutable =
-      KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
+      KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
 
   IdentifierNode *identifier = node.GetIdentifierNode();
   if (!identifier) {
@@ -222,7 +222,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
 
   auto punctuator_token = static_cast<PunctuatorToken *>(node.GetToken());
   auto signature = Signatures::AcceptingSignature(
-      punctuator_token->GetPunctuator(), child_types);
+      punctuator_token->GetPunctuatorEnum(), child_types);
 
   if (signature) {
     node.SetType(signature->GetOutputType()->CreateEquivalentType());

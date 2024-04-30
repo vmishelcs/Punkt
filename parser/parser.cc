@@ -34,16 +34,18 @@ void Parser::ReadToken() {
   }
 }
 
-void Parser::Expect(KeywordEnum keyword) {
+void Parser::Expect(Keyword keyword) {
   if (now_reading->GetTokenType() != TokenType::KEYWORD) {
-    SyntaxErrorUnexpectedToken("\'" + Keyword::ForKeywordEnum(keyword) + "\'");
+    SyntaxErrorUnexpectedToken("\'" + keyword_utils::GetKeywordLexeme(keyword) +
+                               "\'");
     ReadToken();
     return;
   }
 
   KeywordToken &keyword_token = dynamic_cast<KeywordToken &>(*now_reading);
   if (keyword_token.GetKeywordEnum() != keyword) {
-    SyntaxErrorUnexpectedToken("\'" + Keyword::ForKeywordEnum(keyword) + "\'");
+    SyntaxErrorUnexpectedToken("\'" + keyword_utils::GetKeywordLexeme(keyword) +
+                               "\'");
     ReadToken();
     return;
   }
@@ -61,7 +63,7 @@ void Parser::Expect(Punctuator punctuator) {
 
   PunctuatorToken &punctuator_token =
       dynamic_cast<PunctuatorToken &>(*now_reading);
-  if (punctuator_token.GetPunctuator() != punctuator) {
+  if (punctuator_token.GetPunctuatorEnum() != punctuator) {
     SyntaxErrorUnexpectedToken(
         "\'" + punctuator_utils::GetPunctuatorLexeme(punctuator) + "\'");
     ReadToken();
@@ -97,7 +99,7 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
 }
 
 bool Parser::StartsFunctionDefinition(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::FUNCTION});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::FUNCTION});
 }
 std::unique_ptr<ParseNode> Parser::ParseFunctionDefinition() {
   if (!StartsFunctionDefinition(*now_reading)) {
@@ -176,7 +178,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
 }
 
 bool Parser::StartsMain(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::MAIN});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::MAIN});
 }
 std::unique_ptr<ParseNode> Parser::ParseMain() {
   if (!StartsMain(*now_reading)) {
@@ -255,8 +257,7 @@ std::unique_ptr<ParseNode> Parser::ParseCodeBlock() {
 }
 
 bool Parser::StartsDeclaration(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token,
-                                      {KeywordEnum::CONST, KeywordEnum::VAR});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::CONST, Keyword::VAR});
 }
 std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
   if (!StartsDeclaration(*now_reading)) {
@@ -308,10 +309,10 @@ std::unique_ptr<ParseNode> Parser::ParseExpressionStatement(
 }
 
 bool Parser::StartsIfStatement(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::IF});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::IF});
 }
 bool Parser::StartsElseBlock(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::ELSE});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::ELSE});
 }
 std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
   if (!StartsIfStatement(*now_reading)) {
@@ -346,7 +347,7 @@ std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
 }
 
 bool Parser::StartsForStatement(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::FOR});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::FOR});
 }
 std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   if (!StartsForStatement(*now_reading)) {
@@ -402,7 +403,7 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
 }
 
 bool Parser::StartsCallStatement(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::CALL});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::CALL});
 }
 std::unique_ptr<ParseNode> Parser::ParseCallStatement() {
   if (!StartsCallStatement(*now_reading)) {
@@ -432,7 +433,7 @@ std::unique_ptr<ParseNode> Parser::ParseCallStatement() {
 }
 
 bool Parser::StartsPrintStatement(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::PRINT});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::PRINT});
 }
 std::unique_ptr<ParseNode> Parser::ParsePrintStatement(bool expect_terminator) {
   if (!StartsPrintStatement(*now_reading)) {
@@ -477,7 +478,7 @@ std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(
 }
 
 bool Parser::StartsReturnStatement(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {KeywordEnum::RETURN});
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::RETURN});
 }
 std::unique_ptr<ParseNode> Parser::ParseReturnStatement() {
   if (!StartsReturnStatement(*now_reading)) {
@@ -862,8 +863,8 @@ std::unique_ptr<ParseNode> Parser::ParseType() {
 
 bool Parser::StartsBaseType(Token &token) {
   return KeywordToken::IsTokenKeyword(
-      &token, {KeywordEnum::VOID, KeywordEnum::BOOL, KeywordEnum::CHAR,
-               KeywordEnum::INT, KeywordEnum::STRING});
+      &token, {Keyword::VOID, Keyword::BOOL, Keyword::CHAR, Keyword::INT,
+               Keyword::STRING});
 }
 std::unique_ptr<ParseNode> Parser::ParseBaseType() {
   if (!StartsBaseType(*now_reading)) {

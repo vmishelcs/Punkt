@@ -1,43 +1,42 @@
 #include "keyword.h"
 
-std::unordered_map<std::string, KeywordEnum> Keyword::dictionary = {
-    {"bool", KeywordEnum::BOOL},     {"call", KeywordEnum::CALL},
-    {"char", KeywordEnum::CHAR},     {"const", KeywordEnum::CONST},
-    {"else", KeywordEnum::ELSE},     {"false", KeywordEnum::FALSE},
-    {"for", KeywordEnum::FOR},       {"function", KeywordEnum::FUNCTION},
-    {"if", KeywordEnum::IF},         {"int", KeywordEnum::INT},
-    {"main", KeywordEnum::MAIN},     {"print", KeywordEnum::PRINT},
-    {"return", KeywordEnum::RETURN}, {"string", KeywordEnum::STRING},
-    {"true", KeywordEnum::TRUE},     {"var", KeywordEnum::VAR},
-    {"void", KeywordEnum::VOID},
+#include <logging/punkt_logger.h>
+
+#include <map>
+#include <string>
+
+static std::map<std::string, Keyword> dictionary = {
+    {"bool", Keyword::BOOL},     {"call", Keyword::CALL},
+    {"char", Keyword::CHAR},     {"const", Keyword::CONST},
+    {"else", Keyword::ELSE},     {"false", Keyword::FALSE},
+    {"for", Keyword::FOR},       {"function", Keyword::FUNCTION},
+    {"if", Keyword::IF},         {"int", Keyword::INT},
+    {"main", Keyword::MAIN},     {"print", Keyword::PRINT},
+    {"return", Keyword::RETURN}, {"string", Keyword::STRING},
+    {"true", Keyword::TRUE},     {"var", Keyword::VAR},
+    {"void", Keyword::VOID},
 };
 
-std::unordered_map<KeywordEnum, std::string> Keyword::reverse_dictionary = [] {
-  std::unordered_map<KeywordEnum, std::string> result;
+static std::map<Keyword, std::string> reverse_dictionary = [] {
+  std::map<Keyword, std::string> result;
   for (const auto &[key, value] : dictionary) {
     result[value] = key;
   }
   return result;
 }();
 
-Keyword::Keyword(std::string lexeme) : ReservedComponent(lexeme) {
-  this->keyword_enum = dictionary.at(lexeme);
+bool keyword_utils::IsKeyword(const std::string &lexeme) {
+  return dictionary.contains(lexeme);
 }
 
-Keyword::Keyword(Keyword &&keyword) : ReservedComponent(std::move(keyword)) {
-  this->keyword_enum = std::move(keyword.keyword_enum);
+Keyword keyword_utils::GetKeywordEnum(const std::string &lexeme) {
+  if (!dictionary.contains(lexeme)) {
+    PunktLogger::LogFatalInternalError("no entry for \'" + lexeme +
+                                       "\' in keyword dictionary");
+  }
+  return dictionary[lexeme];
 }
 
-KeywordEnum Keyword::GetKeywordEnum() const { return keyword_enum; }
-
-KeywordEnum Keyword::ForLexeme(std::string lexeme) {
-  return dictionary.at(lexeme);
-}
-
-std::string Keyword::ForKeywordEnum(KeywordEnum keyword_enum) {
-  return reverse_dictionary.at(keyword_enum);
-}
-
-bool Keyword::IsKeyword(std::string buffer) {
-  return dictionary.contains(buffer);
+std::string keyword_utils::GetKeywordLexeme(Keyword keyword) {
+  return reverse_dictionary[keyword];
 }

@@ -35,13 +35,13 @@ namespace punctuator_utils {
 /// @return `true` if `ch` starts a punctuator, `false` otherwise.
 bool StartsPunctuator(char ch);
 
-/// @brief Get a `Punctuator` corresponding to the provided string.
+/// @brief Get a `Punctuator` enum corresponding to the provided string.
 /// @param lexeme String representation of a punctuator.
-/// @return `Punctuator` representation of the punctuator.
+/// @return `Punctuator`enum representation of the punctuator.
 Punctuator GetPunctuatorEnum(const std::string &lexeme);
 
 /// @brief Get a string representation of the provided punctuator.
-/// @param punctuator_enum `Punctuator` representation of a punctuator.
+/// @param punctuator_enum `Punctuator` enum representation of a punctuator.
 /// @return String representation of the punctuator.
 std::string GetPunctuatorLexeme(Punctuator punctuator_enum);
 

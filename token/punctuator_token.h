@@ -3,6 +3,9 @@
 
 #include <scanner/punctuator.h>
 
+#include <memory>
+#include <string>
+
 #include "token.h"
 
 class PunctuatorToken : public Token {
@@ -12,12 +15,16 @@ class PunctuatorToken : public Token {
       : Token(lexeme, location, TokenType::PUNCTUATOR),
         punctuator(punctuator) {}
 
+  virtual std::unique_ptr<Token> CreateCopy() const override {
+    return std::make_unique<PunctuatorToken>(lexeme, location, punctuator);
+  }
+
   virtual std::string ToString() const override {
     std::string result = "PUNCTUATOR, \'" + this->GetLexeme() + "\'";
     return result;
   }
 
-  Punctuator GetPunctuator() const { return punctuator; }
+  Punctuator GetPunctuatorEnum() const { return punctuator; }
 
   static bool IsTokenPunctuator(Token *token,
                                 std::initializer_list<Punctuator> punctuators) {
@@ -27,7 +34,7 @@ class PunctuatorToken : public Token {
     }
 
     for (const auto &punctuator : punctuators) {
-      if (punctuator_token->GetPunctuator() == punctuator) {
+      if (punctuator_token->GetPunctuatorEnum() == punctuator) {
         return true;
       }
     }

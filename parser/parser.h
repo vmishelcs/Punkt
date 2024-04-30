@@ -15,7 +15,7 @@ class Parser {
 
   void ReadToken();
 
-  void Expect(KeywordEnum keyword);
+  void Expect(Keyword keyword);
   void Expect(Punctuator punctuator);
 
   bool StartsProgram(Token &token);

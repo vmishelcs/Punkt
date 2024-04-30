@@ -3,6 +3,7 @@
 
 #include <input_handler/text_location.h>
 
+#include <memory>
 #include <string>
 
 enum class TokenType {
@@ -21,6 +22,8 @@ class Token {
  public:
   Token(std::string lexeme, TextLocation location, TokenType token_type)
       : lexeme(lexeme), location(location), token_type(token_type) {}
+
+  virtual std::unique_ptr<Token> CreateCopy() const = 0;
 
   bool IsEOF() const { return token_type == TokenType::EOF_TOKEN; }
   std::string GetLexeme() const { return lexeme; }
