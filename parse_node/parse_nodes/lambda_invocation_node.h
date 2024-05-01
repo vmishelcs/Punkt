@@ -14,8 +14,8 @@
 
 class LambdaInvocationNode : public ParseNode {
  public:
-  LambdaInvocationNode(TextLocation text_location)
-      : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, text_location) {}
+  LambdaInvocationNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, std::move(token)) {}
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 

@@ -47,7 +47,6 @@ enum class ParseNodeType {
 /// @brief Class to represent a node of the abstract syntax tree.
 class ParseNode {
  public:
-  ParseNode(ParseNodeType node_type, TextLocation &text_location);
   ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token);
 
   // TODO: Implement proper copying (along with semantic info).

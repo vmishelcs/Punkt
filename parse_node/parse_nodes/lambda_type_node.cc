@@ -11,7 +11,7 @@
 #include <vector>
 
 std::unique_ptr<ParseNode> LambdaTypeNode::CreateCopy() const {
-  auto copy_node = std::make_unique<LambdaTypeNode>(text_location);
+  auto copy_node = std::make_unique<LambdaTypeNode>(token->CreateCopy());
 
   // Copy parameter type nodes.
   for (auto param : GetParameterTypeNodes()) {

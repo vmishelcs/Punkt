@@ -12,14 +12,6 @@
 
 #include "parse_node_visitor.h"
 
-ParseNode::ParseNode(ParseNodeType node_type, TextLocation &text_location)
-    : token{nullptr},
-      text_location(text_location),
-      node_type(node_type),
-      parent{nullptr},
-      type{nullptr},
-      scope{nullptr} {}
-
 ParseNode::ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token)
     : token(std::move(token)),
       text_location(this->token->GetLocation()),

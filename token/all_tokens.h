@@ -7,6 +7,7 @@
 #include "identifier_token.h"
 #include "integer_literal_token.h"
 #include "keyword_token.h"
+#include "placeholder_token.h"
 #include "program_token.h"
 #include "punctuator_token.h"
 #include "string_literal_token.h"

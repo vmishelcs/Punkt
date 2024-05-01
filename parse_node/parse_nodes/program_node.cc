@@ -8,7 +8,7 @@
 #include <string>
 
 std::unique_ptr<ParseNode> ProgramNode::CreateCopy() const {
-  auto copy_node = std::make_unique<ProgramNode>(text_location);
+  auto copy_node = std::make_unique<ProgramNode>(token->CreateCopy());
   for (auto child : GetChildren()) {
     copy_node->AppendChild(child->CreateCopy());
   }

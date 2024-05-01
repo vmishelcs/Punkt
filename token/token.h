@@ -7,21 +7,27 @@
 #include <string>
 
 enum class TokenType {
-  PROGRAM_TOKEN,
-  IDENTIFIER,
-  KEYWORD,
   BOOLEAN_LITERAL,
   CHARACTER_LITERAL,
+  EOF_TOKEN,
+  IDENTIFIER,
   INTEGER_LITERAL,
-  STRING_LITERAL,
+  KEYWORD,
+  PLACEHOLDER_TOKEN,
+  PROGRAM_TOKEN,
   PUNCTUATOR,
-  EOF_TOKEN
+  STRING_LITERAL,
 };
 
 class Token {
  public:
   Token(std::string lexeme, TextLocation location, TokenType token_type)
       : lexeme(lexeme), location(location), token_type(token_type) {}
+
+  Token(const Token &token, TokenType token_type)
+      : lexeme(token.lexeme),
+        location(token.location),
+        token_type(token_type) {}
 
   virtual std::unique_ptr<Token> CreateCopy() const = 0;
 

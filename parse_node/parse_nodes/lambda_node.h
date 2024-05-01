@@ -15,11 +15,11 @@
 
 class LambdaNode : public ParseNode {
  public:
-  LambdaNode(TextLocation text_location)
-      : ParseNode(ParseNodeType::LAMBDA_NODE, text_location),
+  LambdaNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::LAMBDA_NODE, std::move(token)),
         parameter_nodes(),
-        return_type_node(nullptr),
-        lambda_body(nullptr) {}
+        return_type_node{nullptr},
+        lambda_body{nullptr} {}
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 

@@ -10,8 +10,8 @@
 
 class ProgramNode : public ParseNode {
  public:
-  ProgramNode(TextLocation text_location)
-      : ParseNode(ParseNodeType::PROGRAM_NODE, text_location) {}
+  ProgramNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::PROGRAM_NODE, std::move(token)) {}
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 

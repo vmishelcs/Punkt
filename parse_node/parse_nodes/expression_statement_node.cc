@@ -7,7 +7,8 @@
 #include <memory>
 
 std::unique_ptr<ParseNode> ExpressionStatementNode::CreateCopy() const {
-  auto copy_node = std::make_unique<ExpressionStatementNode>(text_location);
+  auto copy_node =
+      std::make_unique<ExpressionStatementNode>(token->CreateCopy());
   for (auto child : GetChildren()) {
     copy_node->AppendChild(child->CreateCopy());
   }

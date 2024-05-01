@@ -81,7 +81,8 @@ std::unique_ptr<ParseNode> Parser::ParseProgram() {
     return SyntaxErrorUnexpectedToken("well defined program start");
   }
 
-  auto program = std::make_unique<ProgramNode>(now_reading->GetLocation());
+  auto program_token = std::make_unique<ProgramToken>();
+  auto program = std::make_unique<ProgramNode>(std::move(program_token));
 
   while (StartsFunctionDefinition(*now_reading)) {
     auto function = ParseFunctionDefinition();
@@ -132,31 +133,41 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
     return SyntaxErrorUnexpectedToken("lambda");
   }
 
-  auto lambda_node = std::make_unique<LambdaNode>(now_reading->GetLocation());
+  auto lambda_node =
+      std::make_unique<LambdaNode>(PlaceholderToken::Create(*now_reading));
 
   // Discard '<'.
   ReadToken();
 
   // Parse parameters.
   if (StartsType(*now_reading)) {
-    auto parameter_node =
-        std::make_unique<LambdaParameterNode>(now_reading->GetLocation());
+    auto parameter_node = std::make_unique<LambdaParameterNode>(
+        PlaceholderToken::Create(*now_reading));
+
     std::unique_ptr<ParseNode> param_type = ParseType();
+
     std::unique_ptr<ParseNode> param_id = ParseIdentifier();
+
     parameter_node->AppendChild(std::move(param_type));
     parameter_node->AppendChild(std::move(param_id));
+
     lambda_node->AddParameterNode(std::move(parameter_node));
   }
   while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
                                             {Punctuator::SEPARATOR})) {
     // Discard ','.
     ReadToken();
-    auto parameter_node =
-        std::make_unique<LambdaParameterNode>(now_reading->GetLocation());
+
+    auto parameter_node = std::make_unique<LambdaParameterNode>(
+        PlaceholderToken::Create(*now_reading));
+
     std::unique_ptr<ParseNode> param_type = ParseType();
+
     std::unique_ptr<ParseNode> param_id = ParseIdentifier();
+
     parameter_node->AppendChild(std::move(param_type));
     parameter_node->AppendChild(std::move(param_id));
+
     lambda_node->AddParameterNode(std::move(parameter_node));
   }
 
@@ -294,8 +305,8 @@ std::unique_ptr<ParseNode> Parser::ParseExpressionStatement(
     return SyntaxErrorUnexpectedToken("expression statement");
   }
 
-  auto expr_stmt_node =
-      std::make_unique<ExpressionStatementNode>(now_reading->GetLocation());
+  auto expr_stmt_node = std::make_unique<ExpressionStatementNode>(
+      PlaceholderToken::Create(*now_reading));
 
   std::unique_ptr<ParseNode> expr = ParseExpression();
 
@@ -367,7 +378,7 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   } else if (StartsAssignmentExpression(*now_reading)) {
     init = ParseAssignmentExpression();
   } else {
-    init = std::make_unique<NopNode>(now_reading->GetLocation());
+    init = std::make_unique<NopNode>(PlaceholderToken::Create(*now_reading));
   }
   for_statement->AppendChild(std::move(init));
 
@@ -393,7 +404,8 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   if (StartsAssignmentExpression(*now_reading)) {
     increment = ParseAssignmentExpression();
   } else {
-    increment = std::make_unique<NopNode>(now_reading->GetLocation());
+    increment =
+        std::make_unique<NopNode>(PlaceholderToken::Create(*now_reading));
   }
   for_statement->AppendChild(std::move(increment));
 
@@ -887,7 +899,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
   }
 
   auto lambda_type_node =
-      std::make_unique<LambdaTypeNode>(now_reading->GetLocation());
+      std::make_unique<LambdaTypeNode>(PlaceholderToken::Create(*now_reading));
   ReadToken();
 
   // Parse parameter types.
@@ -945,8 +957,8 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaInvocation(
     }
 
     // Create lambda invocation node.
-    lambda_invocation =
-        std::make_unique<LambdaInvocationNode>(now_reading->GetLocation());
+    lambda_invocation = std::make_unique<LambdaInvocationNode>(
+        PlaceholderToken::Create(*now_reading));
 
     // Append lambda that is to be invoked.
     lambda_invocation->AppendChild(std::move(lambda));

@@ -9,8 +9,8 @@
 
 class NopNode : public ParseNode {
  public:
-  NopNode(TextLocation text_location)
-      : ParseNode(ParseNodeType::FOR_STATEMENT_NODE, text_location) {}
+  NopNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::FOR_STATEMENT_NODE, std::move(token)) {}
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 

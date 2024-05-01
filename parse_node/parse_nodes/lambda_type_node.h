@@ -12,8 +12,8 @@
 
 class LambdaTypeNode : public ParseNode {
  public:
-  LambdaTypeNode(TextLocation text_location)
-      : ParseNode(ParseNodeType::LAMBDA_TYPE_NODE, text_location),
+  LambdaTypeNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::LAMBDA_TYPE_NODE, std::move(token)),
         parameter_type_nodes(),
         return_type_node{nullptr} {}
 

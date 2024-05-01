@@ -7,7 +7,7 @@
 #include <token/token.h>
 
 std::unique_ptr<ParseNode> NopNode::CreateCopy() const {
-  return std::make_unique<NopNode>(text_location);
+  return std::make_unique<NopNode>(token->CreateCopy());
 }
 
 void NopNode::Accept(ParseNodeVisitor &visitor) { visitor.Visit(*this); }

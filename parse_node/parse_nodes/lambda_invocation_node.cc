@@ -8,7 +8,7 @@
 #include <vector>
 
 std::unique_ptr<ParseNode> LambdaInvocationNode::CreateCopy() const {
-  auto copy_node = std::make_unique<LambdaInvocationNode>(text_location);
+  auto copy_node = std::make_unique<LambdaInvocationNode>(token->CreateCopy());
   for (auto child : GetChildren()) {
     copy_node->AppendChild(child->CreateCopy());
   }

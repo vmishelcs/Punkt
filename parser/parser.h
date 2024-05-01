@@ -36,12 +36,12 @@ class Parser {
   bool StartsCodeBlock(Token &token);
   std::unique_ptr<ParseNode> ParseCodeBlock();
 
-  /// declarationStatement ::- `var` identifierToken `=` expression.
+  /// declarationStatement ::= `var` identifierToken `=` expression.
   ///                       |  `const` identifierToken `=` expression.
   bool StartsDeclaration(Token &token);
   std::unique_ptr<ParseNode> ParseDeclaration(bool expect_terminator = true);
 
-  /// expressionStatement ::- expression.
+  /// expressionStatement ::= expression.
   bool StartsExpressionStatement(Token &token);
   std::unique_ptr<ParseNode> ParseExpressionStatement(
       bool expect_terminator = true);

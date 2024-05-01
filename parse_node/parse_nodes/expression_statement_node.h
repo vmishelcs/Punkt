@@ -9,8 +9,8 @@
 
 class ExpressionStatementNode : public ParseNode {
  public:
-  ExpressionStatementNode(TextLocation text_location)
-      : ParseNode(ParseNodeType::EXPRESSION_STATEMENT_NODE, text_location) {}
+  ExpressionStatementNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::EXPRESSION_STATEMENT_NODE, std::move(token)) {}
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
