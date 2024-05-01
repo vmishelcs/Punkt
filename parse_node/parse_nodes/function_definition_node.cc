@@ -5,8 +5,16 @@
 #include <parse_node/parse_node_visitor.h>
 #include <token/token.h>
 
-FunctionDefinitionNode::FunctionDefinitionNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::FUNCTION_DEFINITION_NODE, std::move(token)) {}
+#include <memory>
+
+std::unique_ptr<ParseNode> FunctionDefinitionNode::CreateCopy() const {
+  auto copy_node =
+      std::make_unique<FunctionDefinitionNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  return copy_node;
+}
 
 void FunctionDefinitionNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);

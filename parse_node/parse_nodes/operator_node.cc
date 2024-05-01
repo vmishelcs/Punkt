@@ -1,17 +1,27 @@
 #include "operator_node.h"
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
+#include <token/punctuator_token.h>
+
+#include <memory>
 
 OperatorNode::OperatorNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::OPERATOR_NODE, std::move(token)) {
-  PunctuatorToken &punctuator_token =
-      dynamic_cast<PunctuatorToken &>(*(this->token));
-  punctuator_enum = punctuator_token.GetPunctuatorEnum();
+  auto punctuator_token = static_cast<PunctuatorToken *>(this->token.get());
+  punctuator = punctuator_token->GetPunctuatorEnum();
 }
 
-std::string OperatorNode::ToString() const {
-  return "OPERATOR NODE: " + token->ToString();
+std::unique_ptr<ParseNode> OperatorNode::CreateCopy() const {
+  auto copy_node = std::make_unique<OperatorNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+
+  copy_node->punctuator = this->punctuator;
+
+  return copy_node;
 }
 
 void OperatorNode::Accept(ParseNodeVisitor &visitor) {

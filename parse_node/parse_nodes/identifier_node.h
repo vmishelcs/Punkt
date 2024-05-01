@@ -8,9 +8,14 @@
 #include <symbol_table/symbol_table.h>
 #include <token/token.h>
 
+#include <memory>
+#include <string>
+
 class IdentifierNode : public ParseNode {
  public:
   IdentifierNode(std::unique_ptr<Token> token);
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   const std::string &GetName() const { return name; }
 

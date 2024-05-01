@@ -4,17 +4,18 @@
 #include <parse_node/parse_node_visitor.h>
 #include <token/boolean_literal_token.h>
 
+#include <memory>
+
 BooleanLiteralNode::BooleanLiteralNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::BOOLEAN_LITERAL_NODE, std::move(token)) {
-  BooleanLiteralToken *boolean_literal_token =
-      (BooleanLiteralToken *)this->token.get();
-  this->value = boolean_literal_token->GetValue();
+  auto bool_literal_token =
+      static_cast<BooleanLiteralToken *>(this->token.get());
+  this->value = bool_literal_token->GetValue();
 }
 
-BooleanLiteralNode::BooleanLiteralNode(bool value)
-    : ParseNode(ParseNodeType::BOOLEAN_LITERAL_NODE, nullptr), value(value) {}
-
-bool BooleanLiteralNode::GetValue() const { return value; }
+std::unique_ptr<ParseNode> BooleanLiteralNode::CreateCopy() const {
+  return std::make_unique<BooleanLiteralNode>(token->CreateCopy());
+}
 
 std::string BooleanLiteralNode::ToString() const {
   return "BOOLEAN LITERAL NODE: " + token->ToString();

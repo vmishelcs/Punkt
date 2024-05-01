@@ -5,16 +5,14 @@
 #include <token/integer_literal_token.h>
 
 IntegerLiteralNode::IntegerLiteralNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::INTEGER_LITERAL_NODE, std::move(token)) {}
-
-int IntegerLiteralNode::GetValue() const {
-  IntegerLiteralToken &integer_literal_token =
-      dynamic_cast<IntegerLiteralToken &>(*(this->token));
-  return integer_literal_token.GetValue();
+    : ParseNode(ParseNodeType::INTEGER_LITERAL_NODE, std::move(token)) {
+  auto int_literal_token =
+      static_cast<IntegerLiteralToken *>(this->token.get());
+  this->value = int_literal_token->GetValue();
 }
 
-std::string IntegerLiteralNode::ToString() const {
-  return "INTEGER LITERAL NODE: " + token->ToString();
+std::unique_ptr<ParseNode> IntegerLiteralNode::CreateCopy() const {
+  return std::make_unique<IntegerLiteralNode>(token->CreateCopy());
 }
 
 void IntegerLiteralNode::Accept(ParseNodeVisitor &visitor) {

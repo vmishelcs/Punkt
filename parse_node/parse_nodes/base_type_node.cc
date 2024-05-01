@@ -9,7 +9,12 @@
 #include <semantic_analyzer/types/base_type.h>
 #include <token/keyword_token.h>
 
+#include <memory>
 #include <string>
+
+std::unique_ptr<ParseNode> BaseTypeNode::CreateCopy() const {
+  return std::make_unique<BaseTypeNode>(token->CreateCopy());
+}
 
 std::unique_ptr<Type> BaseTypeNode::InferOwnType() const {
   Token *token = GetToken();

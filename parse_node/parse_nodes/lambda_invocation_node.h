@@ -1,7 +1,9 @@
 #ifndef LAMBDA_INVOCATION_NODE_H_
 #define LAMBDA_INVOCATION_NODE_H_
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
+#include <token/token.h>
 
 #include <memory>
 #include <string>
@@ -14,6 +16,8 @@ class LambdaInvocationNode : public ParseNode {
  public:
   LambdaInvocationNode(TextLocation text_location)
       : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, text_location) {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   ParseNode *GetCalleeNode() const { return GetChild(0); }
 

@@ -13,7 +13,11 @@
 IdentifierNode::IdentifierNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::IDENTIFIER_NODE, std::move(token)),
       name(std::string(this->token->GetLexeme())),
-      symbol_table_entry(nullptr) {}
+      symbol_table_entry{nullptr} {}
+
+std::unique_ptr<ParseNode> IdentifierNode::CreateCopy() const {
+  return std::make_unique<IdentifierNode>(token->CreateCopy());
+}
 
 std::string IdentifierNode::ToString() const {
   return "IDENTIFIER NODE: " + token->ToString();

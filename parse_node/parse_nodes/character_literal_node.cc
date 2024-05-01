@@ -5,13 +5,17 @@
 #include <parse_node/parse_node_visitor.h>
 #include <token/character_literal_token.h>
 
-CharacterLiteralNode::CharacterLiteralNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::CHARACTER_LITERAL_NODE, std::move(token)) {}
+#include <memory>
 
-char CharacterLiteralNode::GetValue() const {
-  CharacterLiteralToken &character_literal_token =
-      dynamic_cast<CharacterLiteralToken &>(*(this->token));
-  return character_literal_token.GetValue();
+CharacterLiteralNode::CharacterLiteralNode(std::unique_ptr<Token> token)
+    : ParseNode(ParseNodeType::CHARACTER_LITERAL_NODE, std::move(token)) {
+  auto char_literal_token =
+      static_cast<CharacterLiteralToken *>(this->token.get());
+  this->value = char_literal_token->GetValue();
+}
+
+std::unique_ptr<ParseNode> CharacterLiteralNode::CreateCopy() const {
+  return std::make_unique<CharacterLiteralNode>(token->CreateCopy());
 }
 
 std::string CharacterLiteralNode::ToString() const {

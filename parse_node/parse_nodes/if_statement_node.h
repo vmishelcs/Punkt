@@ -5,9 +5,15 @@
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
+#include <memory>
+#include <string>
+
 class IfStatementNode : public ParseNode {
  public:
-  IfStatementNode(std::unique_ptr<Token> token);
+  IfStatementNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::IF_STATEMENT_NODE, std::move(token)) {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   ParseNode *GetConditionNode() const { return GetChild(0); }
   ParseNode *GetThenBlockNode() const { return GetChild(1); }
@@ -15,7 +21,7 @@ class IfStatementNode : public ParseNode {
 
   bool HasElseBlock() const;
 
-  virtual std::string ToString() const override;
+  virtual std::string ToString() const override { return "IF STATEMENT NODE"; }
 
   virtual void Accept(ParseNodeVisitor &visitor) override;
 

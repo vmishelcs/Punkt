@@ -50,17 +50,19 @@ class ParseNode {
   ParseNode(ParseNodeType node_type, TextLocation &text_location);
   ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token);
 
+  // TODO: Implement proper copying (along with semantic info).
   /// @brief Creates a copy of the subtree defined by this node.
   /// @return A `unique_ptr` to a `ParseNode` object that is an independent copy
-  /// of this node, along with an independent copy of any descendants.
+  /// of this node, along with any descendants.
   /// @warning This method does not initialize any semantic information (e.g.
   /// type, scope, etc) of the returned copy. Hence, this method should only be
   /// used by the parser.
-  virtual std::unique_ptr<ParseNode> CreateCopy();
+  virtual std::unique_ptr<ParseNode> CreateCopy() const = 0;
 
   ParseNodeType GetParseNodeType() const { return node_type; }
 
-  Token *GetToken() const;
+  Token *GetToken() const { return token.get(); }
+  TextLocation GetTextLocation() const { return text_location; }
 
   ParseNode *GetParent() const { return parent; }
   unsigned NumChildren() const;
@@ -92,10 +94,10 @@ class ParseNode {
   void VisitChildren(ParseNodeVisitor &visitor);
 
   std::unique_ptr<Token> token;
+  TextLocation text_location;
 
  private:
   ParseNodeType node_type;
-  TextLocation text_location;
 
   ParseNode *parent;
   std::vector<std::unique_ptr<ParseNode> > children;

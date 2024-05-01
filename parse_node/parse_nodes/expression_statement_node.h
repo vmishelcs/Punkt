@@ -4,10 +4,15 @@
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
 
+#include <memory>
+#include <string>
+
 class ExpressionStatementNode : public ParseNode {
  public:
   ExpressionStatementNode(TextLocation text_location)
       : ParseNode(ParseNodeType::EXPRESSION_STATEMENT_NODE, text_location) {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   ParseNode *GetExpressionNode() const { return GetChild(0); }
 

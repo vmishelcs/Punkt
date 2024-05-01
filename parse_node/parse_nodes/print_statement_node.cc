@@ -1,13 +1,17 @@
 #include "print_statement_node.h"
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-PrintStatementNode::PrintStatementNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::PRINT_STATEMENT_NODE, std::move(token)) {}
+#include <memory>
 
-std::string PrintStatementNode::ToString() const {
-  return "PRINT STATEMENT NODE: " + token->ToString();
+std::unique_ptr<ParseNode> PrintStatementNode::CreateCopy() const {
+  auto copy_node = std::make_unique<PrintStatementNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  return copy_node;
 }
 
 void PrintStatementNode::Accept(ParseNodeVisitor &visitor) {

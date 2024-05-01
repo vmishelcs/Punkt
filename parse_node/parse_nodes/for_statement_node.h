@@ -5,9 +5,15 @@
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
+#include <memory>
+#include <string>
+
 class ForStatementNode : public ParseNode {
  public:
-  ForStatementNode(std::unique_ptr<Token> token);
+  ForStatementNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::FOR_STATEMENT_NODE, std::move(token)) {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   ParseNode *GetLoopInitializerNode() const { return GetChild(0); }
   ParseNode *GetEndConditionNode() const { return GetChild(1); }

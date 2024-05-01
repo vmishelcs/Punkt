@@ -12,10 +12,12 @@
 
 class LambdaTypeNode : public ParseNode {
  public:
-  LambdaTypeNode(std::unique_ptr<Token> token)
-      : ParseNode(ParseNodeType::LAMBDA_TYPE_NODE, std::move(token)),
+  LambdaTypeNode(TextLocation text_location)
+      : ParseNode(ParseNodeType::LAMBDA_TYPE_NODE, text_location),
         parameter_type_nodes(),
-        return_type_node(nullptr) {}
+        return_type_node{nullptr} {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   /// @brief Attach the specified `ParseNode` to `this` node to represent a
   /// parameter type.

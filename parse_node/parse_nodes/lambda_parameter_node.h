@@ -1,12 +1,11 @@
 #ifndef LAMBDA_PARAMETER_NODE_H_
 #define LAMBDA_PARAMETER_NODE_H_
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
+#include <memory>
 #include <string>
 
 #include "identifier_node.h"
@@ -15,6 +14,8 @@ class LambdaParameterNode : public ParseNode {
  public:
   LambdaParameterNode(TextLocation text_location)
       : ParseNode(ParseNodeType::LAMBDA_PARAMETER_NODE, text_location) {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   ParseNode *GetTypeNode() const { return GetChild(0); }
 

@@ -379,7 +379,9 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   if (StartsExpression(*now_reading)) {
     condition = ParseExpression();
   } else {
-    condition = std::make_unique<BooleanLiteralNode>(true);
+    auto cond_token = std::make_unique<BooleanLiteralToken>(
+        "true", now_reading->GetLocation(), true);
+    condition = std::make_unique<BooleanLiteralNode>(std::move(cond_token));
   }
   for_statement->AppendChild(std::move(condition));
 
@@ -885,7 +887,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
   }
 
   auto lambda_type_node =
-      std::make_unique<LambdaTypeNode>(std::move(now_reading));
+      std::make_unique<LambdaTypeNode>(now_reading->GetLocation());
   ReadToken();
 
   // Parse parameter types.

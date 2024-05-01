@@ -4,7 +4,16 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
+#include <memory>
 #include <vector>
+
+std::unique_ptr<ParseNode> LambdaInvocationNode::CreateCopy() const {
+  auto copy_node = std::make_unique<LambdaInvocationNode>(text_location);
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  return copy_node;
+}
 
 std::vector<ParseNode *> LambdaInvocationNode::GetArgumentNodes() const {
   std::vector<ParseNode *> result;
