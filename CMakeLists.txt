@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.29)
-set(CMAKE_C_COMPILER "/usr/bin/gcc-12")
-set(CMAKE_CXX_COMPILER "/usr/bin/g++-12")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING
+	"Available build-types: Debug, Release")
 project(Punkt)
 
 include_directories(${CMAKE_SOURCE_DIR})
