@@ -198,7 +198,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   }
 
   auto punctuator_token = static_cast<PunctuatorToken *>(node.GetToken());
-  auto signature = Signatures::AcceptingSignature(
+  auto signature = signatures::AcceptingSignature(
       punctuator_token->GetPunctuatorEnum(), child_types);
 
   if (signature) {
@@ -208,7 +208,6 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
     InvalidOperandTypeError(node, child_types);
     node.SetType(BaseType::CreateErrorType());
   }
-  signature->ResetArbitraryTypes();
 }
 
 void SemanticAnalysisVisitor::VisitLeave(PrintStatementNode &node) {

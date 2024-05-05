@@ -51,13 +51,13 @@ class Signature {
   /// @param types A vector of `Type` pointers representing Punkt types.
   /// @return `true` if this signature accepts the specified types, `false`
   /// otherwise.
-  bool Accepts(std::vector<Type *> &types);
+  bool Accepts(const std::vector<Type *> &types);
 
+ private:
   /// @brief Reset any `ArbitraryType` objects that this signature may hold to
   /// have no set type.
   void ResetArbitraryTypes();
 
- private:
   std::vector<Type *> input_types;
   Type *output_type;
 

@@ -41,7 +41,10 @@ code_gen_function_variant Signature::GetCodeGenFunc() const {
   return func_variant;
 }
 
-bool Signature::Accepts(std::vector<Type *> &types) {
+bool Signature::Accepts(const std::vector<Type *> &types) {
+  // Reset any previously set arbitrary types.
+  ResetArbitraryTypes();
+
   if (types.size() != input_types.size()) {
     return false;
   }
@@ -58,8 +61,7 @@ bool Signature::Accepts(std::vector<Type *> &types) {
 void Signature::ResetArbitraryTypes() {
   // Reset any arbitrary types that are stored as input types.
   for (Type *type : input_types) {
-    auto arbitrary_type = dynamic_cast<ArbitraryType *>(type);
-    if (arbitrary_type) {
+    if (auto arbitrary_type = dynamic_cast<ArbitraryType *>(type)) {
       arbitrary_type->ResetSetType();
     }
   }
