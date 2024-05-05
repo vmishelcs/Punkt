@@ -1,7 +1,6 @@
 #ifndef ALL_NODES_H_
 #define ALL_NODES_H_
 
-#include "assignment_statement_node.h"
 #include "base_type_node.h"
 #include "boolean_literal_node.h"
 #include "call_statement_node.h"
@@ -9,6 +8,7 @@
 #include "code_block_node.h"
 #include "declaration_statement_node.h"
 #include "error_node.h"
+#include "expression_statement_node.h"
 #include "for_statement_node.h"
 #include "function_definition_node.h"
 #include "identifier_node.h"

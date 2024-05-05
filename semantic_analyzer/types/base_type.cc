@@ -34,7 +34,7 @@ bool BaseType::IsEquivalentTo(BaseTypeEnum base_type_enum) const {
   return this->base_type_enum == base_type_enum;
 }
 
-bool BaseType::IsEquivalentTo(Type *other_type) const {
+bool BaseType::IsEquivalentTo(Type *other_type) {
   BaseType *other_base_type = dynamic_cast<BaseType *>(other_type);
   if (!other_base_type) {
     return false;

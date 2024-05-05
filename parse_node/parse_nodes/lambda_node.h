@@ -1,7 +1,13 @@
 #ifndef LAMBDA_NODE_H_
 #define LAMBDA_NODE_H_
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
+#include <token/token.h>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "base_type_node.h"
 #include "code_block_node.h"
@@ -9,11 +15,13 @@
 
 class LambdaNode : public ParseNode {
  public:
-  LambdaNode()
-      : ParseNode(ParseNodeType::LAMBDA_NODE, nullptr),
+  LambdaNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::LAMBDA_NODE, std::move(token)),
         parameter_nodes(),
-        return_type_node(nullptr),
-        lambda_body(nullptr) {}
+        return_type_node{nullptr},
+        lambda_body{nullptr} {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   /// @brief Attach the specified `ParseNode` to `this` node to represent a
   /// parameter.
@@ -39,11 +47,11 @@ class LambdaNode : public ParseNode {
   /// field.
   void AddLambdaBodyNode(std::unique_ptr<ParseNode> lambda_body);
 
-  std::vector<LambdaParameterNode *> GetParameterNodes() {
+  std::vector<LambdaParameterNode *> GetParameterNodes() const {
     return parameter_nodes;
   }
-  ParseNode *GetReturnTypeNode() { return return_type_node; }
-  ParseNode *GetLambdaBodyNode() { return lambda_body; }
+  ParseNode *GetReturnTypeNode() const { return return_type_node; }
+  ParseNode *GetLambdaBodyNode() const { return lambda_body; }
 
   bool IsAnonymous() const {
     return GetParent()->GetParseNodeType() !=

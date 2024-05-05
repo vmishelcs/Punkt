@@ -1,0 +1,7 @@
+function f <> -> void {
+	print "good".
+}
+
+main {
+	f().
+}

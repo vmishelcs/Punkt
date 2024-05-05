@@ -2,11 +2,8 @@
 #define KEYWORD_H_
 
 #include <string>
-#include <unordered_map>
 
-#include "reserved_component.h"
-
-enum class KeywordEnum {
+enum class Keyword {
   BOOL,
   CALL,
   CHAR,
@@ -26,21 +23,23 @@ enum class KeywordEnum {
   VOID,
 };
 
-class Keyword : public ReservedComponent {
- public:
-  Keyword(std::string lexeme);
-  Keyword(Keyword &&keyword);
+namespace keyword_utils {
 
-  KeywordEnum GetKeywordEnum() const;
+/// @brief Checks if the provided lexeme is a keyword.
+/// @param lexeme String to be checked if it is a keyword.
+/// @return `true` if `lexeme` is a keyword, `false` otherwise.
+bool IsKeyword(const std::string& lexeme);
 
-  static bool IsKeyword(std::string buffer);
-  static KeywordEnum ForLexeme(std::string buffer);
-  static std::string ForKeywordEnum(KeywordEnum keyword_enum);
+/// @brief Get a `Keyword` enum corresponding to the provided string.
+/// @param lexeme String representation of a keyword.
+/// @return A `Keyword` enum corresponding to the provided string.
+Keyword GetKeywordEnum(const std::string& lexeme);
 
- private:
-  KeywordEnum keyword_enum;
-  static std::unordered_map<std::string, KeywordEnum> dictionary;
-  static std::unordered_map<KeywordEnum, std::string> reverse_dictionary;
-};
+/// @brief Get a string representation of the provided keyword.
+/// @param keyword `Keyword` enum representation of a punctuator.
+/// @return String representation of the `keyword`.
+std::string GetKeywordLexeme(Keyword keyword);
+
+}  // namespace keyword_utils
 
 #endif  // KEYWORD_H_

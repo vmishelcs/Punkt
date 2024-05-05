@@ -4,8 +4,15 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-CodeBlockNode::CodeBlockNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::CODE_BLOCK_NODE, std::move(token)) {}
+#include <memory>
+
+std::unique_ptr<ParseNode> CodeBlockNode::CreateCopy() const {
+  auto copy_node = std::make_unique<CodeBlockNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  return copy_node;
+}
 
 std::string CodeBlockNode::ToString() const {
   return "CODE BLOCK NODE: " + token->ToString();

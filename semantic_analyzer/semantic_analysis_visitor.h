@@ -6,8 +6,6 @@
 class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
  public:
   // ---- Non-leaf nodes -------------------------------------------------------
-  virtual void VisitLeave(AssignmentStatementNode &node) override;
-
   virtual void VisitLeave(CallStatementNode &node) override;
 
   virtual void VisitEnter(CodeBlockNode &node) override;

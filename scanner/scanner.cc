@@ -4,7 +4,6 @@
 #include <token/all_tokens.h>
 
 #include "keyword.h"
-#include "punctuator_scanner.h"
 
 static const size_t kMaxIdentifierLength = 32;
 
@@ -64,15 +63,13 @@ std::unique_ptr<Token> Scanner::ScanIdentifier(LocatedChar first_char) {
     ch = input_stream->Peek();
   }
 
-  if (Keyword::IsKeyword(buffer)) {
-    if (Keyword::ForLexeme(buffer) == KeywordEnum::TRUE ||
-        Keyword::ForLexeme(buffer) == KeywordEnum::FALSE) {
-      return std::make_unique<BooleanLiteralToken>(
-          buffer, first_char.location,
-          Keyword::ForLexeme(buffer) == KeywordEnum::TRUE);
+  if (keyword_utils::IsKeyword(buffer)) {
+    Keyword keyword = keyword_utils::GetKeywordEnum(buffer);
+    if (keyword == Keyword::TRUE || keyword == Keyword::FALSE) {
+      return std::make_unique<BooleanLiteralToken>(buffer, first_char.location,
+                                                   keyword == Keyword::TRUE);
     }
-    return std::make_unique<KeywordToken>(buffer, first_char.location,
-                                          Keyword(buffer));
+    return std::make_unique<KeywordToken>(buffer, first_char.location, keyword);
   }
 
   if (buffer.size() > kMaxIdentifierLength) {
@@ -108,16 +105,27 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
     case ')':
     case ',':
     case '.':
+      buffer.push_back(lc.character);
+      break;
     case '+':
     case '*':
     case '/':
+    case '%':
       buffer.push_back(lc.character);
+      if (input_stream->Peek().character == '=') {
+        // += (add and assign) operator
+        // *= (multiply and assign) operator
+        // /= (divide and assign) operator
+        buffer.push_back(input_stream->Next().character);
+      }
       break;
 
     case '-':
       buffer.push_back(lc.character);
-      if (input_stream->Peek().character == '>') {
+      if (input_stream->Peek().character == '>' ||
+          input_stream->Peek().character == '=') {
         // '->' (returns) punctuator
+        // '-=' (subtract and assign) operator
         buffer.push_back(input_stream->Next().character);
       }
       break;
@@ -143,9 +151,10 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
     default:
       PunktLogger::LogFatalInternalError("unexpected punctuator character");
   }
+
+  Punctuator punctuator_enum = punctuator_utils::GetPunctuatorEnum(buffer);
   return std::make_unique<PunctuatorToken>(buffer, first_char.location,
-                                           Punctuator(buffer));
-  // return PunctuatorScanner::Scan(first_char, input_stream);
+                                           punctuator_enum);
 }
 
 std::unique_ptr<Token> Scanner::ScanCharacter(LocatedChar first_char) {

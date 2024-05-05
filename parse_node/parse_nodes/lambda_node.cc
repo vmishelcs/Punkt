@@ -1,9 +1,31 @@
 #include "lambda_node.h"
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "lambda_parameter_node.h"
+
+std::unique_ptr<ParseNode> LambdaNode::CreateCopy() const {
+  auto copy_node = std::make_unique<LambdaNode>(token->CreateCopy());
+
+  // Copy over the parameter nodes.
+  for (auto param : GetParameterNodes()) {
+    copy_node->AddParameterNode(param->CreateCopy());
+  }
+
+  // Copy over return type node.
+  copy_node->AddReturnTypeNode(return_type_node->CreateCopy());
+
+  // Copy over the lambda body.
+  copy_node->AddLambdaBodyNode(lambda_body->CreateCopy());
+
+  return copy_node;
+}
 
 void LambdaNode::AddParameterNode(std::unique_ptr<ParseNode> parameter_node) {
   this->parameter_nodes.push_back(

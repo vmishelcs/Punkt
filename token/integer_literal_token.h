@@ -1,12 +1,19 @@
 #ifndef INTEGER_LITERAL_TOKEN_H_
 #define INTEGER_LITERAL_TOKEN_H_
 
+#include <memory>
+#include <string>
+
 #include "token.h"
 
 class IntegerLiteralToken : public Token {
  public:
   IntegerLiteralToken(std::string lexeme, TextLocation location, int value)
       : Token(lexeme, location, TokenType::INTEGER_LITERAL), value(value) {}
+
+  virtual std::unique_ptr<Token> CreateCopy() const override {
+    return std::make_unique<IntegerLiteralToken>(lexeme, location, value);
+  }
 
   virtual std::string ToString() const override {
     std::string result =

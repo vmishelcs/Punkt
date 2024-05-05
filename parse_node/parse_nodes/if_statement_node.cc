@@ -5,17 +5,20 @@
 #include <parse_node/parse_node_visitor.h>
 #include <token/token.h>
 
-IfStatementNode::IfStatementNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::IF_STATEMENT_NODE, std::move(token)) {}
+#include <memory>
+
+std::unique_ptr<ParseNode> IfStatementNode::CreateCopy() const {
+  auto copy_node = std::make_unique<IfStatementNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  return copy_node;
+}
 
 bool IfStatementNode::HasElseBlock() const {
   // If-statement has an 'else' block if there are more than two children
   // (first 2 children are the condition and the 'then' block).
   return NumChildren() > 2;
-}
-
-std::string IfStatementNode::ToString() const {
-  return "IF STATEMENT NODE: " + token->ToString();
 }
 
 void IfStatementNode::Accept(ParseNodeVisitor &visitor) {

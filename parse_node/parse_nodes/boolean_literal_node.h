@@ -5,12 +5,16 @@
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
+#include <memory>
+#include <string>
+
 class BooleanLiteralNode : public ParseNode {
  public:
   BooleanLiteralNode(std::unique_ptr<Token> token);
-  BooleanLiteralNode(bool value);
 
-  bool GetValue() const;
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
+
+  bool GetValue() const { return value; }
 
   virtual std::string ToString() const override;
 

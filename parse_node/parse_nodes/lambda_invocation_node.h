@@ -1,7 +1,9 @@
 #ifndef LAMBDA_INVOCATION_NODE_H_
 #define LAMBDA_INVOCATION_NODE_H_
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
+#include <token/token.h>
 
 #include <memory>
 #include <string>
@@ -12,13 +14,10 @@
 
 class LambdaInvocationNode : public ParseNode {
  public:
-  LambdaInvocationNode()
-      : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, nullptr) {}
+  LambdaInvocationNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::LAMBDA_INVOCATION_NODE, std::move(token)) {}
 
-  static std::unique_ptr<LambdaInvocationNode>
-  CreateLambdaInvocationNodeWithArguments(
-      std::unique_ptr<ParseNode> identifier,
-      std::vector<std::unique_ptr<ParseNode> > args);
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   ParseNode *GetCalleeNode() const { return GetChild(0); }
 

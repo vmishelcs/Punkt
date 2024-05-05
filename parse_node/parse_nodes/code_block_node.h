@@ -3,9 +3,15 @@
 
 #include <parse_node/parse_node.h>
 
+#include <memory>
+#include <string>
+
 class CodeBlockNode : public ParseNode {
  public:
-  CodeBlockNode(std::unique_ptr<Token> token);
+  CodeBlockNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::CODE_BLOCK_NODE, std::move(token)) {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   virtual std::string ToString() const override;
 

@@ -5,6 +5,7 @@
 #include <parse_node/parse_node.h>
 
 #include <memory>
+#include <string>
 
 #include "lambda_invocation_node.h"
 
@@ -12,6 +13,8 @@ class CallStatementNode : public ParseNode {
  public:
   CallStatementNode(std::unique_ptr<Token> token)
       : ParseNode(ParseNodeType::CALL_STATEMENT_NODE, std::move(token)) {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   LambdaInvocationNode *GetLambdaInvocationNode() const {
     return dynamic_cast<LambdaInvocationNode *>(GetChild(0));

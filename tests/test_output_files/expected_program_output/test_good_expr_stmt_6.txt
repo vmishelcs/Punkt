@@ -1,0 +1,16 @@
+i=0
+even
+i=1
+odd
+i=2
+even
+i=3
+odd
+i=4
+even
+i=5
+odd
+i=6
+even
+i=7
+odd

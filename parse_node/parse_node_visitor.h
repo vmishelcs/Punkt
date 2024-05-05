@@ -7,9 +7,6 @@ class ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(AssignmentStatementNode &node) = 0;
-  virtual void VisitLeave(AssignmentStatementNode &node) = 0;
-
   virtual void VisitEnter(CallStatementNode &node) = 0;
   virtual void VisitLeave(CallStatementNode &node) = 0;
 
@@ -18,6 +15,9 @@ class ParseNodeVisitor {
 
   virtual void VisitEnter(DeclarationStatementNode &node) = 0;
   virtual void VisitLeave(DeclarationStatementNode &node) = 0;
+
+  virtual void VisitEnter(ExpressionStatementNode &node) = 0;
+  virtual void VisitLeave(ExpressionStatementNode &node) = 0;
 
   virtual void VisitEnter(ForStatementNode &node) = 0;
   virtual void VisitLeave(ForStatementNode &node) = 0;
@@ -76,13 +76,6 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(AssignmentStatementNode &node) override {
-    DefaultVisit(node);
-  }
-  virtual void VisitLeave(AssignmentStatementNode &node) override {
-    DefaultVisit(node);
-  }
-
   virtual void VisitEnter(CallStatementNode &node) override {
     DefaultVisit(node);
   }
@@ -97,6 +90,13 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
     DefaultVisit(node);
   }
   virtual void VisitLeave(DeclarationStatementNode &node) override {
+    DefaultVisit(node);
+  }
+
+  virtual void VisitEnter(ExpressionStatementNode &node) override {
+    DefaultVisit(node);
+  }
+  virtual void VisitLeave(ExpressionStatementNode &node) override {
     DefaultVisit(node);
   }
 

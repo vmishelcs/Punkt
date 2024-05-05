@@ -1,13 +1,17 @@
 #include "main_node.h"
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-MainNode::MainNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::MAIN_NODE, std::move(token)) {}
+#include <memory>
 
-std::string MainNode::ToString() const {
-  return "MAIN NODE: " + token->ToString();
+std::unique_ptr<ParseNode> MainNode::CreateCopy() const {
+  auto copy_node = std::make_unique<MainNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  return copy_node;
 }
 
 void MainNode::Accept(ParseNodeVisitor &visitor) {

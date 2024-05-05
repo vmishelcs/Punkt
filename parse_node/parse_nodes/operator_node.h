@@ -8,7 +8,8 @@
 #include <scanner/punctuator.h>
 #include <token/punctuator_token.h>
 
-#include <functional>
+#include <memory>
+#include <string>
 #include <variant>
 
 using code_gen_function_variant =
@@ -22,19 +23,21 @@ class OperatorNode : public ParseNode {
  public:
   OperatorNode(std::unique_ptr<Token> token);
 
-  inline PunctuatorEnum GetPunctuatorEnum() { return punctuator_enum; }
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
-  inline void SetCodeGenFunc(code_gen_function_variant f) { this->f = f; }
-  inline code_gen_function_variant GetCodeGenFunc() { return f; }
+  Punctuator GetPunctuatorEnum() const { return punctuator; }
 
-  virtual std::string ToString() const override;
+  void SetCodeGenFunc(code_gen_function_variant f) { this->f = f; }
+  code_gen_function_variant GetCodeGenFunc() const { return f; }
+
+  virtual std::string ToString() const override { return "OPERATOR NODE"; }
 
   virtual void Accept(ParseNodeVisitor &visitor) override;
 
   virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 
  private:
-  PunctuatorEnum punctuator_enum;
+  Punctuator punctuator;
   code_gen_function_variant f;
 };
 

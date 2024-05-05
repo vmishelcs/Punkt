@@ -7,20 +7,18 @@
 #include <semantic_analyzer/types/lambda_type.h>
 #include <semantic_analyzer/types/type.h>
 
+#include <memory>
+#include <vector>
+
 #include "parse_node_visitor.h"
 
 ParseNode::ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token)
     : token(std::move(token)),
+      text_location(this->token->GetLocation()),
       node_type(node_type),
       parent{nullptr},
       type{nullptr},
       scope{nullptr} {}
-
-ParseNodeType ParseNode::GetParseNodeType() const { return node_type; }
-
-Token *ParseNode::GetToken() const { return token.get(); }
-
-ParseNode *ParseNode::GetParent() const { return parent; }
 
 ParseNode *ParseNode::GetChild(unsigned i) const {
   if (children.size() <= i) {

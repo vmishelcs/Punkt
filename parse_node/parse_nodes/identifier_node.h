@@ -8,9 +8,14 @@
 #include <symbol_table/symbol_table.h>
 #include <token/token.h>
 
+#include <memory>
+#include <string>
+
 class IdentifierNode : public ParseNode {
  public:
   IdentifierNode(std::unique_ptr<Token> token);
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   const std::string &GetName() const { return name; }
 
@@ -28,6 +33,11 @@ class IdentifierNode : public ParseNode {
     this->symbol_table_entry = symbol_table_entry;
   }
   SymbolTableEntry *GetSymbolTableEntry() const { return symbol_table_entry; }
+
+  /// @brief Checks if this node is a target of an assignment operation.
+  /// @return `true` if this identifer is a target of an assignment operation,
+  /// `false` otherwise.
+  bool IsAssignmentTarget() const;
 
   void SetLLVMAlloca(llvm::AllocaInst *alloca);
   void SetLLVMFunction(llvm::Function *function);

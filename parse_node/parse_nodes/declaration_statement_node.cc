@@ -4,8 +4,16 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-DeclarationStatementNode::DeclarationStatementNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::DECLARATION_STATEMENT_NODE, std::move(token)) {}
+#include <memory>
+
+std::unique_ptr<ParseNode> DeclarationStatementNode::CreateCopy() const {
+  auto copy_node =
+      std::make_unique<DeclarationStatementNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  return copy_node;
+}
 
 std::string DeclarationStatementNode::ToString() const {
   return "DECLARATION STATEMENT NODE: " + token->ToString();

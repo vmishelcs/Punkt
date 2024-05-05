@@ -1,6 +1,9 @@
 #ifndef CHARACTER_LITERAL_TOKEN_H_
 #define CHARACTER_LITERAL_TOKEN_H_
 
+#include <memory>
+#include <string>
+
 #include "token.h"
 
 class CharacterLiteralToken : public Token {
@@ -9,6 +12,10 @@ class CharacterLiteralToken : public Token {
                         char value)
       : Token(lexeme, text_location, TokenType::CHARACTER_LITERAL),
         value(value) {}
+
+  virtual std::unique_ptr<Token> CreateCopy() const override {
+    return std::make_unique<CharacterLiteralToken>(lexeme, location, value);
+  }
 
   virtual std::string ToString() const override {
     std::string result =

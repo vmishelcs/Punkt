@@ -56,6 +56,6 @@ _deps
 /**/__pycache__
 
 # Test output files
-/tests/test_output_files/actual/
 /tests/test_output_files/ir_output/
 /tests/test_output_files/exe_output/
+/tests/test_output_files/program_output/

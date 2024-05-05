@@ -3,8 +3,11 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-ErrorNode::ErrorNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::ERROR_NODE, std::move(token)) {}
+#include <memory>
+
+std::unique_ptr<ParseNode> ErrorNode::CreateCopy() const {
+  return std::make_unique<ErrorNode>(token->CreateCopy());
+}
 
 std::string ErrorNode::ToString() const {
   return "SYNTAX ERROR: " + token->ToString();

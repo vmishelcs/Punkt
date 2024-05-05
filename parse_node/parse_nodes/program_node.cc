@@ -1,19 +1,23 @@
 #include "program_node.h"
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-ProgramNode::ProgramNode(std::unique_ptr<Token> token)
-    : ParseNode(ParseNodeType::PROGRAM_NODE, std::move(token)) {}
+#include <memory>
+#include <string>
 
-std::string ProgramNode::GetModuleID() const { return module_id; }
+std::unique_ptr<ParseNode> ProgramNode::CreateCopy() const {
+  auto copy_node = std::make_unique<ProgramNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  copy_node->SetModuleID(module_id);
+  return copy_node;
+}
 
 void ProgramNode::SetModuleID(const std::string module_id) {
   this->module_id = module_id;
-}
-
-std::string ProgramNode::ToString() const {
-  return "PROGRAM NODE: " + token->ToString();
 }
 
 void ProgramNode::Accept(ParseNodeVisitor &visitor) {

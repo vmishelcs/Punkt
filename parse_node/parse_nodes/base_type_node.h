@@ -14,6 +14,8 @@ class BaseTypeNode : public ParseNode {
   BaseTypeNode(std::unique_ptr<Token> token)
       : ParseNode(ParseNodeType::LAMBDA_TYPE_NODE, std::move(token)) {}
 
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
+
   /// @brief Get the type of this `BaseTypeNode`.
   /// @return A `unique_ptr<BaseType>` object representing the type of this
   /// node.

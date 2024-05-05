@@ -61,25 +61,9 @@ XMLGeneratorVisitor::XMLGeneratorVisitor(std::ostream &output_stream)
   this->depth = 0;
 }
 
-//--------------------------------------------------------------------------------------//
-//                                    Non-leaf nodes //
-//--------------------------------------------------------------------------------------//
-void XMLGeneratorVisitor::VisitEnter(AssignmentStatementNode &node) {
-  std::unique_ptr<XMLTag> tag =
-      XMLTag::CreateStartTag("AssignmentStatementNode");
-
-  AddBasicParseNodeAttributes(*tag, node);
-
-  OutputTag(*tag);
-  ++depth;
-}
-void XMLGeneratorVisitor::VisitLeave(AssignmentStatementNode &node) {
-  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("AssignmentStatementNode");
-
-  --depth;
-  OutputTag(*tag);
-}
-
+/******************************************************************************
+ *                               Non-leaf nodes                               *
+ ******************************************************************************/
 void XMLGeneratorVisitor::VisitEnter(CallStatementNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("CallStatementNode");
 
@@ -124,6 +108,22 @@ void XMLGeneratorVisitor::VisitEnter(DeclarationStatementNode &node) {
 void XMLGeneratorVisitor::VisitLeave(DeclarationStatementNode &node) {
   std::unique_ptr<XMLTag> tag =
       XMLTag::CreateEndTag("DeclarationStatementNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(ExpressionStatementNode &node) {
+  std::unique_ptr<XMLTag> tag =
+      XMLTag::CreateStartTag("ExpressionStatementNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(ExpressionStatementNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("ExpressionStatementNode");
 
   --depth;
   OutputTag(*tag);
@@ -311,9 +311,9 @@ void XMLGeneratorVisitor::VisitLeave(ReturnStatementNode &node) {
   OutputTag(*tag);
 }
 
-//--------------------------------------------------------------------------------------//
-//                                      Leaf nodes //
-//--------------------------------------------------------------------------------------//
+/******************************************************************************
+ *                                 Leaf nodes                                 *
+ ******************************************************************************/
 void XMLGeneratorVisitor::Visit(ErrorNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("ErrorNode");
 

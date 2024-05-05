@@ -1,6 +1,9 @@
 #ifndef BOOLEAN_LITERAL_TOKEN_H_
 #define BOOLEAN_LITERAL_TOKEN_H_
 
+#include <memory>
+#include <string>
+
 #include "token.h"
 
 class BooleanLiteralToken : public Token {
@@ -9,6 +12,10 @@ class BooleanLiteralToken : public Token {
                       bool value)
       : Token(lexeme, text_location, TokenType::BOOLEAN_LITERAL),
         value(value) {}
+
+  virtual std::unique_ptr<Token> CreateCopy() const override {
+    return std::make_unique<BooleanLiteralToken>(lexeme, location, value);
+  }
 
   virtual std::string ToString() const override {
     std::string result =

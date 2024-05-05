@@ -4,22 +4,15 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
 
-#include <iterator>
 #include <memory>
 #include <vector>
 
-std::unique_ptr<LambdaInvocationNode>
-LambdaInvocationNode::CreateLambdaInvocationNodeWithArguments(
-    std::unique_ptr<ParseNode> identifier,
-    std::vector<std::unique_ptr<ParseNode> > args) {
-  auto lambda_invocation = std::make_unique<LambdaInvocationNode>();
-  lambda_invocation->AppendChild(std::move(identifier));
-
-  for (unsigned i = 0, n = args.size(); i < n; ++i) {
-    lambda_invocation->AppendChild(std::move(args.at(i)));
+std::unique_ptr<ParseNode> LambdaInvocationNode::CreateCopy() const {
+  auto copy_node = std::make_unique<LambdaInvocationNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
   }
-
-  return lambda_invocation;
+  return copy_node;
 }
 
 std::vector<ParseNode *> LambdaInvocationNode::GetArgumentNodes() const {

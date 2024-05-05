@@ -1,20 +1,18 @@
 #include "lambda_parameter_node.h"
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
-#include <logging/punkt_logger.h>
 #include <parse_node/parse_node.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
-#include <semantic_analyzer/types/base_type.h>
 
-std::unique_ptr<LambdaParameterNode> LambdaParameterNode::CreateParameterNode(
-    std::unique_ptr<ParseNode> type, std::unique_ptr<ParseNode> identifier) {
-  auto function_parameter_node = std::make_unique<LambdaParameterNode>();
-  function_parameter_node->AppendChild(std::move(type));
-  function_parameter_node->AppendChild(std::move(identifier));
-  return function_parameter_node;
+#include <memory>
+
+std::unique_ptr<ParseNode> LambdaParameterNode::CreateCopy() const {
+  auto copy_node = std::make_unique<LambdaParameterNode>(token->CreateCopy());
+  for (auto child : GetChildren()) {
+    copy_node->AppendChild(child->CreateCopy());
+  }
+  return copy_node;
 }
 
 void LambdaParameterNode::Accept(ParseNodeVisitor &visitor) {

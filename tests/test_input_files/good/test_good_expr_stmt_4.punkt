@@ -1,0 +1,8 @@
+main {
+	const l = <int x, int y> -> int {
+		print x + y.
+		return x + y.
+	}.
+
+	l(1, 2).
+}

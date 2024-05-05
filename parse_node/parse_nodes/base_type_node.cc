@@ -9,7 +9,12 @@
 #include <semantic_analyzer/types/base_type.h>
 #include <token/keyword_token.h>
 
+#include <memory>
 #include <string>
+
+std::unique_ptr<ParseNode> BaseTypeNode::CreateCopy() const {
+  return std::make_unique<BaseTypeNode>(token->CreateCopy());
+}
 
 std::unique_ptr<Type> BaseTypeNode::InferOwnType() const {
   Token *token = GetToken();
@@ -20,15 +25,15 @@ std::unique_ptr<Type> BaseTypeNode::InferOwnType() const {
   }
 
   switch (keyword_token->GetKeywordEnum()) {
-    case KeywordEnum::VOID:
+    case Keyword::VOID:
       return BaseType::Create(BaseTypeEnum::VOID);
-    case KeywordEnum::BOOL:
+    case Keyword::BOOL:
       return BaseType::Create(BaseTypeEnum::BOOLEAN);
-    case KeywordEnum::CHAR:
+    case Keyword::CHAR:
       return BaseType::Create(BaseTypeEnum::CHARACTER);
-    case KeywordEnum::INT:
+    case Keyword::INT:
       return BaseType::Create(BaseTypeEnum::INTEGER);
-    case KeywordEnum::STRING:
+    case Keyword::STRING:
       return BaseType::Create(BaseTypeEnum::STRING);
     default:
       PunktLogger::LogFatalInternalError(

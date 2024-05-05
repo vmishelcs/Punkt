@@ -1,9 +1,0 @@
-main {
-    if true {
-        print "hello".
-    }
-
-    if false {
-        print "good bye".
-    }
-}

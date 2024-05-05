@@ -14,37 +14,6 @@
 /******************************************************************************
  *                               Non-leaf nodes                               *
  ******************************************************************************/
-void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode &node) {
-  ParseNode *target = node.GetTargetNode();
-  if (auto identifier_node = dynamic_cast<IdentifierNode *>(target)) {
-    // Make sure identifier is not classified with error type.
-    if (identifier_node->GetType()->IsErrorType()) {
-      node.SetType(BaseType::CreateErrorType());
-      return;
-    }
-
-    // Make sure identifier is mutable.
-    if (!identifier_node->GetSymbolTableEntry()->is_mutable) {
-      AssignmentToImmutableTargetError(*identifier_node);
-      node.SetType(BaseType::CreateErrorType());
-      return;
-    }
-
-    auto new_value = node.GetChild(1);
-
-    // Make sure we are assigning an equivalent type.
-    if (!identifier_node->GetType()->IsEquivalentTo(new_value->GetType())) {
-      AssignmentTypeMismatchError(*identifier_node, *identifier_node->GetType(),
-                                  *new_value->GetType());
-      node.SetType(BaseType::CreateErrorType());
-      return;
-    }
-  } else {
-    NonTargettableExpressionError(*target);
-    node.SetType(BaseType::CreateErrorType());
-  }
-}
-
 void SemanticAnalysisVisitor::VisitLeave(CallStatementNode &node) {
   if (!node.GetLambdaInvocationNode()) {
     // Call statement must be followed by a lambda invocation.
@@ -63,7 +32,7 @@ void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode &node) {
 
 void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode &node) {
   bool is_mutable =
-      KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
+      KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
 
   // Perform declaration here if the initializer is a lambda literal.
   ParseNode *initializer = node.GetInitializer();
@@ -88,7 +57,7 @@ void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode &node) {
 
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode &node) {
   bool is_mutable =
-      KeywordToken::IsTokenKeyword(node.GetToken(), {KeywordEnum::VAR});
+      KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
 
   IdentifierNode *identifier = node.GetIdentifierNode();
   if (!identifier) {
@@ -198,6 +167,8 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaParameterNode &node) {
 
 void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   std::vector<Type *> child_types;
+  child_types.reserve(node.NumChildren());
+
   for (auto child : node.GetChildren()) {
     Type *child_type = child->GetType();
     if (child_type->IsErrorType()) {
@@ -207,14 +178,27 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
     child_types.push_back(child_type);
   }
 
-  PunctuatorToken *punctuator_token =
-      dynamic_cast<PunctuatorToken *>(node.GetToken());
-  if (!punctuator_token) {
-    node.SetType(BaseType::CreateErrorType());
-    return;
+  // Assignment semantic analysis is performed here.
+  if (PunctuatorToken::IsTokenPunctuator(node.GetToken(),
+                                         {Punctuator::ASSIGN})) {
+    // Make sure left-hand side is targettable.
+    if (!dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
+      NonTargettableExpressionError(node);
+      node.SetType(BaseType::CreateErrorType());
+      return;
+    }
+
+    // Make sure left-hand side is not a const variable.
+    auto id_node = static_cast<IdentifierNode *>(node.GetChild(0));
+    if (!id_node->GetSymbolTableEntry()->is_mutable) {
+      AssignmentToImmutableTargetError(*id_node);
+      node.SetType(BaseType::CreateErrorType());
+      return;
+    }
   }
 
-  auto signature = Signatures::AcceptingSignature(
+  auto punctuator_token = static_cast<PunctuatorToken *>(node.GetToken());
+  auto signature = signatures::AcceptingSignature(
       punctuator_token->GetPunctuatorEnum(), child_types);
 
   if (signature) {

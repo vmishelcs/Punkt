@@ -87,7 +87,7 @@ TEST_F(ScannerTest, TestScanKeywordsAndIdentifiers) {
   for (int i = 0; i < n; ++i) {
     auto token = scanner.Next();
     ASSERT_EQ(token->GetLexeme(), strings[i]);
-    if (Keyword::IsKeyword(strings[i])) {
+    if (keyword_utils::IsKeyword(strings[i])) {
       ASSERT_EQ(token->GetTokenType(), TokenType::KEYWORD);
     } else {
       ASSERT_EQ(token->GetTokenType(), TokenType::IDENTIFIER);
@@ -105,17 +105,17 @@ TEST_F(ScannerTest, TestScanPunctuatorsSimple) {
   std::shared_ptr<Token> token = nullptr;
   std::shared_ptr<PunctuatorToken> punctuator_token = nullptr;
   int num_scanned_punctuators = 10;
-  std::vector<PunctuatorEnum> punctuator_enums = {
-      PunctuatorEnum::OPEN_BRACE,
-      PunctuatorEnum::CLOSE_BRACE,
-      PunctuatorEnum::OPEN_PARENTHESIS,
-      PunctuatorEnum::CLOSE_PARENTHESIS,
-      PunctuatorEnum::TERMINATOR,
-      PunctuatorEnum::EQUAL,
-      PunctuatorEnum::PLUS,
-      PunctuatorEnum::MINUS,
-      PunctuatorEnum::MULTIPLY,
-      PunctuatorEnum::DIVIDE,
+  std::vector<Punctuator> punctuator_enums = {
+      Punctuator::OPEN_BRACE,
+      Punctuator::CLOSE_BRACE,
+      Punctuator::OPEN_PARENTHESIS,
+      Punctuator::CLOSE_PARENTHESIS,
+      Punctuator::TERMINATOR,
+      Punctuator::ASSIGN,
+      Punctuator::PLUS,
+      Punctuator::MINUS,
+      Punctuator::MUL,
+      Punctuator::DIV,
   };
 
   for (int i = 0; i < num_scanned_punctuators; ++i) {

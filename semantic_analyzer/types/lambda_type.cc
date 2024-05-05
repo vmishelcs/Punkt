@@ -39,7 +39,7 @@ std::vector<Type *> LambdaType::GetParameterTypes() const {
   return result;
 }
 
-bool LambdaType::IsEquivalentTo(Type *other_type) const {
+bool LambdaType::IsEquivalentTo(Type *other_type) {
   LambdaType *other_lambda_type = dynamic_cast<LambdaType *>(other_type);
   if (!other_lambda_type) {
     return false;

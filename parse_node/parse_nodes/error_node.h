@@ -3,9 +3,15 @@
 
 #include <parse_node/parse_node.h>
 
+#include <memory>
+#include <string>
+
 class ErrorNode : public ParseNode {
  public:
-  ErrorNode(std::unique_ptr<Token> token);
+  ErrorNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::ERROR_NODE, std::move(token)) {}
+
+  virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   virtual std::string ToString() const override;
 
