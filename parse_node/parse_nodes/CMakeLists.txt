@@ -1,4 +1,3 @@
-add_library(assignment_statement_node assignment_statement_node.cc)
 add_library(base_type_node base_type_node.cc)
 add_library(boolean_literal_node boolean_literal_node.cc)
 add_library(call_statement_node call_statement_node.cc)

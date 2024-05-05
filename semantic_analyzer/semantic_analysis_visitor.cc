@@ -14,37 +14,6 @@
 /******************************************************************************
  *                               Non-leaf nodes                               *
  ******************************************************************************/
-void SemanticAnalysisVisitor::VisitLeave(AssignmentStatementNode &node) {
-  ParseNode *target = node.GetTargetNode();
-  if (auto identifier_node = dynamic_cast<IdentifierNode *>(target)) {
-    // Make sure identifier is not classified with error type.
-    if (identifier_node->GetType()->IsErrorType()) {
-      node.SetType(BaseType::CreateErrorType());
-      return;
-    }
-
-    // Make sure identifier is mutable.
-    if (!identifier_node->GetSymbolTableEntry()->is_mutable) {
-      AssignmentToImmutableTargetError(*identifier_node);
-      node.SetType(BaseType::CreateErrorType());
-      return;
-    }
-
-    auto new_value = node.GetChild(1);
-
-    // Make sure we are assigning an equivalent type.
-    if (!identifier_node->GetType()->IsEquivalentTo(new_value->GetType())) {
-      AssignmentTypeMismatchError(*identifier_node, *identifier_node->GetType(),
-                                  *new_value->GetType());
-      node.SetType(BaseType::CreateErrorType());
-      return;
-    }
-  } else {
-    NonTargettableExpressionError(*target);
-    node.SetType(BaseType::CreateErrorType());
-  }
-}
-
 void SemanticAnalysisVisitor::VisitLeave(CallStatementNode &node) {
   if (!node.GetLambdaInvocationNode()) {
     // Call statement must be followed by a lambda invocation.
@@ -209,12 +178,20 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
     child_types.push_back(child_type);
   }
 
-  // If this operator node represents assignment, make sure the left-hand side
-  // is a targettable expression.
+  // Assignment semantic analysis is performed here.
   if (PunctuatorToken::IsTokenPunctuator(node.GetToken(),
                                          {Punctuator::ASSIGN})) {
+    // Make sure left-hand side is targettable.
     if (!dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
       NonTargettableExpressionError(node);
+      node.SetType(BaseType::CreateErrorType());
+      return;
+    }
+
+    // Make sure left-hand side is not a const variable.
+    auto id_node = static_cast<IdentifierNode *>(node.GetChild(0));
+    if (!id_node->GetSymbolTableEntry()->is_mutable) {
+      AssignmentToImmutableTargetError(*id_node);
       node.SetType(BaseType::CreateErrorType());
       return;
     }

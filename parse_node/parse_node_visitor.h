@@ -7,9 +7,6 @@ class ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(AssignmentStatementNode &node) = 0;
-  virtual void VisitLeave(AssignmentStatementNode &node) = 0;
-
   virtual void VisitEnter(CallStatementNode &node) = 0;
   virtual void VisitLeave(CallStatementNode &node) = 0;
 
@@ -79,13 +76,6 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(AssignmentStatementNode &node) override {
-    DefaultVisit(node);
-  }
-  virtual void VisitLeave(AssignmentStatementNode &node) override {
-    DefaultVisit(node);
-  }
-
   virtual void VisitEnter(CallStatementNode &node) override {
     DefaultVisit(node);
   }

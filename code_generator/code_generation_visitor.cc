@@ -41,28 +41,6 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
   module->print(ir_ostream, nullptr);
 }
 
-llvm::Value *CodeGenerationVisitor::GenerateCode(
-    AssignmentStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
-    // No more instructions in this basic block.
-    return nullptr;
-  }
-
-  ParseNode *target = node.GetTargetNode();
-  if (auto identifier_target = dynamic_cast<IdentifierNode *>(target)) {
-    auto alloca_inst = identifier_target->GetSymbolTableEntry()->alloca;
-
-    // Generate code for new value.
-    auto new_value = node.GetNewValueNode()->GenerateCode(*this);
-
-    builder->CreateStore(new_value, alloca_inst);
-    return new_value;
-  }
-
-  return CodeGenerationInternalError(
-      "non-targettable expression in assignment statement");
-}
-
 llvm::Value *CodeGenerationVisitor::GenerateCode(CallStatementNode &node) {
   if (WasPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
