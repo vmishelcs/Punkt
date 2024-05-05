@@ -24,7 +24,7 @@ static const std::unique_ptr<BaseType> kBaseTypeString =
 std::unordered_map<Punctuator, std::vector<Signature> >
     Signatures::signature_map{
         // =
-        {Punctuator::EQUAL,
+        {Punctuator::ASSIGN,
          {Signature({kArbitraryTypeT.get(), kArbitraryTypeT.get()},
                     kArbitraryTypeT.get(),
                     operator_codegen::AssignmentCodegen)}},
@@ -43,15 +43,20 @@ std::unordered_map<Punctuator, std::vector<Signature> >
                     kBaseTypeInteger.get(),
                     operator_codegen::IntegerSubtractCodegen)}},
         // *
-        {Punctuator::MULTIPLY,
+        {Punctuator::MUL,
          {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                     kBaseTypeInteger.get(),
                     operator_codegen::IntegerMultiplyCodegen)}},
         // /
-        {Punctuator::DIVIDE,
+        {Punctuator::DIV,
          {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                     kBaseTypeInteger.get(),
                     operator_codegen::IntegerDivideCodegen)}},
+        // %
+        {Punctuator::MOD,
+         {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
+                    kBaseTypeInteger.get(),
+                    operator_codegen::IntegerModulusCodegen)}},
         // ==
         {Punctuator::CMP_EQ,
          {

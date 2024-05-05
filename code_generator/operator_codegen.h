@@ -60,6 +60,9 @@ llvm::Value *IntegerMultiplyCodegen(llvm::LLVMContext *context,
 llvm::Value *IntegerDivideCodegen(llvm::LLVMContext *context,
                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
                                   llvm::Value *rhs);
+llvm::Value *IntegerModulusCodegen(llvm::LLVMContext *context,
+                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                   llvm::Value *rhs);
 llvm::Value *IntegerCmpEQCodegen(llvm::LLVMContext *context,
                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
                                  llvm::Value *rhs);

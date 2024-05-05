@@ -111,11 +111,11 @@ TEST_F(ScannerTest, TestScanPunctuatorsSimple) {
       Punctuator::OPEN_PARENTHESIS,
       Punctuator::CLOSE_PARENTHESIS,
       Punctuator::TERMINATOR,
-      Punctuator::EQUAL,
+      Punctuator::ASSIGN,
       Punctuator::PLUS,
       Punctuator::MINUS,
-      Punctuator::MULTIPLY,
-      Punctuator::DIVIDE,
+      Punctuator::MUL,
+      Punctuator::DIV,
   };
 
   for (int i = 0; i < num_scanned_punctuators; ++i) {

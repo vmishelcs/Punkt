@@ -1,0 +1,6 @@
+main {
+	var x = 128.
+	print x.
+	x %= 17.
+	print x.
+}

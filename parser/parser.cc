@@ -282,7 +282,7 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
 
   std::unique_ptr<ParseNode> identifier = ParseIdentifier();
 
-  Expect(Punctuator::EQUAL);
+  Expect(Punctuator::ASSIGN);
 
   std::unique_ptr<ParseNode> initializer = ParseExpression();
 
@@ -541,7 +541,7 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
 
   // Parsing regular assignment (=).
   if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                         {Punctuator::EQUAL})) {
+                                         {Punctuator::ASSIGN})) {
     auto assign_op = std::make_unique<OperatorNode>(std::move(now_reading));
     ReadToken();
     std::unique_ptr<ParseNode> new_value = ParseEqualityExpression();
@@ -551,37 +551,69 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
     return assign_op;
   }
 
-  /*
+  // Parsing combined assignment (+=, -=, etc).
+  if (PunctuatorToken::IsTokenPunctuator(
+          now_reading.get(), {Punctuator::ADD_ASSIGN, Punctuator::SUB_ASSIGN,
+                              Punctuator::MUL_ASSIGN, Punctuator::DIV_ASSIGN,
+                              Punctuator::MOD_ASSIGN})) {
+    // Create '=' token.
+    auto assign_token = std::make_unique<PunctuatorToken>(
+        "=", now_reading->GetLocation(), Punctuator::ASSIGN);
 
-  // Parsing add-assignment (+=).
-  if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                         {Punctuator::ADD_ASSIGN})) {
-    // Discard the '+=' token.
+    // Create the operator token.
+    std::unique_ptr<PunctuatorToken> op_token = nullptr;
+    PunctuatorToken *now_reading_punctuator =
+        static_cast<PunctuatorToken *>(now_reading.get());
+    switch (now_reading_punctuator->GetPunctuatorEnum()) {
+      case Punctuator::ADD_ASSIGN:
+        op_token = std::make_unique<PunctuatorToken>(
+            "+", now_reading->GetLocation(), Punctuator::PLUS);
+        break;
+      case Punctuator::SUB_ASSIGN:
+        op_token = std::make_unique<PunctuatorToken>(
+            "-", now_reading->GetLocation(), Punctuator::MINUS);
+        break;
+      case Punctuator::MUL_ASSIGN:
+        op_token = std::make_unique<PunctuatorToken>(
+            "*", now_reading->GetLocation(), Punctuator::MUL);
+        break;
+      case Punctuator::DIV_ASSIGN:
+        op_token = std::make_unique<PunctuatorToken>(
+            "/", now_reading->GetLocation(), Punctuator::DIV);
+        break;
+      case Punctuator::MOD_ASSIGN:
+        op_token = std::make_unique<PunctuatorToken>(
+            "%", now_reading->GetLocation(), Punctuator::MOD);
+        break;
+      default:
+        PunktLogger::LogFatalInternalError("unexpected assignment operator");
+    }
+
+    // Discard the combined assignment token.
     ReadToken();
 
-    // TODO: Create a copy of the `target` node here:
-    // std::unique_ptr<ParseNode> lhs = target->CreateCopy();
+    // Create a copy of the target node here.
+    std::unique_ptr<ParseNode> lhs = target->CreateCopy();
 
-    // Create a token to represent assignment.
-    PunctuatorToken assign_token("=", now_reading->GetLocation());
     // Create assignment operator node.
     auto assign_op = std::make_unique<OperatorNode>(std::move(assign_token));
     // Place the target node on the left of the assignment operator.
     assign_op->AppendChild(std::move(target));
 
-    // Create a token to represent addition.
-    PunctuatorToken plus_token("+", now_reading->GetLocation());
     // Create addition operator node.
-    auto add_op = std::make_unique<OperatorNode>(std::move(plus_token));
+    auto op_node = std::make_unique<OperatorNode>(std::move(op_token));
     // Append the left-hand side operand.
-    add_op->AppendChild(std::move(lhs));
-    // Parse the right operand of addition.
+    op_node->AppendChild(std::move(lhs));
+    // Parse the right-hand side of the operand.
     std::unique_ptr<ParseNode> rhs = ParseEqualityExpression();
     // Append the right-hand side operand.
-    add_op->AppendChild(std::move(rhs));
-  }
+    op_node->AppendChild(std::move(rhs));
 
-  */
+    // Append operator to assignment.
+    assign_op->AppendChild(std::move(op_node));
+
+    return assign_op;
+  }
 
   return target;
 }
@@ -679,7 +711,7 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
   std::unique_ptr<ParseNode> left = ParseUnaryExpression();
 
   while (PunctuatorToken::IsTokenPunctuator(
-      now_reading.get(), {Punctuator::MULTIPLY, Punctuator::DIVIDE})) {
+      now_reading.get(), {Punctuator::MUL, Punctuator::DIV, Punctuator::MOD})) {
     auto multiplicative_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 

@@ -212,7 +212,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   // If this operator node represents assignment, make sure the left-hand side
   // is a targettable expression.
   if (PunctuatorToken::IsTokenPunctuator(node.GetToken(),
-                                         {Punctuator::EQUAL})) {
+                                         {Punctuator::ASSIGN})) {
     if (!dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
       NonTargettableExpressionError(node);
       node.SetType(BaseType::CreateErrorType());

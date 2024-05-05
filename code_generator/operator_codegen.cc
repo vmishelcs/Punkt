@@ -193,6 +193,13 @@ llvm::Value *operator_codegen::IntegerDivideCodegen(llvm::LLVMContext *context,
   return builder->CreateSDiv(lhs, rhs, "divtmp");
 }
 
+llvm::Value *operator_codegen::IntegerModulusCodegen(llvm::LLVMContext *context,
+                                                     llvm::IRBuilder<> *builder,
+                                                     llvm::Value *lhs,
+                                                     llvm::Value *rhs) {
+  return builder->CreateSRem(lhs, rhs, "modtmp");
+}
+
 llvm::Value *operator_codegen::IntegerCmpEQCodegen(llvm::LLVMContext *context,
                                                    llvm::IRBuilder<> *builder,
                                                    llvm::Value *lhs,

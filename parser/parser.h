@@ -70,9 +70,8 @@ class Parser {
   std::unique_ptr<ParseNode> ParseExpression();
 
   /// `=` Simple assignment
-  /// `+=` `-=` Assignment by addition and subtraction (not implemented)
-  /// `*=` `/=` `%=` Assignment by multiplication, division, and modulus (not
-  /// implemented)
+  /// `+=` `-=` Assignment by addition and subtraction
+  /// `*=` `/=` `%=` Assignment by multiplication, division, and modulus
   bool StartsAssignmentExpression(Token &token);
   std::unique_ptr<ParseNode> ParseAssignmentExpression();
 
@@ -89,7 +88,7 @@ class Parser {
   bool StartsAdditiveExpression(Token &token);
   std::unique_ptr<ParseNode> ParseAdditiveExpression();
 
-  /// `*` `/` `%` Multiplication, division, and modulus (not implemented)
+  /// `*` `/` `%` Multiplication, division, and modulus
   bool StartsMultiplicativeExpression(Token &token);
   std::unique_ptr<ParseNode> ParseMultiplicativeExpression();
 

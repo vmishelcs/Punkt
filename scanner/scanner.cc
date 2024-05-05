@@ -110,6 +110,7 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
     case '+':
     case '*':
     case '/':
+    case '%':
       buffer.push_back(lc.character);
       if (input_stream->Peek().character == '=') {
         // += (add and assign) operator

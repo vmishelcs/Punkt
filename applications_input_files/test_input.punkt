@@ -1,4 +1,5 @@
 main {
-    var f = <> -> void { print "hello world!". }.
-    f().
+	var x = 2.
+	var y = x % 3.
+	print y.
 }
