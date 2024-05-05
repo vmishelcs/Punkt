@@ -35,6 +35,7 @@ struct LocatedChar {
   }
   bool IsStringStart() const { return character == '\"'; }
   bool IsCharacterStart() const { return character == '\''; }
+  bool IsEscapeSequenceStart() const { return character == '\\'; }
   bool IsPartOfComment() const { return character != '#' && character != '\n'; }
 
   char character;

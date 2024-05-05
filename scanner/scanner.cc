@@ -158,12 +158,20 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
 }
 
 std::unique_ptr<Token> Scanner::ScanCharacter(LocatedChar first_char) {
-  LocatedChar char_literal = input_stream->Next();
+  LocatedChar ch = input_stream->Next();
+  char char_literal_value = '\0';
 
-  if (char_literal.character == '\'') {
-    // Create a CharacterLiteralToken holding the null char
-    return std::make_unique<CharacterLiteralToken>("", char_literal.location,
-                                                   0);
+  // If no character is specified, create a CharacterLiteralToken denoting a
+  // null char.
+  if (ch.character == '\'') {
+    return std::make_unique<CharacterLiteralToken>("", ch.location,
+                                                   char_literal_value);
+  }
+
+  if (ch.IsEscapeSequenceStart()) {
+    char_literal_value = InterpretEscapeSequence();
+  } else {
+    char_literal_value = ch.character;
   }
 
   LocatedChar next = input_stream->Next();
@@ -173,8 +181,7 @@ std::unique_ptr<Token> Scanner::ScanCharacter(LocatedChar first_char) {
   }
 
   return std::make_unique<CharacterLiteralToken>(
-      std::to_string(char_literal.character), char_literal.location,
-      char_literal.character);
+      std::to_string(char_literal_value), ch.location, char_literal_value);
 }
 
 std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char) {
@@ -183,7 +190,6 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char) {
 
   LocatedChar next_char = input_stream->Peek();
   if (next_char.character != '\"') {
-    // TODO: Replace escape sequences with ASCII value.
     LexicalErrorExpectedDifferentCharacter('\"', next_char.location);
     return GetNextToken();
   }
@@ -220,8 +226,55 @@ void Scanner::ReadStringLiteral(std::string &buffer) {
   // (\n)
   while (ch.character != '\"' && ch.character != '\n') {
     ch = input_stream->Next();
-    buffer.push_back(ch.character);
+    if (ch.IsEscapeSequenceStart()) {
+      buffer.push_back(InterpretEscapeSequence());
+    } else {
+      buffer.push_back(ch.character);
+    }
     ch = input_stream->Peek();
+  }
+}
+
+char Scanner::InterpretEscapeSequence() {
+  // Get the character following the metacharacter '\'.
+  LocatedChar ch = input_stream->Next();
+  switch (ch.character) {
+    case 'a':
+      // Bell
+      return '\a';
+    case 'b':
+      // Backspace
+      return '\b';
+    case 'f':
+      // Formfeed page break
+      return '\f';
+    case 'n':
+      // Newline
+      return '\n';
+    case 'r':
+      // Carriage return
+      return '\r';
+    case 't':
+      // Horizontal tab
+      return '\t';
+    case 'v':
+      // Vertical tab
+      return '\v';
+    case '0':
+      // Null char
+      return '\0';
+    case '\\':
+      // Backslash
+      return '\\';
+    case '\'':
+      // Apostrophe
+      return '\'';
+    case '\"':
+      // Double quotes
+      return '\"';
+    default:
+      // In other cases, just return the character as is.
+      return ch.character;
   }
 }
 
