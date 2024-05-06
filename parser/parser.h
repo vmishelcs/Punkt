@@ -30,26 +30,37 @@ class Parser {
   bool StartsMain(Token &token);
   std::unique_ptr<ParseNode> ParseMain();
 
+  /// <stmt> ::= <declStmt> .
+  ///         |  <exprStmt> .
+  ///         |  <returnStmt> .
+  ///         |  <ifStmt>
+  ///         |  <forStmt>
   bool StartsStatement(Token &token);
   std::unique_ptr<ParseNode> ParseStatement();
 
+  /// <codeBlock> ::= { <stmt>* }
   bool StartsCodeBlock(Token &token);
   std::unique_ptr<ParseNode> ParseCodeBlock();
 
-  /// declarationStatement ::= `var` identifierToken `=` expression.
-  ///                       |  `const` identifierToken `=` expression.
+  /// <declStmt> ::= var <identifierToken> = <expression> .
+  ///             |  const <identifierToken> = <expression> .
   bool StartsDeclaration(Token &token);
   std::unique_ptr<ParseNode> ParseDeclaration(bool expect_terminator = true);
 
-  /// expressionStatement ::= expression.
+  /// <exprStmt> ::= <expression> .
   bool StartsExpressionStatement(Token &token);
   std::unique_ptr<ParseNode> ParseExpressionStatement(
       bool expect_terminator = true);
 
+  /// <ifStmt> ::= if <expression> <codeBlock> <elsePart>
+  /// <elsePart> ::= else <codeBlock>
+  ///             |  _
   bool StartsIfStatement(Token &token);
   bool StartsElseBlock(Token &token);
   std::unique_ptr<ParseNode> ParseIfStatement();
 
+  /// <forStmt> ::= for <declStmt> , <boolExpr> , <expression> <codeBlock>
+  /// <forStmt> ::= for <assignExpr> , <boolExpr> , <expression> <codeBlock>
   bool StartsForStatement(Token &token);
   std::unique_ptr<ParseNode> ParseForStatement();
 
@@ -63,6 +74,9 @@ class Parser {
   std::unique_ptr<ParseNode> ParsePrintExpressionList(
       std::unique_ptr<ParseNode> print_statement);
 
+  /// <returnStmt> ::= return <returnValue> .
+  /// <returnValue> ::= <expression>
+  ///                |  _
   bool StartsReturnStatement(Token &token);
   std::unique_ptr<ParseNode> ParseReturnStatement();
 

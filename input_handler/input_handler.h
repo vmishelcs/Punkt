@@ -4,16 +4,13 @@
 #include <deque>
 #include <filesystem>
 #include <fstream>
-#include <string>
 
 #include "located_char.h"
 
 namespace fs = std::filesystem;
 
-/**
- * InputHandler class for reading the input file providing a stream of
- * LocatedChars.
- */
+/// @brief InputHandler class for reading the input file providing a stream of
+/// LocatedChars.
 class InputHandler {
  public:
   InputHandler(fs::path file_path);

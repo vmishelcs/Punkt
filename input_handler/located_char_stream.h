@@ -6,6 +6,7 @@
 
 #include "input_handler.h"
 
+/// @brief Simple implementation of a stream of LocatedChars.
 class LocatedCharStream {
  public:
   LocatedCharStream(fs::path file_path);

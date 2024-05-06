@@ -6,6 +6,7 @@
 #include <token/all_tokens.h>
 
 #include <memory>
+#include <string>
 #include <vector>
 
 std::unique_ptr<ParseNode> Parser::Parse(fs::path file_path) {
