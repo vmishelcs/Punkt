@@ -37,7 +37,7 @@ Statement \rightarrow & \enspace DeclarationStatement \\
 DeclarationStatement \rightarrow & \enspace \texttt{const} \enspace identifier \enspace \texttt{=} \enspace Expression \enspace \texttt{.} \\
 | & \enspace \texttt{var} \enspace identifier \enspace \texttt{=} \enspace Expression \enspace \texttt{.} \\[16pt]
 IfStatement \rightarrow & \enspace \texttt{if} \enspace Expression \enspace CodeBlock \enspace (\texttt{else} \enspace CodeBlock)^? \\[16pt]
-ForStatement \rightarrow & \enspace \texttt{for} \enspace (DeclarationStatement^1 \enspace |  \enspace Expression) \enspace \texttt{,} \enspace Expression \enspace \texttt{,} \enspace Expression \enspace CodeBlock \\[16pt]
+ForStatement \rightarrow & \enspace \texttt{for} \enspace (DeclarationStatement \enspace |  \enspace Expression) \enspace \texttt{,} \enspace Expression \enspace \texttt{,} \enspace Expression \enspace CodeBlock \\[16pt]
 ExpressionStatement \rightarrow & \enspace Expression \enspace \texttt{.} \\[16pt]
 Expression \rightarrow & \enspace AssignmentExpression \\[16pt]
 AssignmentExpression \rightarrow & \enspace EqualityExpression \enspace \left((\ \texttt{=}\ |\ \texttt{+=}\ |\ \texttt{-=}\ |\ \texttt{*=}\ |\ \texttt{/=}\ |\ \texttt{\%=}\ ) \enspace EqualityExpression \right)^? \\[16pt]
@@ -60,9 +60,9 @@ LambdaAtomic \rightarrow & \enspace Lambda \enspace LambdaInvocation^*
 \end{aligned}
 ```
 
-
 ### Notes
 
 * Comments start with `#` and continue until either the next `#` or the end of the line.
 * Maximum identifier length is 32 characters.
 * Non-void functions with no return statement cause a runtime error.
+* Declaration statements that are part of a for-loop should not end with a terminator (`.`).
