@@ -147,6 +147,24 @@ class TestDeclarationStatement(object):
         except RuntimeError as ex:
             assert False, "Exception was raised: " + repr(ex)
 
+    def test_bad_char_decl_1(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_char_decl_2(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_char_decl_3(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
     def test_good_char_decl_1(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
@@ -176,6 +194,13 @@ class TestDeclarationStatement(object):
             assert False, "Exception was raised: " + repr(ex)
 
     def test_good_char_decl_5(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_char_decl_6(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
             self._compile_helper.verify_actual_output(actual_output_path)
@@ -224,6 +249,30 @@ class TestDeclarationStatement(object):
         except RuntimeError as ex:
             assert False, "Exception was raised: " + repr(ex)
 
+    def test_bad_str_decl_1(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_str_decl_2(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_str_decl_3(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_str_decl_4(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
     def test_good_str_decl_1(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
@@ -260,6 +309,13 @@ class TestDeclarationStatement(object):
             assert False, "Exception was raised: " + repr(ex)
 
     def test_good_str_decl_6(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_str_decl_7(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
             self._compile_helper.verify_actual_output(actual_output_path)

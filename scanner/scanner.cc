@@ -116,6 +116,7 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
         // += (add and assign) operator
         // *= (multiply and assign) operator
         // /= (divide and assign) operator
+        // %= (mod and assign) operator
         buffer.push_back(input_stream->Next().character);
       }
       break;

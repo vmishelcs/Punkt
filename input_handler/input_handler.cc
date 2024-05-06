@@ -5,7 +5,6 @@
 #include <cstdlib>
 
 LocatedChar LocatedChar::EOF_LOCATED_CHAR(0, "", -1, -1);
-LocatedChar LocatedChar::NULL_CHAR(0, "", 0, 0);
 
 InputHandler::InputHandler(fs::path file_path) : file_path(file_path) {
   if (file_path.filename().empty()) {
