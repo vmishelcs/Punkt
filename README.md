@@ -22,7 +22,7 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 
 <!-- TODO: Finish this -->
 
-$$
+```math
 \begin{aligned}
 Program \rightarrow & \enspace FunctionDefinition^* \enspace \texttt{main} \enspace CodeBlock \\[16pt]
 FunctionDefinition \rightarrow & \enspace \texttt{function} \enspace identifier \enspace Lambda \\[16pt]
@@ -58,7 +58,7 @@ Atomic \rightarrow & \enspace \texttt{(} \enspace Expression \enspace \texttt{)}
 IdentifierAtomic \rightarrow & \enspace identifier \enspace LambdaInvocation^* \\[16pt]
 LambdaAtomic \rightarrow & \enspace Lambda \enspace LambdaInvocation^*
 \end{aligned}
-$$
+```
 
 
 ### Notes
