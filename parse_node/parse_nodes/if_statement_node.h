@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 class IfStatementNode : public ParseNode {
  public:
@@ -15,11 +16,15 @@ class IfStatementNode : public ParseNode {
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
-  ParseNode *GetConditionNode() const { return GetChild(0); }
-  ParseNode *GetThenBlockNode() const { return GetChild(1); }
+  void AppendIf(std::unique_ptr<ParseNode> if_condition,
+                std::unique_ptr<ParseNode> if_block);
+  void AppendElse(std::unique_ptr<ParseNode> else_block);
+
+  ParseNode *GetIfConditionNode() const { return GetChild(0); }
+  ParseNode *GetIfBlockNode() const { return GetChild(1); }
   ParseNode *GetElseBlockNode() const { return GetChild(2); }
 
-  bool HasElseBlock() const;
+  bool HasElseBlock() const { return NumChildren() == 3; }
 
   virtual std::string ToString() const override { return "IF STATEMENT NODE"; }
 

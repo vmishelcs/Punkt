@@ -6,15 +6,15 @@
 #include <string>
 
 static std::map<std::string, Keyword> dictionary = {
-    {"bool", Keyword::BOOL},     {"call", Keyword::CALL},
-    {"char", Keyword::CHAR},     {"const", Keyword::CONST},
-    {"else", Keyword::ELSE},     {"false", Keyword::FALSE},
-    {"for", Keyword::FOR},       {"function", Keyword::FUNCTION},
-    {"if", Keyword::IF},         {"int", Keyword::INT},
-    {"main", Keyword::MAIN},     {"print", Keyword::PRINT},
-    {"return", Keyword::RETURN}, {"string", Keyword::STRING},
-    {"true", Keyword::TRUE},     {"var", Keyword::VAR},
-    {"void", Keyword::VOID},
+    {"bool", Keyword::BOOL},         {"call", Keyword::CALL},
+    {"char", Keyword::CHAR},         {"const", Keyword::CONST},
+    {"elif", Keyword::ELIF},         {"else", Keyword::ELSE},
+    {"false", Keyword::FALSE},       {"for", Keyword::FOR},
+    {"function", Keyword::FUNCTION}, {"if", Keyword::IF},
+    {"int", Keyword::INT},           {"main", Keyword::MAIN},
+    {"print", Keyword::PRINT},       {"return", Keyword::RETURN},
+    {"string", Keyword::STRING},     {"true", Keyword::TRUE},
+    {"var", Keyword::VAR},           {"void", Keyword::VOID},
 };
 
 static std::map<Keyword, std::string> reverse_dictionary = [] {

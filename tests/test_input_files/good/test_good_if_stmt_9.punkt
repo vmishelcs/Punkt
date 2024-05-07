@@ -1,0 +1,10 @@
+main {
+	for var i = 0, i < 3, i += 1 {
+		if i == 0
+			print "zero".
+		else if i == 1
+		    print "one".
+		else
+		    print "two".
+	}
+}
