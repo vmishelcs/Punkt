@@ -2,6 +2,7 @@
 #define XML_GENERATOR_VISITOR_H_
 
 #include <parse_node/parse_node_visitor.h>
+#include <parse_node/parse_nodes/all_nodes.h>
 
 #include <filesystem>
 #include <iostream>
@@ -86,6 +87,9 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
 
   virtual void VisitEnter(ReturnStatementNode &node) override;
   virtual void VisitLeave(ReturnStatementNode &node) override;
+
+  virtual void VisitEnter(WhileStatementNode &node) override;
+  virtual void VisitLeave(WhileStatementNode &node) override;
 
   // ---- Leaf nodes
   // -----------------------------------------------------------------------

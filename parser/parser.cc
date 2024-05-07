@@ -211,8 +211,9 @@ std::unique_ptr<ParseNode> Parser::ParseMain() {
 bool Parser::StartsStatement(Token &token) {
   return StartsCodeBlock(token) || StartsDeclaration(token) ||
          StartsExpressionStatement(token) || StartsIfStatement(token) ||
-         StartsForStatement(token) || StartsCallStatement(token) ||
-         StartsPrintStatement(token) || StartsReturnStatement(token);
+         StartsWhileStatement(token) || StartsForStatement(token) ||
+         StartsCallStatement(token) || StartsPrintStatement(token) ||
+         StartsReturnStatement(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseStatement() {
   if (StartsCodeBlock(*now_reading)) {
@@ -224,11 +225,11 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
   if (StartsExpressionStatement(*now_reading)) {
     return ParseExpressionStatement();
   }
-  // if (StartsAssignment(*now_reading)) {
-  //   return ParseAssignment();
-  // }
   if (StartsIfStatement(*now_reading)) {
     return ParseIfStatement();
+  }
+  if (StartsWhileStatement(*now_reading)) {
+    return ParseWhileStatement();
   }
   if (StartsForStatement(*now_reading)) {
     return ParseForStatement();
@@ -241,9 +242,9 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
   }
   if (StartsReturnStatement(*now_reading)) {
     return ParseReturnStatement();
-  } else {
-    return SyntaxErrorUnexpectedToken("start of statement");
   }
+
+  return SyntaxErrorUnexpectedToken("start of statement");
 }
 
 bool Parser::StartsCodeBlock(Token &token) {
@@ -362,6 +363,35 @@ std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
   }
 
   return if_statement;
+}
+
+bool Parser::StartsWhileStatement(Token &token) {
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::WHILE});
+}
+std::unique_ptr<ParseNode> Parser::ParseWhileStatement() {
+  if (!StartsWhileStatement(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("while statement");
+  }
+
+  auto while_stmt =
+      std::make_unique<WhileStatementNode>(std::move(now_reading));
+
+  // Discard 'while'.
+  ReadToken();
+
+  std::unique_ptr<ParseNode> condition = ParseExpression();
+  std::unique_ptr<ParseNode> while_block = nullptr;
+
+  if (StartsCodeBlock(*now_reading)) {
+    while_block = ParseCodeBlock();
+  } else {
+    while_block = ParseStatement();
+  }
+
+  while_stmt->AppendChild(std::move(condition));
+  while_stmt->AppendChild(std::move(while_block));
+
+  return while_stmt;
 }
 
 bool Parser::StartsForStatement(Token &token) {

@@ -558,6 +558,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode &node) {
   return builder->CreateRet(return_value);
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
+  return nullptr;
+}
+
 /******************************************************************************
  *                      Code generation for identifiers                       *
  ******************************************************************************/

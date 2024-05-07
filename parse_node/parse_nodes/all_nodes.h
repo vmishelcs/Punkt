@@ -25,5 +25,6 @@
 #include "program_node.h"
 #include "return_statement_node.h"
 #include "string_literal_node.h"
+#include "while_statement_node.h"
 
 #endif  // ALL_NODES_H_

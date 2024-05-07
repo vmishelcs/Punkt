@@ -42,6 +42,7 @@ enum class ParseNodeType {
   PROGRAM_NODE,
   RETURN_STATEMENT_NODE,
   STRING_LITERAL_NODE,
+  WHILE_STATEMENT_NODE,
 };
 
 /// @brief Class to represent a node of the abstract syntax tree.
@@ -49,7 +50,6 @@ class ParseNode {
  public:
   ParseNode(ParseNodeType node_type, std::unique_ptr<Token> token);
 
-  // TODO: Implement proper copying (along with semantic info).
   /// @brief Creates a copy of the subtree defined by this node.
   /// @return A `unique_ptr` to a `ParseNode` object that is an independent copy
   /// of this node, along with any descendants.
