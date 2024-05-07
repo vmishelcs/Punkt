@@ -3,12 +3,15 @@
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Instruction.h>
+#include <llvm/IR/Instructions.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <semantic_analyzer/types/base_type.h>
 
 #include <map>
+#include <memory>
+#include <string>
 
 class CodeGenerationVisitor : public ParseNodeIRVisitor {
  public:

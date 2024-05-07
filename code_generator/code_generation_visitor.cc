@@ -3,6 +3,7 @@
 #include <llvm/IR/Function.h>
 #include <llvm/IR/GlobalValue.h>
 #include <llvm/IR/Instruction.h>
+#include <llvm/IR/Instructions.h>
 #include <llvm/IR/Value.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/Casting.h>
@@ -12,6 +13,8 @@
 #include <semantic_analyzer/types/type.h>
 #include <token/punctuator_token.h>
 
+#include <memory>
+#include <string>
 #include <variant>
 
 static const std::string kMainFunctionName = "main";
@@ -24,7 +27,7 @@ static const char kLineFeedChar = 10;
 using code_gen_func_type_1_operand =
     llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *,
                      llvm::Value *);
-using code_gen_func_type_2_operand =
+using code_gen_func_type_2_operands =
     llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *,
                      llvm::Value *, llvm::Value *);
 
@@ -416,7 +419,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
 
   // Validate generated code.
   if (llvm::verifyFunction(*function, &llvm::errs())) {
-    // return CodeGenerationInternalError("generated IR is invalid.");
+    return CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // Restore builder insert point after generating lambda.
@@ -465,7 +468,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode &node) {
   }
 
   if (llvm::verifyFunction(*main_func, &llvm::errs())) {
-    // return CodeGenerationInternalError("generated IR is invalid.");
+    return CodeGenerationInternalError("generated IR is invalid.");
   }
 
   return main_func;
@@ -491,7 +494,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode &node) {
 
     // Obtain codegen function pointer for 2 operands from variant.
     try {
-      auto fp = std::get<code_gen_func_type_2_operand>(node.GetCodeGenFunc());
+      auto fp = std::get<code_gen_func_type_2_operands>(node.GetCodeGenFunc());
       return fp(context.get(), builder.get(), lhs, rhs);
     } catch (std::bad_variant_access const &ex) {
       return CodeGenerationInternalError(
@@ -533,7 +536,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
   }
 
   if (llvm::verifyModule(*module, &llvm::errs())) {
-    // return CodeGenerationInternalError("generated IR is invalid.");
+    return CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // GenerateCode(ProgramNode&) return value is not used.
@@ -690,7 +693,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
 }
 
 /******************************************************************************
- *                            NOP code generation *
+ *                            NOP code generation                             *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
   return builder->CreateAdd(
@@ -699,7 +702,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
 }
 
 /******************************************************************************
- *                              Printing helpers *
+ *                              Printing helpers                              *
  ******************************************************************************/
 void CodeGenerationVisitor::GeneratePrintfDeclaration() {
   // Create a vector for parameters
@@ -845,7 +848,7 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
 }
 
 /******************************************************************************
- *                           Miscellaneous helpers *
+ *                           Miscellaneous helpers                            *
  ******************************************************************************/
 void CodeGenerationVisitor::GenerateGlobalConstants() {
   GeneratePrintfFmtStringsForBaseTypes();
@@ -860,7 +863,7 @@ llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(
 }
 
 /******************************************************************************
- *                               Error handling *
+ *                               Error handling                               *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode &node) {
   return CodeGenerationInternalError("encountered ErrorNode " +
