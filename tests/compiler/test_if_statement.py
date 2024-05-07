@@ -7,6 +7,30 @@ class TestIfStatement(object):
     def setup_class(self):
         self._compile_helper = PunktCompilerTestHelper()
 
+    def test_bad_if_stmt_1(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_if_stmt_2(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_if_stmt_3(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_if_stmt_4(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
     def test_good_if_stmt_1(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
