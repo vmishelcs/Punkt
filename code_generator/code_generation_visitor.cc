@@ -126,11 +126,12 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
 
   auto parent_function = builder->GetInsertBlock()->getParent();
 
-  // Create a basic block to check if the loop condition is true/false.
+  // Create a basic block to check if the loop condition is true/false and
+  // attach to the parent function.
   auto condition_block =
       llvm::BasicBlock::Create(*context, "condcheck", parent_function);
 
-  // Create a basic block for the loop and add it to the parent function.
+  // Create a basic block for the loop body.
   auto loop_block = llvm::BasicBlock::Create(*context, "loop");
 
   // Create a basic block for the loop exit.
@@ -144,7 +145,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
   builder->SetInsertPoint(condition_block);
 
   // Check if the condition to enter the loop is satisfied.
-  auto end_condition = node.GetEndConditionNode()->GenerateCode(*this);
+  llvm::Value *end_condition = node.GetEndConditionNode()->GenerateCode(*this);
+  if (!end_condition) {
+    return CodeGenerationInternalError(
+        "failed generating end condition for for-statement");
+  }
   end_condition = builder->CreateTrunc(
       end_condition, llvm::Type::getInt1Ty(*context), "trunctmp");
   builder->CreateCondBr(end_condition, loop_block, afterloop_block);
@@ -559,7 +564,72 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
-  return nullptr;
+  if (WasPreviousInstructionBlockTerminator()) {
+    // No more instructions in this basic block.
+    return nullptr;
+  }
+
+  auto parent_function = builder->GetInsertBlock()->getParent();
+
+  // Create a basic block to check if the while condition is true/false and
+  // attach it to the parent function.
+  auto condition_block =
+      llvm::BasicBlock::Create(*context, "condcheck", parent_function);
+
+  // Create a basic block for the while loop body.
+  auto loop_block = llvm::BasicBlock::Create(*context, "loop");
+
+  // Create a basic block for the loop exit.
+  auto afterloop_block = llvm::BasicBlock::Create(*context, "afterloop");
+
+  // Insert an explicit fall-through from the current block (before the loop) to
+  // the loop condition block.
+  builder->CreateBr(condition_block);
+
+  // Now we are inserting instructions into the loop condition block.
+  builder->SetInsertPoint(condition_block);
+
+  // Generate code for the while loop condition.
+  llvm::Value *condition = node.GetConditionNode()->GenerateCode(*this);
+  if (!condition) {
+    return CodeGenerationInternalError(
+        "failed generating condition for while-statement");
+  }
+  // Truncate condition to make sure it has type `i1`.
+  condition = builder->CreateTrunc(condition, llvm::Type::getInt1Ty(*context),
+                                   "trunctmp");
+  // Create a conditional jump based on the while loop condition.
+  builder->CreateCondBr(condition, loop_block, afterloop_block);
+
+  // Append the loop block after the condition block.
+  parent_function->insert(parent_function->end(), loop_block);
+
+  // Now we are inserting instructions into the loop block.
+  builder->SetInsertPoint(loop_block);
+
+  // Emit loop body.
+  node.GetLoopBodyNode()->GenerateCode(*this);
+
+  // Get an updated pointer to the loop_block.
+  loop_block = builder->GetInsertBlock();
+
+  // Check if the loop block ends in a block terminator.
+  llvm::Instruction *loop_block_last_inst = loop_block->getTerminator();
+  if (!loop_block_last_inst || !loop_block_last_inst->isTerminator()) {
+    // Create an unconditional branch to the start of the loop, where we check
+    // the while condition.
+    builder->CreateBr(condition_block);
+  }
+
+  // Append the afterloop block. We jump to this block if the while condition is
+  // false.
+  parent_function->insert(parent_function->end(), afterloop_block);
+
+  // Any subsequent code is inserted in the afterloop block.
+  builder->SetInsertPoint(afterloop_block);
+
+  // GenerateCode(WhileStatementNode&) return value is not used.
+  return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 /******************************************************************************

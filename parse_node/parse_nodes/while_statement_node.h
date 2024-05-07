@@ -16,7 +16,7 @@ class WhileStatementNode : public ParseNode {
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
   ParseNode *GetConditionNode() const { return GetChild(0); }
-  ParseNode *GetBlockNode() const { return GetChild(1); }
+  ParseNode *GetLoopBodyNode() const { return GetChild(1); }
 
   virtual std::string ToString() const { return "WHILE STATEMENT NODE"; }
 
