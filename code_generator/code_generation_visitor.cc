@@ -197,7 +197,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode &node) {
     return nullptr;
   }
 
-  llvm::Value *condition = node.GetConditionNode()->GenerateCode(*this);
+  llvm::Value *condition = node.GetIfConditionNode()->GenerateCode(*this);
   if (!condition) {
     return CodeGenerationInternalError(
         "failed generating condition for if-statement");
@@ -226,7 +226,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode &node) {
 
   // Emit 'then' block.
   builder->SetInsertPoint(then_block);
-  node.GetThenBlockNode()->GenerateCode(*this);
+  node.GetIfBlockNode()->GenerateCode(*this);
 
   // Get an updated pointer to 'then' block.
   then_block = builder->GetInsertBlock();

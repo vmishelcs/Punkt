@@ -333,26 +333,32 @@ std::unique_ptr<ParseNode> Parser::ParseIfStatement() {
 
   auto if_statement = std::make_unique<IfStatementNode>(std::move(now_reading));
 
+  // Discard 'if'.
   ReadToken();
 
-  std::unique_ptr<ParseNode> condition = ParseExpression();
+  std::unique_ptr<ParseNode> if_condition = ParseExpression();
+  std::unique_ptr<ParseNode> if_block = nullptr;
 
-  std::unique_ptr<ParseNode> then_block = ParseCodeBlock();
+  if (StartsCodeBlock(*now_reading)) {
+    if_block = ParseCodeBlock();
+  } else {
+    if_block = ParseStatement();
+  }
 
-  if_statement->AppendChild(std::move(condition));
-  if_statement->AppendChild(std::move(then_block));
-
-  // TODO: We can add `elif` parsing later...
-  // while (StartsElifBlock(*now_reading)) {
-  //     ...
-  // }
+  if_statement->AppendIf(std::move(if_condition), std::move(if_block));
 
   if (StartsElseBlock(*now_reading)) {
+    // Discard 'else'.
     ReadToken();
 
-    std::unique_ptr<ParseNode> else_block = ParseCodeBlock();
+    std::unique_ptr<ParseNode> else_block = nullptr;
+    if (StartsCodeBlock(*now_reading)) {
+      else_block = ParseCodeBlock();
+    } else {
+      else_block = ParseStatement();
+    }
 
-    if_statement->AppendChild(std::move(else_block));
+    if_statement->AppendElse(std::move(else_block));
   }
 
   return if_statement;

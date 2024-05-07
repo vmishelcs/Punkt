@@ -15,10 +15,14 @@ std::unique_ptr<ParseNode> IfStatementNode::CreateCopy() const {
   return copy_node;
 }
 
-bool IfStatementNode::HasElseBlock() const {
-  // If-statement has an 'else' block if there are more than two children
-  // (first 2 children are the condition and the 'then' block).
-  return NumChildren() > 2;
+void IfStatementNode::AppendIf(std::unique_ptr<ParseNode> if_condition,
+                               std::unique_ptr<ParseNode> if_block) {
+  AppendChild(std::move(if_condition));
+  AppendChild(std::move(if_block));
+}
+
+void IfStatementNode::AppendElse(std::unique_ptr<ParseNode> else_block) {
+  AppendChild(std::move(else_block));
 }
 
 void IfStatementNode::Accept(ParseNodeVisitor &visitor) {

@@ -1,0 +1,6 @@
+main {
+	if true
+		# missing statement/code-block
+	else
+		print "hello".
+}

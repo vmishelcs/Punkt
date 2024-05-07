@@ -8,6 +8,7 @@ enum class Keyword {
   CALL,
   CHAR,
   CONST,
+  ELIF,
   ELSE,
   FALSE,
   FOR,
