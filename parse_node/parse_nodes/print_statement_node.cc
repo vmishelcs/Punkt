@@ -7,7 +7,8 @@
 #include <memory>
 
 std::unique_ptr<ParseNode> PrintStatementNode::CreateCopy() const {
-  auto copy_node = std::make_unique<PrintStatementNode>(token->CreateCopy());
+  auto copy_node = std::make_unique<PrintStatementNode>(token->CreateCopy(),
+                                                        this->is_println);
   for (auto child : GetChildren()) {
     copy_node->AppendChild(child->CreateCopy());
   }

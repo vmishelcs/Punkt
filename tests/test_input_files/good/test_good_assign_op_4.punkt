@@ -1,6 +1,6 @@
 main {
 	var x = 256.
-	print x.
+	println x.
 	x /= 128.
-	print x.
+	println x.
 }

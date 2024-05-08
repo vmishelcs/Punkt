@@ -79,5 +79,5 @@ main {
 	call d().
 	call e().
 	call f().
-	print "good".
+	println "good".
 }

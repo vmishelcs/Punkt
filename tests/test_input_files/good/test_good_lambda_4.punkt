@@ -4,5 +4,5 @@ function f <> -> int {
 
 main {
 	var g = f.
-	print g().
+	println g().
 }

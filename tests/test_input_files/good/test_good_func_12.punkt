@@ -19,5 +19,5 @@ function func5 <int x> -> int {
 }
 
 main {
-	print func1(func2(func3(func4(func5(1))))).
+	println func1(func2(func3(func4(func5(1))))).
 }

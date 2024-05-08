@@ -1,5 +1,5 @@
 main {
 	if false
-		print "false".
-	print "true".
+		println "false".
+	println "true".
 }

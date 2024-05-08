@@ -1,6 +1,6 @@
 main {
     const a = true.
     const b = false.
-    print a.
-    print b.
+    println a.
+    println b.
 }

@@ -5,5 +5,5 @@ main {
 
 	var g = h().
 	var x = g(0).
-	print x.
+	println x.
 }

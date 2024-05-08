@@ -9,5 +9,5 @@ main {
 	} else {
 		x = x * 3.
 	}
-	print x.
+	println x.
 }

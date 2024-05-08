@@ -1,5 +1,5 @@
 main {
 	if {
-		print "missing condition".
+		println "missing condition".
 	}
 }

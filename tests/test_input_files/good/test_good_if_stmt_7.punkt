@@ -1,1 +1,1 @@
-main { if 2 + 2 == 3 { print "we have a problem". } else { print "simple". } }
+main { if 2 + 2 == 3 { println "we have a problem". } else { println "simple". } }

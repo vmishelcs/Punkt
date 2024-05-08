@@ -1,4 +1,4 @@
 main {
     #hello#const s = "hello".
-    print s.
+    println s.
 }

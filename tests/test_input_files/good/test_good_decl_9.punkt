@@ -1,10 +1,10 @@
 main {
     const a = 5.
-    print "int a = ", a.
+    println "int a = ", a.
     {
-        print "int a = ", a.
+        println "int a = ", a.
         const a = true.
-        print "bool a = ", a.
+        println "bool a = ", a.
     }
-    print "int a = ", a.
+    println "int a = ", a.
 }

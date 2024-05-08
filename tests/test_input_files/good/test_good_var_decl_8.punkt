@@ -2,17 +2,17 @@ main {
 	var b = true.
 	if (b) {
 		b = false.
-		print "setting b to false ... ".
+		println "setting b to false ... ".
 	} else {
-		print "b is false.".
+		println "b is false.".
 	}
 
 	if (b) {
-		print "b has not been set to false.".
+		println "b has not been set to false.".
 	} else {
-		print "b really is false.".
+		println "b really is false.".
 		b = true.
 	}
 
-	print b.
+	println b.
 }

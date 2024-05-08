@@ -72,11 +72,7 @@ class Parser {
   std::unique_ptr<ParseNode> ParseCallStatement();
 
   bool StartsPrintStatement(Token &token);
-  std::unique_ptr<ParseNode> ParsePrintStatement(bool expect_terminator = true);
-
-  bool StartsPrintExpressionList(Token &token);
-  std::unique_ptr<ParseNode> ParsePrintExpressionList(
-      std::unique_ptr<ParseNode> print_statement);
+  std::unique_ptr<ParseNode> ParsePrintStatement();
 
   /// <returnStmt> ::= return <returnValue> .
   /// <returnValue> ::= <expr>

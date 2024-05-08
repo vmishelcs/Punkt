@@ -22,5 +22,5 @@ main {
 	call a().
 	call b().
 	call c().
-	print "good".
+	println "good".
 }

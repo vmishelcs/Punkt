@@ -1,15 +1,15 @@
 main {
     const a = 5.
     const b = 10.
-    print a, ">", a, ": ", a > a.
-    print a, ">", b, ": ", a > b.
-    print b, ">", b, ": ", b > b.
-    print b, ">", a, ": ", b > a.
+    println a, ">", a, ": ", a > a.
+    println a, ">", b, ": ", a > b.
+    println b, ">", b, ": ", b > b.
+    println b, ">", a, ": ", b > a.
 
     const c = 'a'.
     const d = 'z'.
-    print c, ">", c, ": ", c > c.
-    print c, ">", d, ": ", c > d.
-    print d, ">", d, ": ", d > d.
-    print d, ">", c, ": ", d > c.
+    println c, ">", c, ": ", c > c.
+    println c, ">", d, ": ", c > d.
+    println d, ">", d, ": ", d > d.
+    println d, ">", c, ": ", d > c.
 }

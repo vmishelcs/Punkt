@@ -1,10 +1,10 @@
 main {
     const a_b_c_d_e_f = 1.
-    print a_b_c_d_e_f.
+    println a_b_c_d_e_f.
     const _a_b_c_d_e_ = 2.
-    print _a_b_c_d_e_.
+    println _a_b_c_d_e_.
     const a_1 = 3.
-    print a_1.
+    println a_1.
     const abc_123 = 4.
-    print abc_123.
+    println abc_123.
 }

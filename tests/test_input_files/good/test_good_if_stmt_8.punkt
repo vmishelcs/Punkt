@@ -1,9 +1,9 @@
 main {
 	if 45 - 27 == 4 * 3 + 2 {
-		print "then".
+		println "then".
 	}
 	else {
-		print "else".
+		println "else".
 	}
-	print "after".
+	println "after".
 }

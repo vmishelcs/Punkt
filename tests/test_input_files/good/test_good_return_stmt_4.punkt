@@ -135,5 +135,5 @@ main {
 	call f1().
 	call g1().
 
-	print "good".
+	println "good".
 }

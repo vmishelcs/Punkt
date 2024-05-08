@@ -1,7 +1,7 @@
 main {
 	var i = 5.
 	for var i = 0, i < 2, i = i + 2 {
-		print i.
+		println i.
 	}
-	print i.
+	println i.
 }

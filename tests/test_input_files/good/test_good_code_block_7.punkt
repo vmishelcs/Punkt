@@ -1,10 +1,10 @@
 main {
     const a = 1.
-    print a.
+    println a.
     {
         const b = a.
-        print a.
-        print b.
+        println a.
+        println b.
     }
-    print a.
+    println a.
 }

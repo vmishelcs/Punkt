@@ -2,5 +2,5 @@ main {
     const a = true == true != false.
     const b = false == false != true.
     const c = true != false == true.
-    print a,b,c.
+    println a,b,c.
 }

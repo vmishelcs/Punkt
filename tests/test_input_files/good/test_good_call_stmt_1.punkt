@@ -1,5 +1,5 @@
 function f <int x> -> void {
-	print x.
+	println x.
 	return.
 }
 

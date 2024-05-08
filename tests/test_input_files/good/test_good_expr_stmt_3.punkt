@@ -1,5 +1,5 @@
 function f <> -> void {
-	print "good".
+	println "good".
 }
 
 main {

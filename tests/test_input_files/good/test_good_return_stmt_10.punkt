@@ -1,6 +1,6 @@
 function f <> -> void {
 	while true {
-		print "returning...".
+		println "returning...".
 		return.
 	}
 }

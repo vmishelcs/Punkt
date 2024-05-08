@@ -1,4 +1,4 @@
 main {
     # constant declaration # const a = 1.
-    print a.
+    println a.
 }

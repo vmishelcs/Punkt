@@ -1,8 +1,8 @@
 function f <int p1, int p2, int p3, int p4, int p5> -> bool {
-	print p1, p2, p3, p4, p5.
+	println p1, p2, p3, p4, p5.
 	return true.
 }
 
 main {
-	print f(0,1,2,3,4).
+	println f(0,1,2,3,4).
 }

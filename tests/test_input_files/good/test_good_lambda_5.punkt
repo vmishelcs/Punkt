@@ -1,6 +1,6 @@
 function takes_lambda < <int> -> int f > -> int {
 	for var i = 0, i <= 10, i = i + 1 {
-		print f(i).
+		println f(i).
 	}
 	return 0.
 }

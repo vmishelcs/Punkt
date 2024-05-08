@@ -3,5 +3,5 @@ function f <int x, int y> -> int {
 }
 
 main {
-	print 5 * f(5, 5) / 10.
+	println 5 * f(5, 5) / 10.
 }

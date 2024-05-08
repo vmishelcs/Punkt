@@ -4,5 +4,5 @@ function f <> -> void {
 }
 
 main {
-	f(). print "nice".
+	f(). println "nice".
 }

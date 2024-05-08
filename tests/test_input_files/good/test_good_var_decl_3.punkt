@@ -1,11 +1,11 @@
 main {
 	var x = 5.
 	{
-		print x.
+		println x.
 		var x = 6.
-		print x.
+		println x.
 		x = x + 4.
-		print x.
+		println x.
 	}
-	print x.
+	println x.
 }

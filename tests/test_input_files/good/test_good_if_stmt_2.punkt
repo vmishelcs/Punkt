@@ -1,13 +1,13 @@
 main {
     if true {
-        print "hello".
+        println "hello".
     } else {
-        print "Hello".
+        println "Hello".
     }
 
     if false {
-        print "good bye".
+        println "good bye".
     } else {
-        print "Good Bye".
+        println "Good Bye".
     }
 }

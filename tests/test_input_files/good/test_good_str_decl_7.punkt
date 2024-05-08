@@ -1,28 +1,28 @@
 main {
 	const str1 = "hello\bno".
-	print str1.
+	println str1.
 
 	const str2 = "hello\f".
-	print str2.
+	println str2.
 
 	const str3 = "hello\n".
-	print str3.
+	println str3.
 
 	const str4 = "hello\rj".
-	print str4.
+	println str4.
 
 	const str5 = "\thello".
-	print str5.
+	println str5.
 
 	const str6 = "\vhello".
-	print str6.
+	println str6.
 
 	const str7 = "backslash: \\".
-	print str7.
+	println str7.
 
 	const str8 = "apostrophe: \'".
-	print str8.
+	println str8.
 
 	const str9 = "double quote: \"".
-	print str9.
+	println str9.
 }

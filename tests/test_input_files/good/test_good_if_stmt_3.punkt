@@ -3,22 +3,22 @@ main {
 
     const a = 2.
     if x == a {
-        print "x = ", a.
+        println "x = ", a.
     } else {
-        print "x != ", a.
+        println "x != ", a.
     }
     
     const b = 4.
     if x + 2 == b {
-        print "x + 2 = ", b.
+        println "x + 2 = ", b.
     } else {
-        print "x + 2 != ", b.
+        println "x + 2 != ", b.
     }
 
     const c = 4.
     if x * 2 == c {
-        print "x * 2 = ", c.
+        println "x * 2 = ", c.
     } else {
-        print "x * 2 != ", c.
+        println "x * 2 != ", c.
     }
 }

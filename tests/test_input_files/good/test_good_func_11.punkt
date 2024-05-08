@@ -3,5 +3,5 @@ function mul_ints <int a, int b> -> int {
 }
 
 main {
-	print mul_ints(1 + 2 + 3 + 4, 5).
+	println mul_ints(1 + 2 + 3 + 4, 5).
 }

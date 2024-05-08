@@ -1,18 +1,18 @@
 main {
     const _ = 1.
-    print _.
+    println _.
     const ________________ = 2.
-    print ________________.
+    println ________________.
     const _a = 3.
-    print _a.
+    println _a.
     const _abc = 4.
-    print _abc.
+    println _abc.
     const _A = 5.
-    print _A.
+    println _A.
     const _ABC = 6.
-    print _ABC.
+    println _ABC.
     const _1 = 7.
-    print _1.
+    println _1.
     const _123 = 8.
-    print _123.
+    println _123.
 }

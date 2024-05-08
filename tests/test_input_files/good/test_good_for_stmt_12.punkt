@@ -3,7 +3,7 @@ main {
 	for var i = 0, i < n, i = i + 1 {
 		for var j = 0, j < n, j = j + 1 {
 			for var k = 0, k < n, k = k + 1 {
-				print i, ' ', j, ' ', k.
+				println i, ' ', j, ' ', k.
 			}
 		}
 	}

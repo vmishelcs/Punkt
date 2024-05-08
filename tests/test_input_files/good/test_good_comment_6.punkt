@@ -1,5 +1,5 @@
 main {
     const x = 1.
-    print x.
+    println x.
 }
 # comment with no line feed
