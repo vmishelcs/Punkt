@@ -1,0 +1,10 @@
+function f <> -> void {
+	while true {
+		print "returning...".
+		return.
+	}
+}
+
+main {
+	f().
+}

@@ -1,5 +1,6 @@
 #include "code_generation_visitor.h"
 
+#include <llvm/Analysis/LoopInfo.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/GlobalValue.h>
 #include <llvm/IR/Instruction.h>
@@ -43,6 +44,9 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
   llvm::raw_fd_ostream ir_ostream(fd, /*shouldClose=*/false);
   module->print(ir_ostream, nullptr);
 }
+
+// TODO: If previous instruction is a block terminator, use LLVM's `unreachable`
+// instruction (need to research this).
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CallStatementNode &node) {
   if (WasPreviousInstructionBlockTerminator()) {

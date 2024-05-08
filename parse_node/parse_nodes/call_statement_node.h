@@ -9,6 +9,7 @@
 
 #include "lambda_invocation_node.h"
 
+// TODO: Get rid of this node.
 class CallStatementNode : public ParseNode {
  public:
   CallStatementNode(std::unique_ptr<Token> token)
