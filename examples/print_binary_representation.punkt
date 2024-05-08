@@ -1,0 +1,29 @@
+# Print the binary representation of an unsigned 8-bit integer.
+function print_binary_representation <int n> -> void {
+	if n < 0 || n > 255 {
+		println "Input n must be 0 <= n <= 255!".
+		return.
+	}
+
+    var d = 128.
+    while d > 0 {
+        if n >= d {
+            n -= d.
+            print '1'.
+        } else {
+            print '0'.
+        }
+        d /= 2.
+    }
+}
+
+main {
+	const n = 255.
+
+    print n, " = ".
+    print_binary_representation(n).
+	print '\n'.
+
+	print_binary_representation(256).
+	print '\n'.
+}
