@@ -1,6 +1,6 @@
 main {
-	var x = true || false.
+	var x = true.
 	println x.
-	var y = true && false.
+	var y = !x.
 	println y.
 }

@@ -54,7 +54,7 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
     {Punctuator::MOD,
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
-                operator_codegen::IntegerModulusCodegen)}},
+                operator_codegen::IntegerModuloCodegen)}},
     // ==
     {Punctuator::CMP_EQ,
      {
@@ -121,16 +121,18 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
                    kBaseTypeBoolean.get(),
                    operator_codegen::IntegerCmpLEQCodegen),
      }},
+    // !
+    {Punctuator::BOOL_NOT,
+     {Signature({kBaseTypeBoolean.get()}, kBaseTypeBoolean.get(),
+                operator_codegen::BooleanNegationCodegen)}},
     // &&
     {Punctuator::BOOL_AND,
      {Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
-                kBaseTypeBoolean.get(),
-                operator_codegen::BooleanBoolANDCodegen)}},
+                kBaseTypeBoolean.get(), operator_codegen::BooleanAndCodegen)}},
     // ||
     {Punctuator::BOOL_OR,
      {Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
-                kBaseTypeBoolean.get(),
-                operator_codegen::BooleanBoolORCodegen)}}};
+                kBaseTypeBoolean.get(), operator_codegen::BooleanOrCodegen)}}};
 
 Signature *signatures::AcceptingSignature(Punctuator punctuator,
                                           const std::vector<Type *> &types) {

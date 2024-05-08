@@ -813,7 +813,8 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
 
 bool Parser::StartsUnaryExpression(Token &token) {
   return PunctuatorToken::IsTokenPunctuator(
-             &token, {Punctuator::PLUS, Punctuator::MINUS}) ||
+             &token,
+             {Punctuator::BOOL_NOT, Punctuator::PLUS, Punctuator::MINUS}) ||
          StartsAtomicExpression(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
@@ -822,7 +823,8 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
   }
 
   if (PunctuatorToken::IsTokenPunctuator(
-          now_reading.get(), {Punctuator::PLUS, Punctuator::MINUS})) {
+          now_reading.get(),
+          {Punctuator::BOOL_NOT, Punctuator::PLUS, Punctuator::MINUS})) {
     auto unary_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 

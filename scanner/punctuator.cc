@@ -33,6 +33,7 @@ static std::map<std::string, Punctuator> dictionary = {
     {"=<", Punctuator::CMP_LEQ},
     {"&&", Punctuator::BOOL_AND},
     {"||", Punctuator::BOOL_OR},
+    {"!", Punctuator::BOOL_NOT},
     {"->", Punctuator::ARROW},
 };
 

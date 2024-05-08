@@ -1,5 +1,6 @@
 #include "operator_codegen.h"
 
+#include <llvm/IR/Constants.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Value.h>
@@ -16,7 +17,7 @@ llvm::Value *operator_codegen::AssignmentCodegen(llvm::LLVMContext *context,
 }
 
 /******************************************************************************
- *                                    NOP *
+ *                                    NOP                                     *
  ******************************************************************************/
 llvm::Value *operator_codegen::UnaryNop(llvm::LLVMContext *context,
                                         llvm::IRBuilder<> *builder,
@@ -27,6 +28,21 @@ llvm::Value *operator_codegen::UnaryNop(llvm::LLVMContext *context,
 /******************************************************************************
  *                                  Booleans                                  *
  ******************************************************************************/
+llvm::Value *operator_codegen::BooleanNegationCodegen(
+    llvm::LLVMContext *context, llvm::IRBuilder<> *builder,
+    llvm::Value *operand) {
+  auto operand_trunc = builder->CreateTrunc(
+      operand, llvm::Type::getInt1Ty(*context), "trunctmp");
+
+  // XOR the operand with 1.
+  auto i1_result = builder->CreateXor(
+      operand_trunc,
+      llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), true), "xortmp");
+
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
+                             "zexttmp");
+}
+
 llvm::Value *operator_codegen::BooleanCmpEQCodegen(llvm::LLVMContext *context,
                                                    llvm::IRBuilder<> *builder,
                                                    llvm::Value *lhs,
@@ -67,10 +83,10 @@ llvm::Value *operator_codegen::BooleanCmpNEQCodegen(llvm::LLVMContext *context,
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::BooleanBoolANDCodegen(llvm::LLVMContext *context,
-                                                     llvm::IRBuilder<> *builder,
-                                                     llvm::Value *lhs,
-                                                     llvm::Value *rhs) {
+llvm::Value *operator_codegen::BooleanAndCodegen(llvm::LLVMContext *context,
+                                                 llvm::IRBuilder<> *builder,
+                                                 llvm::Value *lhs,
+                                                 llvm::Value *rhs) {
   auto lhs_trunc =
       builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
   auto rhs_trunc =
@@ -82,10 +98,10 @@ llvm::Value *operator_codegen::BooleanBoolANDCodegen(llvm::LLVMContext *context,
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::BooleanBoolORCodegen(llvm::LLVMContext *context,
-                                                    llvm::IRBuilder<> *builder,
-                                                    llvm::Value *lhs,
-                                                    llvm::Value *rhs) {
+llvm::Value *operator_codegen::BooleanOrCodegen(llvm::LLVMContext *context,
+                                                llvm::IRBuilder<> *builder,
+                                                llvm::Value *lhs,
+                                                llvm::Value *rhs) {
   auto lhs_trunc =
       builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
   auto rhs_trunc =
@@ -223,10 +239,10 @@ llvm::Value *operator_codegen::IntegerDivideCodegen(llvm::LLVMContext *context,
   return builder->CreateSDiv(lhs, rhs, "divtmp");
 }
 
-llvm::Value *operator_codegen::IntegerModulusCodegen(llvm::LLVMContext *context,
-                                                     llvm::IRBuilder<> *builder,
-                                                     llvm::Value *lhs,
-                                                     llvm::Value *rhs) {
+llvm::Value *operator_codegen::IntegerModuloCodegen(llvm::LLVMContext *context,
+                                                    llvm::IRBuilder<> *builder,
+                                                    llvm::Value *lhs,
+                                                    llvm::Value *rhs) {
   return builder->CreateSRem(lhs, rhs, "modtmp");
 }
 

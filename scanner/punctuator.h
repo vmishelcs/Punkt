@@ -29,6 +29,7 @@ enum class Punctuator {
   CMP_LEQ,
   BOOL_AND,
   BOOL_OR,
+  BOOL_NOT,
   ARROW,
 };
 
