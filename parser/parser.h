@@ -36,6 +36,8 @@ class Parser {
   ///         |  <ifStmt>
   ///         |  <whileStmt>
   ///         |  <forStmt>
+  ///         |  <printStmt>
+  ///         |  <codeBlock>
   bool StartsStatement(Token &token);
   std::unique_ptr<ParseNode> ParseStatement();
 

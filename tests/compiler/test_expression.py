@@ -7,6 +7,24 @@ class TestExpression(object):
     def setup_class(self):
         self._compile_helper = PunktCompilerTestHelper()
 
+    def test_bad_expression_1(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_expression_2(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_expression_3(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
     def test_good_expression_1(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
@@ -29,6 +47,20 @@ class TestExpression(object):
             assert False, "Exception was raised: " + repr(ex)
 
     def test_good_expression_4(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_expression_5(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_expression_6(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
             self._compile_helper.verify_actual_output(actual_output_path)

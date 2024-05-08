@@ -1,0 +1,62 @@
+function f1 <bool p> -> void {
+	print "(p && !p) == contradiction: ".
+	if (p && !p) == false {
+		println "pass".
+	} else {
+		println "fail".
+	}
+}
+
+function f2 <bool p, bool q> -> void {
+	print "!(p || q) == (!p && !q): ".
+	if !(p || q) == (!p && !q) {
+		println "pass".
+	} else {
+		println "fail".
+	}
+}
+
+function f3 <bool p, bool q> -> void {
+	print "!(p && q) == (!p || !q): ".
+	if !(p && q) == (!p || !q) {
+		println "pass".
+	} else {
+		println "fail".
+	}
+}
+
+function f4 <bool p, bool q, bool r> -> void {
+	print "(p && (q || r)) == ((p && q) || (p && r)): ".
+	if (p && (q || r)) == ((p && q) || (p && r)) {
+		println "pass".
+	} else {
+		println "fail".
+	}
+}
+
+main {
+	const T = true.
+	const F = false.
+
+	f1(T).
+	f1(F).
+
+	f2(T, T).
+	f2(T, F).
+	f2(F, T).
+	f2(F, F).
+
+	f3(T, T).
+	f3(T, F).
+	f3(F, T).
+	f3(F, F).
+
+	f4(T, T, T).
+	f4(T, T, F).
+	f4(T, F, T).
+	f4(T, F, F).
+	f4(F, T, T).
+	f4(F, T, F).
+	f4(F, F, T).
+	f4(F, F, F).
+}
