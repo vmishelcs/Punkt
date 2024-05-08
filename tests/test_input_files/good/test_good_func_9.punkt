@@ -11,5 +11,5 @@ function h <int x> -> int {
 }
 
 main {
-	print h(1).
+	println h(1).
 }

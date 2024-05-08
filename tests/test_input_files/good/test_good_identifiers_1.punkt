@@ -2,7 +2,7 @@ main {
     const a = 1.
     const abcdef = 2.
     const aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa = 3.
-    print a.
-    print abcdef.
-    print aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.
+    println a.
+    println abcdef.
+    println aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.
 }

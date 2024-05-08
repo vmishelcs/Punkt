@@ -10,8 +10,11 @@
 
 class PrintStatementNode : public ParseNode {
  public:
-  PrintStatementNode(std::unique_ptr<Token> token)
-      : ParseNode(ParseNodeType::PRINT_STATEMENT_NODE, std::move(token)) {}
+  PrintStatementNode(std::unique_ptr<Token> token, bool is_println)
+      : ParseNode(ParseNodeType::PRINT_STATEMENT_NODE, std::move(token)),
+        is_println(is_println) {}
+
+  bool IsPrintln() const { return is_println; }
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
@@ -22,6 +25,9 @@ class PrintStatementNode : public ParseNode {
   virtual void Accept(ParseNodeVisitor &visitor) override;
 
   virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
+
+ private:
+  bool is_println;
 };
 
 #endif  // PRINT_STATEMENT_NODE_H_

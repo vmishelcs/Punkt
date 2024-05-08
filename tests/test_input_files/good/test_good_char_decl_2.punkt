@@ -1,4 +1,4 @@
 main {
     const null_char = ''.
-    print null_char.
+    println null_char.
 }

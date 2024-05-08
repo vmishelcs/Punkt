@@ -1,10 +1,10 @@
 main {
 	var x = 1.
 	{
-		print x.
+		println x.
 		const x = x * 1337.
-		print x.
+		println x.
 	}
 	x = x + 2.
-	print x.
+	println x.
 }

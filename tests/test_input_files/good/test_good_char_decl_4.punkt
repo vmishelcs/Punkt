@@ -7,5 +7,5 @@ main {
     const W = 'W'.
     const r = 'r'.
     const d = 'd'.
-    print H, e, l, l, o, _, W, o, r, l, d.
+    println H, e, l, l, o, _, W, o, r, l, d.
 }

@@ -5,5 +5,5 @@ main {
 	} else {
 		x = 101.
 	}
-	print x.
+	println x.
 }

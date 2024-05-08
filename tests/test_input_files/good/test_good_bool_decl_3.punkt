@@ -3,5 +3,5 @@ main {
     const b = false != true.
     const c = true != true.
     const d = false != false.
-    print a,b,c,d.
+    println a,b,c,d.
 }

@@ -7,14 +7,14 @@ function f <bool b_val> -> bool {
 
 main {
 	if f(1 > 2) {
-		print "bad".
+		println "bad".
 	} else {
-		print "good".
+		println "good".
 	}
 
 	if f(1 + 2 + 3 + 4 == 10) {
-		print "good".
+		println "good".
 	} else {
-		print "bad".
+		println "bad".
 	}
 }

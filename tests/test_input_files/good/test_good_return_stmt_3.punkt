@@ -19,6 +19,5 @@ main {
 	call returns_char().
 	call returns_int().
 	call returns_string().
-	print "we good".
+	println "we good".
 }
-

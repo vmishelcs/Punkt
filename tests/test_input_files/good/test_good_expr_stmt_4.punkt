@@ -1,6 +1,6 @@
 main {
 	const l = <int x, int y> -> int {
-		print x + y.
+		println x + y.
 		return x + y.
 	}.
 

@@ -3,9 +3,9 @@ main {
     const e2 = true == false.
     const e3 = false == true.
     const e4 = false == false.
-    print e1, ' ', e2, ' ', e3, ' ', e4.
+    println e1, ' ', e2, ' ', e3, ' ', e4.
 
     const e5 = e1 == e3 == true.
     const e6 = e3 == e2 == false.
-    print e5, ' ', e6.
+    println e5, ' ', e6.
 }

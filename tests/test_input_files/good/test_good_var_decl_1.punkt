@@ -1,6 +1,6 @@
 main {
 	var x = 1.
-	print x.
+	println x.
 	x = 2.
-	print x.
+	println x.
 }

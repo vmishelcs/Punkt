@@ -1,9 +1,9 @@
 main {
 	var c1 = '\n'.
-	print "hey", c1.
+	println "hey", c1.
 
 	var c2 = '\t'.
-	print c2, "test".
+	println c2, "test".
 
-	print "brat", '\r', "ch".
+	println "brat", '\r', "ch".
 }

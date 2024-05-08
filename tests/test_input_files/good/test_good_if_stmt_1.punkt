@@ -1,9 +1,9 @@
 main {
     if true {
-        print "hello".
+        println "hello".
     }
 
     if false {
-        print "good bye".
+        println "good bye".
     }
 }

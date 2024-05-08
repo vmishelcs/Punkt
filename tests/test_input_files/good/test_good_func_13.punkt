@@ -6,5 +6,5 @@ function fac <int n> -> int {
 }
 
 main {
-	print fac(12).
+	println fac(12).
 }

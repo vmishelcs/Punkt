@@ -1,5 +1,5 @@
 main {
 	while {
-		print "missing condition".
+		println "missing condition".
 	}
 }

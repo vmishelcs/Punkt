@@ -1,12 +1,12 @@
 function divides <int x> -> void {
 	if x % 3 == 0 {
-		print "3 | ", x.
+		println "3 | ", x.
 	} else if x % 4 == 0 {
-		print "4 | ", x.
+		println "4 | ", x.
 	} else if x % 6 == 0 {
-		print "6 | ", x.
+		println "6 | ", x.
 	} else {
-		print "...".
+		println "...".
 	}
 }
 

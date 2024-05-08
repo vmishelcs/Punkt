@@ -1,11 +1,11 @@
 main {
 	for var i = 0, i < 3, i += 1 {
 		if i == 0 {
-			print "zero".
+			println "zero".
 		} else if i == 1 {
-		    print "one".
+		    println "one".
 		} else {
-		    print "two".
+		    println "two".
 		}
 	}
 }

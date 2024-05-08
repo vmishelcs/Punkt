@@ -1,8 +1,8 @@
 function all_params <bool a, char b, int c, string d> -> bool {
-	print a.
-	print b.
-	print c.
-	print d.
+	println a.
+	println b.
+	println c.
+	println d.
 	return true.
 }
 

@@ -16,6 +16,6 @@ function f <int x> -> bool {
 
 main {
 	if f(0) {
-		print "ZERO!".
+		println "ZERO!".
 	}
 }

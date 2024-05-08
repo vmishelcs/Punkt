@@ -521,8 +521,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
     PrintValue(child->GenerateCode(*this), child->GetType());
   }
 
-  // Print line feed once we are finished.
-  PrintLineFeed();
+  if (node.IsPrintln()) {
+    // Print line feed if we are dealing with a `println` statement.
+    PrintLineFeed();
+  }
 
   // GenerateCode(ProgramNode&) return value is not used.
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));

@@ -237,11 +237,11 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
   if (StartsCallStatement(*now_reading)) {
     return ParseCallStatement();
   }
-  if (StartsPrintStatement(*now_reading)) {
-    return ParsePrintStatement();
-  }
   if (StartsReturnStatement(*now_reading)) {
     return ParseReturnStatement();
+  }
+  if (StartsPrintStatement(*now_reading)) {
+    return ParsePrintStatement();
   }
 
   return SyntaxErrorUnexpectedToken("start of statement");
@@ -484,46 +484,39 @@ std::unique_ptr<ParseNode> Parser::ParseCallStatement() {
 }
 
 bool Parser::StartsPrintStatement(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {Keyword::PRINT});
+  return KeywordToken::IsTokenKeyword(&token,
+                                      {Keyword::PRINT, Keyword::PRINTLN});
 }
-std::unique_ptr<ParseNode> Parser::ParsePrintStatement(bool expect_terminator) {
+std::unique_ptr<ParseNode> Parser::ParsePrintStatement() {
   if (!StartsPrintStatement(*now_reading)) {
     return SyntaxErrorUnexpectedToken("print statement");
   }
 
-  std::unique_ptr<ParseNode> print_statement =
-      std::make_unique<PrintStatementNode>(std::move(now_reading));
+  // The `println` keyword means that we should print a line feed char at the
+  // end.
+  bool is_println =
+      KeywordToken::IsTokenKeyword(now_reading.get(), {Keyword::PRINTLN});
 
+  auto print_statement =
+      std::make_unique<PrintStatementNode>(std::move(now_reading), is_println);
+
+  // Discard 'print' or 'println'.
   ReadToken();
 
-  print_statement = ParsePrintExpressionList(std::move(print_statement));
+  // Parse expressions to be printed.
+  std::unique_ptr<ParseNode> print_expr = ParseExpression();
+  print_statement->AppendChild(std::move(print_expr));
 
-  if (expect_terminator) {
-    Expect(Punctuator::TERMINATOR);
+  while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+                                            {Punctuator::SEPARATOR})) {
+    // Discard ','.
+    ReadToken();
+
+    std::unique_ptr<ParseNode> print_expr = ParseExpression();
+    print_statement->AppendChild(std::move(print_expr));
   }
 
-  return print_statement;
-}
-
-bool Parser::StartsPrintExpressionList(Token &token) {
-  return StartsExpression(token);
-}
-std::unique_ptr<ParseNode> Parser::ParsePrintExpressionList(
-    std::unique_ptr<ParseNode> print_statement) {
-  if (StartsExpression(*now_reading)) {
-    std::unique_ptr<ParseNode> expression = ParseExpression();
-    print_statement->AppendChild(std::move(expression));
-  } else {
-    return SyntaxErrorUnexpectedToken("printable expression");
-  }
-
-  while (!PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                             {Punctuator::TERMINATOR}) &&
-         !now_reading->IsEOF()) {
-    Expect(Punctuator::SEPARATOR);
-    std::unique_ptr<ParseNode> expression = ParseExpression();
-    print_statement->AppendChild(std::move(expression));
-  }
+  Expect(Punctuator::TERMINATOR);
 
   return print_statement;
 }

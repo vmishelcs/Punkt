@@ -1,4 +1,4 @@
 main {
     const ch = '1'.
-    print ch.
+    println ch.
 }

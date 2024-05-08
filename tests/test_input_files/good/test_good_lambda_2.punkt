@@ -7,5 +7,5 @@ main {
 		return func(arg).
 	}.
 
-	print apply_func_to_arg(awesome, 1).
+	println apply_func_to_arg(awesome, 1).
 }

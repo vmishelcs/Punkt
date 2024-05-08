@@ -7,6 +7,6 @@ function g <int a, int b, int c, int d, int e, int f, int g, int h, int i> -> bo
 }
 
 main {
-	print f(1, -1, 1, -1, 1, -1, 1, -1).
-	print g(1, -1, 1, -1, 1, -1, 1, -1, 1).
+	println f(1, -1, 1, -1, 1, -1, 1, -1).
+	println g(1, -1, 1, -1, 1, -1, 1, -1, 1).
 }

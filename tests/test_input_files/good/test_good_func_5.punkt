@@ -7,5 +7,5 @@ function cow <int a, int b, int c, int d> -> int {
 }
 
 main {
-	print cow(1, 2, 3, 4).
+	println cow(1, 2, 3, 4).
 }

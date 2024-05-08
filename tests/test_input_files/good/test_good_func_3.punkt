@@ -9,5 +9,5 @@ function sqrt <int x> -> int {
 }
 
 main {
-	print sqrt(27).
+	println sqrt(27).
 }

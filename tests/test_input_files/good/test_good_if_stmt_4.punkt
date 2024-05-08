@@ -5,7 +5,7 @@ main {
                 if true {
                     if true {
                         if true {
-                            print false.
+                            println false.
                         }
                     }
                 }

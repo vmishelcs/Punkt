@@ -16,6 +16,7 @@ enum class Keyword {
   INT,
   MAIN,
   PRINT,
+  PRINTLN,
   RETURN,
   STRING,
   TRUE,

@@ -3,5 +3,5 @@ function f <int x, int y> -> int {
 }
 
 main {
-	print f(1, 2).
+	println f(1, 2).
 }

@@ -1,8 +1,8 @@
-function printer <string str> -> int {
-	print str.
+function printlner <string str> -> int {
+	println str.
 	return 0.
 }
 
 main {
-	const ret = printer("Hello World!").
+	const ret = printlner("Hello World!").
 }
