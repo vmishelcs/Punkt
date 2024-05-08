@@ -23,6 +23,12 @@ llvm::Value *BooleanCmpEQCodegen(llvm::LLVMContext *context,
 llvm::Value *BooleanCmpNEQCodegen(llvm::LLVMContext *context,
                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
                                   llvm::Value *rhs);
+llvm::Value *BooleanBoolANDCodegen(llvm::LLVMContext *context,
+                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                   llvm::Value *rhs);
+llvm::Value *BooleanBoolORCodegen(llvm::LLVMContext *context,
+                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                  llvm::Value *rhs);
 
 // ---- Characters -------------------------------------------------------------
 llvm::Value *CharacterCmpEQCodegen(llvm::LLVMContext *context,

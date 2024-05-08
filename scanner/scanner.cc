@@ -98,6 +98,8 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
   std::string buffer;
   LocatedChar lc = first_char;
 
+  // TODO: Add better error checking here (e.g. check what happens when user
+  // inputs ">!" or "-+").
   switch (lc.character) {
     case '{':
     case '}':
@@ -146,6 +148,26 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
       buffer.push_back(lc.character);
       if (input_stream->Peek().character == '=') {
         buffer.push_back(input_stream->Next().character);
+      }
+      break;
+
+    case '&':
+      buffer.push_back(lc.character);
+      if (input_stream->Peek().character == '&') {
+        buffer.push_back(input_stream->Next().character);
+      } else {
+        LexicalErrorUnexpectedCharacter(input_stream->Peek());
+        return GetNextToken();
+      }
+      break;
+
+    case '|':
+      buffer.push_back(lc.character);
+      if (input_stream->Peek().character == '|') {
+        buffer.push_back(input_stream->Next().character);
+      } else {
+        LexicalErrorUnexpectedCharacter(input_stream->Peek());
+        return GetNextToken();
       }
       break;
 

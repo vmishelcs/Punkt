@@ -67,6 +67,36 @@ llvm::Value *operator_codegen::BooleanCmpNEQCodegen(llvm::LLVMContext *context,
                              "zexttmp");
 }
 
+llvm::Value *operator_codegen::BooleanBoolANDCodegen(llvm::LLVMContext *context,
+                                                     llvm::IRBuilder<> *builder,
+                                                     llvm::Value *lhs,
+                                                     llvm::Value *rhs) {
+  auto lhs_trunc =
+      builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
+  auto rhs_trunc =
+      builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*context), "trunctmp");
+
+  auto i1_result = builder->CreateAnd(lhs_trunc, rhs_trunc, "andtmp");
+
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
+                             "zexttmp");
+}
+
+llvm::Value *operator_codegen::BooleanBoolORCodegen(llvm::LLVMContext *context,
+                                                    llvm::IRBuilder<> *builder,
+                                                    llvm::Value *lhs,
+                                                    llvm::Value *rhs) {
+  auto lhs_trunc =
+      builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
+  auto rhs_trunc =
+      builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*context), "trunctmp");
+
+  auto i1_result = builder->CreateOr(lhs_trunc, rhs_trunc, "ortmp");
+
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
+                             "zexttmp");
+}
+
 /******************************************************************************
  *                                 Characters                                 *
  ******************************************************************************/

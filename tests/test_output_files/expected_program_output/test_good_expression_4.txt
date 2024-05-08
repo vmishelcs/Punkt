@@ -1,0 +1,51 @@
+---- AND ----------
+1 AND 1 = 1
+1 AND 0 = 0
+0 AND 1 = 0
+0 AND 0 = 0
+
+---- OR ---------
+1 OR 1 = 1
+1 OR 0 = 1
+0 OR 1 = 1
+0 OR 0 = 0
+
+---- AND AND ----
+1 AND 1 AND 1 = 1
+1 AND 1 AND 0 = 0
+1 AND 0 AND 1 = 0
+1 AND 0 AND 0 = 0
+0 AND 1 AND 1 = 0
+0 AND 1 AND 0 = 0
+0 AND 0 AND 1 = 0
+0 AND 0 AND 0 = 0
+
+---- OR OR ------
+1 OR 1 OR 1 = 1
+1 OR 1 OR 0 = 1
+1 OR 0 OR 1 = 1
+1 OR 0 OR 0 = 1
+0 OR 1 OR 1 = 1
+0 OR 1 OR 0 = 1
+0 OR 0 OR 1 = 1
+0 OR 0 OR 0 = 0
+
+---- AND OR -----
+1 AND 1 OR 1 = 1
+1 AND 1 OR 0 = 1
+1 AND 0 OR 1 = 1
+1 AND 0 OR 0 = 0
+0 AND 1 OR 1 = 1
+0 AND 1 OR 0 = 0
+0 AND 0 OR 1 = 1
+0 AND 0 OR 0 = 0
+
+---- OR AND -----
+1 OR 1 AND 1 = 1
+1 OR 1 AND 0 = 1
+1 OR 0 AND 1 = 1
+1 OR 0 AND 0 = 1
+0 OR 1 AND 1 = 1
+0 OR 1 AND 0 = 0
+0 OR 0 AND 1 = 0
+0 OR 0 AND 0 = 0

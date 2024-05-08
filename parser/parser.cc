@@ -560,21 +560,21 @@ std::unique_ptr<ParseNode> Parser::ParseExpression() {
 }
 
 bool Parser::StartsAssignmentExpression(Token &token) {
-  return StartsEqualityExpression(token);
+  return StartsBooleanORExpression(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
   if (!StartsAssignmentExpression(*now_reading)) {
     return SyntaxErrorUnexpectedToken("assignment expression");
   }
 
-  std::unique_ptr<ParseNode> target = ParseEqualityExpression();
+  std::unique_ptr<ParseNode> target = ParseBooleanORExpression();
 
   // Parsing regular assignment (=).
   if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
                                          {Punctuator::ASSIGN})) {
     auto assign_op = std::make_unique<OperatorNode>(std::move(now_reading));
     ReadToken();
-    std::unique_ptr<ParseNode> new_value = ParseEqualityExpression();
+    std::unique_ptr<ParseNode> new_value = ParseBooleanORExpression();
 
     assign_op->AppendChild(std::move(target));
     assign_op->AppendChild(std::move(new_value));
@@ -635,7 +635,7 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
     // Append the left-hand side operand.
     op_node->AppendChild(std::move(lhs));
     // Parse the right-hand side of the operand.
-    std::unique_ptr<ParseNode> rhs = ParseEqualityExpression();
+    std::unique_ptr<ParseNode> rhs = ParseBooleanORExpression();
     // Append the right-hand side operand.
     op_node->AppendChild(std::move(rhs));
 
@@ -646,6 +646,60 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
   }
 
   return target;
+}
+
+bool Parser::StartsBooleanORExpression(Token &token) {
+  return StartsBooleanANDExpression(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseBooleanORExpression() {
+  if (!StartsBooleanORExpression(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("boolean OR expression");
+  }
+
+  std::unique_ptr<ParseNode> lhs = ParseBooleanANDExpression();
+
+  while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+                                            {Punctuator::BOOL_OR})) {
+    auto bool_or_op = std::make_unique<OperatorNode>(std::move(now_reading));
+
+    // Discard '||'.
+    ReadToken();
+
+    std::unique_ptr<ParseNode> rhs = ParseBooleanANDExpression();
+
+    bool_or_op->AppendChild(std::move(lhs));
+    bool_or_op->AppendChild(std::move(rhs));
+    lhs = std::move(bool_or_op);
+  }
+
+  return lhs;
+}
+
+bool Parser::StartsBooleanANDExpression(Token &token) {
+  return StartsEqualityExpression(token);
+}
+std::unique_ptr<ParseNode> Parser::ParseBooleanANDExpression() {
+  if (!StartsBooleanANDExpression(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("boolean AND expression");
+  }
+
+  std::unique_ptr<ParseNode> lhs = ParseEqualityExpression();
+
+  while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+                                            {Punctuator::BOOL_AND})) {
+    auto bool_and_op = std::make_unique<OperatorNode>(std::move(now_reading));
+
+    // Discard '&&'.
+    ReadToken();
+
+    std::unique_ptr<ParseNode> rhs = ParseEqualityExpression();
+
+    bool_and_op->AppendChild(std::move(lhs));
+    bool_and_op->AppendChild(std::move(rhs));
+    lhs = std::move(bool_and_op);
+  }
+
+  return lhs;
 }
 
 bool Parser::StartsEqualityExpression(Token &token) {

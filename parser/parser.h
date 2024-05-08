@@ -89,6 +89,14 @@ class Parser {
   bool StartsAssignmentExpression(Token &token);
   std::unique_ptr<ParseNode> ParseAssignmentExpression();
 
+  /// `||` Boolean OR
+  bool StartsBooleanORExpression(Token &token);
+  std::unique_ptr<ParseNode> ParseBooleanORExpression();
+
+  /// `&&` Boolean AND
+  bool StartsBooleanANDExpression(Token &token);
+  std::unique_ptr<ParseNode> ParseBooleanANDExpression();
+
   /// `==` `!=` Relational equality and inequality
   bool StartsEqualityExpression(Token &token);
   std::unique_ptr<ParseNode> ParseEqualityExpression();
