@@ -8,7 +8,6 @@ enum class Keyword {
   CALL,
   CHAR,
   CONST,
-  ELIF,
   ELSE,
   FALSE,
   FOR,
@@ -22,6 +21,7 @@ enum class Keyword {
   TRUE,
   VAR,
   VOID,
+  WHILE
 };
 
 namespace keyword_utils {

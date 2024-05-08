@@ -55,6 +55,9 @@ class ParseNodeVisitor {
   virtual void VisitEnter(ReturnStatementNode &node) = 0;
   virtual void VisitLeave(ReturnStatementNode &node) = 0;
 
+  virtual void VisitEnter(WhileStatementNode &node) = 0;
+  virtual void VisitLeave(WhileStatementNode &node) = 0;
+
   // ---- Leaf nodes
   // -----------------------------------------------------------------------
   virtual void Visit(ErrorNode &node) = 0;
@@ -161,6 +164,13 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
     DefaultVisit(node);
   }
   virtual void VisitLeave(ReturnStatementNode &node) override {
+    DefaultVisit(node);
+  }
+
+  virtual void VisitEnter(WhileStatementNode &node) override {
+    DefaultVisit(node);
+  }
+  virtual void VisitLeave(WhileStatementNode &node) override {
     DefaultVisit(node);
   }
 

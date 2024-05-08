@@ -3,12 +3,15 @@
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Instruction.h>
+#include <llvm/IR/Instructions.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <semantic_analyzer/types/base_type.h>
 
 #include <map>
+#include <memory>
+#include <string>
 
 class CodeGenerationVisitor : public ParseNodeIRVisitor {
  public:
@@ -32,6 +35,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(PrintStatementNode &node) override;
   virtual llvm::Value *GenerateCode(ProgramNode &node) override;
   virtual llvm::Value *GenerateCode(ReturnStatementNode &node) override;
+  virtual llvm::Value *GenerateCode(WhileStatementNode &node) override;
 
   virtual llvm::Value *GenerateCode(ErrorNode &node) override;
   virtual llvm::Value *GenerateCode(NopNode &node) override;

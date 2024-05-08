@@ -1,8 +1,10 @@
 #include "code_generation_visitor.h"
 
+#include <llvm/Analysis/LoopInfo.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/GlobalValue.h>
 #include <llvm/IR/Instruction.h>
+#include <llvm/IR/Instructions.h>
 #include <llvm/IR/Value.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/Casting.h>
@@ -12,6 +14,8 @@
 #include <semantic_analyzer/types/type.h>
 #include <token/punctuator_token.h>
 
+#include <memory>
+#include <string>
 #include <variant>
 
 static const std::string kMainFunctionName = "main";
@@ -24,7 +28,7 @@ static const char kLineFeedChar = 10;
 using code_gen_func_type_1_operand =
     llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *,
                      llvm::Value *);
-using code_gen_func_type_2_operand =
+using code_gen_func_type_2_operands =
     llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *,
                      llvm::Value *, llvm::Value *);
 
@@ -40,6 +44,9 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
   llvm::raw_fd_ostream ir_ostream(fd, /*shouldClose=*/false);
   module->print(ir_ostream, nullptr);
 }
+
+// TODO: If previous instruction is a block terminator, use LLVM's `unreachable`
+// instruction (need to research this).
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CallStatementNode &node) {
   if (WasPreviousInstructionBlockTerminator()) {
@@ -126,11 +133,12 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
 
   auto parent_function = builder->GetInsertBlock()->getParent();
 
-  // Create a basic block to check if the loop condition is true/false.
+  // Create a basic block to check if the loop condition is true/false and
+  // attach to the parent function.
   auto condition_block =
       llvm::BasicBlock::Create(*context, "condcheck", parent_function);
 
-  // Create a basic block for the loop and add it to the parent function.
+  // Create a basic block for the loop body.
   auto loop_block = llvm::BasicBlock::Create(*context, "loop");
 
   // Create a basic block for the loop exit.
@@ -144,7 +152,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
   builder->SetInsertPoint(condition_block);
 
   // Check if the condition to enter the loop is satisfied.
-  auto end_condition = node.GetEndConditionNode()->GenerateCode(*this);
+  llvm::Value *end_condition = node.GetEndConditionNode()->GenerateCode(*this);
+  if (!end_condition) {
+    return CodeGenerationInternalError(
+        "failed generating end condition for for-statement");
+  }
   end_condition = builder->CreateTrunc(
       end_condition, llvm::Type::getInt1Ty(*context), "trunctmp");
   builder->CreateCondBr(end_condition, loop_block, afterloop_block);
@@ -411,7 +423,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
 
   // Validate generated code.
   if (llvm::verifyFunction(*function, &llvm::errs())) {
-    // return CodeGenerationInternalError("generated IR is invalid.");
+    return CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // Restore builder insert point after generating lambda.
@@ -460,7 +472,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode &node) {
   }
 
   if (llvm::verifyFunction(*main_func, &llvm::errs())) {
-    // return CodeGenerationInternalError("generated IR is invalid.");
+    return CodeGenerationInternalError("generated IR is invalid.");
   }
 
   return main_func;
@@ -486,7 +498,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode &node) {
 
     // Obtain codegen function pointer for 2 operands from variant.
     try {
-      auto fp = std::get<code_gen_func_type_2_operand>(node.GetCodeGenFunc());
+      auto fp = std::get<code_gen_func_type_2_operands>(node.GetCodeGenFunc());
       return fp(context.get(), builder.get(), lhs, rhs);
     } catch (std::bad_variant_access const &ex) {
       return CodeGenerationInternalError(
@@ -528,7 +540,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
   }
 
   if (llvm::verifyModule(*module, &llvm::errs())) {
-    // return CodeGenerationInternalError("generated IR is invalid.");
+    return CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // GenerateCode(ProgramNode&) return value is not used.
@@ -556,6 +568,75 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode &node) {
 
   llvm::Value *return_value = node.GetReturnValueNode()->GenerateCode(*this);
   return builder->CreateRet(return_value);
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
+  if (WasPreviousInstructionBlockTerminator()) {
+    // No more instructions in this basic block.
+    return nullptr;
+  }
+
+  auto parent_function = builder->GetInsertBlock()->getParent();
+
+  // Create a basic block to check if the while condition is true/false and
+  // attach it to the parent function.
+  auto condition_block =
+      llvm::BasicBlock::Create(*context, "condcheck", parent_function);
+
+  // Create a basic block for the while loop body.
+  auto loop_block = llvm::BasicBlock::Create(*context, "loop");
+
+  // Create a basic block for the loop exit.
+  auto afterloop_block = llvm::BasicBlock::Create(*context, "afterloop");
+
+  // Insert an explicit fall-through from the current block (before the loop) to
+  // the loop condition block.
+  builder->CreateBr(condition_block);
+
+  // Now we are inserting instructions into the loop condition block.
+  builder->SetInsertPoint(condition_block);
+
+  // Generate code for the while loop condition.
+  llvm::Value *condition = node.GetConditionNode()->GenerateCode(*this);
+  if (!condition) {
+    return CodeGenerationInternalError(
+        "failed generating condition for while-statement");
+  }
+  // Truncate condition to make sure it has type `i1`.
+  condition = builder->CreateTrunc(condition, llvm::Type::getInt1Ty(*context),
+                                   "trunctmp");
+  // Create a conditional jump based on the while loop condition.
+  builder->CreateCondBr(condition, loop_block, afterloop_block);
+
+  // Append the loop block after the condition block.
+  parent_function->insert(parent_function->end(), loop_block);
+
+  // Now we are inserting instructions into the loop block.
+  builder->SetInsertPoint(loop_block);
+
+  // Emit loop body.
+  node.GetLoopBodyNode()->GenerateCode(*this);
+
+  // Get an updated pointer to the loop_block.
+  loop_block = builder->GetInsertBlock();
+
+  // Check if the loop block ends in a block terminator.
+  llvm::Instruction *loop_block_last_inst = loop_block->getTerminator();
+  if (!loop_block_last_inst || !loop_block_last_inst->isTerminator()) {
+    // Create an unconditional branch to the start of the loop, where we check
+    // the while condition.
+    builder->CreateBr(condition_block);
+  }
+
+  // Append the afterloop block. We jump to this block if the while condition is
+  // false.
+  parent_function->insert(parent_function->end(), afterloop_block);
+
+  // Any subsequent code is inserted in the afterloop block.
+  builder->SetInsertPoint(afterloop_block);
+
+  // GenerateCode(WhileStatementNode&) return value is not used.
+  return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 /******************************************************************************
@@ -616,7 +697,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
 }
 
 /******************************************************************************
- *                            NOP code generation *
+ *                            NOP code generation                             *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
   return builder->CreateAdd(
@@ -625,7 +706,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
 }
 
 /******************************************************************************
- *                              Printing helpers *
+ *                              Printing helpers                              *
  ******************************************************************************/
 void CodeGenerationVisitor::GeneratePrintfDeclaration() {
   // Create a vector for parameters
@@ -771,7 +852,7 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
 }
 
 /******************************************************************************
- *                           Miscellaneous helpers *
+ *                           Miscellaneous helpers                            *
  ******************************************************************************/
 void CodeGenerationVisitor::GenerateGlobalConstants() {
   GeneratePrintfFmtStringsForBaseTypes();
@@ -786,7 +867,7 @@ llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(
 }
 
 /******************************************************************************
- *                               Error handling *
+ *                               Error handling                               *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode &node) {
   return CodeGenerationInternalError("encountered ErrorNode " +

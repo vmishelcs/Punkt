@@ -30,6 +30,8 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
 
   virtual void VisitLeave(ReturnStatementNode &node) override;
 
+  virtual void VisitLeave(WhileStatementNode &node) override;
+
   // ---- Leaf nodes -----------------------------------------------------------
   virtual void Visit(ErrorNode &node) override;
   virtual void Visit(IdentifierNode &node) override;
@@ -54,6 +56,7 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
   void DeclarationOfVarWithVoidTypeError(DeclarationStatementNode &node);
   void InvalidOperandTypeError(OperatorNode &node, std::vector<Type *> &types);
   void NonBooleanConditionError(IfStatementNode &node);
+  void NonBooleanConditionError(WhileStatementNode &node);
   void NonBooleanConditionError(ForStatementNode &node);
   void NonTargettableExpressionError(ParseNode &node);
   void AssignmentToImmutableTargetError(ParseNode &node);

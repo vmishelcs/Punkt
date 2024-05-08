@@ -1,0 +1,6 @@
+main {
+	var cond = true.
+	while cond
+		cond = false.
+	print "stopped".
+}

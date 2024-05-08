@@ -27,6 +27,7 @@ target_link_libraries(parse_node
     program_node
     return_statement_node
     string_literal_node
+    while_statement_node
     type
     scope
     ${llvm_libs}

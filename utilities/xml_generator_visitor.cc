@@ -311,6 +311,21 @@ void XMLGeneratorVisitor::VisitLeave(ReturnStatementNode &node) {
   OutputTag(*tag);
 }
 
+void XMLGeneratorVisitor::VisitEnter(WhileStatementNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("WhileStatementNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(WhileStatementNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("WhileStatementNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
 /******************************************************************************
  *                                 Leaf nodes                                 *
  ******************************************************************************/

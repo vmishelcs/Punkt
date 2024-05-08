@@ -96,7 +96,7 @@ void SemanticAnalysisVisitor::VisitEnter(ForStatementNode &node) {
 }
 void SemanticAnalysisVisitor::VisitLeave(ForStatementNode &node) {
   // Make sure that the condition has boolean type.
-  Type *condition_type = node.GetChild(1)->GetType();
+  Type *condition_type = node.GetEndConditionNode()->GetType();
   BaseType *b_condition_type = dynamic_cast<BaseType *>(condition_type);
 
   if (!b_condition_type ||
@@ -109,7 +109,7 @@ void SemanticAnalysisVisitor::VisitLeave(ForStatementNode &node) {
 
 void SemanticAnalysisVisitor::VisitLeave(IfStatementNode &node) {
   // Make sure that the condition has boolean type.
-  Type *condition_type = node.GetChild(0)->GetType();
+  Type *condition_type = node.GetIfConditionNode()->GetType();
   BaseType *b_condition_type = dynamic_cast<BaseType *>(condition_type);
 
   if (!b_condition_type ||
@@ -267,6 +267,19 @@ void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode &node) {
   }
 }
 
+void SemanticAnalysisVisitor::VisitLeave(WhileStatementNode &node) {
+  // Make sure that the condition has boolean type.
+  Type *condition_type = node.GetConditionNode()->GetType();
+  BaseType *b_condition_type = dynamic_cast<BaseType *>(condition_type);
+
+  if (!b_condition_type ||
+      !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
+    NonBooleanConditionError(node);
+    node.SetType(BaseType::CreateErrorType());
+    return;
+  }
+}
+
 /******************************************************************************
  *                                 Leaf nodes                                 *
  ******************************************************************************/
@@ -374,6 +387,14 @@ void SemanticAnalysisVisitor::InvalidOperandTypeError(
 
 void SemanticAnalysisVisitor::NonBooleanConditionError(IfStatementNode &node) {
   std::string message = "if-statement at " +
+                        node.GetToken()->GetLocation().ToString() +
+                        " has non-boolean condition";
+  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+void SemanticAnalysisVisitor::NonBooleanConditionError(
+    WhileStatementNode &node) {
+  std::string message = "while-statement at " +
                         node.GetToken()->GetLocation().ToString() +
                         " has non-boolean condition";
   PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
