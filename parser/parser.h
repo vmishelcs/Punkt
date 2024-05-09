@@ -36,6 +36,8 @@ class Parser {
   ///         |  <ifStmt>
   ///         |  <whileStmt>
   ///         |  <forStmt>
+  ///         |  <printStmt>
+  ///         |  <codeBlock>
   bool StartsStatement(Token &token);
   std::unique_ptr<ParseNode> ParseStatement();
 
@@ -85,9 +87,17 @@ class Parser {
 
   /// `=` Simple assignment
   /// `+=` `-=` Assignment by addition and subtraction
-  /// `*=` `/=` `%=` Assignment by multiplication, division, and modulus
+  /// `*=` `/=` `%=` Assignment by multiplication, division, and modulo
   bool StartsAssignmentExpression(Token &token);
   std::unique_ptr<ParseNode> ParseAssignmentExpression();
+
+  /// `||` Boolean OR
+  bool StartsBooleanORExpression(Token &token);
+  std::unique_ptr<ParseNode> ParseBooleanORExpression();
+
+  /// `&&` Boolean AND
+  bool StartsBooleanANDExpression(Token &token);
+  std::unique_ptr<ParseNode> ParseBooleanANDExpression();
 
   /// `==` `!=` Relational equality and inequality
   bool StartsEqualityExpression(Token &token);
@@ -102,10 +112,12 @@ class Parser {
   bool StartsAdditiveExpression(Token &token);
   std::unique_ptr<ParseNode> ParseAdditiveExpression();
 
-  /// `*` `/` `%` Multiplication, division, and modulus
+  /// `*` `/` `%` Multiplication, division, and modulo
   bool StartsMultiplicativeExpression(Token &token);
   std::unique_ptr<ParseNode> ParseMultiplicativeExpression();
 
+  /// `!` Boolean negation
+  /// `+` `-` Unary integer plus and minus
   bool StartsUnaryExpression(Token &token);
   std::unique_ptr<ParseNode> ParseUnaryExpression();
 

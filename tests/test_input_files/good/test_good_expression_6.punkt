@@ -1,0 +1,6 @@
+main {
+	const T = true.
+	const F = !T.
+	println T == !F.
+	println F == !T.
+}

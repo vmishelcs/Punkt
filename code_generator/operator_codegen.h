@@ -17,12 +17,21 @@ llvm::Value *UnaryNop(llvm::LLVMContext *context, llvm::IRBuilder<> *builder,
                       llvm::Value *operand);
 
 // ---- Booleans ---------------------------------------------------------------
+llvm::Value *BooleanNegationCodegen(llvm::LLVMContext *context,
+                                    llvm::IRBuilder<> *builder,
+                                    llvm::Value *operand);
 llvm::Value *BooleanCmpEQCodegen(llvm::LLVMContext *context,
                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
                                  llvm::Value *rhs);
 llvm::Value *BooleanCmpNEQCodegen(llvm::LLVMContext *context,
                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
                                   llvm::Value *rhs);
+llvm::Value *BooleanAndCodegen(llvm::LLVMContext *context,
+                               llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                               llvm::Value *rhs);
+llvm::Value *BooleanOrCodegen(llvm::LLVMContext *context,
+                              llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                              llvm::Value *rhs);
 
 // ---- Characters -------------------------------------------------------------
 llvm::Value *CharacterCmpEQCodegen(llvm::LLVMContext *context,
@@ -60,9 +69,9 @@ llvm::Value *IntegerMultiplyCodegen(llvm::LLVMContext *context,
 llvm::Value *IntegerDivideCodegen(llvm::LLVMContext *context,
                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
                                   llvm::Value *rhs);
-llvm::Value *IntegerModulusCodegen(llvm::LLVMContext *context,
-                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                   llvm::Value *rhs);
+llvm::Value *IntegerModuloCodegen(llvm::LLVMContext *context,
+                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
+                                  llvm::Value *rhs);
 llvm::Value *IntegerCmpEQCodegen(llvm::LLVMContext *context,
                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
                                  llvm::Value *rhs);

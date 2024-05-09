@@ -1,0 +1,6 @@
+main {
+	var x = true || false.
+	println x.
+	var y = true && false.
+	println y.
+}

@@ -1,0 +1,18 @@
+(p && !p) == contradiction: pass
+(p && !p) == contradiction: pass
+!(p || q) == (!p && !q): pass
+!(p || q) == (!p && !q): pass
+!(p || q) == (!p && !q): pass
+!(p || q) == (!p && !q): pass
+!(p && q) == (!p || !q): pass
+!(p && q) == (!p || !q): pass
+!(p && q) == (!p || !q): pass
+!(p && q) == (!p || !q): pass
+(p && (q || r)) == ((p && q) || (p && r)): pass
+(p && (q || r)) == ((p && q) || (p && r)): pass
+(p && (q || r)) == ((p && q) || (p && r)): pass
+(p && (q || r)) == ((p && q) || (p && r)): pass
+(p && (q || r)) == ((p && q) || (p && r)): pass
+(p && (q || r)) == ((p && q) || (p && r)): pass
+(p && (q || r)) == ((p && q) || (p && r)): pass
+(p && (q || r)) == ((p && q) || (p && r)): pass

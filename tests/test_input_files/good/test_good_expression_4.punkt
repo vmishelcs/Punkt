@@ -1,0 +1,81 @@
+function and_helper <bool lhs, bool rhs> -> void {
+	println lhs, " AND ", rhs, " = ", lhs && rhs.
+}
+
+function or_helper <bool lhs, bool rhs> -> void {
+	println lhs, " OR ", rhs, " = ", lhs || rhs.
+}
+
+function and_and <bool op1, bool op2, bool op3> -> void {
+	println op1, " AND ", op2, " AND ", op3, " = ", op1 && op2 && op3.
+}
+
+function or_or <bool op1, bool op2, bool op3> -> void {
+	println op1, " OR ", op2, " OR ", op3, " = ", op1 || op2 || op3.
+}
+
+function and_or <bool op1, bool op2, bool op3> -> void {
+	println op1, " AND ", op2, " OR ", op3, " = ", op1 && op2 || op3.
+}
+
+function or_and <bool op1, bool op2, bool op3> -> void {
+	println op1, " OR ", op2, " AND ", op3, " = ", op1 || op2 && op3.
+}
+
+
+main {
+	const T = true.
+	const F = false.
+
+	println "---- AND ----------".
+	and_helper(T, T).
+	and_helper(T, F).
+	and_helper(F, T).
+	and_helper(F, F).
+
+	println "\n---- OR ---------".
+	or_helper(T, T).
+	or_helper(T, F).
+	or_helper(F, T).
+	or_helper(F, F).
+
+	println "\n---- AND AND ----".
+	and_and(T, T, T).
+	and_and(T, T, F).
+	and_and(T, F, T).
+	and_and(T, F, F).
+	and_and(F, T, T).
+	and_and(F, T, F).
+	and_and(F, F, T).
+	and_and(F, F, F).
+
+	println "\n---- OR OR ------".
+	or_or(T, T, T).
+	or_or(T, T, F).
+	or_or(T, F, T).
+	or_or(T, F, F).
+	or_or(F, T, T).
+	or_or(F, T, F).
+	or_or(F, F, T).
+	or_or(F, F, F).
+
+	println "\n---- AND OR -----".
+	and_or(T, T, T).
+	and_or(T, T, F).
+	and_or(T, F, T).
+	and_or(T, F, F).
+	and_or(F, T, T).
+	and_or(F, T, F).
+	and_or(F, F, T).
+	and_or(F, F, F).
+
+	println "\n---- OR AND -----".
+	or_and(T, T, T).
+	or_and(T, T, F).
+	or_and(T, F, T).
+	or_and(T, F, F).
+	or_and(F, T, T).
+	or_and(F, T, F).
+	or_and(F, F, T).
+	or_and(F, F, F).
+}
