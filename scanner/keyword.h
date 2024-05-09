@@ -4,6 +4,7 @@
 #include <string>
 
 enum class Keyword {
+  ALLOC,
   BOOL,
   CALL,
   CHAR,

@@ -1,6 +1,4 @@
 main {
-	var x = true.
-	println x.
-	var y = !x.
-	println y.
+	var arr = alloc [int] (5).
+	var arr2 = alloc [bool] (1).
 }

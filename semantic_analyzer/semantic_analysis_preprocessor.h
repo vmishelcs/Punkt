@@ -7,6 +7,8 @@
 class SemanticAnalysisPreprocessor : public DefaultParseNodeVisitor {
  public:
   // ---- Non-leaf nodes -------------------------------------------------------
+  virtual void VisitLeave(ArrayTypeNode &node) override;
+
   virtual void VisitLeave(FunctionDefinitionNode &node) override;
 
   virtual void VisitLeave(LambdaNode &node) override;

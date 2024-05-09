@@ -19,6 +19,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
 
   void WriteIRToFD(int fd);
 
+  virtual llvm::Value *GenerateCode(ArrayTypeNode &node) override;
   virtual llvm::Value *GenerateCode(CallStatementNode &node) override;
   virtual llvm::Value *GenerateCode(CodeBlockNode &node) override;
   virtual llvm::Value *GenerateCode(DeclarationStatementNode &node) override;

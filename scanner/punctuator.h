@@ -6,16 +6,16 @@
 enum class Punctuator {
   OPEN_BRACE,
   CLOSE_BRACE,
+  OPEN_BRACKET,
+  CLOSE_BRACKET,
   OPEN_PARENTHESIS,
   CLOSE_PARENTHESIS,
   SEPARATOR,
   TERMINATOR,
-  ASSIGN,
-  ADD_ASSIGN,
-  SUB_ASSIGN,
-  MUL_ASSIGN,
-  DIV_ASSIGN,
-  MOD_ASSIGN,
+  ARROW,
+  // Operators
+  ALLOC,
+  ARRAY_IDX,
   PLUS,
   MINUS,
   MUL,
@@ -30,7 +30,12 @@ enum class Punctuator {
   BOOL_AND,
   BOOL_OR,
   BOOL_NOT,
-  ARROW,
+  ASSIGN,
+  ADD_ASSIGN,
+  SUB_ASSIGN,
+  MUL_ASSIGN,
+  DIV_ASSIGN,
+  MOD_ASSIGN,
 };
 
 namespace punctuator_utils {

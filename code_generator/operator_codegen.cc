@@ -299,3 +299,13 @@ llvm::Value *operator_codegen::IntegerCmpLEQCodegen(llvm::LLVMContext *context,
   return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
                              "zexttmp");
 }
+
+/******************************************************************************
+ *                                   Arrays                                   *
+ ******************************************************************************/
+llvm::Value *operator_codegen::AllocCodegen(llvm::LLVMContext *context,
+                                            llvm::IRBuilder<> *builder,
+                                            llvm::Value *array_type,
+                                            llvm::Value *array_size) {
+  return nullptr;
+}

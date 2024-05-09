@@ -1,7 +1,14 @@
 #include "arbitrary_type.h"
 
+#include <semantic_analyzer/types/type.h>
+
+#include <memory>
+
 std::unique_ptr<Type> ArbitraryType::CreateEquivalentType() const {
-  return set_type->CreateEquivalentType();
+  if (set_type) {
+    return set_type->CreateEquivalentType();
+  }
+  return std::make_unique<ArbitraryType>();
 }
 
 bool ArbitraryType::IsEquivalentTo(Type *other_type) {

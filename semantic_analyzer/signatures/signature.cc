@@ -59,6 +59,10 @@ bool Signature::Accepts(const std::vector<Type *> &types) {
 }
 
 void Signature::ResetArbitraryTypes() {
+  // TODO: Implement a virtual `ResetArbitraryType` method for the Type class.
+  // Currently, there is a bug because the ArbitraryTypes don't get reset if
+  // they are array subtypes.
+
   // Reset any arbitrary types that are stored as input types.
   for (Type *type : input_types) {
     if (auto arbitrary_type = dynamic_cast<ArbitraryType *>(type)) {

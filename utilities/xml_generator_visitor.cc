@@ -1,5 +1,9 @@
 #include "xml_generator_visitor.h"
 
+#include <parse_node/parse_nodes/all_nodes.h>
+
+#include <memory>
+#include <ostream>
 #include <string>
 
 std::unique_ptr<XMLTag> XMLTag::CreateStartTag(std::string name) {
@@ -64,6 +68,21 @@ XMLGeneratorVisitor::XMLGeneratorVisitor(std::ostream &output_stream)
 /******************************************************************************
  *                               Non-leaf nodes                               *
  ******************************************************************************/
+void XMLGeneratorVisitor::VisitEnter(ArrayTypeNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("ArrayTypeNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(ArrayTypeNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("ArrayTypeNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
 void XMLGeneratorVisitor::VisitEnter(CallStatementNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("CallStatementNode");
 

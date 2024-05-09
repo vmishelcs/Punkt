@@ -1,3 +1,4 @@
+add_library(array_type_node array_type_node.cc)
 add_library(base_type_node base_type_node.cc)
 add_library(boolean_literal_node boolean_literal_node.cc)
 add_library(call_statement_node call_statement_node.cc)

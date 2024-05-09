@@ -13,6 +13,10 @@
 /******************************************************************************
  *                               Non-leaf nodes                               *
  ******************************************************************************/
+void SemanticAnalysisPreprocessor::VisitLeave(ArrayTypeNode &node) {
+  node.SetType(node.InferOwnType());
+}
+
 void SemanticAnalysisPreprocessor::VisitLeave(FunctionDefinitionNode &node) {
   auto lambda_node = node.GetLambdaNode();
   if (!lambda_node) {

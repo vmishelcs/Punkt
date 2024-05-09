@@ -3,14 +3,23 @@
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
+#include <token/keyword_token.h>
 #include <token/punctuator_token.h>
 
+#include <cassert>
 #include <memory>
 
 OperatorNode::OperatorNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::OPERATOR_NODE, std::move(token)) {
-  auto punctuator_token = static_cast<PunctuatorToken *>(this->token.get());
-  punctuator = punctuator_token->GetPunctuatorEnum();
+  if (auto punctuator_token =
+          dynamic_cast<PunctuatorToken *>(this->token.get())) {
+    punctuator = punctuator_token->GetPunctuatorEnum();
+  } else {
+    // TODO: Make this less awkward.
+    auto keyword_token = static_cast<KeywordToken *>(this->token.get());
+    assert(keyword_token->GetKeywordEnum() == Keyword::ALLOC);
+    punctuator = Punctuator::ALLOC;
+  }
 }
 
 std::unique_ptr<ParseNode> OperatorNode::CreateCopy() const {

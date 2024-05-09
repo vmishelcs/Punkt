@@ -98,11 +98,11 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
   std::string buffer;
   LocatedChar lc = first_char;
 
-  // TODO: Add better error checking here (e.g. check what happens when user
-  // inputs ">!" or "-+").
   switch (lc.character) {
     case '{':
     case '}':
+    case '[':
+    case ']':
     case '(':
     case ')':
     case ',':

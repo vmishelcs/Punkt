@@ -2,6 +2,7 @@
 #define ARBITRARY_TYPE_H_
 
 #include <memory>
+#include <string>
 
 #include "type.h"
 

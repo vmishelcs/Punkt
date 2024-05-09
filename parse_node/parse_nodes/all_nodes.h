@@ -1,6 +1,7 @@
 #ifndef ALL_NODES_H_
 #define ALL_NODES_H_
 
+#include "array_type_node.h"
 #include "base_type_node.h"
 #include "boolean_literal_node.h"
 #include "call_statement_node.h"

@@ -1,9 +1,10 @@
 #ifndef TYPE_H_
 #define TYPE_H_
 
+#include <memory>
 #include <string>
 
-enum class TypeEnum { BASE_TYPE, LAMBDA, ARBITRARY_TYPE };
+enum class TypeEnum { BASE_TYPE, ARRAY, LAMBDA, ARBITRARY_TYPE };
 
 class Type {
  public:

@@ -2,6 +2,7 @@
 
 #include <code_generator/operator_codegen.h>
 #include <semantic_analyzer/types/arbitrary_type.h>
+#include <semantic_analyzer/types/array_type.h>
 #include <semantic_analyzer/types/base_type.h>
 
 #include <map>
@@ -9,16 +10,25 @@
 
 #include "signature.h"
 
-// Types used by signatures.
+// Types used by signatures:
+// Arbitrary type T.
 static const auto kArbitraryTypeT = std::make_unique<ArbitraryType>();
-static const std::unique_ptr<BaseType> kBaseTypeNull =
+// Arbitrary type [T].
+static const std::unique_ptr<ArrayType> kArbitraryArrayTypeT =
+    ArrayType::CreateArrayType(kArbitraryTypeT.get());
+// Void type.
+static const std::unique_ptr<BaseType> kBaseTypeVoid =
     BaseType::CreateVoidType();
+// Boolean type.
 static const std::unique_ptr<BaseType> kBaseTypeBoolean =
     BaseType::CreateBooleanType();
+// Character type.
 static const std::unique_ptr<BaseType> kBaseTypeCharacter =
     BaseType::CreateCharacterType();
+// Integer type.
 static const std::unique_ptr<BaseType> kBaseTypeInteger =
     BaseType::CreateIntegerType();
+// String type.
 static const std::unique_ptr<BaseType> kBaseTypeString =
     BaseType::CreateStringType();
 
@@ -132,7 +142,11 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
     // ||
     {Punctuator::BOOL_OR,
      {Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
-                kBaseTypeBoolean.get(), operator_codegen::BooleanOrCodegen)}}};
+                kBaseTypeBoolean.get(), operator_codegen::BooleanOrCodegen)}},
+    // alloc
+    {Punctuator::ALLOC,
+     {Signature({kArbitraryArrayTypeT.get(), kBaseTypeInteger.get()},
+                kArbitraryArrayTypeT.get(), operator_codegen::AllocCodegen)}}};
 
 Signature *signatures::AcceptingSignature(Punctuator punctuator,
                                           const std::vector<Type *> &types) {

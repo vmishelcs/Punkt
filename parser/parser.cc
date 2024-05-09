@@ -844,7 +844,7 @@ bool Parser::StartsAtomicExpression(Token &token) {
   return StartsParenthesizedExpression(token) || StartsIdentifier(token) ||
          StartsBooleanLiteral(token) || StartsCharacterLiteral(token) ||
          StartsIntegerLiteral(token) || StartsStringLiteral(token) ||
-         StartsLambda(token);
+         StartsAllocExpression(token) || StartsLambda(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
   if (StartsParenthesizedExpression(*now_reading)) {
@@ -864,6 +864,9 @@ std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
   }
   if (StartsStringLiteral(*now_reading)) {
     return ParseStringLiteral();
+  }
+  if (StartsAllocExpression(*now_reading)) {
+    return ParseAllocExpression();
   }
   if (StartsLambdaLiteral(*now_reading)) {
     return ParseLambdaLiteral();
@@ -965,6 +968,36 @@ std::unique_ptr<ParseNode> Parser::ParseStringLiteral() {
   return string_literal;
 }
 
+bool Parser::StartsAllocExpression(Token &token) {
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::ALLOC});
+}
+std::unique_ptr<ParseNode> Parser::ParseAllocExpression() {
+  if (!StartsAllocExpression(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("alloc statement");
+  }
+
+  // TODO: Maybe make a separate `OperatorToken` instead of using
+  // `PunctuatorToken` for both operators and punctuators?
+  auto alloc_punc = std::make_unique<PunctuatorToken>(
+      "alloc", now_reading->GetLocation(), Punctuator::ALLOC);
+  auto alloc_expr = std::make_unique<OperatorNode>(std::move(alloc_punc));
+
+  // Discard 'alloc' token.
+  ReadToken();
+
+  // Parse array type.
+  std::unique_ptr<ParseNode> array_type = ParseArrayType();
+  alloc_expr->AppendChild(std::move(array_type));
+
+  // Parse array size.
+  Expect(Punctuator::OPEN_PARENTHESIS);
+  std::unique_ptr<ParseNode> expr = ParseExpression();
+  alloc_expr->AppendChild(std::move(expr));
+  Expect(Punctuator::CLOSE_PARENTHESIS);
+
+  return alloc_expr;
+}
+
 bool Parser::StartsLambdaLiteral(Token &token) { return StartsLambda(token); }
 std::unique_ptr<ParseNode> Parser::ParseLambdaLiteral() {
   if (!StartsLambdaLiteral(*now_reading)) {
@@ -981,11 +1014,15 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaLiteral() {
 }
 
 bool Parser::StartsType(Token &token) {
-  return StartsBaseType(token) || StartsLambdaType(token);
+  return StartsBaseType(token) || StartsArrayType(token) ||
+         StartsLambdaType(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseType() {
   if (StartsBaseType(*now_reading)) {
     return ParseBaseType();
+  }
+  if (StartsArrayType(*now_reading)) {
+    return ParseArrayType();
   }
   if (StartsLambdaType(*now_reading)) {
     return ParseLambdaType();
@@ -1006,6 +1043,30 @@ std::unique_ptr<ParseNode> Parser::ParseBaseType() {
   auto type_node = std::make_unique<BaseTypeNode>(std::move(now_reading));
   ReadToken();
   return type_node;
+}
+
+bool Parser::StartsArrayType(Token &token) {
+  return PunctuatorToken::IsTokenPunctuator(&token, {Punctuator::OPEN_BRACKET});
+}
+std::unique_ptr<ParseNode> Parser::ParseArrayType() {
+  if (!StartsArrayType(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("array type");
+  }
+
+  auto arr_type_node =
+      std::make_unique<ArrayTypeNode>(PlaceholderToken::Create(*now_reading));
+
+  // Discard '['.
+  ReadToken();
+
+  // Parse array subtype.
+  std::unique_ptr<ParseNode> subtype = ParseType();
+  arr_type_node->AppendChild(std::move(subtype));
+
+  // Expect closing ']'.
+  Expect(Punctuator::CLOSE_BRACKET);
+
+  return arr_type_node;
 }
 
 bool Parser::StartsLambdaType(Token &token) {

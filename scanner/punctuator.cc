@@ -8,16 +8,15 @@
 static std::map<std::string, Punctuator> dictionary = {
     {"{", Punctuator::OPEN_BRACE},
     {"}", Punctuator::CLOSE_BRACE},
+    {"[", Punctuator::OPEN_BRACKET},
+    {"]", Punctuator::CLOSE_BRACKET},
     {"(", Punctuator::OPEN_PARENTHESIS},
     {")", Punctuator::CLOSE_PARENTHESIS},
     {",", Punctuator::SEPARATOR},
     {".", Punctuator::TERMINATOR},
-    {"=", Punctuator::ASSIGN},
-    {"+=", Punctuator::ADD_ASSIGN},
-    {"-=", Punctuator::SUB_ASSIGN},
-    {"*=", Punctuator::MUL_ASSIGN},
-    {"/=", Punctuator::DIV_ASSIGN},
-    {"%=", Punctuator::MOD_ASSIGN},
+    {"->", Punctuator::ARROW},
+    // Operators
+    {"[]", Punctuator::ARRAY_IDX},
     {"+", Punctuator::PLUS},
     {"-", Punctuator::MINUS},
     {"*", Punctuator::MUL},
@@ -34,7 +33,12 @@ static std::map<std::string, Punctuator> dictionary = {
     {"&&", Punctuator::BOOL_AND},
     {"||", Punctuator::BOOL_OR},
     {"!", Punctuator::BOOL_NOT},
-    {"->", Punctuator::ARROW},
+    {"=", Punctuator::ASSIGN},
+    {"+=", Punctuator::ADD_ASSIGN},
+    {"-=", Punctuator::SUB_ASSIGN},
+    {"*=", Punctuator::MUL_ASSIGN},
+    {"/=", Punctuator::DIV_ASSIGN},
+    {"%=", Punctuator::MOD_ASSIGN},
 };
 
 static std::map<Punctuator, std::string> reverse_dictionary = []() {

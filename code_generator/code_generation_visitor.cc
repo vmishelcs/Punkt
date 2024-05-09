@@ -47,6 +47,11 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
 // TODO: If previous instruction is a block terminator, use LLVM's `unreachable`
 // instruction (need to research this).
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(ArrayTypeNode &node) {
+  // TODO
+  return nullptr;
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(CallStatementNode &node) {
   if (WasPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.

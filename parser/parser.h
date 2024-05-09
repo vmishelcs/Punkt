@@ -142,6 +142,9 @@ class Parser {
   bool StartsStringLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseStringLiteral();
 
+  bool StartsAllocExpression(Token &token);
+  std::unique_ptr<ParseNode> ParseAllocExpression();
+
   bool StartsLambdaLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseLambdaLiteral();
 
@@ -150,6 +153,9 @@ class Parser {
 
   bool StartsBaseType(Token &token);
   std::unique_ptr<ParseNode> ParseBaseType();
+
+  bool StartsArrayType(Token &token);
+  std::unique_ptr<ParseNode> ParseArrayType();
 
   bool StartsLambdaType(Token &token);
   std::unique_ptr<ParseNode> ParseLambdaType();
