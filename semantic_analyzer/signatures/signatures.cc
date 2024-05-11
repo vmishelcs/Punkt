@@ -37,7 +37,7 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
     // =
     {Operator::ASSIGN,
      {Signature({kArbitraryTypeT.get(), kArbitraryTypeT.get()},
-                kArbitraryTypeT.get(), operator_codegen::AssignmentCodegen)}},
+                kBaseTypeVoid.get(), operator_codegen::AssignmentCodegen)}},
     // +
     {Operator::PLUS,
      {Signature({kBaseTypeInteger.get()}, kBaseTypeInteger.get(),
@@ -147,7 +147,12 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
     // alloc
     {Operator::ALLOC,
      {Signature({kArbitraryArrayTypeT.get(), kBaseTypeInteger.get()},
-                kArbitraryArrayTypeT.get(), operator_codegen::AllocCodegen)}}};
+                kArbitraryArrayTypeT.get(), operator_codegen::AllocCodegen)}},
+    // []
+    {Operator::ARRAY_IDX,
+     {Signature({kArbitraryArrayTypeT.get(), kBaseTypeInteger.get()},
+                kArbitraryArrayTypeT->GetSubtype(),
+                operator_codegen::IndexingCodegen)}}};
 
 Signature *signatures::AcceptingSignature(Operator op,
                                           const std::vector<Type *> &types) {

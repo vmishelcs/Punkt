@@ -1,4 +1,4 @@
 main {
 	var arr = alloc [int] (5).
-	var arr2 = alloc [bool] (1).
+	arr[1 + 1] = 0.
 }

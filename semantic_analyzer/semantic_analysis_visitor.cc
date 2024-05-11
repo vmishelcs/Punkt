@@ -182,23 +182,30 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   // Assignment semantic analysis is performed here.
   if (OperatorToken::IsTokenOperator(node.GetToken(), {Operator::ASSIGN})) {
     // Make sure left-hand side is targettable.
-    if (!dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
+    if (auto id_node = dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
+      // Make sure variable is not `const`.
+      if (!id_node->GetSymbolTableEntry()->is_mutable) {
+        AssignmentToImmutableTargetError(*id_node);
+        node.SetType(BaseType::CreateErrorType());
+        return;
+      }
+    } else if (auto op_node = dynamic_cast<OperatorNode *>(node.GetChild(0))) {
+      // Make sure the operator is array indexing.
+      if (op_node->GetOperatorEnum() != Operator::ARRAY_IDX) {
+        NonTargettableExpressionError(node);
+        node.SetType(BaseType::CreateErrorType());
+        return;
+      }
+    } else {
+      // Any other operand is not targettable.
       NonTargettableExpressionError(node);
-      node.SetType(BaseType::CreateErrorType());
-      return;
-    }
-
-    // Make sure left-hand side is not a const variable.
-    auto id_node = static_cast<IdentifierNode *>(node.GetChild(0));
-    if (!id_node->GetSymbolTableEntry()->is_mutable) {
-      AssignmentToImmutableTargetError(*id_node);
       node.SetType(BaseType::CreateErrorType());
       return;
     }
   }
 
   auto operator_token = static_cast<OperatorToken *>(node.GetToken());
-  auto signature = signatures::AcceptingSignature(
+  Signature *signature = signatures::AcceptingSignature(
       operator_token->GetOperatorEnum(), child_types);
 
   if (signature) {

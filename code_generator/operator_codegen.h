@@ -93,8 +93,11 @@ llvm::Value *IntegerCmpLEQCodegen(llvm::LLVMContext *context,
 
 // ---- Arrays -----------------------------------------------------------------
 llvm::Value *AllocCodegen(llvm::LLVMContext *context,
-                          llvm::IRBuilder<> *builder, llvm::Value *array_type,
-                          llvm::Value *array_size);
+                          llvm::IRBuilder<> *builder, llvm::Value *elem_size,
+                          llvm::Value *arr_size);
+llvm::Value *IndexingCodegen(llvm::LLVMContext *context,
+                             llvm::IRBuilder<> *builder, llvm::Value *arr,
+                             llvm::Value *idx);
 
 };  // namespace operator_codegen
 

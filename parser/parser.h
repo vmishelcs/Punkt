@@ -128,8 +128,18 @@ class Parser {
   bool StartsParenthesizedExpression(Token &token);
   std::unique_ptr<ParseNode> ParseParenthesizedExpression();
 
+  bool StartsIdentifierAtomic(Token &token);
+  std::unique_ptr<ParseNode> ParseIdentifierAtomic();
+
   bool StartsIdentifier(Token &token);
   std::unique_ptr<ParseNode> ParseIdentifier();
+
+  bool StartsLambdaInvocation(Token &token);
+  std::unique_ptr<ParseNode> ParseLambdaInvocation(
+      std::unique_ptr<ParseNode> lambda);
+
+  bool StartsArrayIndexing(Token &token);
+  std::unique_ptr<ParseNode> ParseArrayIndexing(std::unique_ptr<ParseNode> arr);
 
   bool StartsBooleanLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseBooleanLiteral();
@@ -160,10 +170,6 @@ class Parser {
 
   bool StartsLambdaType(Token &token);
   std::unique_ptr<ParseNode> ParseLambdaType();
-
-  bool StartsLambdaInvocation(Token &token);
-  std::unique_ptr<ParseNode> ParseLambdaInvocation(
-      std::unique_ptr<ParseNode> lambda);
 
   std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
   std::unique_ptr<ParseNode> GetSyntaxErrorNode();

@@ -1,5 +1,6 @@
 #include "code_generation_visitor.h"
 
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/GlobalValue.h>
 #include <llvm/IR/Instruction.h>
@@ -17,12 +18,23 @@
 #include <string>
 #include <variant>
 
+// Array helper constants
+static const std::string kPunktArrayStructName = "PunktArray_struct";
+static const std::string kAllocPunktArrayFunctionName = "alloc_PunktArray";
+static const std::string kDeallocPunktArrayFunctionName = "dealloc_PunktArray";
+
+// Function names
 static const std::string kMainFunctionName = "main";
 static const std::string kPrintfFunctionName = "printf";
+static const std::string kMallocFunctionName = "malloc";
+static const std::string kFreeFunctionName = "free";
+static const std::string kMemsetFunctionName = "memset";
+
+// Internal constants
 static const std::string kCharFmtString = "%c";
 static const std::string kIntFmtString = "%d";
 static const std::string kStrFmtString = "%s";
-static const char kLineFeedChar = 10;
+static const char kLineFeedChar = '\n';
 
 using code_gen_func_type_1_operand =
     llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *,
@@ -536,7 +548,16 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
-  GeneratePrintfDeclaration();
+  GeneratePunktArrayType();
+
+  GenerateMallocFunctionDeclaration();
+  GenerateFreeFunctionDeclaration();
+  GenerateMemsetFunctionDeclaration();
+
+  GenerateAllocPunktArrayFunction();
+  GenerateDeallocPunktArrayFunction();
+
+  GeneratePrintfFunctionDeclaration();
 
   GenerateGlobalConstants();
 
@@ -714,10 +735,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
 /******************************************************************************
  *                              Printing helpers                              *
  ******************************************************************************/
-void CodeGenerationVisitor::GeneratePrintfDeclaration() {
+void CodeGenerationVisitor::GeneratePrintfFunctionDeclaration() {
   // Create a vector for parameters
-  std::vector<llvm::Type *> parameters(1,
-                                       llvm::PointerType::getUnqual(*context));
+  std::vector<llvm::Type *> parameters = {
+      llvm::PointerType::getUnqual(*context)};
   // Create a function type returning a 32-bit int, taking 1 parameter and a
   // variable number of arguments
   llvm::FunctionType *printf_func_type = llvm::FunctionType::get(
@@ -860,6 +881,173 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
 /******************************************************************************
  *                           Miscellaneous helpers                            *
  ******************************************************************************/
+void CodeGenerationVisitor::GenerateMallocFunctionDeclaration() {
+  std::vector<llvm::Type *> parameters = {llvm::Type::getInt64Ty(*context)};
+  // Create a function type returning a pointer type, taking an integer
+  // argument.
+  llvm::FunctionType *malloc_func_type = llvm::FunctionType::get(
+      llvm::PointerType::getUnqual(*context), parameters, /* IsVarArg=*/false);
+
+  // Create the function declaration
+  llvm::Function *malloc_func =
+      llvm::Function::Create(malloc_func_type, llvm::Function::ExternalLinkage,
+                             kMallocFunctionName, *module);
+  if (!malloc_func) {
+    CodeGenerationInternalError("could not generate declaration for malloc");
+  }
+}
+
+void CodeGenerationVisitor::GenerateFreeFunctionDeclaration() {
+  std::vector<llvm::Type *> parameters = {
+      llvm::PointerType::getUnqual(*context)};
+  // Create a void function taking a pointer argument.
+  llvm::FunctionType *free_func_type = llvm::FunctionType::get(
+      llvm::Type::getVoidTy(*context), parameters, /* IsVarArg=*/false);
+
+  // Create the function declaration
+  llvm::Function *free_func =
+      llvm::Function::Create(free_func_type, llvm::Function::ExternalLinkage,
+                             kFreeFunctionName, *module);
+  if (!free_func) {
+    CodeGenerationInternalError("could not generate declaration for free");
+  }
+}
+
+void CodeGenerationVisitor::GenerateMemsetFunctionDeclaration() {
+  std::vector<llvm::Type *> parameters = {
+      llvm::PointerType::getUnqual(*context), llvm::Type::getInt8Ty(*context),
+      llvm::Type::getInt32Ty(*context)};
+  // Create a void function taking a pointer argument.
+  llvm::FunctionType *memset_func_type = llvm::FunctionType::get(
+      llvm::Type::getVoidTy(*context), parameters, /* IsVarArg=*/false);
+
+  // Create the function declaration
+  llvm::Function *memset_func =
+      llvm::Function::Create(memset_func_type, llvm::Function::ExternalLinkage,
+                             kMemsetFunctionName, *module);
+  if (!memset_func) {
+    CodeGenerationInternalError("could not generate declaration for memset");
+  }
+}
+
+void CodeGenerationVisitor::GeneratePunktArrayType() {
+  // Initialize PunktArray struct type for storing arrays.
+  llvm::StructType *punkt_array_type =
+      llvm::StructType::create(*context, kPunktArrayStructName);
+  std::vector<llvm::Type *> struct_fields = {
+      llvm::Type::getInt32Ty(*context) /* array size */,
+      llvm::PointerType::getUnqual(*context) /* array data */};
+  punkt_array_type->setBody(struct_fields);
+}
+
+void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
+  // Create a function that returns a pointer and takes 2 integer arguments.
+  std::vector<llvm::Type *> parameters = {llvm::Type::getInt32Ty(*context),
+                                          llvm::Type::getInt32Ty(*context)};
+  llvm::FunctionType *f_type = llvm::FunctionType::get(
+      llvm::PointerType::getUnqual(*context), parameters, /*isVarArg=*/false);
+  auto alloc_PunktArray_function =
+      llvm::Function::Create(f_type, llvm::Function::InternalLinkage,
+                             kAllocPunktArrayFunctionName, *module);
+
+  // Set argument names.
+  alloc_PunktArray_function->arg_begin()->setName("elem_size");
+  (alloc_PunktArray_function->arg_begin() + 1)->setName("arr_size");
+
+  // Get a reference to the `malloc` and `memset` functions.
+  llvm::Function *malloc_func = module->getFunction(kMallocFunctionName);
+  llvm::Function *memset_func = module->getFunction(kMemsetFunctionName);
+
+  llvm::BasicBlock *entry_block =
+      llvm::BasicBlock::Create(*context, "entry", alloc_PunktArray_function);
+  builder->SetInsertPoint(entry_block);
+
+  // Allocate memory for the PunktArray data type.
+  llvm::Value *PunktArray_ptr = builder->CreateCall(
+      malloc_func,
+      {llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 16)},
+      "PunktArray");
+
+  // Store array size in the size field.
+  builder->CreateStore(alloc_PunktArray_function->getArg(1), PunktArray_ptr);
+
+  // Calculate the number of bytes required for the data field.
+  llvm::Value *data_size_in_bytes_32 = builder->CreateMul(
+      alloc_PunktArray_function->getArg(0),
+      alloc_PunktArray_function->getArg(1), "data_size_in_bytes_32");
+
+  // Sign-extend to match malloc function signature.
+  llvm::Value *data_size_in_bytes_64 = builder->CreateSExt(
+      data_size_in_bytes_32, llvm::Type::getInt64Ty(*context),
+      "data_size_in_bytes_64");
+
+  // Allocate memory for the array.
+  llvm::Value *data_memory_block = builder->CreateCall(
+      malloc_func, {data_size_in_bytes_64}, "data_memory_block");
+
+  // Initialize all memory within the data block to 0.
+  builder->CreateCall(
+      memset_func, {data_memory_block,
+                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0),
+                    data_size_in_bytes_32});
+
+  auto PunktArray_struct =
+      llvm::StructType::getTypeByName(*context, kPunktArrayStructName);
+
+  // Get the pointer to the data field of the PunktArray object.
+  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
+      PunktArray_struct, PunktArray_ptr,
+      {llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0),
+       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 1)},
+      "PunktArray_data_ptr");
+
+  // Store the data memory block in the PunktArray object.
+  builder->CreateStore(data_memory_block, PunktArray_data_ptr);
+
+  builder->CreateRet(PunktArray_ptr);
+}
+
+void CodeGenerationVisitor::GenerateDeallocPunktArrayFunction() {
+  // Create a void function that takes a pointer argument.
+  std::vector<llvm::Type *> parameters = {
+      llvm::PointerType::getUnqual(*context)};
+  llvm::FunctionType *f_type = llvm::FunctionType::get(
+      llvm::Type::getVoidTy(*context), parameters, /*isVarArg=*/false);
+  auto dealloc_PunktArray_function =
+      llvm::Function::Create(f_type, llvm::Function::InternalLinkage,
+                             kDeallocPunktArrayFunctionName, *module);
+
+  // Set argument array.
+  dealloc_PunktArray_function->arg_begin()->setName("arr");
+
+  // Get a reference to the `free` function.
+  llvm::Function *free_func = module->getFunction(kFreeFunctionName);
+
+  llvm::BasicBlock *entry_block =
+      llvm::BasicBlock::Create(*context, "entry", dealloc_PunktArray_function);
+  builder->SetInsertPoint(entry_block);
+
+  auto PunktArray_struct =
+      llvm::StructType::getTypeByName(*context, kPunktArrayStructName);
+  llvm::Value *PunktArray_ptr = dealloc_PunktArray_function->getArg(0);
+
+  // First, free PunktArray data field.
+  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
+      PunktArray_struct, PunktArray_ptr,
+      {llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0),
+       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 1)},
+      "PunktArray_data_ptr");
+  llvm::Value *PunktArray_data =
+      builder->CreateLoad(llvm::PointerType::getUnqual(*context),
+                          PunktArray_data_ptr, "PunktArray_data");
+  builder->CreateCall(free_func, {PunktArray_data});
+
+  // Now free PunktArray object pointer.
+  builder->CreateCall(free_func, {PunktArray_ptr});
+
+  builder->CreateRetVoid();
+}
+
 void CodeGenerationVisitor::GenerateGlobalConstants() {
   GeneratePrintfFmtStringsForBaseTypes();
 }

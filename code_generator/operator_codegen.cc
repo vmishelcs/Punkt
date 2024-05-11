@@ -305,7 +305,14 @@ llvm::Value *operator_codegen::IntegerCmpLEQCodegen(llvm::LLVMContext *context,
  ******************************************************************************/
 llvm::Value *operator_codegen::AllocCodegen(llvm::LLVMContext *context,
                                             llvm::IRBuilder<> *builder,
-                                            llvm::Value *array_type,
-                                            llvm::Value *array_size) {
+                                            llvm::Value *elem_size,
+                                            llvm::Value *arr_size) {
+  return nullptr;
+}
+
+llvm::Value *operator_codegen::IndexingCodegen(llvm::LLVMContext *context,
+                                               llvm::IRBuilder<> *builder,
+                                               llvm::Value *arr,
+                                               llvm::Value *idx) {
   return nullptr;
 }

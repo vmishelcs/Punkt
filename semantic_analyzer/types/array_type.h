@@ -11,6 +11,8 @@ class ArrayType : public Type {
   /// @return A `unique_ptr` holding the array type object.
   static std::unique_ptr<ArrayType> CreateArrayType(Type *subtype);
 
+  Type *GetSubtype() const { return subtype.get(); }
+
   virtual std::unique_ptr<Type> CreateEquivalentType() const override;
 
   virtual bool IsEquivalentTo(Type *other_type) override;

@@ -1,6 +1,7 @@
 #ifndef CODE_GENERATION_VISITOR_H_
 #define CODE_GENERATION_VISITOR_H_
 
+#include <llvm/IR/Function.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Instruction.h>
 #include <llvm/IR/Instructions.h>
@@ -63,7 +64,33 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
                                            const std::string &identifier_name,
                                            llvm::Type *llvm_type);
 
-  void GeneratePrintfDeclaration();
+  /// @brief Generate LLVM IR for the `malloc(int)` C standard library function
+  /// declaration.
+  void GenerateMallocFunctionDeclaration();
+  /// @brief Generate LLVM IR for the `free(void *)` C standard library function
+  /// declaration.
+  void GenerateFreeFunctionDeclaration();
+  /// @brief Generate LLVM IR for the `memset(void *, char, int)` C standard
+  /// library function declaration.
+  void GenerateMemsetFunctionDeclaration();
+  /// @brief Generate LLVM for the `printf(const char *)` C standard library
+  /// function delcaration.
+  void GeneratePrintfFunctionDeclaration();
+
+  /// @brief Generate LLVM IR for the `PunktArray` struct. This struct is
+  /// equivalent to the following C definition:
+  ///
+  /// `
+  /// typedef struct {
+  ///   int size;
+  ///   void *data;
+  /// } PunktArray;
+  /// `
+  void GeneratePunktArrayType();
+
+  void GenerateAllocPunktArrayFunction();
+  void GenerateDeallocPunktArrayFunction();
+
   void GeneratePrintfFmtStringsForBaseTypes();
   llvm::Value *GenerateFmtStringForBaseType(BaseTypeEnum base_type_enum,
                                             std::string fmt_str);
