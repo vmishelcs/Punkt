@@ -6,6 +6,7 @@
 #include <semantic_analyzer/signatures/signatures.h>
 #include <symbol_table/scope.h>
 #include <token/keyword_token.h>
+#include <token/operator_token.h>
 
 #include "types/base_type.h"
 #include "types/lambda_type.h"
@@ -179,8 +180,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   }
 
   // Assignment semantic analysis is performed here.
-  if (PunctuatorToken::IsTokenPunctuator(node.GetToken(),
-                                         {Punctuator::ASSIGN})) {
+  if (OperatorToken::IsTokenOperator(node.GetToken(), {Operator::ASSIGN})) {
     // Make sure left-hand side is targettable.
     if (!dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
       NonTargettableExpressionError(node);
@@ -197,9 +197,9 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
     }
   }
 
-  auto punctuator_token = static_cast<PunctuatorToken *>(node.GetToken());
+  auto operator_token = static_cast<OperatorToken *>(node.GetToken());
   auto signature = signatures::AcceptingSignature(
-      punctuator_token->GetPunctuatorEnum(), child_types);
+      operator_token->GetOperatorEnum(), child_types);
 
   if (signature) {
     node.SetType(signature->GetOutputType()->CreateEquivalentType());

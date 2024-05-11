@@ -19,6 +19,9 @@ class ArrayType : public Type {
 
   virtual bool IsErrorType() const override { return false; }
 
+  /// @brief Resets the underlying subtype if it is arbitrary.
+  virtual void ResetArbitraryTypes() override;
+
   ArrayType(Type *subtype);
 
  private:

@@ -5,8 +5,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
-#include <scanner/punctuator.h>
-#include <token/punctuator_token.h>
+#include <scanner/operator.h>
 
 #include <memory>
 #include <string>
@@ -25,7 +24,7 @@ class OperatorNode : public ParseNode {
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
-  Punctuator GetPunctuatorEnum() const { return punctuator; }
+  Operator GetOperatorEnum() const { return op; }
 
   void SetCodeGenFunc(code_gen_function_variant f) { this->f = f; }
   code_gen_function_variant GetCodeGenFunc() const { return f; }
@@ -37,7 +36,7 @@ class OperatorNode : public ParseNode {
   virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 
  private:
-  Punctuator punctuator;
+  Operator op;
   code_gen_function_variant f;
 };
 

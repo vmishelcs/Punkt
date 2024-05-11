@@ -28,6 +28,13 @@ class Type {
 
   virtual bool IsErrorType() const = 0;
 
+  /// @brief Resets any arbitrary types that make up this type. If this method
+  /// is called on an ArbitraryType object, the ArbitraryType is reset. If this
+  /// method is called on an ArrayType object that holds an ArbitraryType, the
+  /// underlying ArbitraryType is reset. If this method is called on a BaseType,
+  /// nothing happens.
+  virtual void ResetArbitraryTypes() = 0;
+
  protected:
   Type(TypeEnum type_enum) : type_enum(type_enum) {}
 

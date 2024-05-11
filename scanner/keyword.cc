@@ -37,6 +37,6 @@ Keyword keyword_utils::GetKeywordEnum(const std::string &lexeme) {
   return dictionary[lexeme];
 }
 
-std::string keyword_utils::GetKeywordLexeme(Keyword keyword) {
+const std::string &keyword_utils::GetKeywordLexeme(Keyword keyword) {
   return reverse_dictionary[keyword];
 }

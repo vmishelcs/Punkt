@@ -54,23 +54,21 @@ void Parser::Expect(Keyword keyword) {
   ReadToken();
 }
 
-void Parser::Expect(Punctuator punctuator) {
-  if (now_reading->GetTokenType() != TokenType::PUNCTUATOR) {
-    SyntaxErrorUnexpectedToken(
-        "\'" + punctuator_utils::GetPunctuatorLexeme(punctuator) + "\'");
-    ReadToken();
-    return;
+void Parser::Expect(Operator op) {
+  auto op_token = dynamic_cast<OperatorToken *>(now_reading.get());
+  if (!op_token || op_token->GetOperatorEnum() != op) {
+    SyntaxErrorUnexpectedToken("\'" + operator_utils::GetOperatorLexeme(op) +
+                               "\'");
   }
+  ReadToken();
+}
 
-  PunctuatorToken &punctuator_token =
-      dynamic_cast<PunctuatorToken &>(*now_reading);
-  if (punctuator_token.GetPunctuatorEnum() != punctuator) {
+void Parser::Expect(Punctuator punc) {
+  auto punc_token = dynamic_cast<PunctuatorToken *>(now_reading.get());
+  if (!punc_token || punc_token->GetPunctuatorEnum() != punc) {
     SyntaxErrorUnexpectedToken(
-        "\'" + punctuator_utils::GetPunctuatorLexeme(punctuator) + "\'");
-    ReadToken();
-    return;
+        "\'" + punctuator_utils::GetPunctuatorLexeme(punc) + "\'");
   }
-
   ReadToken();
 }
 
@@ -127,7 +125,7 @@ std::unique_ptr<ParseNode> Parser::ParseFunctionDefinition() {
 }
 
 bool Parser::StartsLambda(Token &token) {
-  return PunctuatorToken::IsTokenPunctuator(&token, {Punctuator::CMP_LT});
+  return OperatorToken::IsTokenOperator(&token, {Operator::CMP_LT});
 }
 std::unique_ptr<ParseNode> Parser::ParseLambda() {
   if (!StartsLambda(*now_reading)) {
@@ -173,7 +171,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambda() {
   }
 
   // Expect closing '>'.
-  Expect(Punctuator::CMP_GT);
+  Expect(Operator::CMP_GT);
 
   // Expect '->' before return type.
   Expect(Punctuator::ARROW);
@@ -284,7 +282,7 @@ std::unique_ptr<ParseNode> Parser::ParseDeclaration(bool expect_terminator) {
 
   std::unique_ptr<ParseNode> identifier = ParseIdentifier();
 
-  Expect(Punctuator::ASSIGN);
+  Expect(Operator::ASSIGN);
 
   std::unique_ptr<ParseNode> initializer = ParseExpression();
 
@@ -570,8 +568,7 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
   std::unique_ptr<ParseNode> target = ParseBooleanORExpression();
 
   // Parsing regular assignment (=).
-  if (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                         {Punctuator::ASSIGN})) {
+  if (OperatorToken::IsTokenOperator(now_reading.get(), {Operator::ASSIGN})) {
     auto assign_op = std::make_unique<OperatorNode>(std::move(now_reading));
     ReadToken();
     std::unique_ptr<ParseNode> new_value = ParseBooleanORExpression();
@@ -582,38 +579,38 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
   }
 
   // Parsing combined assignment (+=, -=, etc).
-  if (PunctuatorToken::IsTokenPunctuator(
-          now_reading.get(), {Punctuator::ADD_ASSIGN, Punctuator::SUB_ASSIGN,
-                              Punctuator::MUL_ASSIGN, Punctuator::DIV_ASSIGN,
-                              Punctuator::MOD_ASSIGN})) {
+  if (OperatorToken::IsTokenOperator(
+          now_reading.get(),
+          {Operator::ADD_ASSIGN, Operator::SUB_ASSIGN, Operator::MUL_ASSIGN,
+           Operator::DIV_ASSIGN, Operator::MOD_ASSIGN})) {
     // Create '=' token.
-    auto assign_token = std::make_unique<PunctuatorToken>(
-        "=", now_reading->GetLocation(), Punctuator::ASSIGN);
+    auto assign_token = std::make_unique<OperatorToken>(
+        "=", now_reading->GetLocation(), Operator::ASSIGN);
 
     // Create the operator token.
-    std::unique_ptr<PunctuatorToken> op_token = nullptr;
-    PunctuatorToken *now_reading_punctuator =
-        static_cast<PunctuatorToken *>(now_reading.get());
-    switch (now_reading_punctuator->GetPunctuatorEnum()) {
-      case Punctuator::ADD_ASSIGN:
-        op_token = std::make_unique<PunctuatorToken>(
-            "+", now_reading->GetLocation(), Punctuator::PLUS);
+    std::unique_ptr<OperatorToken> op_token = nullptr;
+    OperatorToken *now_reading_operator =
+        static_cast<OperatorToken *>(now_reading.get());
+    switch (now_reading_operator->GetOperatorEnum()) {
+      case Operator::ADD_ASSIGN:
+        op_token = std::make_unique<OperatorToken>(
+            "+", now_reading->GetLocation(), Operator::PLUS);
         break;
-      case Punctuator::SUB_ASSIGN:
-        op_token = std::make_unique<PunctuatorToken>(
-            "-", now_reading->GetLocation(), Punctuator::MINUS);
+      case Operator::SUB_ASSIGN:
+        op_token = std::make_unique<OperatorToken>(
+            "-", now_reading->GetLocation(), Operator::MINUS);
         break;
-      case Punctuator::MUL_ASSIGN:
-        op_token = std::make_unique<PunctuatorToken>(
-            "*", now_reading->GetLocation(), Punctuator::MUL);
+      case Operator::MUL_ASSIGN:
+        op_token = std::make_unique<OperatorToken>(
+            "*", now_reading->GetLocation(), Operator::MUL);
         break;
-      case Punctuator::DIV_ASSIGN:
-        op_token = std::make_unique<PunctuatorToken>(
-            "/", now_reading->GetLocation(), Punctuator::DIV);
+      case Operator::DIV_ASSIGN:
+        op_token = std::make_unique<OperatorToken>(
+            "/", now_reading->GetLocation(), Operator::DIV);
         break;
-      case Punctuator::MOD_ASSIGN:
-        op_token = std::make_unique<PunctuatorToken>(
-            "%", now_reading->GetLocation(), Punctuator::MOD);
+      case Operator::MOD_ASSIGN:
+        op_token = std::make_unique<OperatorToken>(
+            "%", now_reading->GetLocation(), Operator::MOD);
         break;
       default:
         PunktLogger::LogFatalInternalError("unexpected assignment operator");
@@ -638,7 +635,6 @@ std::unique_ptr<ParseNode> Parser::ParseAssignmentExpression() {
     std::unique_ptr<ParseNode> rhs = ParseBooleanORExpression();
     // Append the right-hand side operand.
     op_node->AppendChild(std::move(rhs));
-
     // Append operator to assignment.
     assign_op->AppendChild(std::move(op_node));
 
@@ -658,8 +654,8 @@ std::unique_ptr<ParseNode> Parser::ParseBooleanORExpression() {
 
   std::unique_ptr<ParseNode> lhs = ParseBooleanANDExpression();
 
-  while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                            {Punctuator::BOOL_OR})) {
+  while (
+      OperatorToken::IsTokenOperator(now_reading.get(), {Operator::BOOL_OR})) {
     auto bool_or_op = std::make_unique<OperatorNode>(std::move(now_reading));
 
     // Discard '||'.
@@ -685,8 +681,8 @@ std::unique_ptr<ParseNode> Parser::ParseBooleanANDExpression() {
 
   std::unique_ptr<ParseNode> lhs = ParseEqualityExpression();
 
-  while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
-                                            {Punctuator::BOOL_AND})) {
+  while (
+      OperatorToken::IsTokenOperator(now_reading.get(), {Operator::BOOL_AND})) {
     auto bool_and_op = std::make_unique<OperatorNode>(std::move(now_reading));
 
     // Discard '&&'.
@@ -712,8 +708,8 @@ std::unique_ptr<ParseNode> Parser::ParseEqualityExpression() {
 
   std::unique_ptr<ParseNode> lhs = ParseComparisonExpression();
 
-  while (PunctuatorToken::IsTokenPunctuator(
-      now_reading.get(), {Punctuator::CMP_EQ, Punctuator::CMP_NEQ})) {
+  while (OperatorToken::IsTokenOperator(
+      now_reading.get(), {Operator::CMP_EQ, Operator::CMP_NEQ})) {
     auto equality_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -739,9 +735,9 @@ std::unique_ptr<ParseNode> Parser::ParseComparisonExpression() {
 
   std::unique_ptr<ParseNode> lhs = ParseAdditiveExpression();
 
-  while (PunctuatorToken::IsTokenPunctuator(
-      &(*now_reading), {Punctuator::CMP_GT, Punctuator::CMP_LT,
-                        Punctuator::CMP_GEQ, Punctuator::CMP_LEQ})) {
+  while (OperatorToken::IsTokenOperator(
+      now_reading.get(), {Operator::CMP_GT, Operator::CMP_LT, Operator::CMP_GEQ,
+                          Operator::CMP_LEQ})) {
     auto comparison_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -767,8 +763,8 @@ std::unique_ptr<ParseNode> Parser::ParseAdditiveExpression() {
 
   std::unique_ptr<ParseNode> left = ParseMultiplicativeExpression();
 
-  while (PunctuatorToken::IsTokenPunctuator(
-      now_reading.get(), {Punctuator::PLUS, Punctuator::MINUS})) {
+  while (OperatorToken::IsTokenOperator(now_reading.get(),
+                                        {Operator::PLUS, Operator::MINUS})) {
     auto additive_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -794,11 +790,12 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
 
   std::unique_ptr<ParseNode> left = ParseUnaryExpression();
 
-  while (PunctuatorToken::IsTokenPunctuator(
-      now_reading.get(), {Punctuator::MUL, Punctuator::DIV, Punctuator::MOD})) {
+  while (OperatorToken::IsTokenOperator(
+      now_reading.get(), {Operator::MUL, Operator::DIV, Operator::MOD})) {
     auto multiplicative_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
+    // Discard operator token.
     ReadToken();
 
     std::unique_ptr<ParseNode> right = ParseUnaryExpression();
@@ -812,9 +809,8 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
 }
 
 bool Parser::StartsUnaryExpression(Token &token) {
-  return PunctuatorToken::IsTokenPunctuator(
-             &token,
-             {Punctuator::BOOL_NOT, Punctuator::PLUS, Punctuator::MINUS}) ||
+  return OperatorToken::IsTokenOperator(
+             &token, {Operator::BOOL_NOT, Operator::PLUS, Operator::MINUS}) ||
          StartsAtomicExpression(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
@@ -822,12 +818,13 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
     return SyntaxErrorUnexpectedToken("unary expression");
   }
 
-  if (PunctuatorToken::IsTokenPunctuator(
+  if (OperatorToken::IsTokenOperator(
           now_reading.get(),
-          {Punctuator::BOOL_NOT, Punctuator::PLUS, Punctuator::MINUS})) {
+          {Operator::BOOL_NOT, Operator::PLUS, Operator::MINUS})) {
     auto unary_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
+    // Discard operator token.
     ReadToken();
 
     std::unique_ptr<ParseNode> operand = ParseUnaryExpression();
@@ -969,18 +966,14 @@ std::unique_ptr<ParseNode> Parser::ParseStringLiteral() {
 }
 
 bool Parser::StartsAllocExpression(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {Keyword::ALLOC});
+  return OperatorToken::IsTokenOperator(&token, {Operator::ALLOC});
 }
 std::unique_ptr<ParseNode> Parser::ParseAllocExpression() {
   if (!StartsAllocExpression(*now_reading)) {
     return SyntaxErrorUnexpectedToken("alloc statement");
   }
 
-  // TODO: Maybe make a separate `OperatorToken` instead of using
-  // `PunctuatorToken` for both operators and punctuators?
-  auto alloc_punc = std::make_unique<PunctuatorToken>(
-      "alloc", now_reading->GetLocation(), Punctuator::ALLOC);
-  auto alloc_expr = std::make_unique<OperatorNode>(std::move(alloc_punc));
+  auto alloc_expr = std::make_unique<OperatorNode>(std::move(now_reading));
 
   // Discard 'alloc' token.
   ReadToken();
@@ -1070,7 +1063,7 @@ std::unique_ptr<ParseNode> Parser::ParseArrayType() {
 }
 
 bool Parser::StartsLambdaType(Token &token) {
-  return PunctuatorToken::IsTokenPunctuator(&token, {Punctuator::CMP_LT});
+  return OperatorToken::IsTokenOperator(&token, {Operator::CMP_LT});
 }
 std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
   if (!StartsLambdaType(*now_reading)) {
@@ -1095,7 +1088,7 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
   }
 
   // Expect closing '>'.
-  Expect(Punctuator::CMP_GT);
+  Expect(Operator::CMP_GT);
 
   // Expect '->' before return type.
   Expect(Punctuator::ARROW);

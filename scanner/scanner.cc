@@ -26,11 +26,11 @@ std::unique_ptr<Token> Scanner::GetNextToken() {
   LocatedChar ch = this->input_stream->NextNonwhitespaceChar();
 
   if (ch.IsIdentifierStart()) {
-    return ScanIdentifier(ch);
+    return ScanKeywordOrIdentifier(ch);
   } else if (ch.IsNumberStart()) {
     return ScanNumber(ch);
-  } else if (ch.IsPunctuatorStart()) {
-    return ScanPunctuator(ch);
+  } else if (ch.IsOperatorOrPunctuatorStart()) {
+    return ScanOperatorOrPunctuator(ch);
   } else if (ch.IsCharacterStart()) {
     return ScanCharacter(ch);
   } else if (ch.IsStringStart()) {
@@ -53,7 +53,8 @@ bool Scanner::IsEndOfInput(LocatedChar ch) {
   return ch == LocatedChar::EOF_LOCATED_CHAR;
 }
 
-std::unique_ptr<Token> Scanner::ScanIdentifier(LocatedChar first_char) {
+std::unique_ptr<Token> Scanner::ScanKeywordOrIdentifier(
+    LocatedChar first_char) {
   std::string buffer;
   buffer.push_back(first_char.character);
   LocatedChar ch = input_stream->Peek();
@@ -68,6 +69,10 @@ std::unique_ptr<Token> Scanner::ScanIdentifier(LocatedChar first_char) {
     if (keyword == Keyword::TRUE || keyword == Keyword::FALSE) {
       return std::make_unique<BooleanLiteralToken>(buffer, first_char.location,
                                                    keyword == Keyword::TRUE);
+    }
+    if (keyword == Keyword::ALLOC) {
+      return std::make_unique<OperatorToken>(buffer, first_char.location,
+                                             Operator::ALLOC);
     }
     return std::make_unique<KeywordToken>(buffer, first_char.location, keyword);
   }
@@ -94,7 +99,8 @@ std::unique_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
                                                value);
 }
 
-std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
+std::unique_ptr<Token> Scanner::ScanOperatorOrPunctuator(
+    LocatedChar first_char) {
   std::string buffer;
   LocatedChar lc = first_char;
 
@@ -172,12 +178,24 @@ std::unique_ptr<Token> Scanner::ScanPunctuator(LocatedChar first_char) {
       break;
 
     default:
-      PunktLogger::LogFatalInternalError("unexpected punctuator character");
+      PunktLogger::LogFatalInternalError(
+          "unexpected character encountered when scanning operator/punctuator");
   }
 
-  Punctuator punctuator_enum = punctuator_utils::GetPunctuatorEnum(buffer);
-  return std::make_unique<PunctuatorToken>(buffer, first_char.location,
-                                           punctuator_enum);
+  if (operator_utils::IsOperator(buffer)) {
+    Operator operator_enum = operator_utils::GetOperatorEnum(buffer);
+    return std::make_unique<OperatorToken>(buffer, first_char.location,
+                                           operator_enum);
+  }
+
+  if (punctuator_utils::IsPunctuator(buffer)) {
+    Punctuator punctuator_enum = punctuator_utils::GetPunctuatorEnum(buffer);
+    return std::make_unique<PunctuatorToken>(buffer, first_char.location,
+                                             punctuator_enum);
+  }
+
+  PunktLogger::LogFatalInternalError("unrecognizable operator/punctuator");
+  return GetNextToken();
 }
 
 std::unique_ptr<Token> Scanner::ScanCharacter(LocatedChar first_char) {
@@ -307,7 +325,6 @@ void Scanner::LexicalErrorIdentifierTooLong(std::string id_name) {
                         std::to_string(kMaxIdentifierLength) + " characters.";
   PunktLogger::Log(LogType::SCANNER, message);
 }
-
 void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {
   std::string message = "Unexpected character \'";
   message.push_back(ch.character);

@@ -21,3 +21,5 @@ bool ArbitraryType::IsEquivalentTo(Type *other_type) {
   // Otherwise make sure the set type is equivalent.
   return set_type->IsEquivalentTo(other_type);
 }
+
+void ArbitraryType::ResetArbitraryTypes() { ResetSetType(); }

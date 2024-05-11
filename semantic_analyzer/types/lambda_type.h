@@ -54,6 +54,9 @@ class LambdaType : public Type {
 
   virtual bool IsErrorType() const override { return false; }
 
+  /// @brief Resets any arbitrary parameter types, or arbitrary return type.
+  virtual void ResetArbitraryTypes() override;
+
   LambdaType(std::vector<Type *> parameter_types, Type *return_type);
 
  private:

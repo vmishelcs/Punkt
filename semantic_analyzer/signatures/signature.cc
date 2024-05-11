@@ -2,6 +2,7 @@
 
 #include <code_generator/code_generation_visitor.h>
 #include <semantic_analyzer/types/arbitrary_type.h>
+#include <semantic_analyzer/types/array_type.h>
 #include <semantic_analyzer/types/type.h>
 
 #include <functional>
@@ -59,20 +60,9 @@ bool Signature::Accepts(const std::vector<Type *> &types) {
 }
 
 void Signature::ResetArbitraryTypes() {
-  // TODO: Implement a virtual `ResetArbitraryType` method for the Type class.
-  // Currently, there is a bug because the ArbitraryTypes don't get reset if
-  // they are array subtypes.
-
   // Reset any arbitrary types that are stored as input types.
   for (Type *type : input_types) {
-    if (auto arbitrary_type = dynamic_cast<ArbitraryType *>(type)) {
-      arbitrary_type->ResetSetType();
-    }
+    type->ResetArbitraryTypes();
   }
-
-  // Reset output type if it is an arbitrary type.
-  auto arbitrary_type = dynamic_cast<ArbitraryType *>(output_type);
-  if (arbitrary_type) {
-    arbitrary_type->ResetSetType();
-  }
+  output_type->ResetArbitraryTypes();
 }

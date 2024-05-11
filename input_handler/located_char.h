@@ -1,6 +1,7 @@
 #ifndef LOCATED_CHAR_H_
 #define LOCATED_CHAR_H_
 
+#include <scanner/operator.h>
 #include <scanner/punctuator.h>
 
 #include <cctype>
@@ -28,8 +29,9 @@ struct LocatedChar {
   }
   bool IsNumberStart() const { return isdigit(character); }
   bool IsDigit() const { return isdigit(character); }
-  bool IsPunctuatorStart() const {
-    return punctuator_utils::StartsPunctuator(character);
+  bool IsOperatorOrPunctuatorStart() const {
+    return operator_utils::StartsOperator(character) ||
+           punctuator_utils::StartsPunctuator(character);
   }
   bool IsStringStart() const { return character == '\"'; }
   bool IsCharacterStart() const { return character == '\''; }

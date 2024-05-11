@@ -1,6 +1,7 @@
 #include "signatures.h"
 
 #include <code_generator/operator_codegen.h>
+#include <scanner/operator.h>
 #include <semantic_analyzer/types/arbitrary_type.h>
 #include <semantic_analyzer/types/array_type.h>
 #include <semantic_analyzer/types/base_type.h>
@@ -32,41 +33,41 @@ static const std::unique_ptr<BaseType> kBaseTypeInteger =
 static const std::unique_ptr<BaseType> kBaseTypeString =
     BaseType::CreateStringType();
 
-static std::map<Punctuator, std::vector<Signature> > signature_map = {
+static std::map<Operator, std::vector<Signature> > signature_map = {
     // =
-    {Punctuator::ASSIGN,
+    {Operator::ASSIGN,
      {Signature({kArbitraryTypeT.get(), kArbitraryTypeT.get()},
                 kArbitraryTypeT.get(), operator_codegen::AssignmentCodegen)}},
     // +
-    {Punctuator::PLUS,
+    {Operator::PLUS,
      {Signature({kBaseTypeInteger.get()}, kBaseTypeInteger.get(),
                 operator_codegen::UnaryNop),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(), operator_codegen::IntegerAddCodegen)}},
     // -
-    {Punctuator::MINUS,
+    {Operator::MINUS,
      {Signature({kBaseTypeInteger.get()}, kBaseTypeInteger.get(),
                 operator_codegen::IntegerNegationCodegen),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
                 operator_codegen::IntegerSubtractCodegen)}},
     // *
-    {Punctuator::MUL,
+    {Operator::MUL,
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
                 operator_codegen::IntegerMultiplyCodegen)}},
     // /
-    {Punctuator::DIV,
+    {Operator::DIV,
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
                 operator_codegen::IntegerDivideCodegen)}},
     // %
-    {Punctuator::MOD,
+    {Operator::MOD,
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
                 operator_codegen::IntegerModuloCodegen)}},
     // ==
-    {Punctuator::CMP_EQ,
+    {Operator::CMP_EQ,
      {
          Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
                    kBaseTypeBoolean.get(),
@@ -79,7 +80,7 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
                    operator_codegen::IntegerCmpEQCodegen),
      }},
     // !=
-    {Punctuator::CMP_NEQ,
+    {Operator::CMP_NEQ,
      {
          Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
                    kBaseTypeBoolean.get(),
@@ -92,7 +93,7 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
                    operator_codegen::IntegerCmpNEQCodegen),
      }},
     // >
-    {Punctuator::CMP_GT,
+    {Operator::CMP_GT,
      {
          Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
                    kBaseTypeBoolean.get(),
@@ -102,7 +103,7 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
                    operator_codegen::IntegerCmpGTCodegen),
      }},
     // <
-    {Punctuator::CMP_LT,
+    {Operator::CMP_LT,
      {
          Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
                    kBaseTypeBoolean.get(),
@@ -112,7 +113,7 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
                    operator_codegen::IntegerCmpLTCodegen),
      }},
     // >=
-    {Punctuator::CMP_GEQ,
+    {Operator::CMP_GEQ,
      {
          Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
                    kBaseTypeBoolean.get(),
@@ -122,7 +123,7 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
                    operator_codegen::IntegerCmpGEQCodegen),
      }},
     // <=
-    {Punctuator::CMP_LEQ,
+    {Operator::CMP_LEQ,
      {
          Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
                    kBaseTypeBoolean.get(),
@@ -132,25 +133,25 @@ static std::map<Punctuator, std::vector<Signature> > signature_map = {
                    operator_codegen::IntegerCmpLEQCodegen),
      }},
     // !
-    {Punctuator::BOOL_NOT,
+    {Operator::BOOL_NOT,
      {Signature({kBaseTypeBoolean.get()}, kBaseTypeBoolean.get(),
                 operator_codegen::BooleanNegationCodegen)}},
     // &&
-    {Punctuator::BOOL_AND,
+    {Operator::BOOL_AND,
      {Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
                 kBaseTypeBoolean.get(), operator_codegen::BooleanAndCodegen)}},
     // ||
-    {Punctuator::BOOL_OR,
+    {Operator::BOOL_OR,
      {Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
                 kBaseTypeBoolean.get(), operator_codegen::BooleanOrCodegen)}},
     // alloc
-    {Punctuator::ALLOC,
+    {Operator::ALLOC,
      {Signature({kArbitraryArrayTypeT.get(), kBaseTypeInteger.get()},
                 kArbitraryArrayTypeT.get(), operator_codegen::AllocCodegen)}}};
 
-Signature *signatures::AcceptingSignature(Punctuator punctuator,
+Signature *signatures::AcceptingSignature(Operator op,
                                           const std::vector<Type *> &types) {
-  std::vector<Signature> &signatures = signature_map.at(punctuator);
+  std::vector<Signature> &signatures = signature_map.at(op);
   for (Signature &signature : signatures) {
     if (signature.Accepts(types)) {
       return &signature;

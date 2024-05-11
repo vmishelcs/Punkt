@@ -89,6 +89,9 @@ class BaseType : public Type {
     return base_type_enum == BaseTypeEnum::ERROR;
   };
 
+  /// @brief This method should do nothing for BaseTypes.
+  virtual void ResetArbitraryTypes() override {}
+
   BaseType(BaseTypeEnum base_type_enum);
   static std::string GetEnumString(BaseTypeEnum base_type_enum);
 

@@ -16,9 +16,9 @@ class Scanner {
 
  private:
   std::unique_ptr<Token> GetNextToken();
-  std::unique_ptr<Token> ScanIdentifier(LocatedChar first_char);
+  std::unique_ptr<Token> ScanKeywordOrIdentifier(LocatedChar first_char);
   std::unique_ptr<Token> ScanNumber(LocatedChar first_char);
-  std::unique_ptr<Token> ScanPunctuator(LocatedChar first_char);
+  std::unique_ptr<Token> ScanOperatorOrPunctuator(LocatedChar first_char);
   std::unique_ptr<Token> ScanCharacter(LocatedChar first_char);
   std::unique_ptr<Token> ScanString(LocatedChar first_char);
 

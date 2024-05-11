@@ -41,7 +41,7 @@ Keyword GetKeywordEnum(const std::string& lexeme);
 /// @brief Get a string representation of the provided keyword.
 /// @param keyword `Keyword` enum representation of a punctuator.
 /// @return String representation of the `keyword`.
-std::string GetKeywordLexeme(Keyword keyword);
+const std::string& GetKeywordLexeme(Keyword keyword);
 
 }  // namespace keyword_utils
 

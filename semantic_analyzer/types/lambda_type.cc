@@ -107,6 +107,13 @@ std::string LambdaType::ToString() const {
   return result;
 }
 
+void LambdaType::ResetArbitraryTypes() {
+  for (unsigned i = 0, n = parameter_types.size(); i < n; ++i) {
+    parameter_types[i]->ResetArbitraryTypes();
+  }
+  return_type->ResetArbitraryTypes();
+}
+
 LambdaType::LambdaType(std::vector<Type *> parameter_types_to_copy,
                        Type *return_type)
     : Type(TypeEnum::LAMBDA) {
