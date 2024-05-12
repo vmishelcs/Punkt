@@ -50,16 +50,28 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
 
   const std::string &GetPunktArrayStructName() const;
   const std::string &GetAllocPunktArrayFunctionName() const;
+  const std::string &GetDeallocPunktArrayFunctionName() const;
 
  private:
   void GenerateGlobalConstants();
 
   bool IsPreviousInstructionBlockTerminator();
 
+  /// @brief Create an `AllocaInst` in the entry block of a specified function
+  /// for a provided variable.
+  /// @param function Function the variable resides in.
+  /// @param identifier Identifier of the variable.
+  /// @param llvm_type `llvm::Type` of the variable.
+  /// @return `llvm::AllocaInst` that allocates memory for the specified
+  /// variable within the provided function.
   llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *function,
-                                           const std::string &identifier_name,
+                                           const std::string &identifier,
                                            llvm::Type *llvm_type);
 
+  llvm::Value *GetOrCreateString(const std::string &str);
+
+  /// Helpful C standard library functions.
+  /// @{
   /// @brief Generate LLVM IR for the `malloc(int)` C standard library function
   /// declaration.
   void GenerateMallocFunctionDeclaration();
@@ -69,16 +81,17 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   /// @brief Generate LLVM IR for the `memset(void *, char, int)` C standard
   /// library function declaration.
   void GenerateMemsetFunctionDeclaration();
-  /// @brief Generate LLVM for the `printf(const char *)` C standard library
-  /// function delcaration.
+  /// @brief Generate LLVM for the `printf(const char *, ...)` C standard
+  /// library function delcaration.
   void GeneratePrintfFunctionDeclaration();
+  /// @}
 
   /// Generate LLVM IR for the `PunktArray` struct. This struct is
   /// equivalent to the following C definition:
   ///
   /// `
   /// typedef struct {
-  ///   int size;
+  ///   int64_t size;
   ///   void *data;
   /// } PunktArray;
   /// `
@@ -91,19 +104,17 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   void GenerateDeallocPunktArrayFunction();
   /// @}
 
-  void GeneratePrintfFmtStringsForBaseTypes();
-  llvm::Value *GenerateFmtStringForBaseType(BaseTypeEnum base_type_enum,
-                                            std::string fmt_str);
-
-  llvm::Value *GetPrintfFmtString(Type *type);
-  llvm::Value *GetPrintfFmtStringForBaseType(BaseTypeEnum base_type_enum);
-
-  llvm::Value *PrintValue(llvm::Value *value, Type *type);
-  llvm::Value *PrintLineFeed();
+  /// Printing helper methods.
+  /// @{
+  void PrintBaseTypeValue(BaseType *base_type, llvm::Value *value);
+  llvm::Value *GetPrintfFormatStringForBaseType(BaseType *base_type);
+  void PrintLineFeed();
+  /// @}
 
   llvm::Value *CodeGenerationInternalError(std::string error_msg);
 
   std::map<std::string, llvm::Value *> global_constants_table;
+  std::map<std::string, llvm::Value *> string_map;
 };
 
 #endif  // CODE_GENERATION_VISITOR_H_

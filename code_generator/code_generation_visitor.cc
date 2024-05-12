@@ -536,9 +536,13 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
   CodegenContext &codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context.GetLLVMContext();
 
-  // We call printf for each 'operand'
+  // We call printf for each 'operand'.
   for (auto child : node.GetChildren()) {
-    PrintValue(child->GenerateCode(*this), child->GetType());
+    if (auto child_type = dynamic_cast<BaseType *>(child->GetType())) {
+      PrintBaseTypeValue(child_type, child->GenerateCode(*this));
+    } else {
+      CodeGenerationInternalError("unimplemented type in print statement");
+    }
   }
 
   if (node.IsPrintln()) {
@@ -551,18 +555,17 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
+  // Generate some helpful C standard library function declarations.
   GenerateMallocFunctionDeclaration();
   GenerateFreeFunctionDeclaration();
   GenerateMemsetFunctionDeclaration();
+  GeneratePrintfFunctionDeclaration();
 
+  // Define Punkt array struct type.
   GeneratePunktArrayType();
 
   GenerateAllocPunktArrayFunction();
   GenerateDeallocPunktArrayFunction();
-
-  GeneratePrintfFunctionDeclaration();
-
-  GenerateGlobalConstants();
 
   CodegenContext &codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context.GetLLVMContext();
@@ -742,11 +745,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::Module *module = codegen_context.GetModule();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
-
-  return builder->CreateGlobalString(node.GetValue(), "", 0, module);
+  return GetOrCreateString(node.GetValue());
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
@@ -768,190 +767,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
 }
 
 /******************************************************************************
- *                              Printing helpers                              *
+ *              Helpful C standard library function declarations              *
  ******************************************************************************/
-void CodeGenerationVisitor::GeneratePrintfFunctionDeclaration() {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::Module *module = codegen_context.GetModule();
-
-  // Create a vector for parameters
-  std::vector<llvm::Type *> parameters = {
-      llvm::PointerType::getUnqual(*context)};
-  // Create a function type returning a 32-bit int, taking 1 parameter and a
-  // variable number of arguments
-  llvm::FunctionType *printf_func_type = llvm::FunctionType::get(
-      llvm::Type::getInt32Ty(*context), parameters, /*isVarArg=*/true);
-
-  // Create the function declaration
-  llvm::Function *printf_func =
-      llvm::Function::Create(printf_func_type, llvm::Function::ExternalLinkage,
-                             kPrintfFunctionName, *module);
-  if (!printf_func) {
-    CodeGenerationInternalError("could not generate declaration for printf");
-  }
-}
-
-void CodeGenerationVisitor::GeneratePrintfFmtStringsForBaseTypes() {
-  llvm::Value *fmt_str = nullptr;
-
-  if (fmt_str =
-          GenerateFmtStringForBaseType(BaseTypeEnum::CHARACTER, kCharFmtString),
-      !fmt_str) {
-    CodeGenerationInternalError(
-        "failed to generate format string for CHARACTER type");
-  }
-  global_constants_table[kCharFmtString] = fmt_str;
-
-  if (fmt_str =
-          GenerateFmtStringForBaseType(BaseTypeEnum::INTEGER, kIntFmtString),
-      !fmt_str) {
-    CodeGenerationInternalError(
-        "failed to generate format string for INTEGER type");
-  }
-  global_constants_table[kIntFmtString] = fmt_str;
-
-  if (fmt_str =
-          GenerateFmtStringForBaseType(BaseTypeEnum::STRING, kStrFmtString),
-      !fmt_str) {
-    CodeGenerationInternalError(
-        "failed to generate format string for STRING type");
-  }
-  global_constants_table[kStrFmtString] = fmt_str;
-}
-
-llvm::Value *CodeGenerationVisitor::GenerateFmtStringForBaseType(
-    BaseTypeEnum base_type_enum, std::string fmt_str) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::Module *module = codegen_context.GetModule();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
-
-  return builder->CreateGlobalString(
-      fmt_str, ".fmt_" + BaseType::GetEnumString(base_type_enum), 0, module);
-}
-
-llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(Type *type) {
-  if (type->GetTypeEnum() == TypeEnum::BASE_TYPE) {
-    BaseType *base_type = dynamic_cast<BaseType *>(type);
-    if (!base_type) {
-      return CodeGenerationInternalError("failed to cast Type to BaseType");
-    }
-
-    return GetPrintfFmtStringForBaseType(base_type->GetBaseTypeEnum());
-  }
-  return CodeGenerationInternalError(
-      "CodeGenerationVisitor::GetPrintfFmtString not implemented for "
-      "non-base "
-      "types");
-}
-
-llvm::Value *CodeGenerationVisitor::GetPrintfFmtStringForBaseType(
-    BaseTypeEnum base_type_enum) {
-  const std::string *key = nullptr;
-  switch (base_type_enum) {
-    case BaseTypeEnum::CHARACTER:
-      key = &kCharFmtString;
-      break;
-    case BaseTypeEnum::BOOLEAN:
-    case BaseTypeEnum::INTEGER:
-      key = &kIntFmtString;
-      break;
-    case BaseTypeEnum::STRING:
-      key = &kStrFmtString;
-      break;
-    default:
-      return CodeGenerationInternalError(
-          "unimplemented format string for type " +
-          BaseType::GetEnumString(base_type_enum));
-  }
-
-  if (!global_constants_table.contains(*key)) {
-    return CodeGenerationInternalError("unimplemented format string");
-  }
-  return global_constants_table.at(*key);
-}
-
-llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, Type *type) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::Module *module = codegen_context.GetModule();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
-
-  llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
-  if (!printf_func) {
-    return CodeGenerationInternalError(
-        "unable to obtain llvm::Function pointer for printf");
-  }
-
-  std::vector<llvm::Value *> printf_args;
-
-  printf_args.push_back(GetPrintfFmtString(type));
-  if (printf_args.back() == nullptr) {
-    return CodeGenerationInternalError(
-        "failed obtaining llvm::Value object for fmt string");
-  }
-
-  auto print_value = value;
-
-  // When printing booleans, we first truncate to 1-bit such that only the
-  // least significant bit remains. Then we extend to 32 bits and print the
-  // boolean as an integer.
-  BaseType *base_type = dynamic_cast<BaseType *>(type);
-  if (base_type && base_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
-    auto truncated_value = builder->CreateTrunc(
-        print_value, llvm::Type::getInt1Ty(*context), "trunctmp");
-    print_value = builder->CreateZExt(
-        truncated_value, llvm::Type::getInt32Ty(*context), "zexttmp");
-  }
-  // When printing characters, we sign-extend to 32 bits.
-  else if (base_type && base_type->IsEquivalentTo(BaseTypeEnum::CHARACTER)) {
-    print_value = builder->CreateSExt(
-        print_value, llvm::Type::getInt32Ty(*context), "sexttmp");
-  }
-
-  printf_args.push_back(print_value);
-  if (printf_args.back() == nullptr) {
-    return CodeGenerationInternalError(
-        "failed to generate argument for printf");
-  }
-
-  return builder->CreateCall(printf_func, printf_args, "printf_ret");
-}
-
-llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-
-  auto temp_char_base_type = BaseType::Create(BaseTypeEnum::CHARACTER);
-  return PrintValue(
-      llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), kLineFeedChar),
-      temp_char_base_type.get());
-}
-
-/******************************************************************************
- *                           Miscellaneous helpers                            *
- ******************************************************************************/
-const std::string &CodeGenerationVisitor::GetPunktArrayStructName() const {
-  return kPunktArrayStructName;
-}
-
-const std::string &CodeGenerationVisitor::GetAllocPunktArrayFunctionName()
-    const {
-  return kAllocPunktArrayFunctionName;
-}
-
-bool CodeGenerationVisitor::IsPreviousInstructionBlockTerminator() {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
-
-  llvm::Instruction *last_instruction =
-      builder->GetInsertBlock()->getTerminator();
-  if (last_instruction && last_instruction->isTerminator()) {
-    return true;
-  }
-  return false;
-}
-
 void CodeGenerationVisitor::GenerateMallocFunctionDeclaration() {
   CodegenContext &codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context.GetLLVMContext();
@@ -1013,6 +830,150 @@ void CodeGenerationVisitor::GenerateMemsetFunctionDeclaration() {
   }
 }
 
+void CodeGenerationVisitor::GeneratePrintfFunctionDeclaration() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+
+  // Create a vector for parameters
+  std::vector<llvm::Type *> parameters = {
+      llvm::PointerType::getUnqual(*context)};
+  // Create a function type returning a 32-bit int, taking 1 parameter and a
+  // variable number of arguments
+  llvm::FunctionType *printf_func_type = llvm::FunctionType::get(
+      llvm::Type::getInt32Ty(*context), parameters, /*isVarArg=*/true);
+
+  // Create the function declaration
+  llvm::Function *printf_func =
+      llvm::Function::Create(printf_func_type, llvm::Function::ExternalLinkage,
+                             kPrintfFunctionName, *module);
+  if (!printf_func) {
+    CodeGenerationInternalError("could not generate declaration for printf");
+  }
+}
+
+/******************************************************************************
+ *                              Printing helpers                              *
+ ******************************************************************************/
+void CodeGenerationVisitor::PrintBaseTypeValue(BaseType *base_type,
+                                               llvm::Value *value) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
+  llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
+  if (!printf_func) {
+    CodeGenerationInternalError(
+        "unable to obtain llvm::Function pointer for printf");
+  }
+
+  // Vector for holding arguments for `printf`.
+  std::vector<llvm::Value *> printf_args;
+
+  printf_args.push_back(GetPrintfFormatStringForBaseType(base_type));
+  if (printf_args.back() == nullptr) {
+    CodeGenerationInternalError(
+        "failed obtaining llvm::Value object for printf format string");
+  }
+
+  llvm::Value *print_value = value;
+  if (base_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
+    // When printing booleans, we first truncate to 1-bit such that only the
+    // least significant bit remains. Then we extend to 32 bits and print the
+    // boolean as an integer.
+    auto truncated_value = builder->CreateTrunc(
+        print_value, llvm::Type::getInt1Ty(*context), "trunctmp");
+    print_value = builder->CreateZExt(
+        truncated_value, llvm::Type::getInt32Ty(*context), "zexttmp");
+  } else if (base_type->IsEquivalentTo(BaseTypeEnum::CHARACTER)) {
+    // When printing characters, we sign-extend to 32 bits.
+    print_value = builder->CreateSExt(
+        print_value, llvm::Type::getInt32Ty(*context), "sexttmp");
+  }
+
+  printf_args.push_back(print_value);
+  if (printf_args.back() == nullptr) {
+    CodeGenerationInternalError("failed to generate argument for printf");
+  }
+
+  builder->CreateCall(printf_func, printf_args, "printf_ret");
+}
+
+llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
+    BaseType *base_type) {
+  BaseTypeEnum base_type_enum = base_type->GetBaseTypeEnum();
+  switch (base_type_enum) {
+    case BaseTypeEnum::BOOLEAN:
+      return GetOrCreateString("%d");
+    case BaseTypeEnum::CHARACTER:
+      return GetOrCreateString("%c");
+    case BaseTypeEnum::INTEGER:
+      return GetOrCreateString("%d");
+    case BaseTypeEnum::STRING:
+      return GetOrCreateString("%s");
+
+    case BaseTypeEnum::VOID:
+    case BaseTypeEnum::ERROR:
+    default:
+      CodeGenerationInternalError(
+          "invalid BaseTypeEnum in "
+          "CodeGenerationVisitor::GetPrintfFormatStringForBaseType");
+      return nullptr;
+  }
+}
+
+void CodeGenerationVisitor::PrintLineFeed() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+
+  auto temp_char_base_type = BaseType::Create(BaseTypeEnum::CHARACTER);
+  llvm::Value *line_feed_char_value =
+      llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), kLineFeedChar);
+
+  PrintBaseTypeValue(temp_char_base_type.get(), line_feed_char_value);
+}
+
+/******************************************************************************
+ *                           Miscellaneous helpers                            *
+ ******************************************************************************/
+llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(
+    llvm::Function *function, const std::string &identifier_name,
+    llvm::Type *llvm_type) {
+  llvm::IRBuilder<> tmp_builder(&function->getEntryBlock(),
+                                function->getEntryBlock().begin());
+  return tmp_builder.CreateAlloca(llvm_type, nullptr, identifier_name);
+}
+
+llvm::Value *CodeGenerationVisitor::GetOrCreateString(const std::string &str) {
+  static int64_t string_counter = 1;
+  if (string_map.contains(str)) {
+    return string_map[str];
+  }
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  llvm::Value *str_value = builder->CreateGlobalString(
+      str, "string_" + std::to_string(string_counter++));
+  string_map[str] = str_value;
+  return str_value;
+}
+
+bool CodeGenerationVisitor::IsPreviousInstructionBlockTerminator() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
+  llvm::Instruction *last_instruction =
+      builder->GetInsertBlock()->getTerminator();
+  if (last_instruction && last_instruction->isTerminator()) {
+    return true;
+  }
+  return false;
+}
+
+/******************************************************************************
+ *                         Punkt array helper methods                         *
+ ******************************************************************************/
 void CodeGenerationVisitor::GeneratePunktArrayType() {
   CodegenContext &codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context.GetLLVMContext();
@@ -1144,16 +1105,18 @@ void CodeGenerationVisitor::GenerateDeallocPunktArrayFunction() {
   builder->CreateRetVoid();
 }
 
-void CodeGenerationVisitor::GenerateGlobalConstants() {
-  GeneratePrintfFmtStringsForBaseTypes();
+const std::string &CodeGenerationVisitor::GetPunktArrayStructName() const {
+  return kPunktArrayStructName;
 }
 
-llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(
-    llvm::Function *function, const std::string &identifier_name,
-    llvm::Type *llvm_type) {
-  llvm::IRBuilder<> tmp_builder(&function->getEntryBlock(),
-                                function->getEntryBlock().begin());
-  return tmp_builder.CreateAlloca(llvm_type, nullptr, identifier_name);
+const std::string &CodeGenerationVisitor::GetAllocPunktArrayFunctionName()
+    const {
+  return kAllocPunktArrayFunctionName;
+}
+
+const std::string &CodeGenerationVisitor::GetDeallocPunktArrayFunctionName()
+    const {
+  return kDeallocPunktArrayFunctionName;
 }
 
 /******************************************************************************
