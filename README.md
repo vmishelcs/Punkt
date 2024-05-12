@@ -67,7 +67,7 @@ BaseType \rightarrow & \enspace \texttt{void} \\
 | & \enspace \texttt{int} \\
 | & \enspace \texttt{string} \\[16pt]
 
-ArrayType \rightarrow & \enspace \texttt{[} \enspace Type \enspace \texttt{]}
+ArrayType \rightarrow & \enspace \texttt{[} \enspace Type \enspace \texttt{]} \\[16pt]
 
 LambdaType \rightarrow & \enspace \texttt{<} \enspace TypeList^? \enspace \texttt{>} \enspace \texttt{->} \enspace Type \\[16pt]
 
