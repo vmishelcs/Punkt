@@ -8,7 +8,6 @@
 #include <llvm/IR/Value.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/Casting.h>
-#include <llvm/TargetParser/Host.h>
 #include <logging/punkt_logger.h>
 #include <semantic_analyzer/types/base_type.h>
 #include <semantic_analyzer/types/type.h>
@@ -16,7 +15,8 @@
 
 #include <memory>
 #include <string>
-#include <variant>
+
+#include "codegen_context.h"
 
 // Array helper constants
 static const std::string kPunktArrayStructName = "PunktArray_struct";
@@ -36,23 +36,17 @@ static const std::string kIntFmtString = "%d";
 static const std::string kStrFmtString = "%s";
 static const char kLineFeedChar = '\n';
 
-using code_gen_func_type_1_operand =
-    llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *,
-                     llvm::Value *);
-using code_gen_func_type_2_operands =
-    llvm::Value *(*)(llvm::LLVMContext *context, llvm::IRBuilder<> *,
-                     llvm::Value *, llvm::Value *);
+using codegen_function_type = llvm::Value *(*)(CodeGenerationVisitor &,
+                                               OperatorNode &);
 
-CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
-    : context(std::make_unique<llvm::LLVMContext>()),
-      module(std::make_unique<llvm::Module>(module_id, *context)),
-      builder(std::make_unique<llvm::IRBuilder<> >(*context)) {
-  std::string target_triple = llvm::sys::getDefaultTargetTriple();
-  module->setTargetTriple(target_triple);
+CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id) {
+  CodegenContext::Initialize(module_id);
 }
 
 void CodeGenerationVisitor::WriteIRToFD(int fd) {
   llvm::raw_fd_ostream ir_ostream(fd, /*shouldClose=*/false);
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::Module *module = codegen_context.GetModule();
   module->print(ir_ostream, nullptr);
 }
 
@@ -65,7 +59,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ArrayTypeNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CallStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
+  if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
     return nullptr;
   }
@@ -79,29 +73,36 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode &node) {
     if (!gen) break;
   }
 
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
   // GenerateCode(CodeBlockNode&) return value is not used.
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(
     ExpressionStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
+  if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
     return nullptr;
   }
 
   node.GetExpressionNode()->GenerateCode(*this);
 
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
   // GenerateCode(ExpressionStatementNode&) return value is not used.
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*context));
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(
     DeclarationStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
+  if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
     return nullptr;
   }
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
 
   IdentifierNode *identifier_node = node.GetIdentifierNode();
   if (!identifier_node) {
@@ -139,10 +140,14 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
+  if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
     return nullptr;
   }
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
 
   // Emit code for the loop initializer.
   node.GetLoopInitializerNode()->GenerateCode(*this);
@@ -220,10 +225,14 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(FunctionDefinitionNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
+  if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
     return nullptr;
   }
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
 
   llvm::Value *condition = node.GetIfConditionNode()->GenerateCode(*this);
   if (!condition) {
@@ -294,6 +303,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode &node) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   llvm::Value *callee_value = node.GetCalleeNode()->GenerateCode(*this);
 
   std::vector<llvm::Value *> arg_values;
@@ -330,6 +343,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   std::vector<llvm::Type *> param_types;
   std::vector<LambdaParameterNode *> param_nodes = node.GetParameterNodes();
   param_types.reserve(param_nodes.size());
@@ -351,8 +369,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
                         : llvm::GlobalValue::LinkageTypes::InternalLinkage;
 
   // Create the function.
-  auto function = llvm::Function::Create(function_type, linkage_type, "usrfunc",
-                                         module.get());
+  auto function =
+      llvm::Function::Create(function_type, linkage_type, "usrfunc", module);
 
   // Set names for arguments.
   unsigned i = 0;
@@ -431,7 +449,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
       // Create a call to a "trap" intrinsic in case no return statement is
       // provided.
       llvm::Function *trap_intrinsic =
-          llvm::Intrinsic::getDeclaration(module.get(), llvm::Intrinsic::trap);
+          llvm::Intrinsic::getDeclaration(module, llvm::Intrinsic::trap);
       builder->CreateCall(trap_intrinsic);
       builder->CreateUnreachable();
     }
@@ -459,6 +477,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaTypeNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode &node) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   // Main always returns int (always returns 0).
   llvm::Type *return_type = llvm::Type::getInt32Ty(*context);
 
@@ -495,43 +518,22 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode &node) {
-  unsigned num_operands = node.GetChildren().size();
-  if (num_operands == 1) {
-    llvm::Value *operand = node.GetChild(0)->GenerateCode(*this);
-
-    // Obtain codegen function pointer for 1 operand from variant.
-    try {
-      auto fp = std::get<code_gen_func_type_1_operand>(node.GetCodeGenFunc());
-      return fp(context.get(), builder.get(), operand);
-    } catch (std::bad_variant_access const &ex) {
-      return CodeGenerationInternalError(
-          "bad variant access when generating code for 1 operand");
-    }
+  codegen_function_type codegen_function = node.GetCodegenFunction();
+  if (!codegen_function) {
+    CodeGenerationInternalError("operator codegen function not set");
   }
-  if (num_operands == 2) {
-    llvm::Value *lhs = node.GetChild(0)->GenerateCode(*this);
-    llvm::Value *rhs = node.GetChild(1)->GenerateCode(*this);
 
-    // Obtain codegen function pointer for 2 operands from variant.
-    try {
-      auto fp = std::get<code_gen_func_type_2_operands>(node.GetCodeGenFunc());
-      return fp(context.get(), builder.get(), lhs, rhs);
-    } catch (std::bad_variant_access const &ex) {
-      return CodeGenerationInternalError(
-          "bad variant access when generating code for 2 operands");
-    }
-  } else {
-    return CodeGenerationInternalError("code generation not implemented for " +
-                                       std::to_string(num_operands) +
-                                       " operands");
-  }
+  return codegen_function(*this, node);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
+  if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
     return nullptr;
   }
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
 
   // We call printf for each 'operand'
   for (auto child : node.GetChildren()) {
@@ -548,11 +550,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
-  GeneratePunktArrayType();
-
   GenerateMallocFunctionDeclaration();
   GenerateFreeFunctionDeclaration();
   GenerateMemsetFunctionDeclaration();
+
+  GeneratePunktArrayType();
 
   GenerateAllocPunktArrayFunction();
   GenerateDeallocPunktArrayFunction();
@@ -560,6 +562,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
   GeneratePrintfFunctionDeclaration();
 
   GenerateGlobalConstants();
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
 
   // Generate code for each function of the program.
   for (const auto &child : node.GetChildren()) {
@@ -575,10 +581,14 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
+  if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
     return nullptr;
   }
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
 
   ParseNode *enclosing_function = node.GetEnclosingFunctionNode();
 
@@ -598,10 +608,14 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ReturnStatementNode &node) {
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
-  if (WasPreviousInstructionBlockTerminator()) {
+  if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
     return nullptr;
   }
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
 
   auto parent_function = builder->GetInsertBlock()->getParent();
 
@@ -670,6 +684,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
  *                      Code generation for identifiers                       *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   // Look up the symbol table entry for this identifier.
   auto sym_table_entry = node.GetSymbolTableEntry();
   if (!sym_table_entry) {
@@ -700,22 +717,35 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
  *                        Code generation for literals *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(BooleanLiteralNode &node) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+
   return llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context),
                                 (int)node.GetValue());
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(CharacterLiteralNode &node) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+
   return llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context),
                                 node.GetValue());
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode &node) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+
   return llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(*context),
                                       node.GetValue());
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode &node) {
-  return builder->CreateGlobalString(node.GetValue(), "", 0, module.get());
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
+  return builder->CreateGlobalString(node.GetValue(), "", 0, module);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
@@ -727,6 +757,10 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
  *                            NOP code generation                             *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   return builder->CreateAdd(
       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0), "nop");
@@ -736,13 +770,17 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
  *                              Printing helpers                              *
  ******************************************************************************/
 void CodeGenerationVisitor::GeneratePrintfFunctionDeclaration() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+
   // Create a vector for parameters
   std::vector<llvm::Type *> parameters = {
       llvm::PointerType::getUnqual(*context)};
   // Create a function type returning a 32-bit int, taking 1 parameter and a
   // variable number of arguments
   llvm::FunctionType *printf_func_type = llvm::FunctionType::get(
-      llvm::Type::getInt32Ty(*context), parameters, /* IsVarArg = */ true);
+      llvm::Type::getInt32Ty(*context), parameters, /*isVarArg=*/true);
 
   // Create the function declaration
   llvm::Function *printf_func =
@@ -783,9 +821,12 @@ void CodeGenerationVisitor::GeneratePrintfFmtStringsForBaseTypes() {
 
 llvm::Value *CodeGenerationVisitor::GenerateFmtStringForBaseType(
     BaseTypeEnum base_type_enum, std::string fmt_str) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   return builder->CreateGlobalString(
-      fmt_str, ".fmt_" + BaseType::GetEnumString(base_type_enum), 0,
-      module.get());
+      fmt_str, ".fmt_" + BaseType::GetEnumString(base_type_enum), 0, module);
 }
 
 llvm::Value *CodeGenerationVisitor::GetPrintfFmtString(Type *type) {
@@ -830,6 +871,11 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFmtStringForBaseType(
 }
 
 llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, Type *type) {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   llvm::Function *printf_func = module->getFunction(kPrintfFunctionName);
   if (!printf_func) {
     return CodeGenerationInternalError(
@@ -872,6 +918,9 @@ llvm::Value *CodeGenerationVisitor::PrintValue(llvm::Value *value, Type *type) {
 }
 
 llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+
   auto temp_char_base_type = BaseType::Create(BaseTypeEnum::CHARACTER);
   return PrintValue(
       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), kLineFeedChar),
@@ -881,7 +930,23 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
 /******************************************************************************
  *                           Miscellaneous helpers                            *
  ******************************************************************************/
+bool CodeGenerationVisitor::IsPreviousInstructionBlockTerminator() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
+  llvm::Instruction *last_instruction =
+      builder->GetInsertBlock()->getTerminator();
+  if (last_instruction && last_instruction->isTerminator()) {
+    return true;
+  }
+  return false;
+}
+
 void CodeGenerationVisitor::GenerateMallocFunctionDeclaration() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+
   std::vector<llvm::Type *> parameters = {llvm::Type::getInt64Ty(*context)};
   // Create a function type returning a pointer type, taking an integer
   // argument.
@@ -898,6 +963,10 @@ void CodeGenerationVisitor::GenerateMallocFunctionDeclaration() {
 }
 
 void CodeGenerationVisitor::GenerateFreeFunctionDeclaration() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+
   std::vector<llvm::Type *> parameters = {
       llvm::PointerType::getUnqual(*context)};
   // Create a void function taking a pointer argument.
@@ -914,6 +983,10 @@ void CodeGenerationVisitor::GenerateFreeFunctionDeclaration() {
 }
 
 void CodeGenerationVisitor::GenerateMemsetFunctionDeclaration() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+
   std::vector<llvm::Type *> parameters = {
       llvm::PointerType::getUnqual(*context), llvm::Type::getInt8Ty(*context),
       llvm::Type::getInt32Ty(*context)};
@@ -931,6 +1004,9 @@ void CodeGenerationVisitor::GenerateMemsetFunctionDeclaration() {
 }
 
 void CodeGenerationVisitor::GeneratePunktArrayType() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+
   // Initialize PunktArray struct type for storing arrays.
   llvm::StructType *punkt_array_type =
       llvm::StructType::create(*context, kPunktArrayStructName);
@@ -941,6 +1017,11 @@ void CodeGenerationVisitor::GeneratePunktArrayType() {
 }
 
 void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   // Create a function that returns a pointer and takes 2 integer arguments.
   std::vector<llvm::Type *> parameters = {llvm::Type::getInt32Ty(*context),
                                           llvm::Type::getInt32Ty(*context)};
@@ -1008,6 +1089,11 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
 }
 
 void CodeGenerationVisitor::GenerateDeallocPunktArrayFunction() {
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
   // Create a void function that takes a pointer argument.
   std::vector<llvm::Type *> parameters = {
       llvm::PointerType::getUnqual(*context)};

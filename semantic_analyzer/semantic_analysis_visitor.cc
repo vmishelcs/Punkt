@@ -210,7 +210,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
 
   if (signature) {
     node.SetType(signature->GetOutputType()->CreateEquivalentType());
-    node.SetCodeGenFunc(signature->GetCodeGenFunc());
+    node.SetCodegenFunction(signature->GetCodegenFunction());
   } else {
     InvalidOperandTypeError(node, child_types);
     node.SetType(BaseType::CreateErrorType());

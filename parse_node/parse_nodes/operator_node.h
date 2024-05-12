@@ -9,14 +9,13 @@
 
 #include <memory>
 #include <string>
-#include <variant>
 
-using code_gen_function_variant =
-    std::variant<llvm::Value *(*)(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *, llvm::Value *),
-                 llvm::Value *(*)(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *, llvm::Value *,
-                                  llvm::Value *)>;
+// Forward-declare types.
+class CodeGenerationVisitor;
+class OperatorNode;
+
+using codegen_function_type = llvm::Value *(*)(CodeGenerationVisitor &,
+                                               OperatorNode &);
 
 class OperatorNode : public ParseNode {
  public:
@@ -26,8 +25,10 @@ class OperatorNode : public ParseNode {
 
   Operator GetOperatorEnum() const { return op; }
 
-  void SetCodeGenFunc(code_gen_function_variant f) { this->f = f; }
-  code_gen_function_variant GetCodeGenFunc() const { return f; }
+  void SetCodegenFunction(codegen_function_type codegen_function) {
+    this->codegen_function = codegen_function;
+  }
+  codegen_function_type GetCodegenFunction() const { return codegen_function; }
 
   virtual std::string ToString() const override { return "OPERATOR NODE"; }
 
@@ -37,7 +38,7 @@ class OperatorNode : public ParseNode {
 
  private:
   Operator op;
-  code_gen_function_variant f;
+  codegen_function_type codegen_function;
 };
 
 #endif  // OPERATOR_NODE_H_

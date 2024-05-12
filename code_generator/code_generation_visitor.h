@@ -51,14 +51,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
  private:
   void GenerateGlobalConstants();
 
-  bool WasPreviousInstructionBlockTerminator() {
-    llvm::Instruction *last_instruction =
-        builder->GetInsertBlock()->getTerminator();
-    if (last_instruction && last_instruction->isTerminator()) {
-      return true;
-    }
-    return false;
-  }
+  bool IsPreviousInstructionBlockTerminator();
 
   llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *function,
                                            const std::string &identifier_name,
@@ -77,7 +70,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   /// function delcaration.
   void GeneratePrintfFunctionDeclaration();
 
-  /// @brief Generate LLVM IR for the `PunktArray` struct. This struct is
+  /// Generate LLVM IR for the `PunktArray` struct. This struct is
   /// equivalent to the following C definition:
   ///
   /// `
@@ -88,8 +81,12 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   /// `
   void GeneratePunktArrayType();
 
+  /// Generate helper functions in LLVM IR for allocating and deallocating Punkt
+  /// arrays.
+  /// @{
   void GenerateAllocPunktArrayFunction();
   void GenerateDeallocPunktArrayFunction();
+  /// @}
 
   void GeneratePrintfFmtStringsForBaseTypes();
   llvm::Value *GenerateFmtStringForBaseType(BaseTypeEnum base_type_enum,
@@ -102,10 +99,6 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   llvm::Value *PrintLineFeed();
 
   llvm::Value *CodeGenerationInternalError(std::string error_msg);
-
-  std::unique_ptr<llvm::LLVMContext> context;
-  std::unique_ptr<llvm::Module> module;
-  std::unique_ptr<llvm::IRBuilder<> > builder;
 
   std::map<std::string, llvm::Value *> global_constants_table;
 };

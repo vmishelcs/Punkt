@@ -1,4 +1,4 @@
 main {
-	var arr = alloc [int] (5).
-	arr[1 + 1] = 0.
+	const a = 1 + 2.
+	println a.
 }

@@ -1,103 +1,77 @@
 #ifndef OPERATOR_CODEGEN_H_
 #define OPERATOR_CODEGEN_H_
 
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Value.h>
+#include <parse_node/parse_nodes/operator_node.h>
+
+#include "code_generation_visitor.h"
 
 namespace operator_codegen {
 
 // ---- Assignment -------------------------------------------------------------
-llvm::Value *AssignmentCodegen(llvm::LLVMContext *context,
-                               llvm::IRBuilder<> *builder, llvm::Value *target,
-                               llvm::Value *new_value);
+llvm::Value *AssignmentCodegen(CodeGenerationVisitor &codegen_visitor,
+                               OperatorNode &operator_node);
 
 // ---- NOP --------------------------------------------------------------------
-llvm::Value *UnaryNop(llvm::LLVMContext *context, llvm::IRBuilder<> *builder,
-                      llvm::Value *operand);
+llvm::Value *UnaryNop(CodeGenerationVisitor &codegen_visitor,
+                      OperatorNode &operator_node);
 
 // ---- Booleans ---------------------------------------------------------------
-llvm::Value *BooleanNegationCodegen(llvm::LLVMContext *context,
-                                    llvm::IRBuilder<> *builder,
-                                    llvm::Value *operand);
-llvm::Value *BooleanCmpEQCodegen(llvm::LLVMContext *context,
-                                 llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                 llvm::Value *rhs);
-llvm::Value *BooleanCmpNEQCodegen(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                  llvm::Value *rhs);
-llvm::Value *BooleanAndCodegen(llvm::LLVMContext *context,
-                               llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                               llvm::Value *rhs);
-llvm::Value *BooleanOrCodegen(llvm::LLVMContext *context,
-                              llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                              llvm::Value *rhs);
+llvm::Value *BooleanNegationCodegen(CodeGenerationVisitor &codegen_visitor,
+                                    OperatorNode &operator_node);
+llvm::Value *BooleanCmpEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                 OperatorNode &operator_node);
+llvm::Value *BooleanCmpNEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                  OperatorNode &operator_node);
+llvm::Value *BooleanAndCodegen(CodeGenerationVisitor &codegen_visitor,
+                               OperatorNode &operator_node);
+llvm::Value *BooleanOrCodegen(CodeGenerationVisitor &codegen_visitor,
+                              OperatorNode &operator_node);
 
 // ---- Characters -------------------------------------------------------------
-llvm::Value *CharacterCmpEQCodegen(llvm::LLVMContext *context,
-                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                   llvm::Value *rhs);
-llvm::Value *CharacterCmpNEQCodegen(llvm::LLVMContext *context,
-                                    llvm::IRBuilder<> *builder,
-                                    llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *CharacterCmpGTCodegen(llvm::LLVMContext *context,
-                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                   llvm::Value *rhs);
-llvm::Value *CharacterCmpLTCodegen(llvm::LLVMContext *context,
-                                   llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                   llvm::Value *rhs);
-llvm::Value *CharacterCmpGEQCodegen(llvm::LLVMContext *context,
-                                    llvm::IRBuilder<> *builder,
-                                    llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *CharacterCmpLEQCodegen(llvm::LLVMContext *context,
-                                    llvm::IRBuilder<> *builder,
-                                    llvm::Value *lhs, llvm::Value *rhs);
+llvm::Value *CharacterCmpEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                   OperatorNode &operator_node);
+llvm::Value *CharacterCmpNEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                    OperatorNode &operator_node);
+llvm::Value *CharacterCmpGTCodegen(CodeGenerationVisitor &codegen_visitor,
+                                   OperatorNode &operator_node);
+llvm::Value *CharacterCmpLTCodegen(CodeGenerationVisitor &codegen_visitor,
+                                   OperatorNode &operator_node);
+llvm::Value *CharacterCmpGEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                    OperatorNode &operator_node);
+llvm::Value *CharacterCmpLEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                    OperatorNode &operator_node);
 
 // ---- Integers ---------------------------------------------------------------
-llvm::Value *IntegerNegationCodegen(llvm::LLVMContext *context,
-                                    llvm::IRBuilder<> *builder,
-                                    llvm::Value *operand);
-llvm::Value *IntegerAddCodegen(llvm::LLVMContext *context,
-                               llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                               llvm::Value *rhs);
-llvm::Value *IntegerSubtractCodegen(llvm::LLVMContext *context,
-                                    llvm::IRBuilder<> *builder,
-                                    llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerMultiplyCodegen(llvm::LLVMContext *context,
-                                    llvm::IRBuilder<> *builder,
-                                    llvm::Value *lhs, llvm::Value *rhs);
-llvm::Value *IntegerDivideCodegen(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                  llvm::Value *rhs);
-llvm::Value *IntegerModuloCodegen(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                  llvm::Value *rhs);
-llvm::Value *IntegerCmpEQCodegen(llvm::LLVMContext *context,
-                                 llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                 llvm::Value *rhs);
-llvm::Value *IntegerCmpNEQCodegen(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                  llvm::Value *rhs);
-llvm::Value *IntegerCmpGTCodegen(llvm::LLVMContext *context,
-                                 llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                 llvm::Value *rhs);
-llvm::Value *IntegerCmpLTCodegen(llvm::LLVMContext *context,
-                                 llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                 llvm::Value *rhs);
-llvm::Value *IntegerCmpGEQCodegen(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                  llvm::Value *rhs);
-llvm::Value *IntegerCmpLEQCodegen(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *builder, llvm::Value *lhs,
-                                  llvm::Value *rhs);
+llvm::Value *IntegerNegationCodegen(CodeGenerationVisitor &codegen_visitor,
+                                    OperatorNode &operator_node);
+llvm::Value *IntegerAddCodegen(CodeGenerationVisitor &codegen_visitor,
+                               OperatorNode &operator_node);
+llvm::Value *IntegerSubtractCodegen(CodeGenerationVisitor &codegen_visitor,
+                                    OperatorNode &operator_node);
+llvm::Value *IntegerMultiplyCodegen(CodeGenerationVisitor &codegen_visitor,
+                                    OperatorNode &operator_node);
+llvm::Value *IntegerDivideCodegen(CodeGenerationVisitor &codegen_visitor,
+                                  OperatorNode &operator_node);
+llvm::Value *IntegerModuloCodegen(CodeGenerationVisitor &codegen_visitor,
+                                  OperatorNode &operator_node);
+llvm::Value *IntegerCmpEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                 OperatorNode &operator_node);
+llvm::Value *IntegerCmpNEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                  OperatorNode &operator_node);
+llvm::Value *IntegerCmpGTCodegen(CodeGenerationVisitor &codegen_visitor,
+                                 OperatorNode &operator_node);
+llvm::Value *IntegerCmpLTCodegen(CodeGenerationVisitor &codegen_visitor,
+                                 OperatorNode &operator_node);
+llvm::Value *IntegerCmpGEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                  OperatorNode &operator_node);
+llvm::Value *IntegerCmpLEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                  OperatorNode &operator_node);
 
 // ---- Arrays -----------------------------------------------------------------
-llvm::Value *AllocCodegen(llvm::LLVMContext *context,
-                          llvm::IRBuilder<> *builder, llvm::Value *elem_size,
-                          llvm::Value *arr_size);
-llvm::Value *IndexingCodegen(llvm::LLVMContext *context,
-                             llvm::IRBuilder<> *builder, llvm::Value *arr,
-                             llvm::Value *idx);
+llvm::Value *ArrayAllocCodegen(CodeGenerationVisitor &codegen_visitor,
+                               OperatorNode &operator_node);
+llvm::Value *ArrayIndexingCodegen(CodeGenerationVisitor &codegen_visitor,
+                                  OperatorNode &operator_node);
 
 };  // namespace operator_codegen
 
