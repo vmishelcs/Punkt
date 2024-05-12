@@ -59,6 +59,7 @@ PrintStatement \rightarrow & \enspace \texttt{print} \enspace PrintExpressionLis
 PrintExpressionList \rightarrow & \enspace Expression \enspace (\texttt{,} \enspace Expression)^* \\[16pt]
 
 Type \rightarrow & \enspace BaseType \\
+| & \enspace ArrayType \\[16pt]
 | & \enspace LambdaType \\[16pt]
 
 BaseType \rightarrow & \enspace \texttt{void} \\
