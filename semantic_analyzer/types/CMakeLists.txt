@@ -9,4 +9,5 @@ target_link_libraries(type
     array_type
     lambda_type
     arbitrary_type
+    ${llvm_libs}
 )

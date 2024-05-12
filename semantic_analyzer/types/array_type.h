@@ -1,6 +1,8 @@
 #ifndef ARRAY_TYPE_H_
 #define ARRAY_TYPE_H_
 
+#include <llvm/IR/Type.h>
+
 #include "type.h"
 
 /// @brief This class is used to denote Punkt array types.
@@ -23,6 +25,10 @@ class ArrayType : public Type {
 
   /// @brief Resets the underlying subtype if it is arbitrary.
   virtual void ResetArbitraryTypes() override;
+
+  virtual int GetSizeInBytes() const override;
+  virtual llvm::Type *GetLLVMType(
+      llvm::LLVMContext &llvm_context) const override;
 
   ArrayType(Type *subtype);
 

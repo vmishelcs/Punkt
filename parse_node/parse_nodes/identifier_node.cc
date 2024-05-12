@@ -41,8 +41,7 @@ SymbolTableEntry *IdentifierNode::FindSymbolTableEntry() {
 bool IdentifierNode::IsAssignmentTarget() const {
   ParseNode *parent = GetParent();
   auto op_node = dynamic_cast<OperatorNode *>(parent);
-  if (op_node &&
-      OperatorToken::IsTokenOperator(op_node->GetToken(), {Operator::ASSIGN})) {
+  if (op_node && op_node->GetOperatorEnum() == Operator::ASSIGN) {
     return true;
   }
   return false;

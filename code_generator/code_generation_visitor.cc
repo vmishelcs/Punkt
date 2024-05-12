@@ -52,6 +52,7 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
 
 // TODO: If previous instruction is a block terminator, use LLVM's `unreachable`
 // instruction (need to research this).
+// TODO: Stop using ParseNode::GetLLVMType and use Type::GetLLVMType instead.
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ArrayTypeNode &node) {
   // TODO
@@ -930,6 +931,15 @@ llvm::Value *CodeGenerationVisitor::PrintLineFeed() {
 /******************************************************************************
  *                           Miscellaneous helpers                            *
  ******************************************************************************/
+const std::string &CodeGenerationVisitor::GetPunktArrayStructName() const {
+  return kPunktArrayStructName;
+}
+
+const std::string &CodeGenerationVisitor::GetAllocPunktArrayFunctionName()
+    const {
+  return kAllocPunktArrayFunctionName;
+}
+
 bool CodeGenerationVisitor::IsPreviousInstructionBlockTerminator() {
   CodegenContext &codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
@@ -1078,7 +1088,7 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
   // Get the pointer to the data field of the PunktArray object.
   llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
       PunktArray_struct, PunktArray_ptr,
-      {llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0),
+      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
        llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 1)},
       "PunktArray_data_ptr");
 

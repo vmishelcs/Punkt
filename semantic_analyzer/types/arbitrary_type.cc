@@ -1,5 +1,7 @@
 #include "arbitrary_type.h"
 
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
 #include <semantic_analyzer/types/type.h>
 
 #include <memory>
@@ -23,3 +25,17 @@ bool ArbitraryType::IsEquivalentTo(Type *other_type) {
 }
 
 void ArbitraryType::ResetArbitraryTypes() { ResetSetType(); }
+
+int ArbitraryType::GetSizeInBytes() const {
+  if (set_type) {
+    return set_type->GetSizeInBytes();
+  }
+  return 0;
+}
+
+llvm::Type *ArbitraryType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
+  if (set_type) {
+    return set_type->GetLLVMType(llvm_context);
+  }
+  return nullptr;
+}

@@ -1,9 +1,14 @@
 #include "array_type.h"
 
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
+
 #include <memory>
 #include <string>
 
 #include "arbitrary_type.h"
+
+static const int kArrayTypeSizeInBytes = 8;
 
 std::unique_ptr<ArrayType> ArrayType::CreateArrayType(Type *subtype) {
   return std::make_unique<ArrayType>(subtype);
@@ -27,6 +32,12 @@ std::string ArrayType::ToString() const {
 }
 
 void ArrayType::ResetArbitraryTypes() { subtype->ResetArbitraryTypes(); }
+
+int ArrayType::GetSizeInBytes() const { return kArrayTypeSizeInBytes; }
+
+llvm::Type *ArrayType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
+  return llvm::PointerType::getUnqual(llvm_context);
+}
 
 ArrayType::ArrayType(Type *subtype) : Type(TypeEnum::ARRAY) {
   this->subtype = subtype->CreateEquivalentType();

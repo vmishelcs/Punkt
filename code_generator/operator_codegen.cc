@@ -1,10 +1,15 @@
 #include "operator_codegen.h"
 
 #include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
+#include <semantic_analyzer/types/array_type.h>
+#include <semantic_analyzer/types/type.h>
 
+#include "code_generation_visitor.h"
 #include "codegen_context.h"
 
 /******************************************************************************
@@ -12,11 +17,11 @@
  ******************************************************************************/
 llvm::Value *operator_codegen::AssignmentCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  llvm::Value *target = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *new_value = node.GetChild(1)->GenerateCode(codegen_visitor);
-
   CodegenContext &codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
+  llvm::Value *target = node.GetChild(0)->GenerateCode(codegen_visitor);
+  llvm::Value *new_value = node.GetChild(1)->GenerateCode(codegen_visitor);
 
   builder->CreateStore(new_value, target);
   return new_value;
@@ -426,10 +431,68 @@ llvm::Value *operator_codegen::IntegerCmpLEQCodegen(
  ******************************************************************************/
 llvm::Value *operator_codegen::ArrayAllocCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  return nullptr;
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::Module *module = codegen_context.GetModule();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
+  // Determine array element size.
+  ArrayType *array_type = static_cast<ArrayType *>(node.GetChild(0)->GetType());
+  Type *subtype = array_type->GetSubtype();
+  int elem_size = subtype->GetSizeInBytes();
+  llvm::Value *elem_size_value =
+      llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), elem_size);
+
+  // Generate code for array size.
+  llvm::Value *arr_size_value = node.GetChild(1)->GenerateCode(codegen_visitor);
+
+  // Call internal function for allocating arrays.
+  const std::string &alloc_PunktArray_function_name =
+      codegen_visitor.GetAllocPunktArrayFunctionName();
+  llvm::Function *alloc_PunktArray_function =
+      module->getFunction(alloc_PunktArray_function_name);
+  llvm::Value *result =
+      builder->CreateCall(alloc_PunktArray_function,
+                          {elem_size_value, arr_size_value}, "alloc_arr");
+
+  return result;
 }
 
 llvm::Value *operator_codegen::ArrayIndexingCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  return nullptr;
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+
+  // Find Punkt array struct type.
+  const std::string &PunktArray_struct_name =
+      codegen_visitor.GetPunktArrayStructName();
+  llvm::StructType *PunktArray_struct =
+      llvm::StructType::getTypeByName(*context, PunktArray_struct_name);
+
+  // Load the data portion of the Punkt array object.
+  llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(codegen_visitor);
+  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
+      PunktArray_struct, PunktArray_ptr,
+      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
+       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 1)},
+      "PunktArray_data_ptr");
+  llvm::Value *PunktArray_data =
+      builder->CreateLoad(llvm::PointerType::getUnqual(*context),
+                          PunktArray_data_ptr, "PunktArray_data");
+
+  ArrayType *array_type = static_cast<ArrayType *>(node.GetChild(0)->GetType());
+  Type *subtype = array_type->GetSubtype();
+  llvm::Type *llvm_subtype = subtype->GetLLVMType(*context);
+  llvm::Value *idx = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *elem_addr =
+      builder->CreateGEP(llvm_subtype, PunktArray_data, {idx}, "elemaddr");
+
+  // If this node is an assignment operation target, we just have to return the
+  // address of the indexed element.
+  if (node.IsAssignmentTarget()) {
+    return elem_addr;
+  }
+
+  return builder->CreateLoad(llvm_subtype, elem_addr, "elemval");
 }

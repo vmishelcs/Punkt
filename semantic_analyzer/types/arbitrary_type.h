@@ -1,6 +1,8 @@
 #ifndef ARBITRARY_TYPE_H_
 #define ARBITRARY_TYPE_H_
 
+#include <llvm/IR/Type.h>
+
 #include <memory>
 #include <string>
 
@@ -34,6 +36,10 @@ class ArbitraryType : public Type {
   virtual bool IsErrorType() const override { return false; }
 
   virtual void ResetArbitraryTypes() override;
+
+  virtual int GetSizeInBytes() const override;
+  virtual llvm::Type *GetLLVMType(
+      llvm::LLVMContext &llvm_context) const override;
 
  private:
   /// @brief Reset the set type on this arbitrary type.

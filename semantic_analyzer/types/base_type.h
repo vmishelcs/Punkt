@@ -1,6 +1,8 @@
 #ifndef BASE_TYPE_H_
 #define BASE_TYPE_H_
 
+#include <llvm/IR/Type.h>
+
 #include <memory>
 #include <string>
 
@@ -91,6 +93,10 @@ class BaseType : public Type {
 
   /// @brief This method should do nothing for BaseTypes.
   virtual void ResetArbitraryTypes() override {}
+
+  virtual int GetSizeInBytes() const override;
+  virtual llvm::Type *GetLLVMType(
+      llvm::LLVMContext &llvm_context) const override;
 
   BaseType(BaseTypeEnum base_type_enum);
   static std::string GetEnumString(BaseTypeEnum base_type_enum);

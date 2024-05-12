@@ -48,6 +48,9 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(StringLiteralNode &node) override;
   virtual llvm::Value *GenerateCode(BaseTypeNode &node) override;
 
+  const std::string &GetPunktArrayStructName() const;
+  const std::string &GetAllocPunktArrayFunctionName() const;
+
  private:
   void GenerateGlobalConstants();
 

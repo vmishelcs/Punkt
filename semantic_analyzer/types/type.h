@@ -1,6 +1,8 @@
 #ifndef TYPE_H_
 #define TYPE_H_
 
+#include <llvm/IR/Type.h>
+
 #include <memory>
 #include <string>
 
@@ -34,6 +36,9 @@ class Type {
   /// underlying ArbitraryType is reset. If this method is called on a BaseType,
   /// nothing happens.
   virtual void ResetArbitraryTypes() = 0;
+
+  virtual int GetSizeInBytes() const = 0;
+  virtual llvm::Type *GetLLVMType(llvm::LLVMContext &llvm_context) const = 0;
 
  protected:
   Type(TypeEnum type_enum) : type_enum(type_enum) {}

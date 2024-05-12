@@ -25,6 +25,15 @@ std::unique_ptr<ParseNode> OperatorNode::CreateCopy() const {
   return copy_node;
 }
 
+bool OperatorNode::IsAssignmentTarget() const {
+  ParseNode *parent = GetParent();
+  auto op_node = dynamic_cast<OperatorNode *>(parent);
+  if (op_node && op_node->GetOperatorEnum() == Operator::ASSIGN) {
+    return true;
+  }
+  return false;
+}
+
 void OperatorNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);

@@ -30,6 +30,11 @@ class OperatorNode : public ParseNode {
   }
   codegen_function_type GetCodegenFunction() const { return codegen_function; }
 
+  /// @brief Checks if this node is a target of an assignment operation.
+  /// @return `true` if this identifer is a target of an assignment operation,
+  /// `false` otherwise.
+  bool IsAssignmentTarget() const;
+
   virtual std::string ToString() const override { return "OPERATOR NODE"; }
 
   virtual void Accept(ParseNodeVisitor &visitor) override;
