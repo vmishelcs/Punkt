@@ -860,6 +860,8 @@ void CodeGenerationVisitor::PrintValue(Type *type, llvm::Value *value) {
     PrintBaseTypeValue(base_type, value);
   } else if (auto array_type = dynamic_cast<ArrayType *>(type)) {
     PrintArrayTypeValue(array_type, value);
+  } else if (auto lambda_type = dynamic_cast<LambdaType *>(type)) {
+    PrintLambdaTypeValue(lambda_type);
   } else {
     CodeGenerationInternalError("unimplemented type in print statement");
   }
@@ -908,29 +910,6 @@ void CodeGenerationVisitor::PrintBaseTypeValue(BaseType *base_type,
   }
 
   builder->CreateCall(printf_func, printf_args, "printf_ret");
-}
-
-llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
-    BaseType *base_type) {
-  BaseTypeEnum base_type_enum = base_type->GetBaseTypeEnum();
-  switch (base_type_enum) {
-    case BaseTypeEnum::BOOLEAN:
-      return GetOrCreateString("%d");
-    case BaseTypeEnum::CHARACTER:
-      return GetOrCreateString("%c");
-    case BaseTypeEnum::INTEGER:
-      return GetOrCreateString("%d");
-    case BaseTypeEnum::STRING:
-      return GetOrCreateString("%s");
-
-    case BaseTypeEnum::VOID:
-    case BaseTypeEnum::ERROR:
-    default:
-      CodeGenerationInternalError(
-          "invalid BaseTypeEnum in "
-          "CodeGenerationVisitor::GetPrintfFormatStringForBaseType");
-      return nullptr;
-  }
 }
 
 void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
@@ -1126,15 +1105,48 @@ void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
   PrintBaseTypeValue(char_base_type_tmp.get(), close_bracket_char_val);
 }
 
+void CodeGenerationVisitor::PrintLambdaTypeValue(LambdaType *lambda_type) {
+  std::unique_ptr<BaseType> basetype_tmp =
+      BaseType::Create(BaseTypeEnum::STRING);
+  llvm::Value *lambda_type_string_value =
+      GetOrCreateString(lambda_type->ToString());
+
+  PrintBaseTypeValue(basetype_tmp.get(), lambda_type_string_value);
+}
+
 void CodeGenerationVisitor::PrintLineFeed() {
   CodegenContext &codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context.GetLLVMContext();
 
-  auto temp_char_base_type = BaseType::Create(BaseTypeEnum::CHARACTER);
+  std::unique_ptr<BaseType> basetype_tmp =
+      BaseType::Create(BaseTypeEnum::CHARACTER);
   llvm::Value *line_feed_char_value =
       llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), kLineFeedChar);
 
-  PrintBaseTypeValue(temp_char_base_type.get(), line_feed_char_value);
+  PrintBaseTypeValue(basetype_tmp.get(), line_feed_char_value);
+}
+
+llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
+    BaseType *base_type) {
+  BaseTypeEnum base_type_enum = base_type->GetBaseTypeEnum();
+  switch (base_type_enum) {
+    case BaseTypeEnum::BOOLEAN:
+      return GetOrCreateString("%d");
+    case BaseTypeEnum::CHARACTER:
+      return GetOrCreateString("%c");
+    case BaseTypeEnum::INTEGER:
+      return GetOrCreateString("%d");
+    case BaseTypeEnum::STRING:
+      return GetOrCreateString("%s");
+
+    case BaseTypeEnum::VOID:
+    case BaseTypeEnum::ERROR:
+    default:
+      CodeGenerationInternalError(
+          "invalid BaseTypeEnum in "
+          "CodeGenerationVisitor::GetPrintfFormatStringForBaseType");
+      return nullptr;
+  }
 }
 
 /******************************************************************************

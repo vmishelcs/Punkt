@@ -218,16 +218,10 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
 }
 
 void SemanticAnalysisVisitor::VisitLeave(PrintStatementNode &node) {
-  // Print only non-void, non-lambda types.
+  // Print only non-void type values.
   for (const auto &p_node : node.GetChildren()) {
-    Type *p_node_type = p_node->GetType();
-
-    if (p_node_type->GetTypeEnum() == TypeEnum::LAMBDA) {
-      PrintingLambdaTypeError(node);
-      return;
-    }
-
-    auto base_type = dynamic_cast<BaseType *>(p_node_type);
+    // Cannot print values of type void.
+    auto base_type = dynamic_cast<BaseType *>(p_node->GetType());
     if (base_type && base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
       PrintingVoidTypeError(node);
       return;
@@ -439,13 +433,6 @@ void SemanticAnalysisVisitor::AssignmentTypeMismatchError(
 
 void SemanticAnalysisVisitor::PrintingVoidTypeError(PrintStatementNode &node) {
   std::string message = "cannot print void type value at " +
-                        node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
-}
-
-void SemanticAnalysisVisitor::PrintingLambdaTypeError(
-    PrintStatementNode &node) {
-  std::string message = "cannot print lambda type value at " +
                         node.GetToken()->GetLocation().ToString();
   PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }

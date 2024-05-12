@@ -63,7 +63,6 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
   void AssignmentTypeMismatchError(ParseNode &node, const Type &target_type,
                                    const Type &value_type);
   void PrintingVoidTypeError(PrintStatementNode &node);
-  void PrintingLambdaTypeError(PrintStatementNode &node);
   void InvocationExpressionWithNonLambdaTypeError();
   void LambdaDoesNotAcceptProvidedTypesError();
   void ReturnStatementOutsideOfFunctionError(ReturnStatementNode &node);

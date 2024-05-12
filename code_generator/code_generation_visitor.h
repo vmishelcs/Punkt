@@ -10,6 +10,7 @@
 #include <parse_node/parse_node_ir_visitor.h>
 #include <semantic_analyzer/types/array_type.h>
 #include <semantic_analyzer/types/base_type.h>
+#include <semantic_analyzer/types/lambda_type.h>
 
 #include <map>
 #include <memory>
@@ -109,9 +110,10 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   /// @{
   void PrintValue(Type *type, llvm::Value *value);
   void PrintBaseTypeValue(BaseType *base_type, llvm::Value *value);
-  llvm::Value *GetPrintfFormatStringForBaseType(BaseType *base_type);
   void PrintArrayTypeValue(ArrayType *array_type, llvm::Value *arr_value);
+  void PrintLambdaTypeValue(LambdaType *lambda_type);
   void PrintLineFeed();
+  llvm::Value *GetPrintfFormatStringForBaseType(BaseType *base_type);
   /// @}
 
   llvm::Value *CodeGenerationInternalError(std::string error_msg);
