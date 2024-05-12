@@ -1050,7 +1050,8 @@ std::unique_ptr<ParseNode> Parser::ParseAllocExpression() {
     return SyntaxErrorUnexpectedToken("alloc statement");
   }
 
-  auto alloc_expr = std::make_unique<OperatorNode>(std::move(now_reading));
+  std::unique_ptr<ParseNode> alloc_expr =
+      std::make_unique<OperatorNode>(std::move(now_reading));
 
   // Discard 'alloc' token.
   ReadToken();
@@ -1065,6 +1066,15 @@ std::unique_ptr<ParseNode> Parser::ParseAllocExpression() {
   alloc_expr->AppendChild(std::move(expr));
   Expect(Punctuator::CLOSE_PARENTHESIS);
 
+  while (StartsLambdaInvocation(*now_reading) ||
+         StartsArrayIndexing(*now_reading)) {
+    if (StartsArrayIndexing(*now_reading)) {
+      alloc_expr = ParseArrayIndexing(std::move(alloc_expr));
+    } else {
+      alloc_expr = ParseLambdaInvocation(std::move(alloc_expr));
+    }
+  }
+
   return alloc_expr;
 }
 
@@ -1076,11 +1086,16 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaLiteral() {
 
   std::unique_ptr<ParseNode> lambda_literal = ParseLambda();
 
-  // If we are not parsing a lambda invocation, return the lambda literal.
-  if (!StartsLambdaInvocation(*now_reading)) {
-    return lambda_literal;
+  while (StartsLambdaInvocation(*now_reading) ||
+         StartsArrayIndexing(*now_reading)) {
+    if (StartsArrayIndexing(*now_reading)) {
+      lambda_literal = ParseArrayIndexing(std::move(lambda_literal));
+    } else {
+      lambda_literal = ParseLambdaInvocation(std::move(lambda_literal));
+    }
   }
-  return ParseLambdaInvocation(std::move(lambda_literal));
+
+  return lambda_literal;
 }
 
 bool Parser::StartsType(Token &token) {

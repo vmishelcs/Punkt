@@ -14,6 +14,12 @@
  *                               Non-leaf nodes                               *
  ******************************************************************************/
 void SemanticAnalysisPreprocessor::VisitLeave(ArrayTypeNode &node) {
+  auto base_subtype = dynamic_cast<BaseType *>(node.GetChild(0)->GetType());
+  if (base_subtype && base_subtype->GetBaseTypeEnum() == BaseTypeEnum::VOID) {
+    // Arrays cannot have void subtype.
+    VoidArrayTypeError(node);
+    return;
+  }
   node.SetType(node.InferOwnType());
 }
 
@@ -108,6 +114,12 @@ void SemanticAnalysisPreprocessor::DeclareFunction(IdentifierNode &node,
 /******************************************************************************
  *                              Error reporting                               *
  ******************************************************************************/
+void SemanticAnalysisPreprocessor::VoidArrayTypeError(ParseNode &type_node) {
+  std::string message =
+      "array of void types at " + type_node.GetTextLocation().ToString();
+  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
 void SemanticAnalysisPreprocessor::VoidParameterTypeError(
     ParseNode &type_node) {
   std::string message = "parameter cannot have void type at " +

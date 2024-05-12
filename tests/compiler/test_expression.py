@@ -67,6 +67,13 @@ class TestExpression(object):
         except RuntimeError as ex:
             assert False, "Exception was raised: " + repr(ex)
 
+    def test_good_expression_7(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
     def test_good_bool_expr_1(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()

@@ -1,0 +1,25 @@
+main {
+	const n = 4.
+	const arr1 = alloc [int] (n).
+	for var i = 0, i < n, i += 1 {
+		arr1[i] = i + 1.
+	}
+
+	const m = 8.
+	const arr2 = alloc [int] (m).
+	for var i = 0, i < m, i += 1 {
+		arr2[i] = i + 1.
+	}
+
+	var x = arr1.
+	for var i = 0, i < n, i += 1 {
+		print x[i], ' '.
+	}
+	print '\n'.
+
+	x = arr2.
+	for var i = 0, i < m, i+= 1 {
+		print x[i], ' '.
+	}
+	print '\n'.
+}

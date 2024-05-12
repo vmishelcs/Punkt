@@ -1,0 +1,14 @@
+main {
+	const n = 4.
+	const f_arr = alloc [<int, int> -> int] (n).
+
+	f_arr[0] = <int x, int y> -> int { return x + y. }.
+	f_arr[1] = <int x, int y> -> int { return x - y. }.
+	f_arr[2] = <int x, int y> -> int { return x * y. }.
+	f_arr[3] = <int x, int y> -> int { return x / y. }.
+
+	println f_arr[0](12, 4).
+	println f_arr[1](12, 4).
+	println f_arr[2](12, 4).
+	println f_arr[3](12, 4).
+}

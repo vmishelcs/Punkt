@@ -28,7 +28,8 @@ std::unique_ptr<ParseNode> OperatorNode::CreateCopy() const {
 bool OperatorNode::IsAssignmentTarget() const {
   ParseNode *parent = GetParent();
   auto op_node = dynamic_cast<OperatorNode *>(parent);
-  if (op_node && op_node->GetOperatorEnum() == Operator::ASSIGN) {
+  if (op_node && op_node->GetOperatorEnum() == Operator::ASSIGN &&
+      op_node->GetChild(0) == this) {
     return true;
   }
   return false;
