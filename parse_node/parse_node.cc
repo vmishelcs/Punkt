@@ -77,34 +77,6 @@ Scope *ParseNode::GetLocalScope() {
   return nullptr;
 }
 
-llvm::Type *ParseNode::GetLLVMType(llvm::LLVMContext &context) const {
-  Type *type = GetType();
-  auto base_type = dynamic_cast<BaseType *>(type);
-  if (base_type) {
-    switch (base_type->GetBaseTypeEnum()) {
-      case BaseTypeEnum::VOID:
-        return llvm::Type::getVoidTy(context);
-      case BaseTypeEnum::BOOLEAN:
-        return llvm::Type::getInt8Ty(context);
-      case BaseTypeEnum::CHARACTER:
-        return llvm::Type::getInt8Ty(context);
-      case BaseTypeEnum::INTEGER:
-        return llvm::Type::getInt32Ty(context);
-      case BaseTypeEnum::STRING:
-        return llvm::PointerType::getUnqual(context);
-      default:
-        return (llvm::Type *)PunktLogger::LogFatalInternalError(
-            "unimplemented BaseType in ParseNode::GetLLVMType");
-    }
-  }
-  auto lambda_type = dynamic_cast<LambdaType *>(type);
-  if (lambda_type) {
-    return llvm::PointerType::getUnqual(context);
-  }
-  return (llvm::Type *)PunktLogger::LogFatalInternalError(
-      "ParseNode::GetLLVMType implemented only for BaseType and LambdaType");
-}
-
 void ParseNode::VisitChildren(ParseNodeVisitor &visitor) {
   for (auto &child : children) {
     child->Accept(visitor);

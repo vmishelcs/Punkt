@@ -314,7 +314,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode &node) {
   std::vector<llvm::Type *> arg_types;
   for (const auto &arg : node.GetArgumentNodes()) {
     arg_values.push_back(arg->GenerateCode(*this));
-    arg_types.push_back(arg->GetLLVMType(*context));
+    arg_types.push_back(arg->GetType()->GetLLVMType(*context));
   }
 
   Type *return_type = node.GetType();
@@ -335,8 +335,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode &node) {
 
   // In order to call a function using its pointer, we need to construct the
   // function type and pass it to IRBuilder::CreateCall.
-  auto function_type = llvm::FunctionType::get(node.GetLLVMType(*context),
-                                               arg_types, /*isVarArg=*/false);
+  auto function_type = llvm::FunctionType::get(
+      node.GetType()->GetLLVMType(*context), arg_types, /*isVarArg=*/false);
 
   // Void instructions cannot have a name.
   return builder->CreateCall(function_type, callee_value, arg_values,
@@ -356,12 +356,12 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
   // Create a vector holding llvm::Type pointers describing the parameter
   // types.
   for (const auto &param_node : param_nodes) {
-    param_types.push_back(param_node->GetTypeNode()->GetLLVMType(*context));
+    param_types.push_back(param_node->GetType()->GetLLVMType(*context));
   }
 
   // Create the function type.
   auto function_type = llvm::FunctionType::get(
-      node.GetReturnTypeNode()->GetLLVMType(*context), param_types,
+      node.GetReturnTypeNode()->GetType()->GetLLVMType(*context), param_types,
       /*isVarArg=*/false);
 
   // Functions have external linkage, lambdas have private linkage.
@@ -1021,7 +1021,7 @@ void CodeGenerationVisitor::GeneratePunktArrayType() {
   llvm::StructType *punkt_array_type =
       llvm::StructType::create(*context, kPunktArrayStructName);
   std::vector<llvm::Type *> struct_fields = {
-      llvm::Type::getInt32Ty(*context) /* array size */,
+      llvm::Type::getInt64Ty(*context) /* array size */,
       llvm::PointerType::getUnqual(*context) /* array data */};
   punkt_array_type->setBody(struct_fields);
 }

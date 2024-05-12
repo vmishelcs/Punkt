@@ -1,4 +1,4 @@
 main {
-	const a = 1 + 2.
-	println a.
+	const f = <int x> -> int { return x. }.
+	f(0).
 }

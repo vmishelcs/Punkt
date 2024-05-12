@@ -86,8 +86,6 @@ class ParseNode {
 
   Scope *GetLocalScope();
 
-  llvm::Type *GetLLVMType(llvm::LLVMContext &context) const;
-
   virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) = 0;
 
  protected:
