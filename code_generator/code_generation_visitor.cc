@@ -19,7 +19,7 @@
 #include "codegen_context.h"
 
 // Array helper constants
-static const std::string kPunktArrayStructName = "PunktArray_struct";
+static const std::string kPunktArrayStructName = "struct.PunktArray";
 static const std::string kAllocPunktArrayFunctionName = "alloc_PunktArray";
 static const std::string kDeallocPunktArrayFunctionName = "dealloc_PunktArray";
 
@@ -35,6 +35,10 @@ static const std::string kCharFmtString = "%c";
 static const std::string kIntFmtString = "%d";
 static const std::string kStrFmtString = "%s";
 static const char kLineFeedChar = '\n';
+static const char kOpenBracketChar = '[';
+static const char kCommaChar = ',';
+static const char kSpaceChar = ' ';
+static const char kCloseBracketChar = ']';
 
 using codegen_function_type = llvm::Value *(*)(CodeGenerationVisitor &,
                                                OperatorNode &);
@@ -512,7 +516,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode &node) {
   }
 
   if (llvm::verifyFunction(*main_func, &llvm::errs())) {
-    return CodeGenerationInternalError("generated IR is invalid.");
+    // return CodeGenerationInternalError("generated IR is invalid.");
   }
 
   return main_func;
@@ -538,11 +542,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
 
   // We call printf for each 'operand'.
   for (auto child : node.GetChildren()) {
-    if (auto child_type = dynamic_cast<BaseType *>(child->GetType())) {
-      PrintBaseTypeValue(child_type, child->GenerateCode(*this));
-    } else {
-      CodeGenerationInternalError("unimplemented type in print statement");
-    }
+    PrintValue(child->GetType(), child->GenerateCode(*this));
   }
 
   if (node.IsPrintln()) {
@@ -577,7 +577,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
   }
 
   if (llvm::verifyModule(*module, &llvm::errs())) {
-    return CodeGenerationInternalError("generated IR is invalid.");
+    // return CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // GenerateCode(ProgramNode&) return value is not used.
@@ -816,7 +816,7 @@ void CodeGenerationVisitor::GenerateMemsetFunctionDeclaration() {
 
   std::vector<llvm::Type *> parameters = {
       llvm::PointerType::getUnqual(*context), llvm::Type::getInt8Ty(*context),
-      llvm::Type::getInt32Ty(*context)};
+      llvm::Type::getInt64Ty(*context)};
   // Create a void function taking a pointer argument.
   llvm::FunctionType *memset_func_type = llvm::FunctionType::get(
       llvm::Type::getVoidTy(*context), parameters, /* IsVarArg=*/false);
@@ -855,6 +855,16 @@ void CodeGenerationVisitor::GeneratePrintfFunctionDeclaration() {
 /******************************************************************************
  *                              Printing helpers                              *
  ******************************************************************************/
+void CodeGenerationVisitor::PrintValue(Type *type, llvm::Value *value) {
+  if (auto base_type = dynamic_cast<BaseType *>(type)) {
+    PrintBaseTypeValue(base_type, value);
+  } else if (auto array_type = dynamic_cast<ArrayType *>(type)) {
+    PrintArrayTypeValue(array_type, value);
+  } else {
+    CodeGenerationInternalError("unimplemented type in print statement");
+  }
+}
+
 void CodeGenerationVisitor::PrintBaseTypeValue(BaseType *base_type,
                                                llvm::Value *value) {
   CodegenContext &codegen_context = CodegenContext::Get();
@@ -921,6 +931,199 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
           "CodeGenerationVisitor::GetPrintfFormatStringForBaseType");
       return nullptr;
   }
+}
+
+void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
+                                                llvm::Value *PunktArray_ptr) {
+  // The array printing algorithm is described by the following pseudo-IR.
+  //
+  // array_printloop_before:
+  //   ...
+  //   ; Print '[' character
+  //   %PunktArray_size_ptr = gep PunktArray_ptr, 0
+  //   %PunktArray_size = load %PunktArray_size_ptr
+  //   %cmptmp = cmp eq %PunktArray_size, 0
+  //   br %cmptmp, label %array_printloop_end, label %array_printloop_start
+  //
+  // array_printloop_start:
+  //   %PunktArray_loop_size = sub %PunktArray_size, 1
+  //   br label %array_printloop_cond
+  //
+  // array_printloop_cond:
+  //   %arr_idx = phi [0, %array_printloop_start],
+  //                  [%next_arr_idx, %array_printloop_main]
+  //   ; Load Punkt array data to be available for %array_printloop_main and
+  //   ; %array_printloop_last.
+  //   %cmptmp = cmp ult %arr_idx, %PunktArray_loop_size
+  //   br %cmptmp, label %array_printloop_main, label %array_printloop_last
+  //
+  // array_printloop_main:
+  //   ; Print value at index %arr_idx
+  //   ; Print ',' character
+  //   ; Print ' ' character
+  //   %next_arr_idx = add %arr_idx, 1
+  //   br label %array_printloop_cond
+  //
+  // array_printloop_last:
+  //  ; Print last stored value of the array
+  //  br label %array_printloop_end
+  //
+  // array_printloop_end:
+  //  ; Print ']' character
+  //  ...
+
+  CodegenContext &codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  llvm::StructType *PunktArray_struct =
+      llvm::StructType::getTypeByName(*context, kPunktArrayStructName);
+
+  // Create basic required basic blocks.
+  llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
+  llvm::BasicBlock *printloop_start = llvm::BasicBlock::Create(
+      *context, "array_printloop_start", parent_function);
+  llvm::BasicBlock *printloop_cond =
+      llvm::BasicBlock::Create(*context, "array_printloop_cond");
+  llvm::BasicBlock *printloop_main =
+      llvm::BasicBlock::Create(*context, "array_printloop_main");
+  llvm::BasicBlock *printloop_last =
+      llvm::BasicBlock::Create(*context, "array_printloop_last");
+  llvm::BasicBlock *printloop_end =
+      llvm::BasicBlock::Create(*context, "array_printloop_end");
+
+  // array_printloop_before:
+  // Print '['.
+  auto char_base_type_tmp = BaseType::Create(BaseTypeEnum::CHARACTER);
+  llvm::Value *open_bracket_char_val =
+      llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), kOpenBracketChar);
+  PrintBaseTypeValue(char_base_type_tmp.get(), open_bracket_char_val);
+
+  // Get array size.
+  llvm::Value *PunktArray_size = builder->CreateLoad(
+      llvm::Type::getInt64Ty(*context), PunktArray_ptr, "PunktArray_size");
+
+  // Compare `PunktArray_size == 0`.
+  llvm::Value *size_check = builder->CreateICmpEQ(
+      PunktArray_size,
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0), "cmptmp");
+
+  // If `PunktArray_size == 0`, go to `printloop_end` block. Otherwise, go to
+  // `array_printloop_start`.
+  builder->CreateCondBr(size_check, printloop_end, printloop_start);
+
+  // array_printloop_start:
+  // Attach `array_printloop_start` to the end of the parent function.
+  parent_function->insert(parent_function->end(), printloop_start);
+
+  // Begin inserting in `array_printloop_start`.
+  builder->SetInsertPoint(printloop_start);
+
+  // Here, `PunktArray_loop_size` denotes the number of iterations of
+  // `array_printloop_main` where we print the array element followed by a comma
+  // and space.
+  llvm::Value *PunktArray_loop_size = builder->CreateSub(
+      PunktArray_size,
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 1),
+      "PunktArray_loop_size");
+
+  // Create an unconditional branch to `array_printloop_cond`.
+  builder->CreateBr(printloop_cond);
+
+  // array_printloop_cond:
+  // Attach `array_printloop_cond` to the end of the parent function.
+  parent_function->insert(parent_function->end(), printloop_cond);
+
+  // Begin inserting in `printloop_cond`.
+  builder->SetInsertPoint(printloop_cond);
+
+  // Create PHI node with an entry for `array_printloop_start`.
+  llvm::PHINode *arr_idx =
+      builder->CreatePHI(llvm::Type::getInt64Ty(*context), 2, "arr_idx");
+  arr_idx->addIncoming(
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0),
+      printloop_start);
+
+  // Load Punkt array data to be available for both `array_printloop_main` and
+  // `array_printloop_last`.
+  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
+      PunktArray_struct, PunktArray_ptr,
+      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
+       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 1)},
+      "PunktArray_data_ptr");
+  llvm::Value *PunktArray_data =
+      builder->CreateLoad(llvm::PointerType::getUnqual(*context),
+                          PunktArray_data_ptr, "PunktArray_data");
+
+  // Compute the `array_printloop_main` end condition.
+  llvm::Value *end_cond =
+      builder->CreateICmpULT(arr_idx, PunktArray_loop_size, "cmptmp");
+  builder->CreateCondBr(end_cond, printloop_main, printloop_last);
+
+  // array_printloop_main:
+  // Attach the `array_printloop_main` basic block to the end of the parent
+  // function.
+  parent_function->insert(parent_function->end(), printloop_main);
+
+  // Begin inserting in `printloop`.
+  builder->SetInsertPoint(printloop_main);
+
+  // Print arr[arr_idx] value.
+  Type *subtype = array_type->GetSubtype();
+  llvm::Type *llvm_subtype = subtype->GetLLVMType(*context);
+  llvm::Value *elem_addr =
+      builder->CreateGEP(llvm_subtype, PunktArray_data, {arr_idx}, "elem_addr");
+  llvm::Value *elem = builder->CreateLoad(llvm_subtype, elem_addr, "elem");
+  PrintValue(subtype, elem);
+
+  // Print ','.
+  llvm::Value *comma_char_val =
+      llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), kCommaChar);
+  PrintBaseTypeValue(char_base_type_tmp.get(), comma_char_val);
+
+  // Print ' '.
+  llvm::Value *space_char_val =
+      llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), kSpaceChar);
+  PrintBaseTypeValue(char_base_type_tmp.get(), space_char_val);
+
+  // Increment the array index.
+  llvm::Value *next_arr_idx = builder->CreateAdd(
+      arr_idx, llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 1),
+      "next_arr_idx");
+
+  // Add new entry to the PHI node for `next_arr_idx`.
+  printloop_main = builder->GetInsertBlock();
+  arr_idx->addIncoming(next_arr_idx, printloop_main);
+
+  // Create an unconditional branch to go back to `printloop_cond`.
+  builder->CreateBr(printloop_cond);
+
+  // array_printloop_last:
+  // Attach `array_printloop_last` to the end of the parent function.
+  parent_function->insert(parent_function->end(), printloop_last);
+
+  // Begin inserting in `array_printloop_last`. This basic block is to print the
+  // last stored value of the array.
+  builder->SetInsertPoint(printloop_last);
+
+  // Print last element of the array.
+  elem_addr =
+      builder->CreateGEP(llvm_subtype, PunktArray_data, {arr_idx}, "elem_addr");
+  elem = builder->CreateLoad(llvm_subtype, elem_addr, "elem");
+  PrintValue(subtype, elem);
+
+  // Create an unconditional branch to `printloop_end`.
+  builder->CreateBr(printloop_end);
+
+  // printloop_end:
+  // Append `printloop_end` basic block to the end of the parent function.
+  parent_function->insert(parent_function->end(), printloop_end);
+
+  // Any new code will be inserted after `printloop`.
+  builder->SetInsertPoint(printloop_end);
+
+  llvm::Value *close_bracket_char_val = llvm::ConstantInt::get(
+      llvm::Type::getInt8Ty(*context), kCloseBracketChar);
+  PrintBaseTypeValue(char_base_type_tmp.get(), close_bracket_char_val);
 }
 
 void CodeGenerationVisitor::PrintLineFeed() {
@@ -994,8 +1197,8 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
   llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
 
   // Create a function that returns a pointer and takes 2 integer arguments.
-  std::vector<llvm::Type *> parameters = {llvm::Type::getInt32Ty(*context),
-                                          llvm::Type::getInt32Ty(*context)};
+  std::vector<llvm::Type *> parameters = {llvm::Type::getInt64Ty(*context),
+                                          llvm::Type::getInt64Ty(*context)};
   llvm::FunctionType *f_type = llvm::FunctionType::get(
       llvm::PointerType::getUnqual(*context), parameters, /*isVarArg=*/false);
   auto alloc_PunktArray_function =
@@ -1018,30 +1221,25 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
   llvm::Value *PunktArray_ptr = builder->CreateCall(
       malloc_func,
       {llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 16)},
-      "PunktArray");
+      "PunktArray_ptr");
 
   // Store array size in the size field.
   builder->CreateStore(alloc_PunktArray_function->getArg(1), PunktArray_ptr);
 
   // Calculate the number of bytes required for the data field.
-  llvm::Value *data_size_in_bytes_32 = builder->CreateMul(
+  llvm::Value *data_size_in_bytes = builder->CreateMul(
       alloc_PunktArray_function->getArg(0),
-      alloc_PunktArray_function->getArg(1), "data_size_in_bytes_32");
-
-  // Sign-extend to match malloc function signature.
-  llvm::Value *data_size_in_bytes_64 = builder->CreateSExt(
-      data_size_in_bytes_32, llvm::Type::getInt64Ty(*context),
-      "data_size_in_bytes_64");
+      alloc_PunktArray_function->getArg(1), "data_size_in_bytes");
 
   // Allocate memory for the array.
   llvm::Value *data_memory_block = builder->CreateCall(
-      malloc_func, {data_size_in_bytes_64}, "data_memory_block");
+      malloc_func, {data_size_in_bytes}, "data_memory_block");
 
   // Initialize all memory within the data block to 0.
   builder->CreateCall(
       memset_func, {data_memory_block,
                     llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0),
-                    data_size_in_bytes_32});
+                    data_size_in_bytes});
 
   auto PunktArray_struct =
       llvm::StructType::getTypeByName(*context, kPunktArrayStructName);

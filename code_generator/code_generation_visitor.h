@@ -8,6 +8,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <parse_node/parse_node_ir_visitor.h>
+#include <semantic_analyzer/types/array_type.h>
 #include <semantic_analyzer/types/base_type.h>
 
 #include <map>
@@ -106,8 +107,10 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
 
   /// Printing helper methods.
   /// @{
+  void PrintValue(Type *type, llvm::Value *value);
   void PrintBaseTypeValue(BaseType *base_type, llvm::Value *value);
   llvm::Value *GetPrintfFormatStringForBaseType(BaseType *base_type);
+  void PrintArrayTypeValue(ArrayType *array_type, llvm::Value *arr_value);
   void PrintLineFeed();
   /// @}
 

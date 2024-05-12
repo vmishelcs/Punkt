@@ -441,10 +441,12 @@ llvm::Value *operator_codegen::ArrayAllocCodegen(
   Type *subtype = array_type->GetSubtype();
   int elem_size = subtype->GetSizeInBytes();
   llvm::Value *elem_size_value =
-      llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), elem_size);
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), elem_size);
 
   // Generate code for array size.
   llvm::Value *arr_size_value = node.GetChild(1)->GenerateCode(codegen_visitor);
+  arr_size_value =
+      builder->CreateZExt(arr_size_value, llvm::Type::getInt64Ty(*context));
 
   // Call internal function for allocating arrays.
   const std::string &alloc_PunktArray_function_name =
