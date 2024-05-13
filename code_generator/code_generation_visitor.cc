@@ -1153,11 +1153,11 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
  *                           Miscellaneous helpers                            *
  ******************************************************************************/
 llvm::AllocaInst *CodeGenerationVisitor::CreateEntryBlockAlloca(
-    llvm::Function *function, const std::string &identifier_name,
+    llvm::Function *function, const std::string &identifier,
     llvm::Type *llvm_type) {
   llvm::IRBuilder<> tmp_builder(&function->getEntryBlock(),
                                 function->getEntryBlock().begin());
-  return tmp_builder.CreateAlloca(llvm_type, nullptr, identifier_name);
+  return tmp_builder.CreateAlloca(llvm_type, nullptr, identifier);
 }
 
 llvm::Value *CodeGenerationVisitor::GetOrCreateString(const std::string &str) {

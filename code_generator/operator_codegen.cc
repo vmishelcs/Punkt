@@ -445,6 +445,7 @@ llvm::Value *operator_codegen::ArrayAllocCodegen(
 
   // Generate code for array size.
   llvm::Value *arr_size_value = node.GetChild(1)->GenerateCode(codegen_visitor);
+  // TODO: Runtime error if array size is negative.
   arr_size_value =
       builder->CreateZExt(arr_size_value, llvm::Type::getInt64Ty(*context));
 
@@ -487,6 +488,7 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(
   Type *subtype = array_type->GetSubtype();
   llvm::Type *llvm_subtype = subtype->GetLLVMType(*context);
   llvm::Value *idx = node.GetChild(1)->GenerateCode(codegen_visitor);
+  // TODO: Runtime error if index is negative.
   llvm::Value *elem_addr =
       builder->CreateGEP(llvm_subtype, PunktArray_data, {idx}, "elemaddr");
 
