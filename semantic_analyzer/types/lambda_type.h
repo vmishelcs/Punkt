@@ -59,7 +59,7 @@ class LambdaType : public Type {
   /// @brief Resets any arbitrary parameter types, or arbitrary return type.
   virtual void ResetArbitraryTypes() override;
 
-  virtual int GetSizeInBytes() const override;
+  virtual unsigned GetSizeInBytes() const override;
   virtual llvm::Type *GetLLVMType(
       llvm::LLVMContext &llvm_context) const override;
 

@@ -17,11 +17,11 @@ void CodegenContext::Initialize(std::string module_id) {
   instance = std::make_unique<CodegenContext>(module_id);
 }
 
-CodegenContext &CodegenContext::Get() {
+CodegenContext *CodegenContext::Get() {
   if (instance == nullptr) {
     PunktLogger::LogFatalInternalError("CodegenContext not initialized");
   }
-  return *instance;
+  return instance.get();
 }
 
 CodegenContext::CodegenContext(std::string module_id)

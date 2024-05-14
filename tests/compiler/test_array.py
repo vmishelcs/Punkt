@@ -78,3 +78,31 @@ class TestArray(object):
             self._compile_helper.verify_actual_output(actual_output_path)
         except RuntimeError as ex:
             assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_array_7(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_array_8(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_array_9(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_array_10(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)

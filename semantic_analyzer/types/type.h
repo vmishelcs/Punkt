@@ -37,7 +37,7 @@ class Type {
   /// nothing happens.
   virtual void ResetArbitraryTypes() = 0;
 
-  virtual int GetSizeInBytes() const = 0;
+  virtual unsigned GetSizeInBytes() const = 0;
   virtual llvm::Type *GetLLVMType(llvm::LLVMContext &llvm_context) const = 0;
 
  protected:

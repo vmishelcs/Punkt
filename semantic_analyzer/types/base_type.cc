@@ -7,7 +7,7 @@
 static const int kVoidTypeSizeInBytes = 0;
 static const int kBooleanTypeSizeInBytes = 1;
 static const int kCharacterTypeSizeInBytes = 1;
-static const int kIntegerTypeSizeInBytes = 4;
+static const int kIntegerTypeSizeInBytes = 8;
 static const int kStringTypeSizeInBytes = 8;
 static const int kErrorTypeSizeInBytes = 0;
 
@@ -56,7 +56,7 @@ std::unique_ptr<Type> BaseType::CreateEquivalentType() const {
   return std::make_unique<BaseType>(this->base_type_enum);
 }
 
-int BaseType::GetSizeInBytes() const {
+unsigned BaseType::GetSizeInBytes() const {
   switch (base_type_enum) {
     case BaseTypeEnum::VOID:
       return kVoidTypeSizeInBytes;
@@ -86,7 +86,7 @@ llvm::Type *BaseType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
     case BaseTypeEnum::CHARACTER:
       return llvm::Type::getInt8Ty(llvm_context);
     case BaseTypeEnum::INTEGER:
-      return llvm::Type::getInt32Ty(llvm_context);
+      return llvm::Type::getInt64Ty(llvm_context);
     case BaseTypeEnum::STRING:
       return llvm::PointerType::getUnqual(llvm_context);
     case BaseTypeEnum::ERROR:

@@ -3,6 +3,9 @@
 #include <logging/punkt_logger.h>
 #include <token/all_tokens.h>
 
+#include <cstdint>
+#include <cstdlib>
+
 #include "keyword.h"
 
 static const size_t kMaxIdentifierLength = 32;
@@ -94,7 +97,9 @@ std::unique_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
     buffer.push_back(ch.character);
     ch = input_stream->Peek();
   }
-  int value = std::stoi(buffer);
+
+  char *buffer_end{};
+  int64_t value = strtoll(buffer.c_str(), &buffer_end, 10);
   return std::make_unique<IntegerLiteralToken>(buffer, first_char.location,
                                                value);
 }

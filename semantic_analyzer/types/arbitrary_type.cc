@@ -26,7 +26,7 @@ bool ArbitraryType::IsEquivalentTo(Type *other_type) {
 
 void ArbitraryType::ResetArbitraryTypes() { ResetSetType(); }
 
-int ArbitraryType::GetSizeInBytes() const {
+unsigned ArbitraryType::GetSizeInBytes() const {
   if (set_type) {
     return set_type->GetSizeInBytes();
   }

@@ -94,7 +94,7 @@ class BaseType : public Type {
   /// @brief This method should do nothing for BaseTypes.
   virtual void ResetArbitraryTypes() override {}
 
-  virtual int GetSizeInBytes() const override;
+  virtual unsigned GetSizeInBytes() const override;
   virtual llvm::Type *GetLLVMType(
       llvm::LLVMContext &llvm_context) const override;
 

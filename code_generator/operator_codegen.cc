@@ -17,8 +17,8 @@
  ******************************************************************************/
 llvm::Value *operator_codegen::AssignmentCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *target = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *new_value = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -41,9 +41,9 @@ llvm::Value *operator_codegen::UnaryNop(CodeGenerationVisitor &codegen_visitor,
  ******************************************************************************/
 llvm::Value *operator_codegen::BooleanNegationCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *operand = node.GetChild(0)->GenerateCode(codegen_visitor);
 
@@ -61,9 +61,9 @@ llvm::Value *operator_codegen::BooleanNegationCodegen(
 
 llvm::Value *operator_codegen::BooleanCmpEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -86,9 +86,9 @@ llvm::Value *operator_codegen::BooleanCmpEQCodegen(
 
 llvm::Value *operator_codegen::BooleanCmpNEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -111,9 +111,9 @@ llvm::Value *operator_codegen::BooleanCmpNEQCodegen(
 
 llvm::Value *operator_codegen::BooleanAndCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -131,9 +131,9 @@ llvm::Value *operator_codegen::BooleanAndCodegen(
 
 llvm::Value *operator_codegen::BooleanOrCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -154,9 +154,9 @@ llvm::Value *operator_codegen::BooleanOrCodegen(
  ******************************************************************************/
 llvm::Value *operator_codegen::CharacterCmpEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -174,9 +174,9 @@ llvm::Value *operator_codegen::CharacterCmpEQCodegen(
 
 llvm::Value *operator_codegen::CharacterCmpNEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -194,9 +194,9 @@ llvm::Value *operator_codegen::CharacterCmpNEQCodegen(
 
 llvm::Value *operator_codegen::CharacterCmpGTCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -214,9 +214,9 @@ llvm::Value *operator_codegen::CharacterCmpGTCodegen(
 
 llvm::Value *operator_codegen::CharacterCmpLTCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -234,9 +234,9 @@ llvm::Value *operator_codegen::CharacterCmpLTCodegen(
 
 llvm::Value *operator_codegen::CharacterCmpGEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -254,9 +254,9 @@ llvm::Value *operator_codegen::CharacterCmpGEQCodegen(
 
 llvm::Value *operator_codegen::CharacterCmpLEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -277,20 +277,21 @@ llvm::Value *operator_codegen::CharacterCmpLEQCodegen(
  ******************************************************************************/
 llvm::Value *operator_codegen::IntegerNegationCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *operand = node.GetChild(0)->GenerateCode(codegen_visitor);
 
-  auto neg_val = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), -1);
-  return builder->CreateMul(operand, neg_val, "negtmp");
+  return builder->CreateSub(
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0), operand,
+      "negtmp");
 }
 
 llvm::Value *operator_codegen::IntegerAddCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -300,8 +301,8 @@ llvm::Value *operator_codegen::IntegerAddCodegen(
 
 llvm::Value *operator_codegen::IntegerSubtractCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -311,8 +312,8 @@ llvm::Value *operator_codegen::IntegerSubtractCodegen(
 
 llvm::Value *operator_codegen::IntegerMultiplyCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -322,8 +323,8 @@ llvm::Value *operator_codegen::IntegerMultiplyCodegen(
 
 llvm::Value *operator_codegen::IntegerDivideCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -333,8 +334,8 @@ llvm::Value *operator_codegen::IntegerDivideCodegen(
 
 llvm::Value *operator_codegen::IntegerModuloCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -344,9 +345,9 @@ llvm::Value *operator_codegen::IntegerModuloCodegen(
 
 llvm::Value *operator_codegen::IntegerCmpEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -358,9 +359,9 @@ llvm::Value *operator_codegen::IntegerCmpEQCodegen(
 
 llvm::Value *operator_codegen::IntegerCmpNEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -372,9 +373,9 @@ llvm::Value *operator_codegen::IntegerCmpNEQCodegen(
 
 llvm::Value *operator_codegen::IntegerCmpGTCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -386,9 +387,9 @@ llvm::Value *operator_codegen::IntegerCmpGTCodegen(
 
 llvm::Value *operator_codegen::IntegerCmpLTCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -400,9 +401,9 @@ llvm::Value *operator_codegen::IntegerCmpLTCodegen(
 
 llvm::Value *operator_codegen::IntegerCmpGEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -414,9 +415,9 @@ llvm::Value *operator_codegen::IntegerCmpGEQCodegen(
 
 llvm::Value *operator_codegen::IntegerCmpLEQCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
@@ -431,23 +432,38 @@ llvm::Value *operator_codegen::IntegerCmpLEQCodegen(
  ******************************************************************************/
 llvm::Value *operator_codegen::ArrayAllocCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::Module *module = codegen_context.GetModule();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::Module *module = codegen_context->GetModule();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   // Determine array element size.
   ArrayType *array_type = static_cast<ArrayType *>(node.GetChild(0)->GetType());
   Type *subtype = array_type->GetSubtype();
-  int elem_size = subtype->GetSizeInBytes();
+  unsigned elem_size = subtype->GetSizeInBytes();
   llvm::Value *elem_size_value =
       llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), elem_size);
 
   // Generate code for array size.
   llvm::Value *arr_size_value = node.GetChild(1)->GenerateCode(codegen_visitor);
-  // TODO: Runtime error if array size is negative.
-  arr_size_value =
-      builder->CreateZExt(arr_size_value, llvm::Type::getInt64Ty(*context));
+
+  // Issue a runtime error if array size is negative.
+  llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
+  llvm::BasicBlock *negative_array_size_true = llvm::BasicBlock::Create(
+      *context, "negative_array_size_true", parent_function);
+  llvm::BasicBlock *negative_array_size_false = llvm::BasicBlock::Create(
+      *context, "negative_array_size_false", parent_function);
+  llvm::Value *negative_array_size_check = builder->CreateICmpSLT(
+      arr_size_value,
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0),
+      "negative_array_size_check");
+  builder->CreateCondBr(negative_array_size_check, negative_array_size_true,
+                        negative_array_size_false);
+
+  builder->SetInsertPoint(negative_array_size_true);
+  codegen_visitor.GenerateRuntimeErrorWithMessage("negative array size");
+
+  builder->SetInsertPoint(negative_array_size_false);
 
   // Call internal function for allocating arrays.
   const std::string &alloc_PunktArray_function_name =
@@ -463,9 +479,9 @@ llvm::Value *operator_codegen::ArrayAllocCodegen(
 
 llvm::Value *operator_codegen::ArrayIndexingCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext &codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context.GetLLVMContext();
-  llvm::IRBuilder<> *builder = codegen_context.GetIRBuilder();
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   // Find Punkt array struct type.
   const std::string &PunktArray_struct_name =
@@ -488,7 +504,27 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(
   Type *subtype = array_type->GetSubtype();
   llvm::Type *llvm_subtype = subtype->GetLLVMType(*context);
   llvm::Value *idx = node.GetChild(1)->GenerateCode(codegen_visitor);
-  // TODO: Runtime error if index is negative.
+
+  // Issue a runtime error if index is negative.
+  llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
+  llvm::BasicBlock *negative_index_true = llvm::BasicBlock::Create(
+      *context, "negative_index_true", parent_function);
+  llvm::BasicBlock *negative_index_false = llvm::BasicBlock::Create(
+      *context, "negative_index_false", parent_function);
+  llvm::Value *negative_index_check = builder->CreateICmpSLT(
+      idx, llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0),
+      "negative_index_check");
+  builder->CreateCondBr(negative_index_check, negative_index_true,
+                        negative_index_false);
+
+  builder->SetInsertPoint(negative_index_true);
+  codegen_visitor.GenerateRuntimeErrorWithMessage("negative array index");
+
+  builder->SetInsertPoint(negative_index_false);
+
+  // TODO: Issue a runtime error if index is out of bounds (index >= size of
+  // array).
+
   llvm::Value *elem_addr =
       builder->CreateGEP(llvm_subtype, PunktArray_data, {idx}, "elemaddr");
 

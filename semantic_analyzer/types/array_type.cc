@@ -33,7 +33,7 @@ std::string ArrayType::ToString() const {
 
 void ArrayType::ResetArbitraryTypes() { subtype->ResetArbitraryTypes(); }
 
-int ArrayType::GetSizeInBytes() const { return kArrayTypeSizeInBytes; }
+unsigned ArrayType::GetSizeInBytes() const { return kArrayTypeSizeInBytes; }
 
 llvm::Type *ArrayType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
   return llvm::PointerType::getUnqual(llvm_context);

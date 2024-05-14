@@ -16,6 +16,8 @@
 #include <memory>
 #include <string>
 
+#include "codegen_context.h"
+
 class CodeGenerationVisitor : public ParseNodeIRVisitor {
  public:
   CodeGenerationVisitor(std::string module_id);
@@ -54,9 +56,9 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   const std::string &GetAllocPunktArrayFunctionName() const;
   const std::string &GetDeallocPunktArrayFunctionName() const;
 
- private:
-  void GenerateGlobalConstants();
+  void GenerateRuntimeErrorWithMessage(const std::string &message);
 
+ private:
   bool IsPreviousInstructionBlockTerminator();
 
   /// @brief Create an `AllocaInst` in the entry block of a specified function
@@ -70,22 +72,28 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
                                            const std::string &identifier,
                                            llvm::Type *llvm_type);
 
+  /// @brief Get an `llvm::Value` pointer to the provided string.
+  /// @param str String to be created in the IR.
+  /// @return `llvm::Value` pointer to the specified string.
   llvm::Value *GetOrCreateString(const std::string &str);
 
   /// Helpful C standard library functions.
   /// @{
-  /// @brief Generate LLVM IR for the `malloc(int)` C standard library function
-  /// declaration.
+  /// @brief Generate LLVM IR for the `malloc(int64_t)` C standard library
+  /// function declaration.
   void GenerateMallocFunctionDeclaration();
   /// @brief Generate LLVM IR for the `free(void *)` C standard library function
   /// declaration.
   void GenerateFreeFunctionDeclaration();
-  /// @brief Generate LLVM IR for the `memset(void *, char, int)` C standard
+  /// @brief Generate LLVM IR for the `memset(void *, char, int64_t)` C standard
   /// library function declaration.
   void GenerateMemsetFunctionDeclaration();
-  /// @brief Generate LLVM for the `printf(const char *, ...)` C standard
+  /// @brief Generate LLVM IR for the `printf(const char *, ...)` C standard
   /// library function delcaration.
   void GeneratePrintfFunctionDeclaration();
+  /// @brief Generate LLVM IR for the `exit(int)` C standard library function
+  /// declaration.
+  void GenerateExitFunctionDeclaration();
   /// @}
 
   /// Generate LLVM IR for the `PunktArray` struct. This struct is
@@ -118,7 +126,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
 
   llvm::Value *CodeGenerationInternalError(std::string error_msg);
 
-  std::map<std::string, llvm::Value *> global_constants_table;
+  CodegenContext *codegen_context;
   std::map<std::string, llvm::Value *> string_map;
 };
 

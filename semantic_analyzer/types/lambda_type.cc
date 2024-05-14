@@ -119,7 +119,7 @@ void LambdaType::ResetArbitraryTypes() {
   return_type->ResetArbitraryTypes();
 }
 
-int LambdaType::GetSizeInBytes() const {
+unsigned LambdaType::GetSizeInBytes() const {
   // Lambdas are pointers.
   return kLambdaTypeSizeInBytes;
 }
