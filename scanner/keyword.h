@@ -19,6 +19,7 @@ enum class Keyword {
   PRINT,
   PRINTLN,
   RETURN,
+  SIZEOF,
   STRING,
   TRUE,
   VAR,

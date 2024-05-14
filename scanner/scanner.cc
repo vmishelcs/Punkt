@@ -77,6 +77,10 @@ std::unique_ptr<Token> Scanner::ScanKeywordOrIdentifier(
       return std::make_unique<OperatorToken>(buffer, first_char.location,
                                              Operator::ALLOC);
     }
+    if (keyword == Keyword::SIZEOF) {
+      return std::make_unique<OperatorToken>(buffer, first_char.location,
+                                             Operator::SIZEOF);
+    }
     return std::make_unique<KeywordToken>(buffer, first_char.location, keyword);
   }
 

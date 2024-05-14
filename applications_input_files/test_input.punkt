@@ -1,8 +1,4 @@
 main {
-	const size = 13.
-	const arr = alloc [int] (size).
-
-	for var i = 0, i < size, i += 1 {
-		arr[i] = 3 * i + 7.
-	}
+	const arr = alloc [[int]] (5).
+	var x = sizeof(arr).
 }

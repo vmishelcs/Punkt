@@ -13,9 +13,10 @@ static std::map<std::string, Keyword> dictionary = {
     {"function", Keyword::FUNCTION}, {"if", Keyword::IF},
     {"int", Keyword::INT},           {"main", Keyword::MAIN},
     {"print", Keyword::PRINT},       {"println", Keyword::PRINTLN},
-    {"return", Keyword::RETURN},     {"string", Keyword::STRING},
-    {"true", Keyword::TRUE},         {"var", Keyword::VAR},
-    {"void", Keyword::VOID},         {"while", Keyword::WHILE}};
+    {"return", Keyword::RETURN},     {"sizeof", Keyword::SIZEOF},
+    {"string", Keyword::STRING},     {"true", Keyword::TRUE},
+    {"var", Keyword::VAR},           {"void", Keyword::VOID},
+    {"while", Keyword::WHILE}};
 
 static std::map<Keyword, std::string> reverse_dictionary = [] {
   std::map<Keyword, std::string> result;

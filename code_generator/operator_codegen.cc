@@ -470,9 +470,8 @@ llvm::Value *operator_codegen::ArrayAllocCodegen(
       codegen_visitor.GetAllocPunktArrayFunctionName();
   llvm::Function *alloc_PunktArray_function =
       module->getFunction(alloc_PunktArray_function_name);
-  llvm::Value *result =
-      builder->CreateCall(alloc_PunktArray_function,
-                          {elem_size_value, arr_size_value}, "alloc_arr");
+  llvm::Value *result = builder->CreateCall(
+      alloc_PunktArray_function, {elem_size_value, arr_size_value}, "new_arr");
 
   return result;
 }
@@ -535,4 +534,16 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(
   }
 
   return builder->CreateLoad(llvm_subtype, elem_addr, "elemval");
+}
+
+llvm::Value *operator_codegen::ArraySizeofCodegen(
+    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  // Size of array is the first field of the PunktArray struct.
+  llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(codegen_visitor);
+  return builder->CreateLoad(llvm::Type::getInt64Ty(*context), PunktArray_ptr,
+                             "PunktArray_size");
 }

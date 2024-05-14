@@ -72,6 +72,8 @@ llvm::Value *ArrayAllocCodegen(CodeGenerationVisitor &codegen_visitor,
                                OperatorNode &operator_node);
 llvm::Value *ArrayIndexingCodegen(CodeGenerationVisitor &codegen_visitor,
                                   OperatorNode &operator_node);
+llvm::Value *ArraySizeofCodegen(CodeGenerationVisitor &codegen_visitor,
+                                OperatorNode &operator_node);
 
 };  // namespace operator_codegen
 

@@ -153,7 +153,10 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
     {Operator::ARRAY_IDX,
      {Signature({kArbitraryArrayTypeT.get(), kBaseTypeInteger.get()},
                 kArbitraryArrayTypeT->GetSubtype(),
-                operator_codegen::ArrayIndexingCodegen)}}};
+                operator_codegen::ArrayIndexingCodegen)}},
+    {Operator::SIZEOF,
+     {Signature({kArbitraryArrayTypeT.get()}, kBaseTypeInteger.get(),
+                operator_codegen::ArraySizeofCodegen)}}};
 
 Signature *signatures::AcceptingSignature(Operator op,
                                           const std::vector<Type *> &types) {

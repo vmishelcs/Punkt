@@ -800,7 +800,8 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
 
 bool Parser::StartsUnaryExpression(Token &token) {
   return OperatorToken::IsTokenOperator(
-             &token, {Operator::BOOL_NOT, Operator::PLUS, Operator::MINUS}) ||
+             &token, {Operator::BOOL_NOT, Operator::PLUS, Operator::MINUS,
+                      Operator::SIZEOF}) ||
          StartsAtomicExpression(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
@@ -808,9 +809,9 @@ std::unique_ptr<ParseNode> Parser::ParseUnaryExpression() {
     return SyntaxErrorUnexpectedToken("unary expression");
   }
 
-  if (OperatorToken::IsTokenOperator(
-          now_reading.get(),
-          {Operator::BOOL_NOT, Operator::PLUS, Operator::MINUS})) {
+  if (OperatorToken::IsTokenOperator(now_reading.get(),
+                                     {Operator::BOOL_NOT, Operator::PLUS,
+                                      Operator::MINUS, Operator::SIZEOF})) {
     auto unary_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 

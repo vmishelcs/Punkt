@@ -25,6 +25,7 @@ enum class Operator {
   MUL_ASSIGN,
   MUL,
   PLUS,
+  SIZEOF,
   SUB_ASSIGN,
 };
 
