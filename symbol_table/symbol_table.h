@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_map>
 
-enum class SymbolType { VARIABLE, LAMBDA };
+enum class SymbolType { VARIABLE, FUNCTION };
 
 struct SymbolTableEntry {
   const TextLocation text_location;

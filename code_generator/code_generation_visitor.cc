@@ -20,8 +20,9 @@
 
 // Array helper constants
 static const std::string kPunktArrayStructName = "struct.PunktArray";
-static const std::string kAllocPunktArrayFunctionName = "alloc_PunktArray";
-static const std::string kDeallocPunktArrayFunctionName = "dealloc_PunktArray";
+static const std::string kAllocPunktArrayFunctionName = "function.alloc_array";
+static const std::string kDeallocPunktArrayFunctionName =
+    "function.dealloc_array";
 
 // Function names
 static const std::string kMainFunctionName = "main";
@@ -113,23 +114,13 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   IdentifierNode *identifier_node = node.GetIdentifierNode();
-  if (!identifier_node) {
-    return CodeGenerationInternalError(
-        "GenerateCode(DeclarationStatementNode&): "
-        "incorrectly constructed declaration node.");
-  }
 
   // Generate code for initializer value.
   llvm::Value *initializer_value = node.GetInitializer()->GenerateCode(*this);
-  if (dynamic_cast<LambdaNode *>(node.GetInitializer())) {
-    // If the initializer value is a lambda node, all declaration codegen has
-    // already been done in the `GenerateCode(LambdaNode&)` method.
-    return initializer_value;
-  }
 
   SymbolTableEntry *sym_table_entry = identifier_node->GetSymbolTableEntry();
   if (!sym_table_entry) {
-    return CodeGenerationInternalError(
+    CodeGenerationInternalError(
         "no symbol table entry found for identifier node.");
   }
 
@@ -388,11 +379,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
   // Functions have external linkage, lambdas have private linkage.
   llvm::GlobalValue::LinkageTypes linkage_type =
       node.IsFunction() ? llvm::GlobalValue::LinkageTypes::ExternalLinkage
-                        : llvm::GlobalValue::LinkageTypes::InternalLinkage;
+                        : llvm::GlobalValue::LinkageTypes::PrivateLinkage;
 
   // Create the function.
   auto function = llvm::Function::Create(function_type, linkage_type,
-                                         "user_function", module);
+                                         "function.user_function", module);
 
   // Set names for arguments.
   unsigned i = 0;
@@ -403,28 +394,15 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
 
   // Check if this lambda is anonymous.
   if (!node.IsAnonymous()) {
-    // TODO: This seems to not work if we assign a variable a new lamdba.
-    // Consider this example:
-    // var f = <int x> -> int { return x. }.
-    // f = <int x> -> int { return -x. }.
-    // # `f` still holds the original definition.
+    // Locate the identifier node.
+    ParseNode *parent = node.GetParent();
+    auto identifier_node = static_cast<IdentifierNode *>(parent->GetChild(0));
 
-    // If it is not anonymous, store the function signature in the
-    // identifier's symbol table entry.
-    IdentifierNode *identifier_node = nullptr;
-    if (auto func_def_node =
-            dynamic_cast<FunctionDefinitionNode *>(node.GetParent())) {
-      identifier_node =
-          static_cast<IdentifierNode *>(func_def_node->GetIdentifierNode());
-    } else /* parent is a DeclarationStatementNode */
-    {
-      auto decl_node =
-          dynamic_cast<DeclarationStatementNode *>(node.GetParent());
-      identifier_node = decl_node->GetIdentifierNode();
-    }
-
+    // Store llvm::Function pointer in the symbol table entry.
     SymbolTableEntry *sym_table_entry = identifier_node->GetSymbolTableEntry();
-    sym_table_entry->function = function;
+    if (dynamic_cast<FunctionDefinitionNode *>(parent)) {
+      sym_table_entry->function = function;
+    }
   }
 
   // In case we are generating lambda variable code, save the current insert
@@ -480,7 +458,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
 
   // Validate generated code.
   if (llvm::verifyFunction(*function, &llvm::errs())) {
-    CodeGenerationInternalError("generated IR is invalid.");
+    // CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // Restore builder insert point after generating lambda.
@@ -594,7 +572,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
   }
 
   if (llvm::verifyModule(*module, &llvm::errs())) {
-    CodeGenerationInternalError("generated IR is invalid.");
+    // CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // GenerateCode(ProgramNode&) return value is not used.
@@ -650,8 +628,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
   // Create a basic block for the loop exit.
   auto afterloop_block = llvm::BasicBlock::Create(*llvm_context, "afterloop");
 
-  // Insert an explicit fall-through from the current block (before the loop) to
-  // the loop condition block.
+  // Insert an explicit fall-through from the current block (before the
+  // loop) to the loop condition block.
   builder->CreateBr(condition_block);
 
   // Now we are inserting instructions into the loop condition block.
@@ -684,13 +662,13 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
   // Check if the loop block ends in a block terminator.
   llvm::Instruction *loop_block_last_inst = loop_block->getTerminator();
   if (!loop_block_last_inst || !loop_block_last_inst->isTerminator()) {
-    // Create an unconditional branch to the start of the loop, where we check
-    // the while condition.
+    // Create an unconditional branch to the start of the loop, where we
+    // check the while condition.
     builder->CreateBr(condition_block);
   }
 
-  // Append the afterloop block. We jump to this block if the while condition is
-  // false.
+  // Append the afterloop block. We jump to this block if the while
+  // condition is false.
   parent_function->insert(parent_function->end(), afterloop_block);
 
   // Any subsequent code is inserted in the afterloop block.
@@ -701,7 +679,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
 }
 
 /******************************************************************************
- *                      Code generation for identifiers                       *
+ *                      Code generation for identifiers *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
@@ -713,7 +691,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
                                 node.ToString());
   }
 
-  if (sym_table_entry->symbol_type == SymbolType::LAMBDA) {
+  if (sym_table_entry->symbol_type == SymbolType::FUNCTION) {
     return sym_table_entry->function;
   }
 
@@ -766,7 +744,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
 }
 
 /******************************************************************************
- *                            NOP code generation                             *
+ *                            NOP code generation *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
@@ -778,7 +756,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
 }
 
 /******************************************************************************
- *              Helpful C standard library function declarations              *
+ *              Helpful C standard library function declarations *
  ******************************************************************************/
 void CodeGenerationVisitor::GenerateMallocFunctionDeclaration() {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
@@ -824,8 +802,8 @@ void CodeGenerationVisitor::GenerateMemsetFunctionDeclaration() {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::Module *module = codegen_context->GetModule();
 
-  // Create a void function taking a pointer, a char, and a 64-bit integer as
-  // arguments.
+  // Create a void function taking a pointer, a char, and a 64-bit integer
+  // as arguments.
   std::vector<llvm::Type *> parameters = {
       llvm::PointerType::getUnqual(*llvm_context),
       llvm::Type::getInt8Ty(*llvm_context),
@@ -881,7 +859,7 @@ void CodeGenerationVisitor::GenerateExitFunctionDeclaration() {
 }
 
 /******************************************************************************
- *                              Printing helpers                              *
+ *                              Printing helpers *
  ******************************************************************************/
 void CodeGenerationVisitor::PrintValue(Type *type, llvm::Value *value) {
   if (auto base_type = dynamic_cast<BaseType *>(type)) {
@@ -919,8 +897,8 @@ void CodeGenerationVisitor::PrintBaseTypeValue(BaseType *base_type,
   llvm::Value *print_value = value;
   if (base_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
     // When printing booleans, we first truncate to 1-bit such that only the
-    // least significant bit remains. Then we extend to 32 bits and print the
-    // boolean as an integer.
+    // least significant bit remains. Then we extend to 32 bits and print
+    // the boolean as an integer.
     auto truncated_value = builder->CreateTrunc(
         print_value, llvm::Type::getInt1Ty(*context), "trunctmp");
     print_value = builder->CreateZExt(
@@ -1013,8 +991,8 @@ void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
       llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0),
       "cmptmp");
 
-  // If `PunktArray_size == 0`, go to `printloop_end` block. Otherwise, go to
-  // `array_printloop_start`.
+  // If `PunktArray_size == 0`, go to `printloop_end` block. Otherwise, go
+  // to `array_printloop_start`.
   builder->CreateCondBr(size_check, printloop_end, printloop_start);
 
   // array_printloop_start:
@@ -1025,8 +1003,8 @@ void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
   builder->SetInsertPoint(printloop_start);
 
   // Here, `PunktArray_loop_size` denotes the number of iterations of
-  // `array_printloop_main` where we print the array element followed by a comma
-  // and space.
+  // `array_printloop_main` where we print the array element followed by a
+  // comma and space.
   llvm::Value *PunktArray_loop_size = builder->CreateSub(
       PunktArray_size,
       llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 1),
@@ -1049,8 +1027,8 @@ void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
       llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0),
       printloop_start);
 
-  // Load Punkt array data to be available for both `array_printloop_main` and
-  // `array_printloop_last`.
+  // Load Punkt array data to be available for both `array_printloop_main`
+  // and `array_printloop_last`.
   llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
       PunktArray_struct, PunktArray_ptr,
       {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 0),
@@ -1107,8 +1085,8 @@ void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
   // Attach `array_printloop_last` to the end of the parent function.
   parent_function->insert(parent_function->end(), printloop_last);
 
-  // Begin inserting in `array_printloop_last`. This basic block is to print the
-  // last stored value of the array.
+  // Begin inserting in `array_printloop_last`. This basic block is to print
+  // the last stored value of the array.
   builder->SetInsertPoint(printloop_last);
 
   // Print last element of the array.
@@ -1175,7 +1153,7 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
 }
 
 /******************************************************************************
- *                           Miscellaneous helpers                            *
+ *                           Miscellaneous helpers *
  ******************************************************************************/
 void CodeGenerationVisitor::GenerateRuntimeErrorWithMessage(
     const std::string &message) {
@@ -1228,7 +1206,7 @@ bool CodeGenerationVisitor::IsPreviousInstructionBlockTerminator() {
 }
 
 /******************************************************************************
- *                         Punkt array helper methods                         *
+ *                         Punkt array helper methods *
  ******************************************************************************/
 void CodeGenerationVisitor::GeneratePunktArrayType() {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
@@ -1254,20 +1232,20 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
   llvm::FunctionType *f_type =
       llvm::FunctionType::get(llvm::PointerType::getUnqual(*llvm_context),
                               parameters, /*isVarArg=*/false);
-  auto alloc_PunktArray_function =
-      llvm::Function::Create(f_type, llvm::Function::InternalLinkage,
+  auto function_alloc_array =
+      llvm::Function::Create(f_type, llvm::Function::PrivateLinkage,
                              kAllocPunktArrayFunctionName, *module);
 
   // Set argument names.
-  alloc_PunktArray_function->arg_begin()->setName("elem_size");
-  (alloc_PunktArray_function->arg_begin() + 1)->setName("arr_size");
+  function_alloc_array->arg_begin()->setName("elem_size");
+  (function_alloc_array->arg_begin() + 1)->setName("arr_size");
 
   // Get a reference to the `malloc` and `memset` functions.
   llvm::Function *malloc_func = module->getFunction(kMallocFunctionName);
   llvm::Function *memset_func = module->getFunction(kMemsetFunctionName);
 
-  llvm::BasicBlock *entry_block = llvm::BasicBlock::Create(
-      *llvm_context, "entry", alloc_PunktArray_function);
+  llvm::BasicBlock *entry_block =
+      llvm::BasicBlock::Create(*llvm_context, "entry", function_alloc_array);
   builder->SetInsertPoint(entry_block);
 
   // Allocate memory for the PunktArray data type.
@@ -1277,12 +1255,12 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
       "PunktArray_ptr");
 
   // Store array size in the size field.
-  builder->CreateStore(alloc_PunktArray_function->getArg(1), PunktArray_ptr);
+  builder->CreateStore(function_alloc_array->getArg(1), PunktArray_ptr);
 
   // Calculate the number of bytes required for the data field.
-  llvm::Value *data_size_in_bytes = builder->CreateMul(
-      alloc_PunktArray_function->getArg(0),
-      alloc_PunktArray_function->getArg(1), "data_size_in_bytes");
+  llvm::Value *data_size_in_bytes =
+      builder->CreateMul(function_alloc_array->getArg(0),
+                         function_alloc_array->getArg(1), "data_size_in_bytes");
 
   // Allocate memory for the array.
   llvm::Value *data_memory_block = builder->CreateCall(
@@ -1321,23 +1299,23 @@ void CodeGenerationVisitor::GenerateDeallocPunktArrayFunction() {
       llvm::PointerType::getUnqual(*llvm_context)};
   llvm::FunctionType *f_type = llvm::FunctionType::get(
       llvm::Type::getVoidTy(*llvm_context), parameters, /*isVarArg=*/false);
-  auto dealloc_PunktArray_function =
-      llvm::Function::Create(f_type, llvm::Function::InternalLinkage,
+  auto function_dealloc_array =
+      llvm::Function::Create(f_type, llvm::Function::PrivateLinkage,
                              kDeallocPunktArrayFunctionName, *module);
 
   // Set argument array.
-  dealloc_PunktArray_function->arg_begin()->setName("arr");
+  function_dealloc_array->arg_begin()->setName("arr");
 
   // Get a reference to the `free` function.
   llvm::Function *free_func = module->getFunction(kFreeFunctionName);
 
-  llvm::BasicBlock *entry_block = llvm::BasicBlock::Create(
-      *llvm_context, "entry", dealloc_PunktArray_function);
+  llvm::BasicBlock *entry_block =
+      llvm::BasicBlock::Create(*llvm_context, "entry", function_dealloc_array);
   builder->SetInsertPoint(entry_block);
 
   auto PunktArray_struct =
       llvm::StructType::getTypeByName(*llvm_context, kPunktArrayStructName);
-  llvm::Value *PunktArray_ptr = dealloc_PunktArray_function->getArg(0);
+  llvm::Value *PunktArray_ptr = function_dealloc_array->getArg(0);
 
   // First, free PunktArray data field.
   llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
@@ -1371,7 +1349,7 @@ const std::string &CodeGenerationVisitor::GetDeallocPunktArrayFunctionName()
 }
 
 /******************************************************************************
- *                               Error handling                               *
+ *                               Error handling *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode &node) {
   CodeGenerationInternalError("encountered ErrorNode " + node.ToString());

@@ -8,7 +8,10 @@
 #include <string>
 #include <vector>
 
+#include "declaration_statement_node.h"
+#include "function_definition_node.h"
 #include "lambda_parameter_node.h"
+#include "operator_node.h"
 
 std::unique_ptr<ParseNode> LambdaNode::CreateCopy() const {
   auto copy_node = std::make_unique<LambdaNode>(token->CreateCopy());
@@ -42,6 +45,20 @@ void LambdaNode::AddReturnTypeNode(
 void LambdaNode::AddLambdaBodyNode(std::unique_ptr<ParseNode> lambda_body) {
   this->lambda_body = lambda_body.get();
   this->AppendChild(std::move(lambda_body));
+}
+
+bool LambdaNode::IsAnonymous() const {
+  if (dynamic_cast<FunctionDefinitionNode *>(GetParent())) {
+    return false;
+  }
+  if (dynamic_cast<DeclarationStatementNode *>(GetParent())) {
+    return false;
+  }
+  if (auto parent = dynamic_cast<OperatorNode *>(GetParent())) {
+    return parent->GetOperatorEnum() != Operator::ASSIGN;
+  }
+
+  return true;
 }
 
 void LambdaNode::Accept(ParseNodeVisitor &visitor) {

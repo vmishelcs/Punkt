@@ -31,30 +31,30 @@ void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode &node) {
   }
 }
 
-void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode &node) {
-  bool is_mutable =
-      KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
+// void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode &node) {
+//   bool is_mutable =
+//       KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
 
-  // Perform declaration here if the initializer is a lambda literal.
-  ParseNode *initializer = node.GetInitializer();
-  auto lambda_node = dynamic_cast<LambdaNode *>(initializer);
-  if (!lambda_node) {
-    return;
-  }
+//   // Perform declaration here if the initializer is a lambda literal.
+//   ParseNode *initializer = node.GetInitializer();
+//   auto lambda_node = dynamic_cast<LambdaNode *>(initializer);
+//   if (!lambda_node) {
+//     return;
+//   }
 
-  IdentifierNode *identifier = node.GetIdentifierNode();
-  if (!identifier) {
-    PunktLogger::LogFatalInternalError(
-        "VisitEnter(DeclarationStatementNode&): "
-        "incorrectly constructed declaration node.");
-  }
+//   IdentifierNode *identifier = node.GetIdentifierNode();
+//   if (!identifier) {
+//     PunktLogger::LogFatalInternalError(
+//         "VisitEnter(DeclarationStatementNode&): "
+//         "incorrectly constructed declaration node.");
+//   }
 
-  auto lambda_type = static_cast<LambdaType *>(lambda_node->GetType());
+//   auto lambda_type = static_cast<LambdaType *>(lambda_node->GetType());
 
-  identifier->SetType(lambda_type->CreateEquivalentType());
-  DeclareInLocalScope(*identifier, is_mutable, identifier->GetType(),
-                      SymbolType::LAMBDA);
-}
+//   identifier->SetType(lambda_type->CreateEquivalentType());
+//   DeclareInLocalScope(*identifier, is_mutable, identifier->GetType(),
+//                       SymbolType::FUNCTION);
+// }
 
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode &node) {
   bool is_mutable =
@@ -68,12 +68,6 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode &node) {
   }
 
   ParseNode *initializer = node.GetInitializer();
-  if (dynamic_cast<LambdaNode *>(initializer)) {
-    // Declaration for variables that hold lambda literals is done in
-    // VisitEnter(DeclarationStatementNode&).
-    return;
-  }
-
   Type *declaration_type = initializer->GetType();
 
   // Make sure we are not declaring variables with void type.

@@ -107,7 +107,7 @@ void SemanticAnalysisPreprocessor::DeclareFunction(IdentifierNode &node,
   Scope *local_scope = node.GetLocalScope();
   SymbolTableEntry *symbol_table_entry = local_scope->Declare(
       node.GetToken()->GetLexeme(), node.GetToken()->GetLocation(),
-      /*is_mutable=*/false, type, SymbolType::LAMBDA);
+      /*is_mutable=*/false, type, SymbolType::FUNCTION);
   node.SetSymbolTableEntry(symbol_table_entry);
 }
 

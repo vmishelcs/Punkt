@@ -3,14 +3,13 @@
 
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
+#include <scanner/operator.h>
 #include <token/token.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "base_type_node.h"
-#include "code_block_node.h"
 #include "lambda_parameter_node.h"
 
 class LambdaNode : public ParseNode {
@@ -53,12 +52,7 @@ class LambdaNode : public ParseNode {
   ParseNode *GetReturnTypeNode() const { return return_type_node; }
   ParseNode *GetLambdaBodyNode() const { return lambda_body; }
 
-  bool IsAnonymous() const {
-    return GetParent()->GetParseNodeType() !=
-               ParseNodeType::FUNCTION_DEFINITION_NODE &&
-           GetParent()->GetParseNodeType() !=
-               ParseNodeType::DECLARATION_STATEMENT_NODE;
-  }
+  bool IsAnonymous() const;
 
   /// @brief Checks if this lambda node represents a proper function (i.e. a
   /// variable defined using `function function_name ...`).

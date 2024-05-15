@@ -1,0 +1,11 @@
+function f <int x> -> int { return x. }
+
+function g <int x> -> int { return -x. }
+
+main {
+	var h = f.
+	println h(1).
+
+	h = g.
+	println h(1).
+}
