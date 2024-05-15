@@ -61,7 +61,7 @@ class LambdaNode : public ParseNode {
   }
 
   /// @brief Checks if this lambda node represents a proper function (i.e. a
-  /// variable defined using `function functionName ...`).
+  /// variable defined using `function function_name ...`).
   /// @return `true` if this lambda is a proper function, `false` otherwise.
   bool IsFunction() const {
     return GetParent()->GetParseNodeType() ==

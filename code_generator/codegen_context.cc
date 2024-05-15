@@ -14,6 +14,11 @@
 std::unique_ptr<CodegenContext> CodegenContext::instance = nullptr;
 
 void CodegenContext::Initialize(std::string module_id) {
+  if (instance) {
+    // Initializing CodegenContext twice is invalid.
+    PunktLogger::LogFatalInternalError(
+        "redundant CodegenContext initialization");
+  }
   instance = std::make_unique<CodegenContext>(module_id);
 }
 

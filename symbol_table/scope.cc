@@ -54,7 +54,7 @@ std::string Scope::GetScopeTypeString(ScopeType scope_type) {
     case ScopeType::SUBSCOPE:
       return "subscope";
     default:
-      return (const char *)PunktLogger::LogFatalInternalError(
+      PunktLogger::LogFatalInternalError(
           "unimplemented ScopeType in Scope::GetScopeTypeString");
   }
 }

@@ -17,11 +17,9 @@ void PunktLogger::LogFatal(std::string message) {
   std::exit(1);
 }
 
-void *PunktLogger::LogFatalInternalError(std::string message) {
+void PunktLogger::LogFatalInternalError(std::string message) {
   std::cerr << "interal error: " << message << std::endl;
-  std::exit(1);
-
-  return nullptr;
+  std::exit(-1);
 }
 
 bool PunktLogger::ThereAreCompileErrors() {
@@ -54,7 +52,7 @@ const char *PunktLogger::Logger::ToString() {
     case LogType::SEMANTIC_ANALYZER:
       return "semantic analyzer";
     default:
-      return (const char *)PunktLogger::LogFatalInternalError(
+      PunktLogger::LogFatalInternalError(
           "unimplemented LogType in PunktLogger::Logger::ToString");
   }
 }

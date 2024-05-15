@@ -59,8 +59,6 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   void GenerateRuntimeErrorWithMessage(const std::string &message);
 
  private:
-  bool IsPreviousInstructionBlockTerminator();
-
   /// @brief Create an `AllocaInst` in the entry block of a specified function
   /// for a provided variable.
   /// @param function Function the variable resides in.
@@ -76,6 +74,11 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   /// @param str String to be created in the IR.
   /// @return `llvm::Value` pointer to the specified string.
   llvm::Value *GetOrCreateString(const std::string &str);
+
+  /// @brief Check if the previous instruction was a block terminator.
+  /// @return `true` if previous instruction was a block terminator, `false
+  /// otherwise.
+  bool IsPreviousInstructionBlockTerminator();
 
   /// Helpful C standard library functions.
   /// @{
@@ -123,8 +126,6 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   void PrintLineFeed();
   llvm::Value *GetPrintfFormatStringForBaseType(BaseType *base_type);
   /// @}
-
-  llvm::Value *CodeGenerationInternalError(std::string error_msg);
 
   CodegenContext *codegen_context;
   std::map<std::string, llvm::Value *> string_map;
