@@ -1,0 +1,30 @@
+# Returns the binary representation of an 8-bit unsigned integer via an array.
+function bin_rep <int n> -> [int] {
+  if n < 0 || n > 255 {
+    println "Input n must be 0 <= n <= 255!".
+    return alloc [int] (0).
+  }
+
+  const result = alloc [int] (8).
+
+  var d = 128.
+  var idx = 0.
+  while idx <8 {
+    if n >= d {
+      n -= d.
+      result[idx] = 1.
+    } else {
+      result[idx] = 0.
+    }
+    idx += 1.
+    d /= 2.
+  }
+
+  return result.
+}
+
+main {
+  const n = 147.
+
+  println n, " = ", bin_rep(n).
+}

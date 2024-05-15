@@ -1,0 +1,30 @@
+function selection_sort <[int] arr> -> void {
+  for var i = 0, i < sizeof(arr), i += 1 {
+    # Find the minimum element starting from i.
+    var min_idx = i.
+    for var j = i, j < sizeof(arr), j += 1 {
+      if arr[j] < arr[min_idx]
+        min_idx = j.
+    }
+
+    # Swap arr[i] and arr[min_idx].
+    var tmp = arr[i].
+    arr[i] = arr[min_idx].
+    arr[min_idx] = tmp.
+  }
+}
+
+main {
+  const n = 16.
+  const A = alloc [int] (n).
+  
+  for var i = 0, i < n, i += 1 {
+    A[i] = n - i.
+  }
+
+  println "unsorted: ", A.
+
+  selection_sort(A).
+
+  println "sorted:   ", A.
+}
