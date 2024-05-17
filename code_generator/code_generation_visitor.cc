@@ -21,8 +21,6 @@
 // Array helper constants
 static const std::string kPunktArrayStructName = "struct.PunktArray";
 static const std::string kAllocPunktArrayFunctionName = "function.alloc_array";
-static const std::string kDeallocPunktArrayFunctionName =
-    "function.dealloc_array";
 
 // Function names
 static const std::string kMainFunctionName = "main";
@@ -33,9 +31,6 @@ static const std::string kPrintfFunctionName = "printf";
 static const std::string kExitFunctionName = "exit";
 
 // Internal constants
-static const std::string kCharFmtString = "%c";
-static const std::string kIntFmtString = "%d";
-static const std::string kStrFmtString = "%s";
 static const char kLineFeedChar = '\n';
 static const char kOpenBracketChar = '[';
 static const char kCommaChar = ',';
@@ -45,12 +40,10 @@ static const char kCloseBracketChar = ']';
 using codegen_function_type = llvm::Value *(*)(CodeGenerationVisitor &,
                                                OperatorNode &);
 
-/// @brief Log fatal internal code generation error.
-/// @param message String to be output before terminating the compilation
-/// process.
-/// @return Always `nullptr`.
-[[noreturn]] static llvm::Value *CodeGenerationInternalError(
-    const std::string &);
+/// @brief Log fatal internal code generation error and terminate the
+/// compilation process.
+/// @param message String to be output as an error message.
+[[noreturn]] static void CodeGenerationInternalError(const std::string &);
 
 CodeGenerationVisitor::CodeGenerationVisitor(std::string module_id)
     : codegen_context{nullptr} {
@@ -63,8 +56,6 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
   llvm::Module *module = codegen_context->GetModule();
   module->print(ir_ostream, nullptr);
 }
-
-// TODO: Stop using ParseNode::GetLLVMType and use Type::GetLLVMType instead.
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ArrayTypeNode &node) {
   // GenerateCode(ArrayTypeNode&) return value should not be used.
@@ -209,7 +200,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
   // Check if the condition to enter the loop is satisfied.
   llvm::Value *end_condition = node.GetEndConditionNode()->GenerateCode(*this);
   if (!end_condition) {
-    return CodeGenerationInternalError(
+    CodeGenerationInternalError(
         "failed generating end condition for for-statement");
   }
   end_condition = builder->CreateTrunc(
@@ -273,8 +264,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode &node) {
 
   llvm::Value *condition = node.GetIfConditionNode()->GenerateCode(*this);
   if (!condition) {
-    return CodeGenerationInternalError(
-        "failed generating condition for if-statement");
+    CodeGenerationInternalError("failed generating condition for if-statement");
   }
   // Truncate condition to make sure it has LLVM type `i1`.
   condition = builder->CreateTrunc(
@@ -1333,19 +1323,13 @@ const std::string &CodeGenerationVisitor::GetAllocPunktArrayFunctionName()
   return kAllocPunktArrayFunctionName;
 }
 
-const std::string &CodeGenerationVisitor::GetDeallocPunktArrayFunctionName()
-    const {
-  return kDeallocPunktArrayFunctionName;
-}
-
 /******************************************************************************
- *                               Error handling *
+ *                               Error handling                               *
  ******************************************************************************/
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode &node) {
   CodeGenerationInternalError("encountered ErrorNode " + node.ToString());
 }
 
-[[noreturn]] llvm::Value *CodeGenerationInternalError(
-    const std::string &message) {
+void CodeGenerationInternalError(const std::string &message) {
   PunktLogger::LogFatalInternalError(message);
 }
