@@ -1,19 +1,4 @@
-function takes_lambda < <int> -> int f > -> int {
-	for var i = 0, i <= 10, i = i + 1 {
-		println f(i).
-	}
-	return 0.
-}
-
 main {
-	var fib = <int n> -> int {
-		if n <= 0 {
-			return 0.
-		}
-		if n <= 2 {
-			return 1.
-		}
-		return fib(n - 1) + fib(n - 2).
-	}.
-	var ret = takes_lambda(fib).
+	var A = alloc [int] (4).
+	dealloc A.
 }

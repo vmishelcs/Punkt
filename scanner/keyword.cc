@@ -6,17 +6,17 @@
 #include <string>
 
 static std::map<std::string, Keyword> dictionary = {
-    {"alloc", Keyword::ALLOC},       {"bool", Keyword::BOOL},
-    {"call", Keyword::CALL},         {"char", Keyword::CHAR},
-    {"const", Keyword::CONST},       {"else", Keyword::ELSE},
-    {"false", Keyword::FALSE},       {"for", Keyword::FOR},
-    {"function", Keyword::FUNCTION}, {"if", Keyword::IF},
-    {"int", Keyword::INT},           {"main", Keyword::MAIN},
-    {"print", Keyword::PRINT},       {"println", Keyword::PRINTLN},
-    {"return", Keyword::RETURN},     {"sizeof", Keyword::SIZEOF},
-    {"string", Keyword::STRING},     {"true", Keyword::TRUE},
-    {"var", Keyword::VAR},           {"void", Keyword::VOID},
-    {"while", Keyword::WHILE}};
+    {"alloc", Keyword::ALLOC},     {"bool", Keyword::BOOL},
+    {"call", Keyword::CALL},       {"char", Keyword::CHAR},
+    {"const", Keyword::CONST},     {"dealloc", Keyword::DEALLOC},
+    {"else", Keyword::ELSE},       {"false", Keyword::FALSE},
+    {"for", Keyword::FOR},         {"function", Keyword::FUNCTION},
+    {"if", Keyword::IF},           {"int", Keyword::INT},
+    {"main", Keyword::MAIN},       {"print", Keyword::PRINT},
+    {"println", Keyword::PRINTLN}, {"return", Keyword::RETURN},
+    {"sizeof", Keyword::SIZEOF},   {"string", Keyword::STRING},
+    {"true", Keyword::TRUE},       {"var", Keyword::VAR},
+    {"void", Keyword::VOID},       {"while", Keyword::WHILE}};
 
 static std::map<Keyword, std::string> reverse_dictionary = [] {
   std::map<Keyword, std::string> result;

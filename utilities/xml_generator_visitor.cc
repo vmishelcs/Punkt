@@ -113,6 +113,21 @@ void XMLGeneratorVisitor::VisitLeave(CodeBlockNode &node) {
   OutputTag(*tag);
 }
 
+void XMLGeneratorVisitor::VisitEnter(DeallocStatementNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("DeallocStatementNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(DeallocStatementNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("DeallocStatementNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
 void XMLGeneratorVisitor::VisitEnter(DeclarationStatementNode &node) {
   std::unique_ptr<XMLTag> tag =
       XMLTag::CreateStartTag("DeclarationStatementNode");

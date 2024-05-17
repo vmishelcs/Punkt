@@ -479,39 +479,39 @@ llvm::Value *operator_codegen::ArrayAllocCodegen(
 llvm::Value *operator_codegen::ArrayIndexingCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   // Find Punkt array struct type.
   const std::string &PunktArray_struct_name =
       codegen_visitor.GetPunktArrayStructName();
   llvm::StructType *PunktArray_struct =
-      llvm::StructType::getTypeByName(*context, PunktArray_struct_name);
+      llvm::StructType::getTypeByName(*llvm_context, PunktArray_struct_name);
 
   // Load the data portion of the Punkt array object.
   llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(codegen_visitor);
   llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
       PunktArray_struct, PunktArray_ptr,
-      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
-       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 1)},
+      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 0),
+       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 1)},
       "PunktArray_data_ptr");
   llvm::Value *PunktArray_data =
-      builder->CreateLoad(llvm::PointerType::getUnqual(*context),
+      builder->CreateLoad(llvm::PointerType::getUnqual(*llvm_context),
                           PunktArray_data_ptr, "PunktArray_data");
 
   ArrayType *array_type = static_cast<ArrayType *>(node.GetChild(0)->GetType());
   Type *subtype = array_type->GetSubtype();
-  llvm::Type *llvm_subtype = subtype->GetLLVMType(*context);
+  llvm::Type *llvm_subtype = subtype->GetLLVMType(*llvm_context);
   llvm::Value *idx = node.GetChild(1)->GenerateCode(codegen_visitor);
 
   // Issue a runtime error if index is negative.
   llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
   llvm::BasicBlock *negative_index_true = llvm::BasicBlock::Create(
-      *context, "negative_index_true", parent_function);
+      *llvm_context, "negative_index_true", parent_function);
   llvm::BasicBlock *negative_index_false = llvm::BasicBlock::Create(
-      *context, "negative_index_false", parent_function);
+      *llvm_context, "negative_index_false", parent_function);
   llvm::Value *negative_index_check = builder->CreateICmpSLT(
-      idx, llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0),
+      idx, llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0),
       "negative_index_check");
   builder->CreateCondBr(negative_index_check, negative_index_true,
                         negative_index_false);
@@ -521,8 +521,21 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(
 
   builder->SetInsertPoint(negative_index_false);
 
-  // TODO: Issue a runtime error if index is out of bounds (index >= size of
-  // array).
+  // Check if index is greater than or equal to array size.
+  llvm::Value *arr_size = builder->CreateLoad(
+      llvm::Type::getInt64Ty(*llvm_context), PunktArray_ptr, "arr_size");
+  llvm::BasicBlock *array_ooo_true = llvm::BasicBlock::Create(
+      *llvm_context, "array_ooo_true", parent_function);
+  llvm::BasicBlock *array_ooo_false = llvm::BasicBlock::Create(
+      *llvm_context, "array_ooo_false", parent_function);
+  llvm::Value *array_ooo_check =
+      builder->CreateICmpUGE(idx, arr_size, "array_ooo_check");
+  builder->CreateCondBr(array_ooo_check, array_ooo_true, array_ooo_false);
+
+  builder->SetInsertPoint(array_ooo_true);
+  codegen_visitor.GenerateRuntimeErrorWithMessage("array index out of bounds");
+
+  builder->SetInsertPoint(array_ooo_false);
 
   llvm::Value *elem_addr =
       builder->CreateGEP(llvm_subtype, PunktArray_data, {idx}, "elemaddr");

@@ -200,8 +200,8 @@ bool Parser::StartsStatement(Token &token) {
   return StartsCodeBlock(token) || StartsDeclaration(token) ||
          StartsExpressionStatement(token) || StartsIfStatement(token) ||
          StartsWhileStatement(token) || StartsForStatement(token) ||
-         StartsCallStatement(token) || StartsPrintStatement(token) ||
-         StartsReturnStatement(token);
+         StartsDeallocStatement(token) || StartsCallStatement(token) ||
+         StartsPrintStatement(token) || StartsReturnStatement(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseStatement() {
   if (StartsCodeBlock(*now_reading)) {
@@ -221,6 +221,9 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
   }
   if (StartsForStatement(*now_reading)) {
     return ParseForStatement();
+  }
+  if (StartsDeallocStatement(*now_reading)) {
+    return ParseDeallocStatement();
   }
   if (StartsCallStatement(*now_reading)) {
     return ParseCallStatement();
@@ -439,6 +442,29 @@ std::unique_ptr<ParseNode> Parser::ParseForStatement() {
   for_statement->AppendChild(std::move(loop_body));
 
   return for_statement;
+}
+
+bool Parser::StartsDeallocStatement(Token &token) {
+  return KeywordToken::IsTokenKeyword(&token, {Keyword::DEALLOC});
+}
+std::unique_ptr<ParseNode> Parser::ParseDeallocStatement() {
+  if (!StartsDeallocStatement(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("dealloc statement");
+  }
+
+  auto dealloc_stmt =
+      std::make_unique<DeallocStatementNode>(std::move(now_reading));
+
+  // Discard 'dealloc' token.
+  ReadToken();
+
+  // Parse argument.
+  std::unique_ptr<ParseNode> arg = ParseExpression();
+  dealloc_stmt->AppendChild(std::move(arg));
+
+  Expect(Punctuator::TERMINATOR);
+
+  return dealloc_stmt;
 }
 
 bool Parser::StartsCallStatement(Token &token) {

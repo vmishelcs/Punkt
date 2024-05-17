@@ -10,6 +10,8 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
 
   virtual void VisitEnter(CodeBlockNode &node) override;
 
+  virtual void VisitLeave(DeallocStatementNode &node) override;
+
   virtual void VisitLeave(DeclarationStatementNode &node) override;
 
   virtual void VisitEnter(ForStatementNode &node) override;

@@ -16,6 +16,9 @@ class ParseNodeVisitor {
   virtual void VisitEnter(CodeBlockNode &node) = 0;
   virtual void VisitLeave(CodeBlockNode &node) = 0;
 
+  virtual void VisitEnter(DeallocStatementNode &node) = 0;
+  virtual void VisitLeave(DeallocStatementNode &node) = 0;
+
   virtual void VisitEnter(DeclarationStatementNode &node) = 0;
   virtual void VisitLeave(DeclarationStatementNode &node) = 0;
 
@@ -94,6 +97,9 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
 
   virtual void VisitEnter(CodeBlockNode &node) override { DefaultVisit(node); }
   virtual void VisitLeave(CodeBlockNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(DeallocStatementNode &node) { DefaultVisit(node); }
+  virtual void VisitLeave(DeallocStatementNode &node) { DefaultVisit(node); }
 
   virtual void VisitEnter(DeclarationStatementNode &node) override {
     DefaultVisit(node);

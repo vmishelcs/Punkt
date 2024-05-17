@@ -22,7 +22,9 @@ class DeclarationStatementNode : public ParseNode {
   }
   ParseNode *GetInitializer() const { return GetChild(1); }
 
-  virtual std::string ToString() const override;
+  virtual std::string ToString() const override {
+    return "DeclarationStatementNode";
+  }
 
   virtual void Accept(ParseNodeVisitor &visitor) override;
 

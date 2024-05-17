@@ -15,10 +15,6 @@ std::unique_ptr<ParseNode> DeclarationStatementNode::CreateCopy() const {
   return copy_node;
 }
 
-std::string DeclarationStatementNode::ToString() const {
-  return "DECLARATION STATEMENT NODE: " + token->ToString();
-}
-
 void DeclarationStatementNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);

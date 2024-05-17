@@ -7,6 +7,7 @@
 #include "call_statement_node.h"
 #include "character_literal_node.h"
 #include "code_block_node.h"
+#include "dealloc_statement_node.h"
 #include "declaration_statement_node.h"
 #include "error_node.h"
 #include "expression_statement_node.h"

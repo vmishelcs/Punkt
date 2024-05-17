@@ -27,6 +27,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(ArrayTypeNode &node) override;
   virtual llvm::Value *GenerateCode(CallStatementNode &node) override;
   virtual llvm::Value *GenerateCode(CodeBlockNode &node) override;
+  virtual llvm::Value *GenerateCode(DeallocStatementNode &node) override;
   virtual llvm::Value *GenerateCode(DeclarationStatementNode &node) override;
   virtual llvm::Value *GenerateCode(ExpressionStatementNode &node) override;
   virtual llvm::Value *GenerateCode(ForStatementNode &node) override;
@@ -114,7 +115,6 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   /// arrays.
   /// @{
   void GenerateAllocPunktArrayFunction();
-  void GenerateDeallocPunktArrayFunction();
   /// @}
 
   /// Printing helper methods.

@@ -67,7 +67,7 @@ void CodeGenerationVisitor::WriteIRToFD(int fd) {
 // TODO: Stop using ParseNode::GetLLVMType and use Type::GetLLVMType instead.
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(ArrayTypeNode &node) {
-  // TODO
+  // GenerateCode(ArrayTypeNode&) return value should not be used.
   return nullptr;
 }
 
@@ -101,6 +101,42 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(
 
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   // GenerateCode(ExpressionStatementNode&) return value is not used.
+  return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(DeallocStatementNode &node) {
+  if (IsPreviousInstructionBlockTerminator()) {
+    // No more instructions in this basic block.
+    return nullptr;
+  }
+
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::Module *module = codegen_context->GetModule();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(*this);
+
+  // Get a reference to the `free` function.
+  llvm::Function *free_func = module->getFunction(kFreeFunctionName);
+
+  auto PunktArray_struct =
+      llvm::StructType::getTypeByName(*llvm_context, kPunktArrayStructName);
+
+  // First, free PunktArray data field.
+  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
+      PunktArray_struct, PunktArray_ptr,
+      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 0),
+       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 1)},
+      "PunktArray_data_ptr");
+  llvm::Value *PunktArray_data =
+      builder->CreateLoad(llvm::PointerType::getUnqual(*llvm_context),
+                          PunktArray_data_ptr, "PunktArray_data");
+  builder->CreateCall(free_func, {PunktArray_data});
+
+  // Now free PunktArray object pointer.
+  builder->CreateCall(free_func, {PunktArray_ptr});
+
+  // Dealloc statements do not return a value.
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
 }
 
@@ -561,7 +597,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
   GeneratePunktArrayType();
 
   GenerateAllocPunktArrayFunction();
-  GenerateDeallocPunktArrayFunction();
 
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::Module *module = codegen_context->GetModule();
@@ -1287,51 +1322,6 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
   builder->CreateStore(data_memory_block, PunktArray_data_ptr);
 
   builder->CreateRet(PunktArray_ptr);
-}
-
-void CodeGenerationVisitor::GenerateDeallocPunktArrayFunction() {
-  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
-  llvm::Module *module = codegen_context->GetModule();
-  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
-
-  // Create a void function that takes a pointer argument.
-  std::vector<llvm::Type *> parameters = {
-      llvm::PointerType::getUnqual(*llvm_context)};
-  llvm::FunctionType *f_type = llvm::FunctionType::get(
-      llvm::Type::getVoidTy(*llvm_context), parameters, /*isVarArg=*/false);
-  auto function_dealloc_array =
-      llvm::Function::Create(f_type, llvm::Function::PrivateLinkage,
-                             kDeallocPunktArrayFunctionName, *module);
-
-  // Set argument array.
-  function_dealloc_array->arg_begin()->setName("arr");
-
-  // Get a reference to the `free` function.
-  llvm::Function *free_func = module->getFunction(kFreeFunctionName);
-
-  llvm::BasicBlock *entry_block =
-      llvm::BasicBlock::Create(*llvm_context, "entry", function_dealloc_array);
-  builder->SetInsertPoint(entry_block);
-
-  auto PunktArray_struct =
-      llvm::StructType::getTypeByName(*llvm_context, kPunktArrayStructName);
-  llvm::Value *PunktArray_ptr = function_dealloc_array->getArg(0);
-
-  // First, free PunktArray data field.
-  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
-      PunktArray_struct, PunktArray_ptr,
-      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 0),
-       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 1)},
-      "PunktArray_data_ptr");
-  llvm::Value *PunktArray_data =
-      builder->CreateLoad(llvm::PointerType::getUnqual(*llvm_context),
-                          PunktArray_data_ptr, "PunktArray_data");
-  builder->CreateCall(free_func, {PunktArray_data});
-
-  // Now free PunktArray object pointer.
-  builder->CreateCall(free_func, {PunktArray_ptr});
-
-  builder->CreateRetVoid();
 }
 
 const std::string &CodeGenerationVisitor::GetPunktArrayStructName() const {

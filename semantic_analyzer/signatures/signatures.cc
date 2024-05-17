@@ -154,6 +154,7 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
      {Signature({kArbitraryArrayTypeT.get(), kBaseTypeInteger.get()},
                 kArbitraryArrayTypeT->GetSubtype(),
                 operator_codegen::ArrayIndexingCodegen)}},
+    // sizeof
     {Operator::SIZEOF,
      {Signature({kArbitraryArrayTypeT.get()}, kBaseTypeInteger.get(),
                 operator_codegen::ArraySizeofCodegen)}}};

@@ -9,6 +9,7 @@ target_link_libraries(parse_node
     boolean_literal_node
     character_literal_node
     code_block_node
+    dealloc_statement_node
     declaration_statement_node
     error_node
     expression_statement_node

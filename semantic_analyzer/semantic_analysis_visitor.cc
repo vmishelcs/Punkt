@@ -8,9 +8,12 @@
 #include <token/keyword_token.h>
 #include <token/operator_token.h>
 
+#include "types/array_type.h"
 #include "types/base_type.h"
 #include "types/lambda_type.h"
 #include "types/type.h"
+
+static void DeallocOnNonArrayType(ParseNode &);
 
 /******************************************************************************
  *                               Non-leaf nodes                               *
@@ -28,6 +31,14 @@ void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode &node) {
     CreateProcedureScope(node);
   } else {
     CreateSubscope(node);
+  }
+}
+
+void SemanticAnalysisVisitor::VisitLeave(DeallocStatementNode &node) {
+  ParseNode *arg = node.GetChild(0);
+  if (dynamic_cast<ArrayType *>(arg->GetType()) == nullptr) {
+    DeallocOnNonArrayType(node);
+    node.SetType(BaseType::CreateErrorType());
   }
 }
 
@@ -361,6 +372,7 @@ void SemanticAnalysisVisitor::CreateSubscope(ParseNode &node) {
 /******************************************************************************
  *                               Error handling                               *
  ******************************************************************************/
+// TODO: These don't need to be methods.
 void SemanticAnalysisVisitor::DeclarationOfVarWithVoidTypeError(
     DeclarationStatementNode &node) {
   std::string message = "variable declared with type void at " +
@@ -475,5 +487,10 @@ void SemanticAnalysisVisitor::CallWithoutFunctionInvocationError(
     CallStatementNode &node) {
   std::string message = "call statement without function invocation at " +
                         node.GetToken()->GetLocation().ToString();
+  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+}
+
+static void DeallocOnNonArrayType(ParseNode &node) {
+  std::string message = "dealloc used on non-array type";
   PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
 }
