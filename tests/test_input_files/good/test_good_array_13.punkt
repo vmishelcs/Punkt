@@ -1,0 +1,3 @@
+main {
+	println ['a', 'v'], 1, 2.
+}

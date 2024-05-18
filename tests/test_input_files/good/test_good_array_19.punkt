@@ -1,0 +1,11 @@
+main {
+	const A = [1, 2].
+	const B = [3, 4].
+	const C = [A, B].
+	println A, B, C.
+	C[0][0] = 11.
+	C[0][1] = 22.
+	C[1][0] = 33.
+	C[1][1] = 44.
+	println A, B, C.
+}

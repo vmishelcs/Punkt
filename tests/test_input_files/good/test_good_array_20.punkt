@@ -1,0 +1,7 @@
+main {
+	const A = alloc [[int]] (3).
+	A[2] = [3, 3, 3].
+	A[1] = [2, 2].
+	A[0] = [1].
+	println A.
+}

@@ -1,0 +1,3 @@
+main {
+	const A = alloc int (2).
+}

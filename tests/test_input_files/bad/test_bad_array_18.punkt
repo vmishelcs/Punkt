@@ -1,0 +1,4 @@
+main {
+	var a = 5.
+	var x = sizeof a.
+}

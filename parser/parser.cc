@@ -900,11 +900,20 @@ std::unique_ptr<ParseNode> Parser::ParseParenthesizedExpression() {
 
   Expect(Punctuator::OPEN_PARENTHESIS);
 
-  std::unique_ptr<ParseNode> expression = ParseExpression();
+  std::unique_ptr<ParseNode> expr = ParseExpression();
 
   Expect(Punctuator::CLOSE_PARENTHESIS);
 
-  return expression;
+  while (StartsLambdaInvocation(*now_reading) ||
+         StartsArrayIndexing(*now_reading)) {
+    if (StartsArrayIndexing(*now_reading)) {
+      expr = ParseArrayIndexing(std::move(expr));
+    } else {
+      expr = ParseLambdaInvocation(std::move(expr));
+    }
+  }
+
+  return expr;
 }
 
 bool Parser::StartsIdentifierAtomic(Token &token) {

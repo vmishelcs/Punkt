@@ -1,0 +1,4 @@
+main {
+	const A = alloc [int] (-1).
+	
+}

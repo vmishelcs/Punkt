@@ -1,0 +1,4 @@
+main {
+	const A = [[1, 2], alloc [int] (0), alloc [int] (4)].
+	println sizeof A[1].
+}
