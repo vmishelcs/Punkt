@@ -1,31 +1,20 @@
 #include "signature.h"
 
-#include <code_generator/code_generation_visitor.h>
-#include <semantic_analyzer/types/arbitrary_type.h>
+#include <parse_node/parse_nodes/operator_node.h>
 #include <semantic_analyzer/types/type.h>
 
-#include <functional>
 #include <vector>
 
-using code_gen_function_variant =
-    std::variant<llvm::Value *(*)(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *, llvm::Value *),
-                 llvm::Value *(*)(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *, llvm::Value *,
-                                  llvm::Value *)>;
+class CodeGenerationVisitor;
+
+using codegen_function_type = llvm::Value *(*)(CodeGenerationVisitor &,
+                                               OperatorNode &);
 
 Signature::Signature(std::initializer_list<Type *> input_types,
-                     Type *output_type,
-                     llvm::Value *(*fp)(llvm::LLVMContext *context,
-                                        llvm::IRBuilder<> *, llvm::Value *))
-    : input_types(input_types), output_type(output_type), func_variant(fp) {}
-
-Signature::Signature(std::initializer_list<Type *> input_types,
-                     Type *output_type,
-                     llvm::Value *(*fp)(llvm::LLVMContext *context,
-                                        llvm::IRBuilder<> *, llvm::Value *,
-                                        llvm::Value *))
-    : input_types(input_types), output_type(output_type), func_variant(fp) {}
+                     Type *output_type, codegen_function_type codegen_function)
+    : input_types(input_types),
+      output_type(output_type),
+      codegen_function(codegen_function) {}
 
 std::vector<Type *> Signature::GetInputTypes() const {
   std::vector<Type *> result;
@@ -37,8 +26,8 @@ std::vector<Type *> Signature::GetInputTypes() const {
 
 Type *Signature::GetOutputType() const { return output_type; }
 
-code_gen_function_variant Signature::GetCodeGenFunc() const {
-  return func_variant;
+codegen_function_type Signature::GetCodegenFunction() const {
+  return codegen_function;
 }
 
 bool Signature::Accepts(const std::vector<Type *> &types) {
@@ -61,14 +50,7 @@ bool Signature::Accepts(const std::vector<Type *> &types) {
 void Signature::ResetArbitraryTypes() {
   // Reset any arbitrary types that are stored as input types.
   for (Type *type : input_types) {
-    if (auto arbitrary_type = dynamic_cast<ArbitraryType *>(type)) {
-      arbitrary_type->ResetSetType();
-    }
+    type->ResetArbitraryTypes();
   }
-
-  // Reset output type if it is an arbitrary type.
-  auto arbitrary_type = dynamic_cast<ArbitraryType *>(output_type);
-  if (arbitrary_type) {
-    arbitrary_type->ResetSetType();
-  }
+  output_type->ResetArbitraryTypes();
 }

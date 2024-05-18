@@ -1,0 +1,18 @@
+# Subtraction based GCD algorithm.
+function gcd <int a, int b> -> int {
+  while a != b {
+    if a > b
+      a = a - b.
+    else
+      b = b - a.
+  }
+  return a.
+}
+
+main {
+    println "gcd(10, 75) = ", gcd(10, 75).
+    println "gcd(48, 360) = ", gcd(48, 360).
+    println "gcd(9357, 5864) = ", gcd(9357, 5864).
+    println "gcd(270, 504) = ", gcd(270, 504).
+    println "gcd(54321,9876) = ", gcd(54321,9876).
+}

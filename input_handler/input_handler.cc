@@ -53,17 +53,17 @@ void InputHandler::PreloadNextLine() {
   line_num += 1;
   while (input_file >> std::noskipws >> c && c != '\n') {
     char_stream.push_back(
-        LocatedChar(c, file_path.filename(), line_num, column_num));
+        LocatedChar(c, file_path.string(), line_num, column_num));
     ++column_num;
   }
   if (!input_file.eof()) {
     char_stream.push_back(
-        LocatedChar('\n', file_path.filename(), line_num, column_num));
+        LocatedChar('\n', file_path.string(), line_num, column_num));
     ++column_num;
   }
 }
 
 void InputHandler::InitializeEOFLocatedChar() {
-  LocatedChar::EOF_LOCATED_CHAR = LocatedChar(0, this->file_path.filename(),
+  LocatedChar::EOF_LOCATED_CHAR = LocatedChar(0, this->file_path.string(),
                                               this->line_num, this->column_num);
 }

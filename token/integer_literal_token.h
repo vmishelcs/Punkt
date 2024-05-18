@@ -1,6 +1,7 @@
 #ifndef INTEGER_LITERAL_TOKEN_H_
 #define INTEGER_LITERAL_TOKEN_H_
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -8,7 +9,7 @@
 
 class IntegerLiteralToken : public Token {
  public:
-  IntegerLiteralToken(std::string lexeme, TextLocation location, int value)
+  IntegerLiteralToken(std::string lexeme, TextLocation location, int64_t value)
       : Token(lexeme, location, TokenType::INTEGER_LITERAL), value(value) {}
 
   virtual std::unique_ptr<Token> CreateCopy() const override {
@@ -21,10 +22,10 @@ class IntegerLiteralToken : public Token {
     return result;
   }
 
-  int GetValue() const { return value; }
+  int64_t GetValue() const { return value; }
 
  private:
-  int value;
+  int64_t value;
 };
 
 #endif  // INTEGER_LITERAL_TOKEN_H_

@@ -1,0 +1,8 @@
+main {
+	const A = alloc [[[[[int]]]]] (1).
+	A[0] = alloc [[[[int]]]] (1).
+	A[0][0] = alloc [[[int]]] (1).
+	A[0][0][0] = alloc [[int]] (1).
+	A[0][0][0][0] = alloc [int] (0).
+	println A.
+}

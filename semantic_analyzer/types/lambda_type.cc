@@ -1,9 +1,14 @@
 #include "lambda_type.h"
 
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
+
 #include <algorithm>
 #include <iterator>
 #include <memory>
 #include <vector>
+
+static const int kLambdaTypeSizeInBytes = 8;
 
 std::unique_ptr<LambdaType> LambdaType::CreateLambdaType(
     std::vector<Type *> parameter_types, Type *return_type) {
@@ -105,6 +110,22 @@ std::string LambdaType::ToString() const {
     result.push_back(')');
 
   return result;
+}
+
+void LambdaType::ResetArbitraryTypes() {
+  for (unsigned i = 0, n = parameter_types.size(); i < n; ++i) {
+    parameter_types[i]->ResetArbitraryTypes();
+  }
+  return_type->ResetArbitraryTypes();
+}
+
+unsigned LambdaType::GetSizeInBytes() const {
+  // Lambdas are pointers.
+  return kLambdaTypeSizeInBytes;
+}
+
+llvm::Type *LambdaType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
+  return llvm::PointerType::getUnqual(llvm_context);
 }
 
 LambdaType::LambdaType(std::vector<Type *> parameter_types_to_copy,

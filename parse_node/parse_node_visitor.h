@@ -7,11 +7,17 @@ class ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(CallStatementNode &node) = 0;
-  virtual void VisitLeave(CallStatementNode &node) = 0;
+  virtual void VisitEnter(AllocExpressionNode &node) = 0;
+  virtual void VisitLeave(AllocExpressionNode &node) = 0;
+
+  virtual void VisitEnter(ArrayTypeNode &node) = 0;
+  virtual void VisitLeave(ArrayTypeNode &node) = 0;
 
   virtual void VisitEnter(CodeBlockNode &node) = 0;
   virtual void VisitLeave(CodeBlockNode &node) = 0;
+
+  virtual void VisitEnter(DeallocStatementNode &node) = 0;
+  virtual void VisitLeave(DeallocStatementNode &node) = 0;
 
   virtual void VisitEnter(DeclarationStatementNode &node) = 0;
   virtual void VisitLeave(DeclarationStatementNode &node) = 0;
@@ -46,6 +52,9 @@ class ParseNodeVisitor {
   virtual void VisitEnter(OperatorNode &node) = 0;
   virtual void VisitLeave(OperatorNode &node) = 0;
 
+  virtual void VisitEnter(PopulatedArrayExpressionNode &node) = 0;
+  virtual void VisitLeave(PopulatedArrayExpressionNode &node) = 0;
+
   virtual void VisitEnter(PrintStatementNode &node) = 0;
   virtual void VisitLeave(PrintStatementNode &node) = 0;
 
@@ -79,15 +88,21 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(CallStatementNode &node) override {
+  virtual void VisitEnter(AllocExpressionNode &node) override {
     DefaultVisit(node);
   }
-  virtual void VisitLeave(CallStatementNode &node) override {
+  virtual void VisitLeave(AllocExpressionNode &node) override {
     DefaultVisit(node);
   }
 
+  virtual void VisitEnter(ArrayTypeNode &node) override { DefaultVisit(node); }
+  virtual void VisitLeave(ArrayTypeNode &node) override { DefaultVisit(node); }
+
   virtual void VisitEnter(CodeBlockNode &node) override { DefaultVisit(node); }
   virtual void VisitLeave(CodeBlockNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(DeallocStatementNode &node) { DefaultVisit(node); }
+  virtual void VisitLeave(DeallocStatementNode &node) { DefaultVisit(node); }
 
   virtual void VisitEnter(DeclarationStatementNode &node) override {
     DefaultVisit(node);
@@ -149,6 +164,13 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
 
   virtual void VisitEnter(OperatorNode &node) override { DefaultVisit(node); }
   virtual void VisitLeave(OperatorNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(PopulatedArrayExpressionNode &node) override {
+    DefaultVisit(node);
+  }
+  virtual void VisitLeave(PopulatedArrayExpressionNode &node) override {
+    DefaultVisit(node);
+  }
 
   virtual void VisitEnter(PrintStatementNode &node) override {
     DefaultVisit(node);

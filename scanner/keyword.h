@@ -4,10 +4,12 @@
 #include <string>
 
 enum class Keyword {
+  ALLOC,
   BOOL,
   CALL,
   CHAR,
   CONST,
+  DEALLOC,
   ELSE,
   FALSE,
   FOR,
@@ -18,6 +20,7 @@ enum class Keyword {
   PRINT,
   PRINTLN,
   RETURN,
+  SIZEOF,
   STRING,
   TRUE,
   VAR,
@@ -40,7 +43,7 @@ Keyword GetKeywordEnum(const std::string& lexeme);
 /// @brief Get a string representation of the provided keyword.
 /// @param keyword `Keyword` enum representation of a punctuator.
 /// @return String representation of the `keyword`.
-std::string GetKeywordLexeme(Keyword keyword);
+const std::string& GetKeywordLexeme(Keyword keyword);
 
 }  // namespace keyword_utils
 

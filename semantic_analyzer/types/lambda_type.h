@@ -1,6 +1,8 @@
 #ifndef LAMBDA_TYPE_H_
 #define LAMBDA_TYPE_H_
 
+#include <llvm/IR/Type.h>
+
 #include <memory>
 #include <vector>
 
@@ -53,6 +55,13 @@ class LambdaType : public Type {
   virtual std::string ToString() const override;
 
   virtual bool IsErrorType() const override { return false; }
+
+  /// @brief Resets any arbitrary parameter types, or arbitrary return type.
+  virtual void ResetArbitraryTypes() override;
+
+  virtual unsigned GetSizeInBytes() const override;
+  virtual llvm::Type *GetLLVMType(
+      llvm::LLVMContext &llvm_context) const override;
 
   LambdaType(std::vector<Type *> parameter_types, Type *return_type);
 

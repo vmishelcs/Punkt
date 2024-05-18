@@ -10,6 +10,7 @@ target_link_libraries(semantic_analysis_preprocessor
 
 add_library(semantic_analysis_visitor semantic_analysis_visitor.cc)
 target_link_libraries(semantic_analysis_visitor
+    operator
     parse_node
     type
     scope

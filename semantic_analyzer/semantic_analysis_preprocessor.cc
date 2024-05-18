@@ -10,9 +10,22 @@
 #include <algorithm>
 #include <iterator>
 
-/******************************************************************************
- *                               Non-leaf nodes                               *
- ******************************************************************************/
+static void ArrayVoidSubtypeError(ParseNode &);
+static void ParameterVoidTypeError(ParseNode &);
+
+//===----------------------------------------------------------------------===//
+// Non-leaf nodes
+//===----------------------------------------------------------------------===//
+void SemanticAnalysisPreprocessor::VisitLeave(ArrayTypeNode &node) {
+  auto base_subtype = dynamic_cast<BaseType *>(node.GetChild(0)->GetType());
+  if (base_subtype && base_subtype->GetBaseTypeEnum() == BaseTypeEnum::VOID) {
+    // Arrays cannot have void subtype.
+    ArrayVoidSubtypeError(node);
+    return;
+  }
+  node.SetType(node.InferOwnType());
+}
+
 void SemanticAnalysisPreprocessor::VisitLeave(FunctionDefinitionNode &node) {
   auto lambda_node = node.GetLambdaNode();
   if (!lambda_node) {
@@ -52,8 +65,7 @@ void SemanticAnalysisPreprocessor::VisitLeave(LambdaParameterNode &node) {
   if (parameter_base_type &&
       parameter_base_type->GetBaseTypeEnum() == BaseTypeEnum::VOID) {
     // Parameter types cannot be void.
-    VoidParameterTypeError(*type_node);
-    node.SetType(BaseType::CreateErrorType());
+    ParameterVoidTypeError(*type_node);
     return;
   }
 
@@ -75,38 +87,43 @@ void SemanticAnalysisPreprocessor::VisitEnter(ProgramNode &node) {
   CreateGlobalScope(node);
 }
 
-/******************************************************************************
- *                                 Leaf nodes                                 *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Leaf nodes
+//===----------------------------------------------------------------------===//
 void SemanticAnalysisPreprocessor::Visit(BaseTypeNode &node) {
   node.SetType(node.InferOwnType());
 }
 
-/******************************************************************************
- *                                  Scoping                                   *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Scoping
+//===----------------------------------------------------------------------===//
 void SemanticAnalysisPreprocessor::CreateGlobalScope(ParseNode &node) {
   node.SetScope(Scope::CreateGlobalScope());
 }
 
-/******************************************************************************
- *                           Miscellaneous helpers                            *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Miscellaneous helpers
+//===----------------------------------------------------------------------===//
 void SemanticAnalysisPreprocessor::DeclareFunction(IdentifierNode &node,
                                                    Type *type) {
   Scope *local_scope = node.GetLocalScope();
   SymbolTableEntry *symbol_table_entry = local_scope->Declare(
       node.GetToken()->GetLexeme(), node.GetToken()->GetLocation(),
-      /*is_mutable=*/false, type, SymbolType::LAMBDA);
+      /*is_mutable=*/false, type, SymbolType::FUNCTION);
   node.SetSymbolTableEntry(symbol_table_entry);
 }
 
-/******************************************************************************
- *                              Error reporting                               *
- ******************************************************************************/
-void SemanticAnalysisPreprocessor::VoidParameterTypeError(
-    ParseNode &type_node) {
-  std::string message = "parameter cannot have void type at " +
-                        type_node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+//===----------------------------------------------------------------------===//
+// Error handling
+//===----------------------------------------------------------------------===//
+void ArrayVoidSubtypeError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "array cannot have void subtype");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void ParameterVoidTypeError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "lambda parameter cannot have void type");
+  node.SetType(BaseType::CreateErrorType());
 }

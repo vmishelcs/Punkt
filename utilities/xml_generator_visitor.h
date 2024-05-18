@@ -40,11 +40,17 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
 
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
-  virtual void VisitEnter(CallStatementNode &node) override;
-  virtual void VisitLeave(CallStatementNode &node) override;
+  virtual void VisitEnter(AllocExpressionNode &node) override;
+  virtual void VisitLeave(AllocExpressionNode &node) override;
+
+  virtual void VisitEnter(ArrayTypeNode &node) override;
+  virtual void VisitLeave(ArrayTypeNode &node) override;
 
   virtual void VisitEnter(CodeBlockNode &node) override;
   virtual void VisitLeave(CodeBlockNode &node) override;
+
+  virtual void VisitEnter(DeallocStatementNode &node) override;
+  virtual void VisitLeave(DeallocStatementNode &node) override;
 
   virtual void VisitEnter(DeclarationStatementNode &node) override;
   virtual void VisitLeave(DeclarationStatementNode &node) override;
@@ -78,6 +84,9 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
 
   virtual void VisitEnter(OperatorNode &node) override;
   virtual void VisitLeave(OperatorNode &node) override;
+
+  virtual void VisitEnter(PopulatedArrayExpressionNode &node) override;
+  virtual void VisitLeave(PopulatedArrayExpressionNode &node) override;
 
   virtual void VisitEnter(PrintStatementNode &node) override;
   virtual void VisitLeave(PrintStatementNode &node) override;

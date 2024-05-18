@@ -1,0 +1,4 @@
+main {
+	const a = alloc [<int> -> int] (2).
+	a[0] = <int x, int y> -> int { return x + y. }.
+}

@@ -83,11 +83,11 @@ function f <> -> void {
 }
 
 main {
-	call a().
-	call b().
-	call c().
-	call d().
-	call e().
-	call f().
+	a().
+	b().
+	c().
+	d().
+	e().
+	f().
 	println "good".
 }

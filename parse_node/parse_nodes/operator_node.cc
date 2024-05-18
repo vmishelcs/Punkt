@@ -3,14 +3,15 @@
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
-#include <token/punctuator_token.h>
+#include <token/operator_token.h>
 
+#include <cassert>
 #include <memory>
 
 OperatorNode::OperatorNode(std::unique_ptr<Token> token)
     : ParseNode(ParseNodeType::OPERATOR_NODE, std::move(token)) {
-  auto punctuator_token = static_cast<PunctuatorToken *>(this->token.get());
-  punctuator = punctuator_token->GetPunctuatorEnum();
+  auto op_token = static_cast<OperatorToken *>(this->token.get());
+  this->op = op_token->GetOperatorEnum();
 }
 
 std::unique_ptr<ParseNode> OperatorNode::CreateCopy() const {
@@ -19,9 +20,19 @@ std::unique_ptr<ParseNode> OperatorNode::CreateCopy() const {
     copy_node->AppendChild(child->CreateCopy());
   }
 
-  copy_node->punctuator = this->punctuator;
+  copy_node->op = this->op;
 
   return copy_node;
+}
+
+bool OperatorNode::IsAssignmentTarget() const {
+  ParseNode *parent = GetParent();
+  auto op_node = dynamic_cast<OperatorNode *>(parent);
+  if (op_node && op_node->GetOperatorEnum() == Operator::ASSIGN &&
+      op_node->GetChild(0) == this) {
+    return true;
+  }
+  return false;
 }
 
 void OperatorNode::Accept(ParseNodeVisitor &visitor) {

@@ -20,5 +20,5 @@ int main(int argc, char **argv) {
   fs::path input_file_directory = fs::path(INPUT_FILE_DIRECTORY);
   fs::path file_path = input_file_directory / argv[1];
   ScanFile(file_path);
-  PunktLogger::DumpCompileErrors();
+  PunktLogger::DumpCompileErrorSummary();
 }

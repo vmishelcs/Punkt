@@ -1,11 +1,9 @@
 #include "parse_node.h"
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Type.h>
 #include <logging/punkt_logger.h>
-#include <semantic_analyzer/types/base_type.h>
-#include <semantic_analyzer/types/lambda_type.h>
 #include <semantic_analyzer/types/type.h>
+#include <symbol_table/scope.h>
+#include <token/token.h>
 
 #include <memory>
 #include <vector>
@@ -75,34 +73,6 @@ Scope *ParseNode::GetLocalScope() {
     }
   }
   return nullptr;
-}
-
-llvm::Type *ParseNode::GetLLVMType(llvm::LLVMContext &context) const {
-  Type *type = GetType();
-  auto base_type = dynamic_cast<BaseType *>(type);
-  if (base_type) {
-    switch (base_type->GetBaseTypeEnum()) {
-      case BaseTypeEnum::VOID:
-        return llvm::Type::getVoidTy(context);
-      case BaseTypeEnum::BOOLEAN:
-        return llvm::Type::getInt8Ty(context);
-      case BaseTypeEnum::CHARACTER:
-        return llvm::Type::getInt8Ty(context);
-      case BaseTypeEnum::INTEGER:
-        return llvm::Type::getInt32Ty(context);
-      case BaseTypeEnum::STRING:
-        return llvm::PointerType::getUnqual(context);
-      default:
-        return (llvm::Type *)PunktLogger::LogFatalInternalError(
-            "unimplemented BaseType in ParseNode::GetLLVMType");
-    }
-  }
-  auto lambda_type = dynamic_cast<LambdaType *>(type);
-  if (lambda_type) {
-    return llvm::PointerType::getUnqual(context);
-  }
-  return (llvm::Type *)PunktLogger::LogFatalInternalError(
-      "ParseNode::GetLLVMType implemented only for BaseType and LambdaType");
 }
 
 void ParseNode::VisitChildren(ParseNodeVisitor &visitor) {

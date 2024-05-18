@@ -13,6 +13,7 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
 add_compile_options(
+	-O0
 	-g
 	-Wall
 	-Wextra

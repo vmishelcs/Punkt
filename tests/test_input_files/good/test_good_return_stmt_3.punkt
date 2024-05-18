@@ -15,9 +15,9 @@ function returns_string <> -> string {
 }
 
 main {
-	call returns_bool().
-	call returns_char().
-	call returns_int().
-	call returns_string().
+	returns_bool().
+	returns_char().
+	returns_int().
+	returns_string().
 	println "we good".
 }

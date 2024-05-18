@@ -1,0 +1,9 @@
+main {
+	var f = <int x> -> int { return x . }.
+	const a = f(1).
+	println a.
+
+	f = <int x> -> int { return -x. }.
+	const b = f(1).
+	println b.
+}

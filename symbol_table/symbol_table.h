@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_map>
 
-enum class SymbolType { VARIABLE, LAMBDA };
+enum class SymbolType { VARIABLE, FUNCTION };
 
 struct SymbolTableEntry {
   const TextLocation text_location;
@@ -39,13 +39,7 @@ class SymbolTable {
 
   bool Contains(const std::string &symbol) const;
 
-  static void UndefinedSymbolReference(const std::string &symbol,
-                                       const TextLocation &tl);
-
  private:
-  void SymbolRedefinitionError(const std::string &symbol,
-                               const TextLocation &tl);
-
   std::unordered_map<std::string, std::unique_ptr<SymbolTableEntry> > table;
 };
 

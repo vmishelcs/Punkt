@@ -19,8 +19,8 @@ function c <> -> void {
 }
 
 main {
-	call a().
-	call b().
-	call c().
+	a().
+	b().
+	c().
 	println "good".
 }

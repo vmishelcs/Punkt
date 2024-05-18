@@ -1,0 +1,16 @@
+main {
+	const arr_bool = alloc [bool]   (1).
+	const arr_char = alloc [char]   (1).
+	const arr_int =  alloc [int]    (1).
+	const arr_str =  alloc [string] (1).
+
+	arr_bool[0] = true.
+	arr_char[0] = 'a'.
+	arr_int[0] = 1337.
+	arr_str[0] = "abc".
+
+	println arr_bool[0].
+	println arr_char[0].
+	println arr_int[0].
+	println arr_str[0].
+}

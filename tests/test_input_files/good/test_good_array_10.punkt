@@ -1,0 +1,31 @@
+main {
+	const A = alloc [string] (26).
+	A[0] = "alpha".
+	A[1] = "bravo".
+	A[2] = "charlie".
+	A[3] = "delta".
+	A[4] = "echo".
+	A[5] = "foxtrot".
+	A[6] = "golf".
+	A[7] = "hotel".
+	A[8] = "india".
+	A[9] = "juliet".
+	A[10] = "kilo".
+	A[11] = "lima".
+	A[12] = "mike".
+	A[13] = "november".
+	A[14] = "oscar".
+	A[15] = "papa".
+	A[16] = "quebec".
+	A[17] = "romeo".
+	A[18] = "sierra".
+	A[19] = "tango".
+	A[20] = "uniform".
+	A[21] = "victor".
+	A[22] = "whiskey".
+	A[23] = "x-ray".
+	A[24] = "yankee".
+	A[25] = "zulu".
+
+	println "military alphabet = ", A.
+}

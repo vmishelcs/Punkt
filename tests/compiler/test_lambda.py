@@ -119,6 +119,13 @@ class TestLambda(object):
         except RuntimeError as ex:
             assert False, "Exception was raised: " + repr(ex)
 
+    def test_good_func_17(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
     def test_good_lambda_1(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
@@ -147,14 +154,28 @@ class TestLambda(object):
         except RuntimeError as ex:
             assert False, "Exception was raised: " + repr(ex)
 
-    def test_good_lambda_5(self):
+    # def test_good_lambda_5(self):
+    #     try:
+    #         actual_output_path = self._compile_helper.compile_with_success()
+    #         self._compile_helper.verify_actual_output(actual_output_path)
+    #     except RuntimeError as ex:
+    #         assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_lambda_6(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
             self._compile_helper.verify_actual_output(actual_output_path)
         except RuntimeError as ex:
             assert False, "Exception was raised: " + repr(ex)
 
-    def test_good_lambda_6(self):
+    def test_good_lambda_7(self):
+        try:
+            actual_output_path = self._compile_helper.compile_with_success()
+            self._compile_helper.verify_actual_output(actual_output_path)
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_good_lambda_8(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()
             self._compile_helper.verify_actual_output(actual_output_path)

@@ -1,0 +1,5 @@
+main {
+  println [1,2,3].
+  println [true, false].
+  println ['a', 'b', 'c'].
+}

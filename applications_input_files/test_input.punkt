@@ -1,6 +1,3 @@
 main {
-	var x = true.
-	println x.
-	var y = !x.
-	println y.
+  const A = alloc [int] (2).
 }

@@ -7,8 +7,10 @@
 
 class ParseNodeIRVisitor {
  public:
-  virtual llvm::Value *GenerateCode(CallStatementNode &node) = 0;
+  virtual llvm::Value *GenerateCode(AllocExpressionNode &node) = 0;
+  virtual llvm::Value *GenerateCode(ArrayTypeNode &node) = 0;
   virtual llvm::Value *GenerateCode(CodeBlockNode &node) = 0;
+  virtual llvm::Value *GenerateCode(DeallocStatementNode &node) = 0;
   virtual llvm::Value *GenerateCode(DeclarationStatementNode &node) = 0;
   virtual llvm::Value *GenerateCode(ExpressionStatementNode &node) = 0;
   virtual llvm::Value *GenerateCode(ForStatementNode &node) = 0;
@@ -20,6 +22,7 @@ class ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(LambdaTypeNode &node) = 0;
   virtual llvm::Value *GenerateCode(MainNode &node) = 0;
   virtual llvm::Value *GenerateCode(OperatorNode &node) = 0;
+  virtual llvm::Value *GenerateCode(PopulatedArrayExpressionNode &node) = 0;
   virtual llvm::Value *GenerateCode(PrintStatementNode &node) = 0;
   virtual llvm::Value *GenerateCode(ProgramNode &node) = 0;
   virtual llvm::Value *GenerateCode(ReturnStatementNode &node) = 0;

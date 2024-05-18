@@ -1,0 +1,4 @@
+main {
+	const A = [""].
+	println 'h', 'e', 'y', A.
+}

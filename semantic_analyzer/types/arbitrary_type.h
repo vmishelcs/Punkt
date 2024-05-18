@@ -1,7 +1,10 @@
 #ifndef ARBITRARY_TYPE_H_
 #define ARBITRARY_TYPE_H_
 
+#include <llvm/IR/Type.h>
+
 #include <memory>
+#include <string>
 
 #include "type.h"
 
@@ -16,9 +19,6 @@
 class ArbitraryType : public Type {
  public:
   ArbitraryType() : Type(TypeEnum::ARBITRARY_TYPE), set_type(nullptr) {}
-
-  /// @brief Reset the set type on this arbitrary type.
-  void ResetSetType() { set_type = nullptr; }
 
   /// This method should probably never be called for `ArbitraryType` objects.
   virtual std::unique_ptr<Type> CreateEquivalentType() const override;
@@ -35,7 +35,16 @@ class ArbitraryType : public Type {
 
   virtual bool IsErrorType() const override { return false; }
 
+  virtual void ResetArbitraryTypes() override;
+
+  virtual unsigned GetSizeInBytes() const override;
+  virtual llvm::Type *GetLLVMType(
+      llvm::LLVMContext &llvm_context) const override;
+
  private:
+  /// @brief Reset the set type on this arbitrary type.
+  void ResetSetType() { set_type = nullptr; }
+
   Type *set_type;
 };
 

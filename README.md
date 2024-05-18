@@ -23,9 +23,13 @@ This is a description of Punkt grammar, simplified slightly for better readabili
 ```math
 \begin{aligned}
 Program \rightarrow & \enspace FunctionDefinition^* \enspace \texttt{main} \enspace CodeBlock \\[16pt]
+
 FunctionDefinition \rightarrow & \enspace \texttt{function} \enspace identifier \enspace Lambda \\[16pt]
-Lambda \rightarrow & \enspace \texttt{<} \enspace ParameterList \enspace \texttt{>} \enspace \texttt{->} \enspace Type \enspace CodeBlock \\[16pt]
-ParameterList \rightarrow & \enspace (Type \enspace identifier \enspace (\texttt{,} \enspace Type \enspace identifier)^*)^? \\[16pt]
+
+Lambda \rightarrow & \enspace \texttt{<} \enspace ParameterList^? \enspace \texttt{>} \enspace \texttt{->} \enspace Type \enspace CodeBlock \\[16pt]
+
+ParameterList \rightarrow & \enspace Type \enspace identifier \enspace (\texttt{,} \enspace Type \enspace identifier)^* \\[16pt]
+
 CodeBlock \rightarrow & \enspace \texttt{\{} \enspace Statement^* \enspace \texttt{\}} \\[16pt]
 Statement \rightarrow & \enspace CodeBlock \\
 | & \enspace DeclarationStatement \\
@@ -55,6 +59,7 @@ PrintStatement \rightarrow & \enspace \texttt{print} \enspace PrintExpressionLis
 PrintExpressionList \rightarrow & \enspace Expression \enspace (\texttt{,} \enspace Expression)^* \\[16pt]
 
 Type \rightarrow & \enspace BaseType \\
+| & \enspace ArrayType \\
 | & \enspace LambdaType \\[16pt]
 
 BaseType \rightarrow & \enspace \texttt{void} \\
@@ -63,9 +68,11 @@ BaseType \rightarrow & \enspace \texttt{void} \\
 | & \enspace \texttt{int} \\
 | & \enspace \texttt{string} \\[16pt]
 
-LambdaType \rightarrow & \enspace \texttt{<} \enspace TypeList \enspace \texttt{>} \enspace \texttt{->} \enspace Type \\[16pt]
+ArrayType \rightarrow & \enspace \texttt{[} \enspace Type \enspace \texttt{]} \\[16pt]
 
-TypeList \rightarrow & \enspace (Type \enspace (\texttt{,} \enspace Type)^*)^?
+LambdaType \rightarrow & \enspace \texttt{<} \enspace TypeList^? \enspace \texttt{>} \enspace \texttt{->} \enspace Type \\[16pt]
+
+TypeList \rightarrow & \enspace Type \enspace (\texttt{,} \enspace Type)^*
 
 \end{aligned}
 ```

@@ -5,6 +5,7 @@
 #include <parse_node/parse_node.h>
 #include <token/token.h>
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -14,7 +15,7 @@ class IntegerLiteralNode : public ParseNode {
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
-  int GetValue() const { return value; }
+  int64_t GetValue() const { return value; }
 
   virtual std::string ToString() const override {
     return "INTEGER LITERAL NODE";
@@ -25,7 +26,7 @@ class IntegerLiteralNode : public ParseNode {
   virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 
  private:
-  int value;
+  int64_t value;
 };
 
 #endif  // INTEGER_LITERAL_NODE_H_

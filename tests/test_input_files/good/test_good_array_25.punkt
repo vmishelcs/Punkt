@@ -1,0 +1,5 @@
+main {
+	var A = alloc [int] (4).
+	A = [1, 2].
+	println A.
+}

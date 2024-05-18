@@ -1,8 +1,6 @@
 #ifndef PARSE_NODE_H_
 #define PARSE_NODE_H_
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
 #include <semantic_analyzer/types/type.h>
 #include <symbol_table/scope.h>
@@ -18,12 +16,13 @@ class ParseNodeVisitor;
 class ParseNodeIRVisitor;
 
 enum class ParseNodeType {
-  ASSIGNMENT_STATEMENT_NODE,
+  ALLOC_EXPRESSION_NODE,
+  ARRAY_TYPE_NODE,
   BASE_TYPE_NODE,
   BOOLEAN_LITERAL_NODE,
-  CALL_STATEMENT_NODE,
   CHARACTER_LITERAL_NODE,
   CODE_BLOCK_NODE,
+  DEALLOC_STATEMENT_NODE,
   DECLARATION_STATEMENT_NODE,
   ERROR_NODE,
   EXPRESSION_STATEMENT_NODE,
@@ -38,6 +37,7 @@ enum class ParseNodeType {
   LAMBDA_TYPE_NODE,
   MAIN_NODE,
   OPERATOR_NODE,
+  POPULATED_ARRAY_EXPRESSION_NODE,
   PRINT_STATEMENT_NODE,
   PROGRAM_NODE,
   RETURN_STATEMENT_NODE,
@@ -61,7 +61,7 @@ class ParseNode {
   ParseNodeType GetParseNodeType() const { return node_type; }
 
   Token *GetToken() const { return token.get(); }
-  TextLocation GetTextLocation() const { return text_location; }
+  const TextLocation &GetTextLocation() const { return text_location; }
 
   ParseNode *GetParent() const { return parent; }
   unsigned NumChildren() const;
@@ -84,8 +84,6 @@ class ParseNode {
   void SetScope(std::unique_ptr<Scope> scope);
 
   Scope *GetLocalScope();
-
-  llvm::Type *GetLLVMType(llvm::LLVMContext &context) const;
 
   virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) = 0;
 

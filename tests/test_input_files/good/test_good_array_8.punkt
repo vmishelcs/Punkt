@@ -1,0 +1,7 @@
+main {
+	const A = alloc [int] (0).
+	const B = alloc [int] (1).
+	const C = alloc [int] (8).
+
+	println A, B, C.
+}

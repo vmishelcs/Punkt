@@ -1,9 +1,12 @@
 #ifndef TYPE_H_
 #define TYPE_H_
 
+#include <llvm/IR/Type.h>
+
+#include <memory>
 #include <string>
 
-enum class TypeEnum { BASE_TYPE, LAMBDA, ARBITRARY_TYPE };
+enum class TypeEnum { BASE_TYPE, ARRAY, LAMBDA, ARBITRARY_TYPE };
 
 class Type {
  public:
@@ -26,6 +29,16 @@ class Type {
   virtual std::string ToString() const = 0;
 
   virtual bool IsErrorType() const = 0;
+
+  /// @brief Resets any arbitrary types that make up this type. If this method
+  /// is called on an ArbitraryType object, the ArbitraryType is reset. If this
+  /// method is called on an ArrayType object that holds an ArbitraryType, the
+  /// underlying ArbitraryType is reset. If this method is called on a BaseType,
+  /// nothing happens.
+  virtual void ResetArbitraryTypes() = 0;
+
+  virtual unsigned GetSizeInBytes() const = 0;
+  virtual llvm::Type *GetLLVMType(llvm::LLVMContext &llvm_context) const = 0;
 
  protected:
   Type(TypeEnum type_enum) : type_enum(type_enum) {}

@@ -16,6 +16,7 @@ class Parser {
   void ReadToken();
 
   void Expect(Keyword keyword);
+  void Expect(Operator op);
   void Expect(Punctuator punctuator);
 
   bool StartsProgram(Token &token);
@@ -70,8 +71,9 @@ class Parser {
   bool StartsForStatement(Token &token);
   std::unique_ptr<ParseNode> ParseForStatement();
 
-  bool StartsCallStatement(Token &token);
-  std::unique_ptr<ParseNode> ParseCallStatement();
+  /// <deallocStmt> ::= dealloc <expr> .
+  bool StartsDeallocStatement(Token &token);
+  std::unique_ptr<ParseNode> ParseDeallocStatement();
 
   bool StartsPrintStatement(Token &token);
   std::unique_ptr<ParseNode> ParsePrintStatement();
@@ -127,8 +129,18 @@ class Parser {
   bool StartsParenthesizedExpression(Token &token);
   std::unique_ptr<ParseNode> ParseParenthesizedExpression();
 
+  bool StartsIdentifierAtomic(Token &token);
+  std::unique_ptr<ParseNode> ParseIdentifierAtomic();
+
   bool StartsIdentifier(Token &token);
   std::unique_ptr<ParseNode> ParseIdentifier();
+
+  bool StartsLambdaInvocation(Token &token);
+  std::unique_ptr<ParseNode> ParseLambdaInvocation(
+      std::unique_ptr<ParseNode> lambda);
+
+  bool StartsArrayIndexing(Token &token);
+  std::unique_ptr<ParseNode> ParseArrayIndexing(std::unique_ptr<ParseNode> arr);
 
   bool StartsBooleanLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseBooleanLiteral();
@@ -142,6 +154,12 @@ class Parser {
   bool StartsStringLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseStringLiteral();
 
+  bool StartsAllocExpression(Token &token);
+  std::unique_ptr<ParseNode> ParseAllocExpression();
+
+  bool StartsPopulatedArrayExpression(Token &token);
+  std::unique_ptr<ParseNode> ParsePopulatedArrayExpression();
+
   bool StartsLambdaLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseLambdaLiteral();
 
@@ -151,12 +169,11 @@ class Parser {
   bool StartsBaseType(Token &token);
   std::unique_ptr<ParseNode> ParseBaseType();
 
+  bool StartsArrayType(Token &token);
+  std::unique_ptr<ParseNode> ParseArrayType();
+
   bool StartsLambdaType(Token &token);
   std::unique_ptr<ParseNode> ParseLambdaType();
-
-  bool StartsLambdaInvocation(Token &token);
-  std::unique_ptr<ParseNode> ParseLambdaInvocation(
-      std::unique_ptr<ParseNode> lambda);
 
   std::unique_ptr<ParseNode> SyntaxErrorUnexpectedToken(std::string expected);
   std::unique_ptr<ParseNode> GetSyntaxErrorNode();

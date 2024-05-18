@@ -16,9 +16,9 @@ class Scanner {
 
  private:
   std::unique_ptr<Token> GetNextToken();
-  std::unique_ptr<Token> ScanIdentifier(LocatedChar first_char);
+  std::unique_ptr<Token> ScanKeywordOrIdentifier(LocatedChar first_char);
   std::unique_ptr<Token> ScanNumber(LocatedChar first_char);
-  std::unique_ptr<Token> ScanPunctuator(LocatedChar first_char);
+  std::unique_ptr<Token> ScanOperatorOrPunctuator(LocatedChar first_char);
   std::unique_ptr<Token> ScanCharacter(LocatedChar first_char);
   std::unique_ptr<Token> ScanString(LocatedChar first_char);
 
@@ -26,11 +26,6 @@ class Scanner {
   char InterpretEscapeSequence();
 
   bool IsEndOfInput(LocatedChar ch);
-
-  void LexicalErrorIdentifierTooLong(std::string id_name);
-  void LexicalErrorUnexpectedCharacter(LocatedChar ch);
-  void LexicalErrorExpectedDifferentCharacter(char expected_char,
-                                              TextLocation location);
 
   std::unique_ptr<LocatedCharStream> input_stream;
   std::unique_ptr<Token> next_token;

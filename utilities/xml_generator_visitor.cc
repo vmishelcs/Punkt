@@ -1,5 +1,9 @@
 #include "xml_generator_visitor.h"
 
+#include <parse_node/parse_nodes/all_nodes.h>
+
+#include <memory>
+#include <ostream>
 #include <string>
 
 std::unique_ptr<XMLTag> XMLTag::CreateStartTag(std::string name) {
@@ -64,16 +68,31 @@ XMLGeneratorVisitor::XMLGeneratorVisitor(std::ostream &output_stream)
 /******************************************************************************
  *                               Non-leaf nodes                               *
  ******************************************************************************/
-void XMLGeneratorVisitor::VisitEnter(CallStatementNode &node) {
-  std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("CallStatementNode");
+void XMLGeneratorVisitor::VisitEnter(AllocExpressionNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("AllocExpressionNode");
 
   AddBasicParseNodeAttributes(*tag, node);
 
   OutputTag(*tag);
   ++depth;
 }
-void XMLGeneratorVisitor::VisitLeave(CallStatementNode &node) {
-  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("CallStatementNode");
+void XMLGeneratorVisitor::VisitLeave(AllocExpressionNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("AllocExpressionNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(ArrayTypeNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("ArrayTypeNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(ArrayTypeNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("ArrayTypeNode");
 
   --depth;
   OutputTag(*tag);
@@ -89,6 +108,21 @@ void XMLGeneratorVisitor::VisitEnter(CodeBlockNode &node) {
 }
 void XMLGeneratorVisitor::VisitLeave(CodeBlockNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("CodeBlockNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(DeallocStatementNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("DeallocStatementNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(DeallocStatementNode &node) {
+  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("DeallocStatementNode");
 
   --depth;
   OutputTag(*tag);
@@ -261,6 +295,23 @@ void XMLGeneratorVisitor::VisitEnter(OperatorNode &node) {
 }
 void XMLGeneratorVisitor::VisitLeave(OperatorNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("OperatorNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
+void XMLGeneratorVisitor::VisitEnter(PopulatedArrayExpressionNode &node) {
+  std::unique_ptr<XMLTag> tag =
+      XMLTag::CreateStartTag("PopulatedArrayExpressionNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(PopulatedArrayExpressionNode &node) {
+  std::unique_ptr<XMLTag> tag =
+      XMLTag::CreateEndTag("PopulatedArrayExpressionNode");
 
   --depth;
   OutputTag(*tag);

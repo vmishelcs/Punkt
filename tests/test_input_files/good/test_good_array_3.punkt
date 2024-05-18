@@ -1,0 +1,9 @@
+main {
+	const arr1 = alloc[int](2).
+	const arr2 = arr1.
+	arr1[0] = 69.
+	arr2[1] = 420.
+
+	println "arr1: ", arr1[0], ' ', arr1[1].
+	println "arr2: ", arr2[0], ' ', arr2[1].
+}

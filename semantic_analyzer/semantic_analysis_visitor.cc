@@ -3,23 +3,67 @@
 #include <logging/punkt_logger.h>
 #include <parse_node/parse_node.h>
 #include <parse_node/parse_nodes/all_nodes.h>
+#include <scanner/operator.h>
 #include <semantic_analyzer/signatures/signatures.h>
 #include <symbol_table/scope.h>
 #include <token/keyword_token.h>
+#include <token/operator_token.h>
 
+#include "types/array_type.h"
 #include "types/base_type.h"
 #include "types/lambda_type.h"
 #include "types/type.h"
 
-/******************************************************************************
- *                               Non-leaf nodes                               *
- ******************************************************************************/
-void SemanticAnalysisVisitor::VisitLeave(CallStatementNode &node) {
-  if (!node.GetLambdaInvocationNode()) {
-    // Call statement must be followed by a lambda invocation.
-    CallWithoutFunctionInvocationError(node);
+static void DeclarationOfVarWithVoidTypeError(ParseNode &);
+static void UndefinedSymbolReferenceError(ParseNode &, const std::string &);
+static void NonTargettableExpressionError(ParseNode &);
+static void AssignmentToImmutableTargetError(ParseNode &);
+static void AssignmentTypeMismatchError(ParseNode &, const Type &,
+                                        const Type &);
+static void InvalidOperandTypeError(ParseNode &, Operator,
+                                    std::vector<Type *> &);
+static void PrintingVoidTypeError(ParseNode &);
+static void InvocationExpressionWithNonLambdaTypeError(ParseNode &);
+static void LambdaDoesNotAcceptProvidedTypesError(ParseNode &);
+static void ReturnStatementOutsideOfFunctionError(ParseNode &);
+static void MainReturnStatementReturnsValueError(ParseNode &);
+static void ReturningValueFromVoidLambdaError(ParseNode &);
+static void IncompatibleReturnTypeError(ParseNode &, const Type &,
+                                        const Type &);
+static void NonArrayTypeInAllocExpressionError(ParseNode &);
+static void VoidArraySubtypeError(ParseNode &);
+static void NonIntegerAllocSizeOperand(ParseNode &);
+static void PopulatedArrayTypeMismatchError(ParseNode &);
+static void DeallocOnNonArrayType(ParseNode &);
+static void NonBooleanConditionError(ParseNode &);
+
+//===----------------------------------------------------------------------===//
+// Non-leaf nodes
+//===----------------------------------------------------------------------===//
+void SemanticAnalysisVisitor::VisitLeave(AllocExpressionNode &node) {
+  // Make sure an array type is specified.
+  ArrayType *array_type =
+      dynamic_cast<ArrayType *>(node.GetChild(0)->GetType());
+  if (!array_type) {
+    NonArrayTypeInAllocExpressionError(node);
     return;
   }
+
+  // Make sure the array does not have void subtype.
+  BaseType *base_subtype = dynamic_cast<BaseType *>(array_type->GetSubtype());
+  if (base_subtype && base_subtype->IsEquivalentTo(BaseTypeEnum::VOID)) {
+    VoidArraySubtypeError(node);
+    return;
+  }
+
+  // Make sure the second operand is of integer type.
+  BaseType *size_type = dynamic_cast<BaseType *>(node.GetChild(1)->GetType());
+  if (!size_type || !size_type->IsEquivalentTo(BaseTypeEnum::INTEGER)) {
+    NonIntegerAllocSizeOperand(node);
+    return;
+  }
+
+  node.SetType(array_type->CreateEquivalentType());
 }
 
 void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode &node) {
@@ -30,49 +74,45 @@ void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode &node) {
   }
 }
 
-void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode &node) {
-  bool is_mutable =
-      KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
-
-  // Perform declaration here if the initializer is a lambda literal.
-  ParseNode *initializer = node.GetInitializer();
-  auto lambda_node = dynamic_cast<LambdaNode *>(initializer);
-  if (!lambda_node) {
-    return;
+void SemanticAnalysisVisitor::VisitLeave(DeallocStatementNode &node) {
+  ParseNode *arg = node.GetChild(0);
+  if (dynamic_cast<ArrayType *>(arg->GetType()) == nullptr) {
+    DeallocOnNonArrayType(node);
   }
-
-  IdentifierNode *identifier = node.GetIdentifierNode();
-  if (!identifier) {
-    PunktLogger::LogFatalInternalError(
-        "VisitEnter(DeclarationStatementNode&): "
-        "incorrectly constructed declaration node.");
-  }
-
-  auto lambda_type = static_cast<LambdaType *>(lambda_node->GetType());
-
-  identifier->SetType(lambda_type->CreateEquivalentType());
-  DeclareInLocalScope(*identifier, is_mutable, identifier->GetType(),
-                      SymbolType::LAMBDA);
 }
+
+// void SemanticAnalysisVisitor::VisitEnter(DeclarationStatementNode &node) {
+//   bool is_mutable =
+//       KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
+
+//   // Perform declaration here if the initializer is a lambda literal.
+//   ParseNode *initializer = node.GetInitializer();
+//   auto lambda_node = dynamic_cast<LambdaNode *>(initializer);
+//   if (!lambda_node) {
+//     return;
+//   }
+
+//   IdentifierNode *identifier = node.GetIdentifierNode();
+//   if (!identifier) {
+//     PunktLogger::LogFatalInternalError(
+//         "VisitEnter(DeclarationStatementNode&): "
+//         "incorrectly constructed declaration node.");
+//   }
+
+//   auto lambda_type = static_cast<LambdaType *>(lambda_node->GetType());
+
+//   identifier->SetType(lambda_type->CreateEquivalentType());
+//   DeclareInLocalScope(*identifier, is_mutable, identifier->GetType(),
+//                       SymbolType::FUNCTION);
+// }
 
 void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode &node) {
   bool is_mutable =
       KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
 
   IdentifierNode *identifier = node.GetIdentifierNode();
-  if (!identifier) {
-    PunktLogger::LogFatalInternalError(
-        "VisitLeave(DeclarationStatementNode&): "
-        "incorrectly constructed declaration node.");
-  }
 
   ParseNode *initializer = node.GetInitializer();
-  if (dynamic_cast<LambdaNode *>(initializer)) {
-    // Declaration for variables that hold lambda literals is done in
-    // VisitEnter(DeclarationStatementNode&).
-    return;
-  }
-
   Type *declaration_type = initializer->GetType();
 
   // Make sure we are not declaring variables with void type.
@@ -80,7 +120,6 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode &node) {
   if (b_declaration_type &&
       b_declaration_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
     DeclarationOfVarWithVoidTypeError(node);
-    identifier->SetType(BaseType::CreateErrorType());
     return;
   }
 
@@ -102,7 +141,6 @@ void SemanticAnalysisVisitor::VisitLeave(ForStatementNode &node) {
   if (!b_condition_type ||
       !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
     NonBooleanConditionError(node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 }
@@ -115,7 +153,6 @@ void SemanticAnalysisVisitor::VisitLeave(IfStatementNode &node) {
   if (!b_condition_type ||
       !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
     NonBooleanConditionError(node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 }
@@ -126,8 +163,7 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode &node) {
   Type *type = callee_node->GetType();
   auto lambda_type = dynamic_cast<LambdaType *>(type);
   if (!lambda_type) {
-    InvocationExpressionWithNonLambdaTypeError();
-    node.SetType(BaseType::CreateErrorType());
+    InvocationExpressionWithNonLambdaTypeError(node);
     return;
   }
 
@@ -141,8 +177,7 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode &node) {
 
   // Check that the lambda accepts the provided arguments.
   if (!lambda_type->AcceptsArgumentTypes(arg_types)) {
-    LambdaDoesNotAcceptProvidedTypesError();
-    node.SetType(BaseType::CreateErrorType());
+    LambdaDoesNotAcceptProvidedTypesError(node);
     return;
   }
 
@@ -179,48 +214,64 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   }
 
   // Assignment semantic analysis is performed here.
-  if (PunctuatorToken::IsTokenPunctuator(node.GetToken(),
-                                         {Punctuator::ASSIGN})) {
+  if (node.GetOperatorEnum() == Operator::ASSIGN) {
     // Make sure left-hand side is targettable.
-    if (!dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
+    if (auto id_node = dynamic_cast<IdentifierNode *>(node.GetChild(0))) {
+      // Make sure variable is not `const`.
+      if (!id_node->GetSymbolTableEntry()->is_mutable) {
+        AssignmentToImmutableTargetError(*id_node);
+        return;
+      }
+    } else if (auto op_node = dynamic_cast<OperatorNode *>(node.GetChild(0))) {
+      // Make sure the operator is array indexing.
+      if (op_node->GetOperatorEnum() != Operator::ARRAY_IDX) {
+        NonTargettableExpressionError(node);
+        return;
+      }
+    } else {
+      // Any other operand is not targettable.
       NonTargettableExpressionError(node);
-      node.SetType(BaseType::CreateErrorType());
-      return;
-    }
-
-    // Make sure left-hand side is not a const variable.
-    auto id_node = static_cast<IdentifierNode *>(node.GetChild(0));
-    if (!id_node->GetSymbolTableEntry()->is_mutable) {
-      AssignmentToImmutableTargetError(*id_node);
-      node.SetType(BaseType::CreateErrorType());
       return;
     }
   }
 
-  auto punctuator_token = static_cast<PunctuatorToken *>(node.GetToken());
-  auto signature = signatures::AcceptingSignature(
-      punctuator_token->GetPunctuatorEnum(), child_types);
+  auto operator_token = static_cast<OperatorToken *>(node.GetToken());
+  Signature *signature = signatures::AcceptingSignature(
+      operator_token->GetOperatorEnum(), child_types);
 
   if (signature) {
     node.SetType(signature->GetOutputType()->CreateEquivalentType());
-    node.SetCodeGenFunc(signature->GetCodeGenFunc());
+    node.SetCodegenFunction(signature->GetCodegenFunction());
   } else {
-    InvalidOperandTypeError(node, child_types);
-    node.SetType(BaseType::CreateErrorType());
+    if (node.GetOperatorEnum() == Operator::ASSIGN) {
+      AssignmentTypeMismatchError(node, *child_types[0], *child_types[1]);
+    } else {
+      InvalidOperandTypeError(node, node.GetOperatorEnum(), child_types);
+    }
   }
 }
 
-void SemanticAnalysisVisitor::VisitLeave(PrintStatementNode &node) {
-  // Print only non-void, non-lambda types.
-  for (const auto &p_node : node.GetChildren()) {
-    Type *p_node_type = p_node->GetType();
+void SemanticAnalysisVisitor::VisitLeave(PopulatedArrayExpressionNode &node) {
+  if (node.NumChildren() == 0) {
+    return;
+  }
 
-    if (p_node_type->GetTypeEnum() == TypeEnum::LAMBDA) {
-      PrintingLambdaTypeError(node);
+  Type *subtype = node.GetChild(0)->GetType();
+  for (auto child : node.GetChildren()) {
+    if (!subtype->IsEquivalentTo(child->GetType())) {
+      PopulatedArrayTypeMismatchError(node);
       return;
     }
+  }
 
-    auto base_type = dynamic_cast<BaseType *>(p_node_type);
+  node.SetType(ArrayType::CreateArrayType(subtype));
+}
+
+void SemanticAnalysisVisitor::VisitLeave(PrintStatementNode &node) {
+  // Print only non-void type values.
+  for (const auto &p_node : node.GetChildren()) {
+    // Cannot print values of type void.
+    auto base_type = dynamic_cast<BaseType *>(p_node->GetType());
     if (base_type && base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
       PrintingVoidTypeError(node);
       return;
@@ -253,8 +304,7 @@ void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode &node) {
   auto lambda_return_b_type = dynamic_cast<BaseType *>(lambda_return_type);
   if (lambda_return_b_type &&
       lambda_return_b_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
-    if (node.NumChildren() > 0)
-      ReturnStatementReturnsValueFromVoidLambdaError(node);
+    if (node.NumChildren() > 0) ReturningValueFromVoidLambdaError(node);
     return;
   }
 
@@ -262,7 +312,7 @@ void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode &node) {
   // to the return type of the enclosing lambda.
   Type *return_value_type = node.GetReturnValueNode()->GetType();
   if (!lambda_return_type->IsEquivalentTo(return_value_type)) {
-    IncompatibleReturnTypeError(node);
+    IncompatibleReturnTypeError(node, *return_value_type, *lambda_return_type);
     return;
   }
 }
@@ -275,14 +325,13 @@ void SemanticAnalysisVisitor::VisitLeave(WhileStatementNode &node) {
   if (!b_condition_type ||
       !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
     NonBooleanConditionError(node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 }
 
-/******************************************************************************
- *                                 Leaf nodes                                 *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Leaf nodes
+//===----------------------------------------------------------------------===//
 void SemanticAnalysisVisitor::Visit(ErrorNode &node) {
   node.SetType(BaseType::CreateErrorType());
 }
@@ -299,8 +348,7 @@ void SemanticAnalysisVisitor::Visit(IdentifierNode &node) {
   SymbolTableEntry *sym_table_entry = node.FindSymbolTableEntry();
 
   if (!sym_table_entry) {
-    SymbolTable::UndefinedSymbolReference(node.GetToken()->GetLexeme(),
-                                          node.GetToken()->GetLocation());
+    UndefinedSymbolReferenceError(node, node.GetName());
     node.SetType(BaseType::CreateErrorType());
     // Note the use of identifier-owned Type pointer.
     DeclareInLocalScope(node, false, node.GetType(), SymbolType::VARIABLE);
@@ -322,9 +370,9 @@ void SemanticAnalysisVisitor::Visit(StringLiteralNode &node) {
   node.SetType(BaseType::CreateStringType());
 }
 
-/******************************************************************************
- *                           Miscellaneous helpers                            *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Miscellaneous helpers
+//===----------------------------------------------------------------------===//
 void SemanticAnalysisVisitor::DeclareInLocalScope(IdentifierNode &node,
                                                   bool is_mutable, Type *type,
                                                   SymbolType symbol_type) {
@@ -347,9 +395,9 @@ bool SemanticAnalysisVisitor::IsParameterIdentifier(IdentifierNode &node) {
          ParseNodeType::LAMBDA_PARAMETER_NODE;
 }
 
-/******************************************************************************
- *                                  Scoping                                   *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Scoping
+//===----------------------------------------------------------------------===//
 void SemanticAnalysisVisitor::CreateParameterScope(ParseNode &node) {
   Scope *local_scope = node.GetLocalScope();
   node.SetScope(local_scope->CreateParameterScope());
@@ -363,129 +411,143 @@ void SemanticAnalysisVisitor::CreateSubscope(ParseNode &node) {
   node.SetScope(local_scope->CreateSubscope());
 }
 
-/******************************************************************************
- *                               Error handling                               *
- ******************************************************************************/
-void SemanticAnalysisVisitor::DeclarationOfVarWithVoidTypeError(
-    DeclarationStatementNode &node) {
-  std::string message = "variable declared with type void at " +
-                        node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+//===----------------------------------------------------------------------===//
+// Error handling
+//===----------------------------------------------------------------------===//
+void DeclarationOfVarWithVoidTypeError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "declaration initializer has void type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::InvalidOperandTypeError(
-    OperatorNode &node, std::vector<Type *> &types) {
-  std::string message =
-      "operator \'" + node.GetToken()->GetLexeme() + "\' not defined for [";
-  for (auto type : types) {
-    message += type->ToString() + " ";
+void UndefinedSymbolReferenceError(ParseNode &node, const std::string &symbol) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "undefined symbol reference \'" + symbol + "\'");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void InvalidOperandTypeError(ParseNode &node, Operator op,
+                             std::vector<Type *> &types) {
+  std::string message = "operator \'" + operator_utils::GetOperatorLexeme(op) +
+                        "\' not defined for types [";
+  for (const auto type : types) {
+    message += type->ToString();
+    message += ", ";
   }
-  message.pop_back();
-  message += "] at \n\t" + node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+
+  if (types.size() > 0) {
+    // Pop the extra ", ".
+    message.pop_back();
+    message.pop_back();
+  }
+
+  message += "]";
+  PunktLogger::LogCompileError(node.GetTextLocation(), message);
+
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::NonBooleanConditionError(IfStatementNode &node) {
-  std::string message = "if-statement at " +
-                        node.GetToken()->GetLocation().ToString() +
-                        " has non-boolean condition";
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void NonBooleanConditionError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "if-statement has non-boolean type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::NonBooleanConditionError(
-    WhileStatementNode &node) {
-  std::string message = "while-statement at " +
-                        node.GetToken()->GetLocation().ToString() +
-                        " has non-boolean condition";
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void NonTargettableExpressionError(ParseNode &node) {
+  PunktLogger::LogCompileError(
+      node.GetTextLocation(),
+      "non-targettable expression in assignment expression");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::NonBooleanConditionError(ForStatementNode &node) {
-  std::string message = "for-statement at " +
-                        node.GetToken()->GetLocation().ToString() +
-                        " has non-boolean condition";
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void AssignmentToImmutableTargetError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "assignment to immutable variable");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::NonTargettableExpressionError(ParseNode &node) {
-  std::string message =
-      "non-targettable expression provided in assignment statement at \n\t" +
-      node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void AssignmentTypeMismatchError(ParseNode &node, const Type &target_type,
+                                 const Type &value_type) {
+  PunktLogger::LogCompileError(
+      node.GetTextLocation(),
+      "cannot assign value of type \'" + value_type.ToString() +
+          "\' to a target of type \'" + target_type.ToString() + "\'");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::AssignmentToImmutableTargetError(
-    ParseNode &node) {
-  std::string message = "variable at " +
-                        node.GetToken()->GetLocation().ToString() +
-                        " is immutable";
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void PrintingVoidTypeError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "cannot print void type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::AssignmentTypeMismatchError(
-    ParseNode &node, const Type &target_type, const Type &value_type) {
-  std::string message = "cannot assign \'" + value_type.ToString() +
-                        "\' value to a target of type \'" +
-                        target_type.ToString() + "\'";
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void InvocationExpressionWithNonLambdaTypeError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "invocation expression with non-lambda type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::PrintingVoidTypeError(PrintStatementNode &node) {
-  std::string message = "cannot print void type value at " +
-                        node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void LambdaDoesNotAcceptProvidedTypesError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "lambda does not accept provided types");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::PrintingLambdaTypeError(
-    PrintStatementNode &node) {
-  std::string message = "cannot print lambda type value at " +
-                        node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void ReturnStatementOutsideOfFunctionError(ParseNode &node) {
+  PunktLogger::LogCompileError(
+      node.GetTextLocation(),
+      "return statement outside of any lambda or function");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::InvocationExpressionWithNonLambdaTypeError() {
-  std::string message = "invocation with non-lambda type";
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void MainReturnStatementReturnsValueError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "cannot return a value form main");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::LambdaDoesNotAcceptProvidedTypesError() {
-  std::string message = "invalid arguments for lambda invocation ";
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void ReturningValueFromVoidLambdaError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "cannot return a value from void lambda");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::ReturnStatementOutsideOfFunctionError(
-    ReturnStatementNode &node) {
-  std::string message = "return statement outside of function at " +
-                        node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void IncompatibleReturnTypeError(ParseNode &node, const Type &return_type,
+                                 const Type &lambda_return_type) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "returning \'" + return_type.ToString() +
+                                   "\' from lambda whose return type is \'" +
+                                   lambda_return_type.ToString() + "\'");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::MainReturnStatementReturnsValueError(
-    ReturnStatementNode &node) {
-  std::string message = "cannot return value from main at " +
-                        node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void NonArrayTypeInAllocExpressionError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "alloc expression must specify an array type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::ReturnStatementReturnsValueFromVoidLambdaError(
-    ReturnStatementNode &node) {
-  std::string message = "return statement at " +
-                        node.GetToken()->GetLocation().ToString() +
-                        " cannot return a value because the enclosing lambda "
-                        "is declared to return void";
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void VoidArraySubtypeError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "array type cannot have void subtype");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::IncompatibleReturnTypeError(
-    ReturnStatementNode &node) {
-  std::string message = "incompatible return type at " +
-                        node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void NonIntegerAllocSizeOperand(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "alloc expression must have integral size type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
-void SemanticAnalysisVisitor::CallWithoutFunctionInvocationError(
-    CallStatementNode &node) {
-  std::string message = "call statement without function invocation at " +
-                        node.GetToken()->GetLocation().ToString();
-  PunktLogger::Log(LogType::SEMANTIC_ANALYZER, message);
+void PopulatedArrayTypeMismatchError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "populated array expression must have the same "
+                               "type for each array value");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void DeallocOnNonArrayType(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "dealloc used on non-array type");
+  node.SetType(BaseType::CreateErrorType());
 }

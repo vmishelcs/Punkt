@@ -3,6 +3,7 @@
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node_ir_visitor.h>
 #include <parse_node/parse_node_visitor.h>
+#include <semantic_analyzer/types/base_type.h>
 #include <semantic_analyzer/types/lambda_type.h>
 
 #include <algorithm>
@@ -32,6 +33,16 @@ std::unique_ptr<Type> LambdaTypeNode::InferOwnType() const {
   std::transform(parameter_type_nodes.begin(), parameter_type_nodes.end(),
                  std::inserter(parameter_types, parameter_types.end()),
                  [](const auto &param_node) { return param_node->GetType(); });
+
+  // Make sure error types propagate.
+  for (auto type : parameter_types) {
+    if (type->IsErrorType()) {
+      return BaseType::CreateErrorType();
+    }
+  }
+  if (return_type_node->GetType()->IsErrorType()) {
+    return BaseType::CreateErrorType();
+  }
 
   return LambdaType::CreateLambdaType(parameter_types,
                                       return_type_node->GetType());

@@ -5,19 +5,17 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
-#include <scanner/punctuator.h>
-#include <token/punctuator_token.h>
+#include <scanner/operator.h>
 
 #include <memory>
 #include <string>
-#include <variant>
 
-using code_gen_function_variant =
-    std::variant<llvm::Value *(*)(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *, llvm::Value *),
-                 llvm::Value *(*)(llvm::LLVMContext *context,
-                                  llvm::IRBuilder<> *, llvm::Value *,
-                                  llvm::Value *)>;
+// Forward-declare types.
+class CodeGenerationVisitor;
+class OperatorNode;
+
+using codegen_function_type = llvm::Value *(*)(CodeGenerationVisitor &,
+                                               OperatorNode &);
 
 class OperatorNode : public ParseNode {
  public:
@@ -25,10 +23,17 @@ class OperatorNode : public ParseNode {
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
-  Punctuator GetPunctuatorEnum() const { return punctuator; }
+  Operator GetOperatorEnum() const { return op; }
 
-  void SetCodeGenFunc(code_gen_function_variant f) { this->f = f; }
-  code_gen_function_variant GetCodeGenFunc() const { return f; }
+  void SetCodegenFunction(codegen_function_type codegen_function) {
+    this->codegen_function = codegen_function;
+  }
+  codegen_function_type GetCodegenFunction() const { return codegen_function; }
+
+  /// @brief Checks if this node is a target of an assignment operation.
+  /// @return `true` if this identifer is a target of an assignment operation,
+  /// `false` otherwise.
+  bool IsAssignmentTarget() const;
 
   virtual std::string ToString() const override { return "OPERATOR NODE"; }
 
@@ -37,8 +42,8 @@ class OperatorNode : public ParseNode {
   virtual llvm::Value *GenerateCode(ParseNodeIRVisitor &visitor) override;
 
  private:
-  Punctuator punctuator;
-  code_gen_function_variant f;
+  Operator op;
+  codegen_function_type codegen_function;
 };
 
 #endif  // OPERATOR_NODE_H_
