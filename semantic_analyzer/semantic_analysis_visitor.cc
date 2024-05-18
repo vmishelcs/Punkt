@@ -30,6 +30,9 @@ static void MainReturnStatementReturnsValueError(ParseNode &);
 static void ReturningValueFromVoidLambdaError(ParseNode &);
 static void IncompatibleReturnTypeError(ParseNode &, const Type &,
                                         const Type &);
+static void NonArrayTypeInAllocExpressionError(ParseNode &);
+static void VoidArraySubtypeError(ParseNode &);
+static void NonIntegerAllocSizeOperand(ParseNode &);
 static void PopulatedArrayTypeMismatchError(ParseNode &);
 static void DeallocOnNonArrayType(ParseNode &);
 static void NonBooleanConditionError(ParseNode &);
@@ -37,6 +40,32 @@ static void NonBooleanConditionError(ParseNode &);
 //===----------------------------------------------------------------------===//
 // Non-leaf nodes
 //===----------------------------------------------------------------------===//
+void SemanticAnalysisVisitor::VisitLeave(AllocExpressionNode &node) {
+  // Make sure an array type is specified.
+  ArrayType *array_type =
+      dynamic_cast<ArrayType *>(node.GetChild(0)->GetType());
+  if (!array_type) {
+    NonArrayTypeInAllocExpressionError(node);
+    return;
+  }
+
+  // Make sure the array does not have void subtype.
+  BaseType *base_subtype = dynamic_cast<BaseType *>(array_type->GetSubtype());
+  if (base_subtype && base_subtype->IsEquivalentTo(BaseTypeEnum::VOID)) {
+    VoidArraySubtypeError(node);
+    return;
+  }
+
+  // Make sure the second operand is of integer type.
+  BaseType *size_type = dynamic_cast<BaseType *>(node.GetChild(1)->GetType());
+  if (!size_type || !size_type->IsEquivalentTo(BaseTypeEnum::INTEGER)) {
+    NonIntegerAllocSizeOperand(node);
+    return;
+  }
+
+  node.SetType(array_type->CreateEquivalentType());
+}
+
 void SemanticAnalysisVisitor::VisitEnter(CodeBlockNode &node) {
   if (node.GetParent()->GetParseNodeType() == ParseNodeType::LAMBDA_NODE) {
     CreateProcedureScope(node);
@@ -178,6 +207,7 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   for (auto child : node.GetChildren()) {
     Type *child_type = child->GetType();
     if (child_type->IsErrorType()) {
+      node.SetType(BaseType::CreateErrorType());
       return;
     }
     child_types.push_back(child_type);
@@ -488,6 +518,24 @@ void IncompatibleReturnTypeError(ParseNode &node, const Type &return_type,
                                "returning \'" + return_type.ToString() +
                                    "\' from lambda whose return type is \'" +
                                    lambda_return_type.ToString() + "\'");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void NonArrayTypeInAllocExpressionError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "alloc expression must specify an array type");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void VoidArraySubtypeError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "array type cannot have void subtype");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void NonIntegerAllocSizeOperand(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "alloc expression must have integral size type");
   node.SetType(BaseType::CreateErrorType());
 }
 

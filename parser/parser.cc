@@ -1078,7 +1078,7 @@ std::unique_ptr<ParseNode> Parser::ParseAllocExpression() {
   }
 
   std::unique_ptr<ParseNode> alloc_expr =
-      std::make_unique<OperatorNode>(std::move(now_reading));
+      std::make_unique<AllocExpressionNode>(std::move(now_reading));
 
   // Discard 'alloc' token.
   ReadToken();

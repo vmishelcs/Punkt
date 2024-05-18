@@ -16,7 +16,7 @@ class ParseNodeVisitor;
 class ParseNodeIRVisitor;
 
 enum class ParseNodeType {
-  ALLOC_STATEMENT_NODE,
+  ALLOC_EXPRESSION_NODE,
   ARRAY_TYPE_NODE,
   BASE_TYPE_NODE,
   BOOLEAN_LITERAL_NODE,

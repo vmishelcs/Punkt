@@ -7,6 +7,9 @@ class ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
+  virtual void VisitEnter(AllocExpressionNode &node) = 0;
+  virtual void VisitLeave(AllocExpressionNode &node) = 0;
+
   virtual void VisitEnter(ArrayTypeNode &node) = 0;
   virtual void VisitLeave(ArrayTypeNode &node) = 0;
 
@@ -88,6 +91,13 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
  public:
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
+  virtual void VisitEnter(AllocExpressionNode &node) override {
+    DefaultVisit(node);
+  }
+  virtual void VisitLeave(AllocExpressionNode &node) override {
+    DefaultVisit(node);
+  }
+
   virtual void VisitEnter(ArrayTypeNode &node) override { DefaultVisit(node); }
   virtual void VisitLeave(ArrayTypeNode &node) override { DefaultVisit(node); }
 

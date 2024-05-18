@@ -430,52 +430,6 @@ llvm::Value *operator_codegen::IntegerCmpLEQCodegen(
 /******************************************************************************
  *                                   Arrays                                   *
  ******************************************************************************/
-llvm::Value *operator_codegen::ArrayAllocCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
-  CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
-  llvm::Module *module = codegen_context->GetModule();
-  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
-
-  // Determine array element size.
-  ArrayType *array_type = static_cast<ArrayType *>(node.GetChild(0)->GetType());
-  Type *subtype = array_type->GetSubtype();
-  unsigned elem_size = subtype->GetSizeInBytes();
-  llvm::Value *elem_size_value =
-      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), elem_size);
-
-  // Generate code for array size.
-  llvm::Value *arr_size_value = node.GetChild(1)->GenerateCode(codegen_visitor);
-
-  // Issue a runtime error if array size is negative.
-  llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
-  llvm::BasicBlock *negative_array_size_true = llvm::BasicBlock::Create(
-      *context, "negative_array_size_true", parent_function);
-  llvm::BasicBlock *negative_array_size_false = llvm::BasicBlock::Create(
-      *context, "negative_array_size_false", parent_function);
-  llvm::Value *negative_array_size_check = builder->CreateICmpSLT(
-      arr_size_value,
-      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0),
-      "negative_array_size_check");
-  builder->CreateCondBr(negative_array_size_check, negative_array_size_true,
-                        negative_array_size_false);
-
-  builder->SetInsertPoint(negative_array_size_true);
-  codegen_visitor.GenerateRuntimeErrorWithMessage("negative array size");
-
-  builder->SetInsertPoint(negative_array_size_false);
-
-  // Call internal function for allocating arrays.
-  const std::string &alloc_PunktArray_function_name =
-      codegen_visitor.GetAllocPunktArrayFunctionName();
-  llvm::Function *alloc_PunktArray_function =
-      module->getFunction(alloc_PunktArray_function_name);
-  llvm::Value *result = builder->CreateCall(
-      alloc_PunktArray_function, {elem_size_value, arr_size_value}, "new_arr");
-
-  return result;
-}
-
 llvm::Value *operator_codegen::ArrayIndexingCodegen(
     CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();

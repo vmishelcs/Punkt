@@ -144,11 +144,6 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
     {Operator::BOOL_OR,
      {Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
                 kBaseTypeBoolean.get(), operator_codegen::BooleanOrCodegen)}},
-    // alloc
-    {Operator::ALLOC,
-     {Signature({kArbitraryArrayTypeT.get(), kBaseTypeInteger.get()},
-                kArbitraryArrayTypeT.get(),
-                operator_codegen::ArrayAllocCodegen)}},
     // []
     {Operator::ARRAY_IDX,
      {Signature({kArbitraryArrayTypeT.get(), kBaseTypeInteger.get()},

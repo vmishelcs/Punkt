@@ -24,6 +24,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
 
   void WriteIRToFD(int fd);
 
+  virtual llvm::Value *GenerateCode(AllocExpressionNode &node) override;
   virtual llvm::Value *GenerateCode(ArrayTypeNode &node) override;
   virtual llvm::Value *GenerateCode(CallStatementNode &node) override;
   virtual llvm::Value *GenerateCode(CodeBlockNode &node) override;
@@ -56,8 +57,6 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(BaseTypeNode &node) override;
 
   const std::string &GetPunktArrayStructName() const;
-  const std::string &GetAllocPunktArrayFunctionName() const;
-  const std::string &GetDeallocPunktArrayFunctionName() const;
 
   void GenerateRuntimeErrorWithMessage(const std::string &message);
 
@@ -112,12 +111,6 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   /// } PunktArray;
   /// `
   void GeneratePunktArrayType();
-
-  /// Generate helper functions in LLVM IR for allocating and deallocating Punkt
-  /// arrays.
-  /// @{
-  void GenerateAllocPunktArrayFunction();
-  /// @}
 
   /// Printing helper methods.
   /// @{

@@ -3,6 +3,7 @@ add_subdirectory(parse_nodes)
 add_library(parse_node parse_node.cc)
 
 target_link_libraries(parse_node
+    alloc_expression_node
     array_type_node
     base_type_node
     call_statement_node

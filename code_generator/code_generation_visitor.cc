@@ -20,7 +20,6 @@
 
 // Array helper constants
 static const std::string kPunktArrayStructName = "struct.PunktArray";
-static const std::string kAllocPunktArrayFunctionName = "function.alloc_array";
 
 // Function names
 static const std::string kMainFunctionName = "main";
@@ -553,70 +552,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode &node) {
   return codegen_function(*this, node);
 }
 
-llvm::Value *CodeGenerationVisitor::GenerateCode(
-    PopulatedArrayExpressionNode &node) {
-  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
-  llvm::Module *module = codegen_context->GetModule();
-  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
-
-  // Get a reference to the `malloc` function.
-  llvm::Function *malloc_func = module->getFunction(kMallocFunctionName);
-
-  // Allocate memory for the PunktArray data type.
-  llvm::Value *PunktArray_ptr = builder->CreateCall(
-      malloc_func,
-      {llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 16)},
-      "PunktArray_ptr");
-
-  // Generate code for array size.
-  unsigned arr_size = node.NumChildren();
-  llvm::Value *arr_size_value =
-      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), arr_size);
-
-  // Store array size in the size field.
-  builder->CreateStore(arr_size_value, PunktArray_ptr);
-
-  // Determine array element size.
-  ArrayType *array_type = static_cast<ArrayType *>(node.GetType());
-  Type *subtype = array_type->GetSubtype();
-  unsigned elem_size = subtype->GetSizeInBytes();
-  llvm::Value *elem_size_value =
-      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), elem_size);
-
-  // Calculate the number of bytes required for the data field.
-  llvm::Value *data_size_in_bytes =
-      builder->CreateMul(elem_size_value, arr_size_value, "data_size_in_bytes");
-
-  // Allocate memory for the array.
-  llvm::Value *data_memory_block = builder->CreateCall(
-      malloc_func, {data_size_in_bytes}, "data_memory_block");
-
-  // Initialize the data memory block to hold the specified values.
-  llvm::Type *llvm_subtype = subtype->GetLLVMType(*llvm_context);
-  for (unsigned i = 0; i < arr_size; ++i) {
-    llvm::Value *elem = node.GetChild(i)->GenerateCode(*this);
-    llvm::Value *elem_idx =
-        llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), i);
-    llvm::Value *elem_addr = builder->CreateGEP(llvm_subtype, data_memory_block,
-                                                {elem_idx}, "elemaddr");
-    builder->CreateStore(elem, elem_addr);
-  }
-
-  // Get the pointer to the data field of the PunktArray object.
-  auto PunktArray_struct =
-      llvm::StructType::getTypeByName(*llvm_context, kPunktArrayStructName);
-  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
-      PunktArray_struct, PunktArray_ptr,
-      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 0),
-       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 1)},
-      "PunktArray_data_ptr");
-
-  // Store the data memory block in the PunktArray object.
-  builder->CreateStore(data_memory_block, PunktArray_data_ptr);
-
-  return PunktArray_ptr;
-}
-
 llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
   if (IsPreviousInstructionBlockTerminator()) {
     // No more instructions in this basic block.
@@ -649,8 +584,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
 
   // Define Punkt array struct type.
   GeneratePunktArrayType();
-
-  GenerateAllocPunktArrayFunction();
 
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::Module *module = codegen_context->GetModule();
@@ -1295,7 +1228,7 @@ bool CodeGenerationVisitor::IsPreviousInstructionBlockTerminator() {
 }
 
 //===----------------------------------------------------------------------===//
-// Punkt array helper methods
+// Arrays
 //===----------------------------------------------------------------------===//
 void CodeGenerationVisitor::GeneratePunktArrayType() {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
@@ -1309,33 +1242,42 @@ void CodeGenerationVisitor::GeneratePunktArrayType() {
   punkt_array_type->setBody(struct_fields);
 }
 
-void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
+llvm::Value *CodeGenerationVisitor::GenerateCode(AllocExpressionNode &node) {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::Module *module = codegen_context->GetModule();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  // Create a function that returns a pointer and takes 2 integer arguments.
-  std::vector<llvm::Type *> parameters = {
-      llvm::Type::getInt64Ty(*llvm_context),
-      llvm::Type::getInt64Ty(*llvm_context)};
-  llvm::FunctionType *f_type =
-      llvm::FunctionType::get(llvm::PointerType::getUnqual(*llvm_context),
-                              parameters, /*isVarArg=*/false);
-  auto function_alloc_array =
-      llvm::Function::Create(f_type, llvm::Function::PrivateLinkage,
-                             kAllocPunktArrayFunctionName, *module);
+  // Determine array element size.
+  ArrayType *array_type = static_cast<ArrayType *>(node.GetChild(0)->GetType());
+  Type *subtype = array_type->GetSubtype();
+  unsigned elem_size = subtype->GetSizeInBytes();
+  llvm::Value *elem_size_value =
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), elem_size);
 
-  // Set argument names.
-  function_alloc_array->arg_begin()->setName("elem_size");
-  (function_alloc_array->arg_begin() + 1)->setName("arr_size");
+  // Generate code for array size.
+  llvm::Value *arr_size_value = node.GetChild(1)->GenerateCode(*this);
+
+  // Issue a runtime error if array size is negative.
+  llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
+  llvm::BasicBlock *negative_array_size_true = llvm::BasicBlock::Create(
+      *llvm_context, "negative_array_size_true", parent_function);
+  llvm::BasicBlock *negative_array_size_false = llvm::BasicBlock::Create(
+      *llvm_context, "negative_array_size_false", parent_function);
+  llvm::Value *negative_array_size_check = builder->CreateICmpSLT(
+      arr_size_value,
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0),
+      "negative_array_size_check");
+  builder->CreateCondBr(negative_array_size_check, negative_array_size_true,
+                        negative_array_size_false);
+
+  builder->SetInsertPoint(negative_array_size_true);
+  GenerateRuntimeErrorWithMessage("negative array size");
+
+  builder->SetInsertPoint(negative_array_size_false);
 
   // Get a reference to the `malloc` and `memset` functions.
   llvm::Function *malloc_func = module->getFunction(kMallocFunctionName);
   llvm::Function *memset_func = module->getFunction(kMemsetFunctionName);
-
-  llvm::BasicBlock *entry_block =
-      llvm::BasicBlock::Create(*llvm_context, "entry", function_alloc_array);
-  builder->SetInsertPoint(entry_block);
 
   // Allocate memory for the PunktArray data type.
   llvm::Value *PunktArray_ptr = builder->CreateCall(
@@ -1344,12 +1286,11 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
       "PunktArray_ptr");
 
   // Store array size in the size field.
-  builder->CreateStore(function_alloc_array->getArg(1), PunktArray_ptr);
+  builder->CreateStore(arr_size_value, PunktArray_ptr);
 
   // Calculate the number of bytes required for the data field.
   llvm::Value *data_size_in_bytes =
-      builder->CreateMul(function_alloc_array->getArg(0),
-                         function_alloc_array->getArg(1), "data_size_in_bytes");
+      builder->CreateMul(elem_size_value, arr_size_value, "data_size_in_bytes");
 
   // Allocate memory for the array.
   llvm::Value *data_memory_block = builder->CreateCall(
@@ -1375,16 +1316,75 @@ void CodeGenerationVisitor::GenerateAllocPunktArrayFunction() {
   // Store the data memory block in the PunktArray object.
   builder->CreateStore(data_memory_block, PunktArray_data_ptr);
 
-  builder->CreateRet(PunktArray_ptr);
+  return PunktArray_ptr;
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(
+    PopulatedArrayExpressionNode &node) {
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::Module *module = codegen_context->GetModule();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  // Get a reference to the `malloc` function.
+  llvm::Function *malloc_func = module->getFunction(kMallocFunctionName);
+
+  // Allocate memory for the PunktArray data type.
+  llvm::Value *PunktArray_ptr = builder->CreateCall(
+      malloc_func,
+      {llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 16)},
+      "PunktArray_ptr");
+
+  // Generate code for array size.
+  unsigned arr_size = node.NumChildren();
+  llvm::Value *arr_size_value =
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), arr_size);
+
+  // Store array size in the size field.
+  builder->CreateStore(arr_size_value, PunktArray_ptr);
+
+  // Determine array element size.
+  ArrayType *array_type = static_cast<ArrayType *>(node.GetType());
+  Type *subtype = array_type->GetSubtype();
+  unsigned elem_size = subtype->GetSizeInBytes();
+  llvm::Value *elem_size_value =
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), elem_size);
+
+  // Calculate the number of bytes required for the data field.
+  llvm::Value *data_size_in_bytes =
+      builder->CreateMul(elem_size_value, arr_size_value, "data_size_in_bytes");
+
+  // Allocate memory for the array.
+  llvm::Value *data_memory_block = builder->CreateCall(
+      malloc_func, {data_size_in_bytes}, "data_memory_block");
+
+  // Initialize the data memory block to hold the specified values.
+  llvm::Type *llvm_subtype = subtype->GetLLVMType(*llvm_context);
+  for (unsigned i = 0; i < arr_size; ++i) {
+    llvm::Value *elem = node.GetChild(i)->GenerateCode(*this);
+    llvm::Value *elem_idx =
+        llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), i);
+    llvm::Value *elem_addr = builder->CreateGEP(llvm_subtype, data_memory_block,
+                                                {elem_idx}, "elemaddr");
+    builder->CreateStore(elem, elem_addr);
+  }
+
+  // Get the pointer to the data field of the PunktArray object.
+  auto PunktArray_struct =
+      llvm::StructType::getTypeByName(*llvm_context, kPunktArrayStructName);
+  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
+      PunktArray_struct, PunktArray_ptr,
+      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 0),
+       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 1)},
+      "PunktArray_data_ptr");
+
+  // Store the data memory block in the PunktArray object.
+  builder->CreateStore(data_memory_block, PunktArray_data_ptr);
+
+  return PunktArray_ptr;
 }
 
 const std::string &CodeGenerationVisitor::GetPunktArrayStructName() const {
   return kPunktArrayStructName;
-}
-
-const std::string &CodeGenerationVisitor::GetAllocPunktArrayFunctionName()
-    const {
-  return kAllocPunktArrayFunctionName;
 }
 
 //===----------------------------------------------------------------------===//

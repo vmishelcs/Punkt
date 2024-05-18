@@ -40,6 +40,9 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
 
   // ---- Non-leaf nodes
   // -------------------------------------------------------------------
+  virtual void VisitEnter(AllocExpressionNode &node) override;
+  virtual void VisitLeave(AllocExpressionNode &node) override;
+
   virtual void VisitEnter(ArrayTypeNode &node) override;
   virtual void VisitLeave(ArrayTypeNode &node) override;
 

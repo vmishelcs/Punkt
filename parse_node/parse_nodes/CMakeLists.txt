@@ -1,3 +1,4 @@
+add_library(alloc_expression_node alloc_expression_node.cc)
 add_library(array_type_node array_type_node.cc)
 add_library(base_type_node base_type_node.cc)
 add_library(boolean_literal_node boolean_literal_node.cc)
