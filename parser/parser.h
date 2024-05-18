@@ -160,6 +160,9 @@ class Parser {
   bool StartsAllocExpression(Token &token);
   std::unique_ptr<ParseNode> ParseAllocExpression();
 
+  bool StartsPopulatedArrayExpression(Token &token);
+  std::unique_ptr<ParseNode> ParsePopulatedArrayExpression();
+
   bool StartsLambdaLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseLambdaLiteral();
 

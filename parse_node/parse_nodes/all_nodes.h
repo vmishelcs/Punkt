@@ -23,6 +23,7 @@
 #include "main_node.h"
 #include "nop_node.h"
 #include "operator_node.h"
+#include "populated_array_expression_node.h"
 #include "print_statement_node.h"
 #include "program_node.h"
 #include "return_statement_node.h"

@@ -22,6 +22,7 @@ class ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(LambdaTypeNode &node) = 0;
   virtual llvm::Value *GenerateCode(MainNode &node) = 0;
   virtual llvm::Value *GenerateCode(OperatorNode &node) = 0;
+  virtual llvm::Value *GenerateCode(PopulatedArrayExpressionNode &node) = 0;
   virtual llvm::Value *GenerateCode(PrintStatementNode &node) = 0;
   virtual llvm::Value *GenerateCode(ProgramNode &node) = 0;
   virtual llvm::Value *GenerateCode(ReturnStatementNode &node) = 0;

@@ -1,4 +1,4 @@
 main {
-  var x = 1.
-  println x().
+  const A = [1, 2, 3].
+  println A.
 }

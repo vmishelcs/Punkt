@@ -544,6 +544,11 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode &node) {
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(
+    PopulatedArrayExpressionNode &node) {
+  return nullptr;
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode &node) {
   codegen_function_type codegen_function = node.GetCodegenFunction();
   if (!codegen_function) {

@@ -40,7 +40,9 @@ int main(int argc, char **argv) {
 
   auto decorated_ast = AnalyzeFile(file_path);
 
-  PunktLogger::DumpCompileErrorSummary();
+  if (PunktLogger::ThereAreCompileErrors()) {
+    PunktLogger::DumpCompileErrorSummary();
+  }
 
   XMLGeneratorVisitor xml_visitor(std::cerr);
   decorated_ast->Accept(xml_visitor);

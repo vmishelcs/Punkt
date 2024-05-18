@@ -39,6 +39,8 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(LambdaTypeNode &node) override;
   virtual llvm::Value *GenerateCode(MainNode &node) override;
   virtual llvm::Value *GenerateCode(OperatorNode &node) override;
+  virtual llvm::Value *GenerateCode(
+      PopulatedArrayExpressionNode &node) override;
   virtual llvm::Value *GenerateCode(PrintStatementNode &node) override;
   virtual llvm::Value *GenerateCode(ProgramNode &node) override;
   virtual llvm::Value *GenerateCode(ReturnStatementNode &node) override;

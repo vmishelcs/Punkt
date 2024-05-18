@@ -25,6 +25,8 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
 
   virtual void VisitLeave(OperatorNode &node) override;
 
+  virtual void VisitLeave(PopulatedArrayExpressionNode &node) override;
+
   virtual void VisitLeave(PrintStatementNode &node) override;
 
   virtual void VisitLeave(ReturnStatementNode &node) override;

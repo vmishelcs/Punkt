@@ -25,6 +25,7 @@ target_link_libraries(parse_node
     main_node
     nop_node
     operator_node
+    populated_array_expression_node
     print_statement_node
     program_node
     return_statement_node

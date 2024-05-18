@@ -30,6 +30,7 @@ static void MainReturnStatementReturnsValueError(ParseNode &);
 static void ReturningValueFromVoidLambdaError(ParseNode &);
 static void IncompatibleReturnTypeError(ParseNode &, const Type &,
                                         const Type &);
+static void PopulatedArrayTypeMismatchError(ParseNode &);
 static void DeallocOnNonArrayType(ParseNode &);
 static void NonBooleanConditionError(ParseNode &);
 
@@ -48,7 +49,6 @@ void SemanticAnalysisVisitor::VisitLeave(DeallocStatementNode &node) {
   ParseNode *arg = node.GetChild(0);
   if (dynamic_cast<ArrayType *>(arg->GetType()) == nullptr) {
     DeallocOnNonArrayType(node);
-    node.SetType(BaseType::CreateErrorType());
   }
 }
 
@@ -96,7 +96,6 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode &node) {
   if (b_declaration_type &&
       b_declaration_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
     DeclarationOfVarWithVoidTypeError(node);
-    identifier->SetType(BaseType::CreateErrorType());
     return;
   }
 
@@ -118,7 +117,6 @@ void SemanticAnalysisVisitor::VisitLeave(ForStatementNode &node) {
   if (!b_condition_type ||
       !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
     NonBooleanConditionError(node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 }
@@ -131,7 +129,6 @@ void SemanticAnalysisVisitor::VisitLeave(IfStatementNode &node) {
   if (!b_condition_type ||
       !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
     NonBooleanConditionError(node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 }
@@ -143,7 +140,6 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode &node) {
   auto lambda_type = dynamic_cast<LambdaType *>(type);
   if (!lambda_type) {
     InvocationExpressionWithNonLambdaTypeError(node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 
@@ -158,7 +154,6 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode &node) {
   // Check that the lambda accepts the provided arguments.
   if (!lambda_type->AcceptsArgumentTypes(arg_types)) {
     LambdaDoesNotAcceptProvidedTypesError(node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 
@@ -188,7 +183,6 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
   for (auto child : node.GetChildren()) {
     Type *child_type = child->GetType();
     if (child_type->IsErrorType()) {
-      node.SetType(BaseType::CreateErrorType());
       return;
     }
     child_types.push_back(child_type);
@@ -201,20 +195,17 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
       // Make sure variable is not `const`.
       if (!id_node->GetSymbolTableEntry()->is_mutable) {
         AssignmentToImmutableTargetError(*id_node);
-        node.SetType(BaseType::CreateErrorType());
         return;
       }
     } else if (auto op_node = dynamic_cast<OperatorNode *>(node.GetChild(0))) {
       // Make sure the operator is array indexing.
       if (op_node->GetOperatorEnum() != Operator::ARRAY_IDX) {
         NonTargettableExpressionError(node);
-        node.SetType(BaseType::CreateErrorType());
         return;
       }
     } else {
       // Any other operand is not targettable.
       NonTargettableExpressionError(node);
-      node.SetType(BaseType::CreateErrorType());
       return;
     }
   }
@@ -232,8 +223,23 @@ void SemanticAnalysisVisitor::VisitLeave(OperatorNode &node) {
     } else {
       InvalidOperandTypeError(node, node.GetOperatorEnum(), child_types);
     }
-    node.SetType(BaseType::CreateErrorType());
   }
+}
+
+void SemanticAnalysisVisitor::VisitLeave(PopulatedArrayExpressionNode &node) {
+  if (node.NumChildren() == 0) {
+    return;
+  }
+
+  Type *subtype = node.GetChild(0)->GetType();
+  for (auto child : node.GetChildren()) {
+    if (!subtype->IsEquivalentTo(child->GetType())) {
+      PopulatedArrayTypeMismatchError(node);
+      return;
+    }
+  }
+
+  node.SetType(ArrayType::CreateArrayType(subtype));
 }
 
 void SemanticAnalysisVisitor::VisitLeave(PrintStatementNode &node) {
@@ -294,7 +300,6 @@ void SemanticAnalysisVisitor::VisitLeave(WhileStatementNode &node) {
   if (!b_condition_type ||
       !b_condition_type->IsEquivalentTo(BaseTypeEnum::BOOLEAN)) {
     NonBooleanConditionError(node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 }
@@ -387,11 +392,13 @@ void SemanticAnalysisVisitor::CreateSubscope(ParseNode &node) {
 void DeclarationOfVarWithVoidTypeError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "declaration initializer has void type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void UndefinedSymbolReferenceError(ParseNode &node, const std::string &symbol) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "undefined symbol reference \'" + symbol + "\'");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void InvalidOperandTypeError(ParseNode &node, Operator op,
@@ -411,22 +418,27 @@ void InvalidOperandTypeError(ParseNode &node, Operator op,
 
   message += "]";
   PunktLogger::LogCompileError(node.GetTextLocation(), message);
+
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void NonBooleanConditionError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "if-statement has non-boolean type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void NonTargettableExpressionError(ParseNode &node) {
   PunktLogger::LogCompileError(
       node.GetTextLocation(),
       "non-targettable expression in assignment expression");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void AssignmentToImmutableTargetError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "assignment to immutable variable");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void AssignmentTypeMismatchError(ParseNode &node, const Type &target_type,
@@ -435,37 +447,44 @@ void AssignmentTypeMismatchError(ParseNode &node, const Type &target_type,
       node.GetTextLocation(),
       "cannot assign value of type \'" + value_type.ToString() +
           "\' to a target of type \'" + target_type.ToString() + "\'");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void PrintingVoidTypeError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "cannot print void type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void InvocationExpressionWithNonLambdaTypeError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "invocation expression with non-lambda type");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void LambdaDoesNotAcceptProvidedTypesError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "lambda does not accept provided types");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void ReturnStatementOutsideOfFunctionError(ParseNode &node) {
   PunktLogger::LogCompileError(
       node.GetTextLocation(),
       "return statement outside of any lambda or function");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void MainReturnStatementReturnsValueError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "cannot return a value form main");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void ReturningValueFromVoidLambdaError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "cannot return a value from void lambda");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void IncompatibleReturnTypeError(ParseNode &node, const Type &return_type,
@@ -474,9 +493,18 @@ void IncompatibleReturnTypeError(ParseNode &node, const Type &return_type,
                                "returning \'" + return_type.ToString() +
                                    "\' from lambda whose return type is \'" +
                                    lambda_return_type.ToString() + "\'");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void PopulatedArrayTypeMismatchError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "populated array expression must have the same "
+                               "type for each array value");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void DeallocOnNonArrayType(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "dealloc used on non-array type");
+  node.SetType(BaseType::CreateErrorType());
 }

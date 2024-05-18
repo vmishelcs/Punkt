@@ -52,6 +52,9 @@ class ParseNodeVisitor {
   virtual void VisitEnter(OperatorNode &node) = 0;
   virtual void VisitLeave(OperatorNode &node) = 0;
 
+  virtual void VisitEnter(PopulatedArrayExpressionNode &node) = 0;
+  virtual void VisitLeave(PopulatedArrayExpressionNode &node) = 0;
+
   virtual void VisitEnter(PrintStatementNode &node) = 0;
   virtual void VisitLeave(PrintStatementNode &node) = 0;
 
@@ -161,6 +164,13 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
 
   virtual void VisitEnter(OperatorNode &node) override { DefaultVisit(node); }
   virtual void VisitLeave(OperatorNode &node) override { DefaultVisit(node); }
+
+  virtual void VisitEnter(PopulatedArrayExpressionNode &node) override {
+    DefaultVisit(node);
+  }
+  virtual void VisitLeave(PopulatedArrayExpressionNode &node) override {
+    DefaultVisit(node);
+  }
 
   virtual void VisitEnter(PrintStatementNode &node) override {
     DefaultVisit(node);

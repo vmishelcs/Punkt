@@ -856,7 +856,7 @@ bool Parser::StartsAtomicExpression(Token &token) {
          StartsIdentifierAtomic(token) || StartsBooleanLiteral(token) ||
          StartsCharacterLiteral(token) || StartsIntegerLiteral(token) ||
          StartsStringLiteral(token) || StartsAllocExpression(token) ||
-         StartsLambda(token);
+         StartsPopulatedArrayExpression(token) || StartsLambda(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
   if (StartsParenthesizedExpression(*now_reading)) {
@@ -879,6 +879,9 @@ std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
   }
   if (StartsAllocExpression(*now_reading)) {
     return ParseAllocExpression();
+  }
+  if (StartsPopulatedArrayExpression(*now_reading)) {
+    return ParsePopulatedArrayExpression();
   }
   if (StartsLambdaLiteral(*now_reading)) {
     return ParseLambdaLiteral();
@@ -1100,6 +1103,46 @@ std::unique_ptr<ParseNode> Parser::ParseAllocExpression() {
   }
 
   return alloc_expr;
+}
+
+bool Parser::StartsPopulatedArrayExpression(Token &token) {
+  return PunctuatorToken::IsTokenPunctuator(&token, {Punctuator::OPEN_BRACKET});
+}
+std::unique_ptr<ParseNode> Parser::ParsePopulatedArrayExpression() {
+  if (!StartsPopulatedArrayExpression(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("populated array creation");
+  }
+
+  std::unique_ptr<ParseNode> pop_arr =
+      std::make_unique<PopulatedArrayExpressionNode>(
+          PlaceholderToken::Create(*now_reading));
+
+  // Discard '['.
+  ReadToken();
+
+  // Parse expression list.
+  std::unique_ptr<ParseNode> expr = ParseExpression();
+  pop_arr->AppendChild(std::move(expr));
+  while (PunctuatorToken::IsTokenPunctuator(now_reading.get(),
+                                            {Punctuator::SEPARATOR})) {
+    // Discard ','.
+    ReadToken();
+    std::unique_ptr<ParseNode> expr = ParseExpression();
+    pop_arr->AppendChild(std::move(expr));
+  }
+
+  Expect(Punctuator::CLOSE_BRACKET);
+
+  while (StartsLambdaInvocation(*now_reading) ||
+         StartsArrayIndexing(*now_reading)) {
+    if (StartsArrayIndexing(*now_reading)) {
+      pop_arr = ParseArrayIndexing(std::move(pop_arr));
+    } else {
+      pop_arr = ParseLambdaInvocation(std::move(pop_arr));
+    }
+  }
+
+  return pop_arr;
 }
 
 bool Parser::StartsLambdaLiteral(Token &token) { return StartsLambda(token); }

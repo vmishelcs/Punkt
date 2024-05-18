@@ -300,6 +300,23 @@ void XMLGeneratorVisitor::VisitLeave(OperatorNode &node) {
   OutputTag(*tag);
 }
 
+void XMLGeneratorVisitor::VisitEnter(PopulatedArrayExpressionNode &node) {
+  std::unique_ptr<XMLTag> tag =
+      XMLTag::CreateStartTag("PopulatedArrayExpressionNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+
+  OutputTag(*tag);
+  ++depth;
+}
+void XMLGeneratorVisitor::VisitLeave(PopulatedArrayExpressionNode &node) {
+  std::unique_ptr<XMLTag> tag =
+      XMLTag::CreateEndTag("PopulatedArrayExpressionNode");
+
+  --depth;
+  OutputTag(*tag);
+}
+
 void XMLGeneratorVisitor::VisitEnter(PrintStatementNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("PrintStatementNode");
 
