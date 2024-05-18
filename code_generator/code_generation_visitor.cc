@@ -474,7 +474,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
 
   // Validate generated code.
   if (llvm::verifyFunction(*function, &llvm::errs())) {
-    // CodeGenerationInternalError("generated IR is invalid.");
+    CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // Restore builder insert point after generating lambda.
@@ -585,7 +585,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ProgramNode &node) {
   }
 
   if (llvm::verifyModule(*module, &llvm::errs())) {
-    // CodeGenerationInternalError("generated IR is invalid.");
+    CodeGenerationInternalError("generated IR is invalid.");
   }
 
   // GenerateCode(ProgramNode&) return value is not used.
