@@ -82,11 +82,6 @@ void SemanticAnalysisVisitor::VisitLeave(DeclarationStatementNode &node) {
       KeywordToken::IsTokenKeyword(node.GetToken(), {Keyword::VAR});
 
   IdentifierNode *identifier = node.GetIdentifierNode();
-  if (!identifier) {
-    PunktLogger::LogFatalInternalError(
-        "VisitLeave(DeclarationStatementNode&): "
-        "incorrectly constructed declaration node.");
-  }
 
   ParseNode *initializer = node.GetInitializer();
   Type *declaration_type = initializer->GetType();

@@ -66,7 +66,6 @@ void SemanticAnalysisPreprocessor::VisitLeave(LambdaParameterNode &node) {
       parameter_base_type->GetBaseTypeEnum() == BaseTypeEnum::VOID) {
     // Parameter types cannot be void.
     ParameterVoidTypeError(*type_node);
-    node.SetType(BaseType::CreateErrorType());
     return;
   }
 
@@ -120,9 +119,11 @@ void SemanticAnalysisPreprocessor::DeclareFunction(IdentifierNode &node,
 void ArrayVoidSubtypeError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "array cannot have void subtype");
+  node.SetType(BaseType::CreateErrorType());
 }
 
 void ParameterVoidTypeError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "lambda parameter cannot have void type");
+  node.SetType(BaseType::CreateErrorType());
 }
