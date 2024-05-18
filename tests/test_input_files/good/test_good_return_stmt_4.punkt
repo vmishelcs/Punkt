@@ -119,21 +119,21 @@ function g1 <> -> void {
 }
 
 main {
-	call a().
-	call b().
-	call c().
-	call d().
-	call e().
-	call f().
-	call g().
+	a().
+	b().
+	c().
+	d().
+	e().
+	f().
+	g().
 
-	call a1().
-	call b1().
-	call c1().
-	call d1().
-	call e1().
-	call f1().
-	call g1().
+	a1().
+	b1().
+	c1().
+	d1().
+	e1().
+	f1().
+	g1().
 
 	println "good".
 }

@@ -3,5 +3,5 @@ function f <> -> void {
 }
 
 main {
-	call f().
+	f().
 }
