@@ -64,21 +64,20 @@ bool PunktLogger::ThereAreCompileErrors() {
 
 void PunktLogger::DumpCompileErrorSummary() {
   PunktLogger *punkt_logger = GetInstance();
-  llvm::raw_fd_ostream output_stream(STDERR_FILENO, /*shouldClose=*/true);
-  punkt_logger->DumpCompileErrors(output_stream);
+  punkt_logger->DumpCompileErrors(llvm::errs());
   unsigned total_errors =
       punkt_logger->compile_errors.size() + punkt_logger->num_suppressed_errors;
-  output_stream << std::to_string(total_errors) << " error";
+  llvm::errs() << std::to_string(total_errors) << " error";
   if (total_errors != 1) {
-    output_stream << 's';
+    llvm::errs() << 's';
   }
-  output_stream << " generated";
+  llvm::errs() << " generated";
 
   if (punkt_logger->num_suppressed_errors > 0) {
-    output_stream << " (" << std::to_string(punkt_logger->num_suppressed_errors)
-                  << " suppressed).\n";
+    llvm::errs() << " (" << std::to_string(punkt_logger->num_suppressed_errors)
+                 << " suppressed).\n";
   } else {
-    output_stream << ".\n";
+    llvm::errs() << ".\n";
   }
 }
 
