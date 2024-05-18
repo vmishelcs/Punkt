@@ -544,11 +544,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(MainNode &node) {
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
 }
 
-llvm::Value *CodeGenerationVisitor::GenerateCode(
-    PopulatedArrayExpressionNode &node) {
-  return nullptr;
-}
-
 llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode &node) {
   codegen_function_type codegen_function = node.GetCodegenFunction();
   if (!codegen_function) {
@@ -556,6 +551,70 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(OperatorNode &node) {
   }
 
   return codegen_function(*this, node);
+}
+
+llvm::Value *CodeGenerationVisitor::GenerateCode(
+    PopulatedArrayExpressionNode &node) {
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::Module *module = codegen_context->GetModule();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  // Get a reference to the `malloc` function.
+  llvm::Function *malloc_func = module->getFunction(kMallocFunctionName);
+
+  // Allocate memory for the PunktArray data type.
+  llvm::Value *PunktArray_ptr = builder->CreateCall(
+      malloc_func,
+      {llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 16)},
+      "PunktArray_ptr");
+
+  // Generate code for array size.
+  unsigned arr_size = node.NumChildren();
+  llvm::Value *arr_size_value =
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), arr_size);
+
+  // Store array size in the size field.
+  builder->CreateStore(arr_size_value, PunktArray_ptr);
+
+  // Determine array element size.
+  ArrayType *array_type = static_cast<ArrayType *>(node.GetType());
+  Type *subtype = array_type->GetSubtype();
+  unsigned elem_size = subtype->GetSizeInBytes();
+  llvm::Value *elem_size_value =
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), elem_size);
+
+  // Calculate the number of bytes required for the data field.
+  llvm::Value *data_size_in_bytes =
+      builder->CreateMul(elem_size_value, arr_size_value, "data_size_in_bytes");
+
+  // Allocate memory for the array.
+  llvm::Value *data_memory_block = builder->CreateCall(
+      malloc_func, {data_size_in_bytes}, "data_memory_block");
+
+  // Initialize the data memory block to hold the specified values.
+  llvm::Type *llvm_subtype = subtype->GetLLVMType(*llvm_context);
+  for (unsigned i = 0; i < arr_size; ++i) {
+    llvm::Value *elem = node.GetChild(i)->GenerateCode(*this);
+    llvm::Value *elem_idx =
+        llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), i);
+    llvm::Value *elem_addr = builder->CreateGEP(llvm_subtype, data_memory_block,
+                                                {elem_idx}, "elemaddr");
+    builder->CreateStore(elem, elem_addr);
+  }
+
+  // Get the pointer to the data field of the PunktArray object.
+  auto PunktArray_struct =
+      llvm::StructType::getTypeByName(*llvm_context, kPunktArrayStructName);
+  llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
+      PunktArray_struct, PunktArray_ptr,
+      {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 0),
+       llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 1)},
+      "PunktArray_data_ptr");
+
+  // Store the data memory block in the PunktArray object.
+  builder->CreateStore(data_memory_block, PunktArray_data_ptr);
+
+  return PunktArray_ptr;
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(PrintStatementNode &node) {
@@ -708,9 +767,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
 }
 
-/******************************************************************************
- *                      Code generation for identifiers *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Code generation for identifiers
+//===----------------------------------------------------------------------===//
 llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
@@ -740,9 +799,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
                              node.GetName());
 }
 
-/******************************************************************************
- *                        Code generation for literals *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Code generation for literals
+//===----------------------------------------------------------------------===//
 llvm::Value *CodeGenerationVisitor::GenerateCode(BooleanLiteralNode &node) {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
 
@@ -773,9 +832,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(BaseTypeNode &node) {
   return nullptr;
 }
 
-/******************************************************************************
- *                            NOP code generation *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// NOP code generation
+//===----------------------------------------------------------------------===//
 llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
@@ -785,9 +844,9 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
       llvm::ConstantInt::get(llvm::Type::getInt8Ty(*llvm_context), 0), "nop");
 }
 
-/******************************************************************************
- *              Helpful C standard library function declarations *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Helpful C standard library function declarations
+//===----------------------------------------------------------------------===//
 void CodeGenerationVisitor::GenerateMallocFunctionDeclaration() {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::Module *module = codegen_context->GetModule();
@@ -888,9 +947,9 @@ void CodeGenerationVisitor::GenerateExitFunctionDeclaration() {
   }
 }
 
-/******************************************************************************
- *                              Printing helpers *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Printing helpers
+//===----------------------------------------------------------------------===//
 void CodeGenerationVisitor::PrintValue(Type *type, llvm::Value *value) {
   if (auto base_type = dynamic_cast<BaseType *>(type)) {
     PrintBaseTypeValue(base_type, value);
@@ -1182,9 +1241,9 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
   }
 }
 
-/******************************************************************************
- *                           Miscellaneous helpers *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Miscellaneous helpers
+//===----------------------------------------------------------------------===//
 void CodeGenerationVisitor::GenerateRuntimeErrorWithMessage(
     const std::string &message) {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
@@ -1235,9 +1294,9 @@ bool CodeGenerationVisitor::IsPreviousInstructionBlockTerminator() {
   return false;
 }
 
-/******************************************************************************
- *                         Punkt array helper methods *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Punkt array helper methods
+//===----------------------------------------------------------------------===//
 void CodeGenerationVisitor::GeneratePunktArrayType() {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
 
@@ -1328,9 +1387,9 @@ const std::string &CodeGenerationVisitor::GetAllocPunktArrayFunctionName()
   return kAllocPunktArrayFunctionName;
 }
 
-/******************************************************************************
- *                               Error handling                               *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Error handling
+//===----------------------------------------------------------------------===//
 llvm::Value *CodeGenerationVisitor::GenerateCode(ErrorNode &node) {
   CodeGenerationInternalError("encountered ErrorNode " + node.ToString());
 }
