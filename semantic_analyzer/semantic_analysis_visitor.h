@@ -6,8 +6,6 @@
 class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
  public:
   // ---- Non-leaf nodes -------------------------------------------------------
-  virtual void VisitLeave(CallStatementNode &node) override;
-
   virtual void VisitEnter(CodeBlockNode &node) override;
 
   virtual void VisitLeave(DeallocStatementNode &node) override;
@@ -52,26 +50,6 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
   void CreateParameterScope(ParseNode &node);
   void CreateProcedureScope(ParseNode &node);
   void CreateSubscope(ParseNode &node);
-
-  // ---- Error reporting ------------------------------------------------------
-  void DeclarationOfVarWithVoidTypeError(DeclarationStatementNode &node);
-  void InvalidOperandTypeError(OperatorNode &node, std::vector<Type *> &types);
-  void NonBooleanConditionError(IfStatementNode &node);
-  void NonBooleanConditionError(WhileStatementNode &node);
-  void NonBooleanConditionError(ForStatementNode &node);
-  void NonTargettableExpressionError(ParseNode &node);
-  void AssignmentToImmutableTargetError(ParseNode &node);
-  void AssignmentTypeMismatchError(ParseNode &node, const Type &target_type,
-                                   const Type &value_type);
-  void PrintingVoidTypeError(PrintStatementNode &node);
-  void InvocationExpressionWithNonLambdaTypeError();
-  void LambdaDoesNotAcceptProvidedTypesError();
-  void ReturnStatementOutsideOfFunctionError(ReturnStatementNode &node);
-  void MainReturnStatementReturnsValueError(ReturnStatementNode &node);
-  void ReturnStatementReturnsValueFromVoidLambdaError(
-      ReturnStatementNode &node);
-  void IncompatibleReturnTypeError(ReturnStatementNode &node);
-  void CallWithoutFunctionInvocationError(CallStatementNode &node);
 };
 
 #endif  // SEMANTIC_ANALYSIS_VISITOR_H_

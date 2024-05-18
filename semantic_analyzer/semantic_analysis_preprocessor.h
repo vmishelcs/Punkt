@@ -28,10 +28,6 @@ class SemanticAnalysisPreprocessor : public DefaultParseNodeVisitor {
 
   // ---- Miscellaneous helpers ------------------------------------------------
   void DeclareFunction(IdentifierNode &node, Type *type);
-
-  // ---- Error reporting ------------------------------------------------------
-  void VoidArrayTypeError(ParseNode &type_node);
-  void VoidParameterTypeError(ParseNode &type_node);
 };
 
 #endif  // SEMANTIC_ANALYSIS_PREPROCESSOR_H_

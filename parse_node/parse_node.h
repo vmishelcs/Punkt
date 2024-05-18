@@ -63,7 +63,7 @@ class ParseNode {
   ParseNodeType GetParseNodeType() const { return node_type; }
 
   Token *GetToken() const { return token.get(); }
-  TextLocation GetTextLocation() const { return text_location; }
+  const TextLocation &GetTextLocation() const { return text_location; }
 
   ParseNode *GetParent() const { return parent; }
   unsigned NumChildren() const;

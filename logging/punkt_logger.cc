@@ -1,15 +1,50 @@
 #include "punkt_logger.h"
 
 #include <execinfo.h>
+#include <input_handler/text_location.h>
+#include <llvm/Support/raw_ostream.h>
+
+#include <filesystem>
+#include <fstream>
+#include <string>
+
+const unsigned kMaxCompileErrors = 8;
 
 std::unique_ptr<PunktLogger> PunktLogger::instance = nullptr;
 
-void PunktLogger::Log(LogType log_type, std::string message) {
+void PunktLogger::LogCompileError(const TextLocation &error_location,
+                                  const std::string &error_message) {
   PunktLogger *punkt_logger = GetInstance();
-  if (!punkt_logger->loggers.contains(log_type)) {
-    LogFatalInternalError("unimplemented log type");
+  if (punkt_logger->compile_errors.size() >= kMaxCompileErrors) {
+    ++(punkt_logger->num_suppressed_errors);
+    return;
   }
-  punkt_logger->loggers[log_type]->LogMessage(message);
+
+  // Locate and store the error line in the input file.
+  const std::string &file_name = error_location.file_name;
+  std::ifstream input_file(file_name);
+  std::string error_location_line;
+  int line_num = error_location.line;
+  input_file.seekg(std::ios::beg);
+  for (int i = 1; i <= line_num - 1; ++i) {
+    input_file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  }
+  std::getline(input_file, error_location_line);
+
+  // Construct complete log message that has format
+  // <text location of error>:  error:  <error message>
+  // <error location line>
+  std::string complete_message = file_name;
+  complete_message += ":" + std::to_string(error_location.line);
+  complete_message += ":" + std::to_string(error_location.column);
+  complete_message += "  error:  " + error_message;
+  complete_message += "\n-->" + error_location_line;
+
+  punkt_logger->InsertLog(complete_message);
+}
+
+void PunktLogger::InsertLog(const std::string &log_message) {
+  this->compile_errors.emplace_back(log_message);
 }
 
 void PunktLogger::LogFatal(std::string message) {
@@ -23,58 +58,34 @@ void PunktLogger::LogFatalInternalError(std::string message) {
 }
 
 bool PunktLogger::ThereAreCompileErrors() {
-  PunktLogger *logger = GetInstance();
-  for (const auto &entry : logger->loggers) {
-    if (!entry.second->messages.empty()) {
-      return true;
-    }
-  }
-  return false;
+  PunktLogger *punkt_logger = GetInstance();
+  return punkt_logger->compile_errors.size() > 0;
 }
 
-void PunktLogger::DumpCompileErrors() {
-  PunktLogger *logger = GetInstance();
-  for (const auto &entry : logger->loggers) {
-    for (const auto &msg : entry.second->messages) {
-      entry.second->PrintLogMessage(msg);
-    }
+void PunktLogger::DumpCompileErrorSummary() {
+  PunktLogger *punkt_logger = GetInstance();
+  llvm::raw_fd_ostream output_stream(STDERR_FILENO, /*shouldClose=*/true);
+  punkt_logger->DumpCompileErrors(output_stream);
+  unsigned total_errors =
+      punkt_logger->compile_errors.size() + punkt_logger->num_suppressed_errors;
+  output_stream << std::to_string(total_errors) << " error";
+  if (total_errors != 1) {
+    output_stream << 's';
   }
-}
+  output_stream << " generated";
 
-const char *PunktLogger::Logger::ToString() {
-  switch (logger_type) {
-    case LogType::SCANNER:
-      return "scanner";
-    case LogType::PARSER:
-      return "parser";
-    case LogType::SYMBOL_TABLE:
-      return "symbol table";
-    case LogType::SEMANTIC_ANALYZER:
-      return "semantic analyzer";
-    default:
-      PunktLogger::LogFatalInternalError(
-          "unimplemented LogType in PunktLogger::Logger::ToString");
+  if (punkt_logger->num_suppressed_errors > 0) {
+    output_stream << " (" << std::to_string(punkt_logger->num_suppressed_errors)
+                  << " suppressed).\n";
+  } else {
+    output_stream << ".\n";
   }
 }
 
-void PunktLogger::Logger::LogMessage(std::string message) {
-  messages.push_back(message);
-}
-
-void PunktLogger::Logger::PrintLogMessage(const std::string &message) {
-  std::string logger_type_string = ToString();
-  std::cerr << "ERROR: " << logger_type_string << ": " << message << std::endl;
-}
-
-PunktLogger::PunktLogger() {
-  loggers[LogType::SCANNER] =
-      std::make_unique<PunktLogger::Logger>(LogType::SCANNER);
-  loggers[LogType::PARSER] =
-      std::make_unique<PunktLogger::Logger>(LogType::PARSER);
-  loggers[LogType::SYMBOL_TABLE] =
-      std::make_unique<PunktLogger::Logger>(LogType::SYMBOL_TABLE);
-  loggers[LogType::SEMANTIC_ANALYZER] =
-      std::make_unique<PunktLogger::Logger>(LogType::SEMANTIC_ANALYZER);
+void PunktLogger::DumpCompileErrors(llvm::raw_ostream &output_stream) {
+  for (const auto &msg : compile_errors) {
+    output_stream << msg << '\n';
+  }
 }
 
 PunktLogger *PunktLogger::GetInstance() {

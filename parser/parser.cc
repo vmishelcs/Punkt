@@ -38,8 +38,7 @@ void Parser::ReadToken() {
 void Parser::Expect(Keyword keyword) {
   auto keyword_token = dynamic_cast<KeywordToken *>(now_reading.get());
   if (!keyword_token || keyword_token->GetKeywordEnum() != keyword) {
-    SyntaxErrorUnexpectedToken("\'" + keyword_utils::GetKeywordLexeme(keyword) +
-                               "\'");
+    SyntaxErrorUnexpectedToken(keyword_utils::GetKeywordLexeme(keyword));
   }
   ReadToken();
 }
@@ -47,8 +46,7 @@ void Parser::Expect(Keyword keyword) {
 void Parser::Expect(Operator op) {
   auto op_token = dynamic_cast<OperatorToken *>(now_reading.get());
   if (!op_token || op_token->GetOperatorEnum() != op) {
-    SyntaxErrorUnexpectedToken("\'" + operator_utils::GetOperatorLexeme(op) +
-                               "\'");
+    SyntaxErrorUnexpectedToken(operator_utils::GetOperatorLexeme(op));
   }
   ReadToken();
 }
@@ -56,8 +54,7 @@ void Parser::Expect(Operator op) {
 void Parser::Expect(Punctuator punc) {
   auto punc_token = dynamic_cast<PunctuatorToken *>(now_reading.get());
   if (!punc_token || punc_token->GetPunctuatorEnum() != punc) {
-    SyntaxErrorUnexpectedToken(
-        "\'" + punctuator_utils::GetPunctuatorLexeme(punc) + "\'");
+    SyntaxErrorUnexpectedToken(punctuator_utils::GetPunctuatorLexeme(punc));
   }
   ReadToken();
 }
@@ -1221,10 +1218,10 @@ std::unique_ptr<ParseNode> Parser::ParseLambdaType() {
 
 std::unique_ptr<ParseNode> Parser::SyntaxErrorUnexpectedToken(
     std::string expected) {
-  std::string message = "Unexpected token \'" + now_reading->GetLexeme() +
-                        "\', expected " + expected + " at " +
-                        now_reading->GetLocation().ToString();
-  PunktLogger::Log(LogType::PARSER, message);
+  PunktLogger::LogCompileError(now_reading->GetLocation(),
+                               "unexpected token \'" +
+                                   now_reading->GetLexeme() +
+                                   "\', expected \'" + expected + "\'");
   return GetSyntaxErrorNode();
 }
 

@@ -27,11 +27,6 @@ class Scanner {
 
   bool IsEndOfInput(LocatedChar ch);
 
-  void LexicalErrorIdentifierTooLong(std::string id_name);
-  void LexicalErrorUnexpectedCharacter(LocatedChar ch);
-  void LexicalErrorExpectedDifferentCharacter(char expected_char,
-                                              TextLocation location);
-
   std::unique_ptr<LocatedCharStream> input_stream;
   std::unique_ptr<Token> next_token;
 };

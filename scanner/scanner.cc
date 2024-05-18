@@ -1,14 +1,20 @@
 #include "scanner.h"
 
+#include <input_handler/text_location.h>
 #include <logging/punkt_logger.h>
 #include <token/all_tokens.h>
 
 #include <cstdint>
 #include <cstdlib>
+#include <string>
 
 #include "keyword.h"
 
 static const size_t kMaxIdentifierLength = 32;
+
+static void IdentifierTooLongError(const TextLocation &, const std::string &);
+static void UnexpectedCharacterError(const TextLocation &, char);
+static void ExpectedDifferentCharacterError(const TextLocation &, char);
 
 Scanner::Scanner(fs::path file_path) : next_token(std::unique_ptr<EOFToken>()) {
   this->input_stream = std::make_unique<LocatedCharStream>(file_path);
@@ -47,7 +53,7 @@ std::unique_ptr<Token> Scanner::GetNextToken() {
   } else if (IsEndOfInput(ch)) {
     return std::make_unique<EOFToken>();
   } else {
-    LexicalErrorUnexpectedCharacter(ch);
+    UnexpectedCharacterError(ch.location, ch.character);
     return GetNextToken();
   }
 }
@@ -85,7 +91,7 @@ std::unique_ptr<Token> Scanner::ScanKeywordOrIdentifier(
   }
 
   if (buffer.size() > kMaxIdentifierLength) {
-    LexicalErrorIdentifierTooLong(buffer);
+    IdentifierTooLongError(first_char.location, buffer);
     return GetNextToken();
   }
 
@@ -171,7 +177,8 @@ std::unique_ptr<Token> Scanner::ScanOperatorOrPunctuator(
       if (input_stream->Peek().character == '&') {
         buffer.push_back(input_stream->Next().character);
       } else {
-        LexicalErrorUnexpectedCharacter(input_stream->Peek());
+        UnexpectedCharacterError(input_stream->Peek().location,
+                                 input_stream->Peek().character);
         return GetNextToken();
       }
       break;
@@ -181,7 +188,8 @@ std::unique_ptr<Token> Scanner::ScanOperatorOrPunctuator(
       if (input_stream->Peek().character == '|') {
         buffer.push_back(input_stream->Next().character);
       } else {
-        LexicalErrorUnexpectedCharacter(input_stream->Peek());
+        UnexpectedCharacterError(input_stream->Peek().location,
+                                 input_stream->Peek().character);
         return GetNextToken();
       }
       break;
@@ -224,9 +232,9 @@ std::unique_ptr<Token> Scanner::ScanCharacter(LocatedChar first_char) {
     char_literal_value = ch.character;
   }
 
-  LocatedChar next = input_stream->Next();
-  if (next.character != '\'') {
-    LexicalErrorExpectedDifferentCharacter('\'', next.location);
+  LocatedChar next_char = input_stream->Next();
+  if (next_char.character != '\'') {
+    ExpectedDifferentCharacterError(next_char.location, next_char.character);
     return GetNextToken();
   }
 
@@ -240,7 +248,7 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char) {
 
   LocatedChar next_char = input_stream->Peek();
   if (next_char.character != '\"') {
-    LexicalErrorExpectedDifferentCharacter('\"', next_char.location);
+    ExpectedDifferentCharacterError(next_char.location, next_char.character);
     return GetNextToken();
   }
 
@@ -253,7 +261,7 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char) {
     ReadStringLiteral(buffer);
     next_char = input_stream->Peek();
     if (next_char.character != '\"') {
-      LexicalErrorExpectedDifferentCharacter('\"', next_char.location);
+      ExpectedDifferentCharacterError(next_char.location, next_char.character);
       return GetNextToken();
     }
     input_stream->Next();
@@ -328,22 +336,26 @@ char Scanner::InterpretEscapeSequence() {
   }
 }
 
-void Scanner::LexicalErrorIdentifierTooLong(std::string id_name) {
-  std::string message = "identifier name " + id_name +
-                        " too long; max identifier name " + "length is " +
-                        std::to_string(kMaxIdentifierLength) + " characters.";
-  PunktLogger::Log(LogType::SCANNER, message);
+//===----------------------------------------------------------------------===//
+// Error handling
+//===----------------------------------------------------------------------===//
+void IdentifierTooLongError(const TextLocation &text_location,
+                            const std::string &id_name) {
+  PunktLogger::LogCompileError(
+      text_location, "variable identifier \'" + id_name + "\' is too long");
 }
-void Scanner::LexicalErrorUnexpectedCharacter(LocatedChar ch) {
-  std::string message = "Unexpected character \'";
-  message.push_back(ch.character);
-  message.append("\' at ").append(ch.location.ToString());
-  PunktLogger::Log(LogType::SCANNER, message);
+
+void UnexpectedCharacterError(const TextLocation &text_location, char c) {
+  std::string message = "unexpected character \'";
+  message.push_back(c);
+  message.push_back('\'');
+  PunktLogger::LogCompileError(text_location, message);
 }
-void Scanner::LexicalErrorExpectedDifferentCharacter(char expected_char,
-                                                     TextLocation location) {
-  std::string message = "Expected \'";
-  message.push_back(expected_char);
-  message += "\' at " + location.ToString();
-  PunktLogger::Log(LogType::SCANNER, message);
+
+void ExpectedDifferentCharacterError(const TextLocation &text_location,
+                                     char c) {
+  std::string message = "expected character \'";
+  message.push_back(c);
+  message.push_back('\'');
+  PunktLogger::LogCompileError(text_location, message);
 }

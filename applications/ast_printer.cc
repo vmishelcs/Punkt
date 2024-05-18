@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 
   auto ast = ParseFile(file_path);
 
-  PunktLogger::DumpCompileErrors();
+  PunktLogger::DumpCompileErrorSummary();
 
   XMLGeneratorVisitor xml_visitor(std::cerr);
   ast->Accept(xml_visitor);
