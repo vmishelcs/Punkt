@@ -1,8 +1,6 @@
 #ifndef PARSE_NODE_H_
 #define PARSE_NODE_H_
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
 #include <semantic_analyzer/types/type.h>
 #include <symbol_table/scope.h>

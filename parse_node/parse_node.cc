@@ -1,11 +1,9 @@
 #include "parse_node.h"
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Type.h>
 #include <logging/punkt_logger.h>
-#include <semantic_analyzer/types/base_type.h>
-#include <semantic_analyzer/types/lambda_type.h>
 #include <semantic_analyzer/types/type.h>
+#include <symbol_table/scope.h>
+#include <token/token.h>
 
 #include <memory>
 #include <vector>
