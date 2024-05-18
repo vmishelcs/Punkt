@@ -33,5 +33,4 @@ target_link_libraries(parse_node
     while_statement_node
     type
     scope
-    ${llvm_libs}
 )
