@@ -9,8 +9,6 @@
 #include <memory>
 #include <vector>
 
-enum class LogType { SCANNER, PARSER, SYMBOL_TABLE, SEMANTIC_ANALYZER };
-
 class PunktLogger {
  public:
   friend std::unique_ptr<PunktLogger> std::make_unique<PunktLogger>();
