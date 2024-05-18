@@ -75,9 +75,6 @@ class Parser {
   bool StartsDeallocStatement(Token &token);
   std::unique_ptr<ParseNode> ParseDeallocStatement();
 
-  bool StartsCallStatement(Token &token);
-  std::unique_ptr<ParseNode> ParseCallStatement();
-
   bool StartsPrintStatement(Token &token);
   std::unique_ptr<ParseNode> ParsePrintStatement();
 

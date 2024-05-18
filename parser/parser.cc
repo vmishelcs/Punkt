@@ -197,8 +197,8 @@ bool Parser::StartsStatement(Token &token) {
   return StartsCodeBlock(token) || StartsDeclaration(token) ||
          StartsExpressionStatement(token) || StartsIfStatement(token) ||
          StartsWhileStatement(token) || StartsForStatement(token) ||
-         StartsDeallocStatement(token) || StartsCallStatement(token) ||
-         StartsPrintStatement(token) || StartsReturnStatement(token);
+         StartsDeallocStatement(token) || StartsPrintStatement(token) ||
+         StartsReturnStatement(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseStatement() {
   if (StartsCodeBlock(*now_reading)) {
@@ -221,9 +221,6 @@ std::unique_ptr<ParseNode> Parser::ParseStatement() {
   }
   if (StartsDeallocStatement(*now_reading)) {
     return ParseDeallocStatement();
-  }
-  if (StartsCallStatement(*now_reading)) {
-    return ParseCallStatement();
   }
   if (StartsReturnStatement(*now_reading)) {
     return ParseReturnStatement();
@@ -462,36 +459,6 @@ std::unique_ptr<ParseNode> Parser::ParseDeallocStatement() {
   Expect(Punctuator::TERMINATOR);
 
   return dealloc_stmt;
-}
-
-bool Parser::StartsCallStatement(Token &token) {
-  return KeywordToken::IsTokenKeyword(&token, {Keyword::CALL});
-}
-std::unique_ptr<ParseNode> Parser::ParseCallStatement() {
-  if (!StartsCallStatement(*now_reading)) {
-    return SyntaxErrorUnexpectedToken("call statement");
-  }
-
-  auto call_statement =
-      std::make_unique<CallStatementNode>(std::move(now_reading));
-
-  // Discard 'call' token.
-  ReadToken();
-
-  std::unique_ptr<ParseNode> lambda_invocation = nullptr;
-  if (StartsIdentifier(*now_reading)) {
-    lambda_invocation = ParseIdentifierAtomic();
-  } else if (StartsLambdaLiteral(*now_reading)) {
-    lambda_invocation = ParseLambdaLiteral();
-  } else {
-    return SyntaxErrorUnexpectedToken("lambda invocation");
-  }
-
-  call_statement->AppendChild(std::move(lambda_invocation));
-
-  Expect(Punctuator::TERMINATOR);
-
-  return call_statement;
 }
 
 bool Parser::StartsPrintStatement(Token &token) {

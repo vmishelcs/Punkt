@@ -98,21 +98,6 @@ void XMLGeneratorVisitor::VisitLeave(ArrayTypeNode &node) {
   OutputTag(*tag);
 }
 
-void XMLGeneratorVisitor::VisitEnter(CallStatementNode &node) {
-  std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("CallStatementNode");
-
-  AddBasicParseNodeAttributes(*tag, node);
-
-  OutputTag(*tag);
-  ++depth;
-}
-void XMLGeneratorVisitor::VisitLeave(CallStatementNode &node) {
-  std::unique_ptr<XMLTag> tag = XMLTag::CreateEndTag("CallStatementNode");
-
-  --depth;
-  OutputTag(*tag);
-}
-
 void XMLGeneratorVisitor::VisitEnter(CodeBlockNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("CodeBlockNode");
 

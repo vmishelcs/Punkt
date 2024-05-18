@@ -61,15 +61,6 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ArrayTypeNode &node) {
   return nullptr;
 }
 
-llvm::Value *CodeGenerationVisitor::GenerateCode(CallStatementNode &node) {
-  if (IsPreviousInstructionBlockTerminator()) {
-    // No more instructions in this basic block.
-    return nullptr;
-  }
-
-  return node.GetLambdaInvocationNode()->GenerateCode(*this);
-}
-
 llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode &node) {
   for (auto child : node.GetChildren()) {
     child->GenerateCode(*this);
