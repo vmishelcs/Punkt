@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "code_block_node.h"
 #include "lambda_parameter_node.h"
 
 class LambdaNode : public ParseNode {
@@ -50,7 +51,9 @@ class LambdaNode : public ParseNode {
     return parameter_nodes;
   }
   ParseNode *GetReturnTypeNode() const { return return_type_node; }
-  ParseNode *GetLambdaBodyNode() const { return lambda_body; }
+  CodeBlockNode *GetLambdaBodyNode() const {
+    return dynamic_cast<CodeBlockNode *>(lambda_body);
+  }
 
   bool IsAnonymous() const;
 

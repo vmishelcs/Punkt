@@ -13,7 +13,9 @@ class CodeBlockNode : public ParseNode {
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
-  virtual std::string ToString() const override;
+  bool DoAllControlPathsReturn() const;
+
+  virtual std::string ToString() const override { return "CodeBlockNode"; }
 
   virtual void Accept(ParseNodeVisitor &visitor) override;
 

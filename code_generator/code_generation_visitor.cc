@@ -468,7 +468,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
       builder->CreateRetVoid();
     } else {
       // Otherwise, issue a runtime error.
-      GenerateRuntimeErrorWithMessage("non-void lambda with no return value");
+      GenerateRuntimeErrorWithMessage(
+          "non-void lambda does not return a value");
     }
   }
 

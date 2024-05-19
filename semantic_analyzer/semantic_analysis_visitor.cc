@@ -30,6 +30,7 @@ static void MainReturnStatementReturnsValueError(ParseNode &);
 static void ReturningValueFromVoidLambdaError(ParseNode &);
 static void IncompatibleReturnTypeError(ParseNode &, const Type &,
                                         const Type &);
+static void NonVoidLambdaDoesNotReturnValue(ParseNode &);
 static void NonArrayTypeInAllocExpressionError(ParseNode &);
 static void VoidArraySubtypeError(ParseNode &);
 static void NonIntegerAllocSizeOperand(ParseNode &);
@@ -162,6 +163,18 @@ void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode &node) {
 
 void SemanticAnalysisVisitor::VisitEnter(LambdaNode &node) {
   CreateParameterScope(node);
+}
+void SemanticAnalysisVisitor::VisitLeave(LambdaNode &node) {
+  LambdaType *lambda_type = static_cast<LambdaType *>(node.GetType());
+  BaseType *ret_type = dynamic_cast<BaseType *>(lambda_type->GetReturnType());
+
+  CodeBlockNode *lambda_body = node.GetLambdaBodyNode();
+  // If this is a non-void lambda, make sure all control paths return a value.
+  if (!ret_type->IsEquivalentTo(BaseTypeEnum::VOID) &&
+      !lambda_body->DoAllControlPathsReturn()) {
+    NonVoidLambdaDoesNotReturnValue(node);
+    return;
+  }
 }
 
 void SemanticAnalysisVisitor::VisitLeave(LambdaParameterNode &node) {
@@ -493,6 +506,12 @@ void IncompatibleReturnTypeError(ParseNode &node, const Type &return_type,
                                "returning \'" + return_type.ToString() +
                                    "\' from lambda whose return type is \'" +
                                    lambda_return_type.ToString() + "\'");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void NonVoidLambdaDoesNotReturnValue(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "non-void function does not return a value");
   node.SetType(BaseType::CreateErrorType());
 }
 

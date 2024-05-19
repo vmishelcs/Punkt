@@ -20,6 +20,7 @@ class SemanticAnalysisVisitor : public DefaultParseNodeVisitor {
   virtual void VisitLeave(LambdaInvocationNode &node) override;
 
   virtual void VisitEnter(LambdaNode &node) override;
+  virtual void VisitLeave(LambdaNode &node) override;
 
   virtual void VisitLeave(LambdaParameterNode &node) override;
 

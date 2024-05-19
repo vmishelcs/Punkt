@@ -37,8 +37,8 @@ void PunktLogger::LogCompileError(const TextLocation &error_location,
   std::string complete_message = file_name;
   complete_message += ":" + std::to_string(error_location.line);
   complete_message += ":" + std::to_string(error_location.column);
-  complete_message += "  error:  " + error_message;
-  complete_message += "\n-->" + error_location_line;
+  complete_message += ": error: " + error_message;
+  complete_message += "\n--> " + error_location_line;
 
   punkt_logger->InsertLog(complete_message);
 }
