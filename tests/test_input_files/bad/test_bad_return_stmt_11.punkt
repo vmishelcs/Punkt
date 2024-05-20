@@ -1,0 +1,12 @@
+function f <> -> int {
+	if true
+		return 0.
+	else
+		println "test".
+
+	println "test".
+}
+
+main {
+	f().
+}

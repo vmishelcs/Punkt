@@ -1,0 +1,8 @@
+function f <> -> int {
+  if true
+    println "a".
+}
+
+main {
+  f().
+}

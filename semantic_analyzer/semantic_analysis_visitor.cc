@@ -22,12 +22,16 @@ static void AssignmentTypeMismatchError(ParseNode &, const Type &,
                                         const Type &);
 static void InvalidOperandTypeError(ParseNode &, Operator,
                                     std::vector<Type *> &);
+static void NonBooleanConditionError(ParseNode &);
+static void DeclarationIfBlockError(ParseNode &);
+static void DeclarationElseBlockError(ParseNode &);
 static void PrintingVoidTypeError(ParseNode &);
 static void InvocationExpressionWithNonLambdaTypeError(ParseNode &);
 static void LambdaDoesNotAcceptProvidedTypesError(ParseNode &);
 static void ReturnStatementOutsideOfFunctionError(ParseNode &);
 static void MainReturnStatementReturnsValueError(ParseNode &);
 static void ReturningValueFromVoidLambdaError(ParseNode &);
+static void MissingReturnValueError(ParseNode &);
 static void IncompatibleReturnTypeError(ParseNode &, const Type &,
                                         const Type &);
 static void NonVoidLambdaDoesNotReturnValue(ParseNode &);
@@ -36,7 +40,6 @@ static void VoidArraySubtypeError(ParseNode &);
 static void NonIntegerAllocSizeOperand(ParseNode &);
 static void PopulatedArrayTypeMismatchError(ParseNode &);
 static void DeallocOnNonArrayType(ParseNode &);
-static void NonBooleanConditionError(ParseNode &);
 
 //===----------------------------------------------------------------------===//
 // Non-leaf nodes
@@ -131,6 +134,28 @@ void SemanticAnalysisVisitor::VisitLeave(IfStatementNode &node) {
     NonBooleanConditionError(node);
     return;
   }
+
+  // If the 'if' path of an 'if' statement is a single statement, then it must
+  // not be a declaration. Ditto for the 'else' path. This is because if we are
+  // to allow this, then we are declaring a variable in the enclosing scope of
+  // the 'if' statement, meaning that we have a variable that the programmer can
+  // use despite it potentially not ever being initialized.
+  //
+  // Example:
+  // main {
+  //   if false
+  //     var x = 1.
+  //   println x. # Here, `x` is never initialized!
+  // }
+
+  if (dynamic_cast<DeclarationStatementNode *>(node.GetIfBlockNode())) {
+    DeclarationIfBlockError(*node.GetIfBlockNode());
+    return;
+  }
+  if (dynamic_cast<DeclarationStatementNode *>(node.GetElseBlockNode())) {
+    DeclarationElseBlockError(*node.GetElseBlockNode());
+    return;
+  }
 }
 
 void SemanticAnalysisVisitor::VisitLeave(LambdaInvocationNode &node) {
@@ -166,12 +191,16 @@ void SemanticAnalysisVisitor::VisitEnter(LambdaNode &node) {
 }
 void SemanticAnalysisVisitor::VisitLeave(LambdaNode &node) {
   LambdaType *lambda_type = static_cast<LambdaType *>(node.GetType());
+
   BaseType *ret_type = dynamic_cast<BaseType *>(lambda_type->GetReturnType());
+  if (ret_type && ret_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+    // Void lambdas don't need further semantic analysis.
+    return;
+  }
 
   CodeBlockNode *lambda_body = node.GetLambdaBodyNode();
   // If this is a non-void lambda, make sure all control paths return a value.
-  if (!ret_type->IsEquivalentTo(BaseTypeEnum::VOID) &&
-      !lambda_body->DoAllControlPathsReturn()) {
+  if (!lambda_body->DoAllControlPathsReturn()) {
     NonVoidLambdaDoesNotReturnValue(node);
     return;
   }
@@ -285,22 +314,29 @@ void SemanticAnalysisVisitor::VisitLeave(ReturnStatementNode &node) {
   // Otherwise, the enclosing function must be a lambda.
   auto lambda = static_cast<LambdaNode *>(enclosing_function);
 
-  Type *lambda_return_type = lambda->GetReturnTypeNode()->GetType();
+  Type *lambda_ret_type = lambda->GetReturnTypeNode()->GetType();
 
-  // If the enclosing lambda is declared as returning void, the return
-  // statement must not return a value.
-  auto lambda_return_b_type = dynamic_cast<BaseType *>(lambda_return_type);
-  if (lambda_return_b_type &&
-      lambda_return_b_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
-    if (node.NumChildren() > 0) ReturningValueFromVoidLambdaError(node);
+  auto lambda_ret_base_type = dynamic_cast<BaseType *>(lambda_ret_type);
+  if (lambda_ret_base_type &&
+      lambda_ret_base_type->IsEquivalentTo(BaseTypeEnum::VOID)) {
+    if (node.NumChildren() > 0) {
+      // Void lambdas must not return a value.
+      ReturningValueFromVoidLambdaError(node);
+    }
+    return;
+  }
+
+  // If we are here, the enclosing lambda returns a non-void type.
+  if (node.NumChildren() == 0) {
+    MissingReturnValueError(node);
     return;
   }
 
   // Make sure this statement is return a value that is semantically equivalent
   // to the return type of the enclosing lambda.
-  Type *return_value_type = node.GetReturnValueNode()->GetType();
-  if (!lambda_return_type->IsEquivalentTo(return_value_type)) {
-    IncompatibleReturnTypeError(node, *return_value_type, *lambda_return_type);
+  Type *ret_value_type = node.GetReturnValueNode()->GetType();
+  if (!lambda_ret_type->IsEquivalentTo(ret_value_type)) {
+    IncompatibleReturnTypeError(node, *ret_value_type, *lambda_ret_type);
     return;
   }
 }
@@ -414,6 +450,28 @@ void UndefinedSymbolReferenceError(ParseNode &node, const std::string &symbol) {
   node.SetType(BaseType::CreateErrorType());
 }
 
+void NonTargettableExpressionError(ParseNode &node) {
+  PunktLogger::LogCompileError(
+      node.GetTextLocation(),
+      "non-targettable expression in assignment expression");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void AssignmentToImmutableTargetError(ParseNode &node) {
+  PunktLogger::LogCompileError(node.GetTextLocation(),
+                               "assignment to immutable variable");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void AssignmentTypeMismatchError(ParseNode &node, const Type &target_type,
+                                 const Type &value_type) {
+  PunktLogger::LogCompileError(
+      node.GetTextLocation(),
+      "cannot assign value of type \'" + value_type.ToString() +
+          "\' to a target of type \'" + target_type.ToString() + "\'");
+  node.SetType(BaseType::CreateErrorType());
+}
+
 void InvalidOperandTypeError(ParseNode &node, Operator op,
                              std::vector<Type *> &types) {
   std::string message = "operator \'" + operator_utils::GetOperatorLexeme(op) +
@@ -441,25 +499,17 @@ void NonBooleanConditionError(ParseNode &node) {
   node.SetType(BaseType::CreateErrorType());
 }
 
-void NonTargettableExpressionError(ParseNode &node) {
+void DeclarationIfBlockError(ParseNode &node) {
   PunktLogger::LogCompileError(
       node.GetTextLocation(),
-      "non-targettable expression in assignment expression");
+      "if block cannot consist of a single declaration statement");
   node.SetType(BaseType::CreateErrorType());
 }
 
-void AssignmentToImmutableTargetError(ParseNode &node) {
-  PunktLogger::LogCompileError(node.GetTextLocation(),
-                               "assignment to immutable variable");
-  node.SetType(BaseType::CreateErrorType());
-}
-
-void AssignmentTypeMismatchError(ParseNode &node, const Type &target_type,
-                                 const Type &value_type) {
+void DeclarationElseBlockError(ParseNode &node) {
   PunktLogger::LogCompileError(
       node.GetTextLocation(),
-      "cannot assign value of type \'" + value_type.ToString() +
-          "\' to a target of type \'" + target_type.ToString() + "\'");
+      "else block cannot consist of a single declaration statement");
   node.SetType(BaseType::CreateErrorType());
 }
 
@@ -490,13 +540,20 @@ void ReturnStatementOutsideOfFunctionError(ParseNode &node) {
 
 void MainReturnStatementReturnsValueError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
-                               "cannot return a value form main");
+                               "cannot return a value from main");
   node.SetType(BaseType::CreateErrorType());
 }
 
 void ReturningValueFromVoidLambdaError(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
                                "cannot return a value from void lambda");
+  node.SetType(BaseType::CreateErrorType());
+}
+
+void MissingReturnValueError(ParseNode &node) {
+  PunktLogger::LogCompileError(
+      node.GetTextLocation(),
+      "return value missing in return statement of non-void lambda");
   node.SetType(BaseType::CreateErrorType());
 }
 
@@ -511,7 +568,7 @@ void IncompatibleReturnTypeError(ParseNode &node, const Type &return_type,
 
 void NonVoidLambdaDoesNotReturnValue(ParseNode &node) {
   PunktLogger::LogCompileError(node.GetTextLocation(),
-                               "non-void function does not return a value");
+                               "non-void lambda does not return a value");
   node.SetType(BaseType::CreateErrorType());
 }
 

@@ -67,7 +67,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode &node) {
   }
 
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
-  // GenerateCode(CodeBlockNode&) return value is not used.
+  // Code-blocks are void statements.
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
 }
 

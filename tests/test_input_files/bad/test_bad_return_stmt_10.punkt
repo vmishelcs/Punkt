@@ -1,0 +1,13 @@
+function f <> -> int {
+	if true {
+		var x = 0.
+	} else if false {
+		return 0.
+	} else {
+		return 1.
+	}
+}
+
+main {
+	f().
+}

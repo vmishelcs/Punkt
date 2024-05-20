@@ -1,0 +1,7 @@
+function f <> -> int {
+	return.
+}
+
+main {
+	f().
+}
