@@ -72,12 +72,12 @@ void PunktLogger::InsertLog(const std::string &log_message) {
 }
 
 void PunktLogger::LogFatal(std::string message) {
-  std::cerr << "ERROR: " << message << "\ncompilation terminated." << std::endl;
+  llvm::errs() << "ERROR: " << message << "\ncompilation terminated.\n";
   std::exit(1);
 }
 
 void PunktLogger::LogFatalInternalError(std::string message) {
-  std::cerr << "interal error: " << message << std::endl;
+  llvm::errs() << "interal error: " << message << '\n';
   std::exit(-1);
 }
 

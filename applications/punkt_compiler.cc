@@ -1,4 +1,5 @@
 #include <code_generator/code_generator.h>
+#include <llvm/Support/raw_ostream.h>
 #include <logging/punkt_logger.h>
 #include <parser/parser.h>
 #include <semantic_analyzer/semantic_analyzer.h>
@@ -138,7 +139,7 @@ static void Compile(fs::path input_file_path, fs::path output_file_path,
 static void CheckForErrors() {
   if (PunktLogger::ThereAreCompileErrors()) {
     PunktLogger::DumpCompileErrorSummary();
-    std::cerr << "program has errors. no output file generated.\n" << std::endl;
-    std::exit(0);
+    llvm::errs() << "program has errors. no output file generated.\n";
+    std::exit(1);
   }
 }
