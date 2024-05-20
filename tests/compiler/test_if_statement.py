@@ -37,6 +37,18 @@ class TestIfStatement(object):
         except RuntimeError as ex:
             assert False, "Exception was raised: " + repr(ex)
 
+    def test_bad_if_stmt_6(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
+    def test_bad_if_stmt_7(self):
+        try:
+            self._compile_helper.compile_with_failure()
+        except RuntimeError as ex:
+            assert False, "Exception was raised: " + repr(ex)
+
     def test_good_if_stmt_1(self):
         try:
             actual_output_path = self._compile_helper.compile_with_success()

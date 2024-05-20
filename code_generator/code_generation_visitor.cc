@@ -67,7 +67,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(CodeBlockNode &node) {
   }
 
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
-  // GenerateCode(CodeBlockNode&) return value is not used.
+  // Code-blocks are void statements.
   return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
 }
 
@@ -468,7 +468,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
       builder->CreateRetVoid();
     } else {
       // Otherwise, issue a runtime error.
-      GenerateRuntimeErrorWithMessage("non-void lambda with no return value");
+      GenerateRuntimeErrorWithMessage(
+          "non-void lambda does not return a value");
     }
   }
 

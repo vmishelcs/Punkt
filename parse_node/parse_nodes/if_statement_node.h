@@ -24,6 +24,8 @@ class IfStatementNode : public ParseNode {
   ParseNode *GetIfBlockNode() const { return GetChild(1); }
   ParseNode *GetElseBlockNode() const { return GetChild(2); }
 
+  bool DoAllControlPathsReturn() const;
+
   bool HasElseBlock() const { return NumChildren() == 3; }
 
   virtual std::string ToString() const override { return "IF STATEMENT NODE"; }
