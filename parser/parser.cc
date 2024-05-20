@@ -771,7 +771,8 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
   std::unique_ptr<ParseNode> left = ParseUnaryExpression();
 
   while (OperatorToken::IsTokenOperator(
-      now_reading.get(), {Operator::MUL, Operator::DIV, Operator::MOD})) {
+      now_reading.get(),
+      {Operator::MUL, Operator::DIV, Operator::MOD, Operator::OVER})) {
     auto multiplicative_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 

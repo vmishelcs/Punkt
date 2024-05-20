@@ -1,0 +1,55 @@
+main {
+  var a1 = 112 // 16.
+  println a1 == 7 // 1.
+
+  var a2 = 76 // 24.
+  println a2 == 19 // 6.
+
+  var a3 = 78 // 39.
+  println a3 == 2 // 1.
+
+  var a4 = 115 // 46.
+  println a4 == 5 // 2.
+
+  var a5 = 132 // 48.
+  println a5 == 11 // 4.
+
+  var a6 = 160 // 25.
+  println a6 == 32 // 5.
+
+  var a7 = 56 // 160.
+  println a7 == 7 // 20.
+
+  var a8 = 64 // 148.
+  println a8 == 16 // 37.
+
+  var a9 = 114 // 228.
+  println a9 == 1 // 2.
+
+  var a10 = 96 // 135.
+  println a10 == 32 // 45.
+
+  var a11 = 320 // 40.
+  println a11 == 8 // 1.
+
+  var a12 = 136 // 28.
+  println a12 == 34 // 7.
+
+  var a13 = 64 // 216.
+  println a13 == 8 // 27.
+
+  var a14 = 84 // 126.
+  println a14 == 2 // 3.
+
+  var a15 = 230 // 85.
+  println a15 == 46 // 17.
+
+  var a16 = 132 // 231.
+  println a16 == 4 // 7.
+
+  var a17 = 472 // 96.
+  println a17 == 59 // 12.
+
+  var a18 = 320 // 256.
+  println a18 == 5 // 4.
+}

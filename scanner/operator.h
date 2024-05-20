@@ -24,6 +24,7 @@ enum class Operator {
   MOD,
   MUL_ASSIGN,
   MUL,
+  OVER,
   PLUS,
   SIZEOF,
   SUB_ASSIGN,

@@ -889,7 +889,7 @@ void CodeGenerationVisitor::PrintValue(Type *type, llvm::Value *value) {
 
 void CodeGenerationVisitor::PrintBaseTypeValue(BaseType *base_type,
                                                llvm::Value *value) {
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::Module *module = codegen_context->GetModule();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
@@ -914,18 +914,30 @@ void CodeGenerationVisitor::PrintBaseTypeValue(BaseType *base_type,
     // least significant bit remains. Then we extend to 32 bits and print
     // the boolean as an integer.
     auto truncated_value = builder->CreateTrunc(
-        print_value, llvm::Type::getInt1Ty(*context), "trunctmp");
+        print_value, llvm::Type::getInt1Ty(*llvm_context), "trunctmp");
     print_value = builder->CreateZExt(
-        truncated_value, llvm::Type::getInt32Ty(*context), "zexttmp");
+        truncated_value, llvm::Type::getInt32Ty(*llvm_context), "zexttmp");
+    printf_args.push_back(print_value);
   } else if (base_type->IsEquivalentTo(BaseTypeEnum::CHARACTER)) {
     // When printing characters, we sign-extend to 32 bits.
     print_value = builder->CreateSExt(
-        print_value, llvm::Type::getInt32Ty(*context), "sexttmp");
-  }
+        print_value, llvm::Type::getInt32Ty(*llvm_context), "sexttmp");
+    printf_args.push_back(print_value);
+  } else if (base_type->IsEquivalentTo(BaseTypeEnum::RATIONAL)) {
+    // Load numerator.
+    llvm::Value *num = builder->CreateShl(print_value, 64, "shltmp");
+    num = builder->CreateLShr(num, 64, "lshrtmp");
+    num = builder->CreateTrunc(num, llvm::Type::getInt64Ty(*llvm_context),
+                               "trunctmp");
+    printf_args.push_back(num);
 
-  printf_args.push_back(print_value);
-  if (printf_args.back() == nullptr) {
-    CodeGenerationInternalError("failed to generate argument for printf");
+    // Load denominator.
+    llvm::Value *denom = builder->CreateLShr(print_value, 64, "shltmp");
+    num = builder->CreateTrunc(denom, llvm::Type::getInt64Ty(*llvm_context),
+                               "trunctmp");
+    printf_args.push_back(denom);
+  } else {
+    printf_args.push_back(print_value);
   }
 
   builder->CreateCall(printf_func, printf_args, "printf_ret");
@@ -1153,7 +1165,9 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
     case BaseTypeEnum::CHARACTER:
       return GetOrCreateString("%c");
     case BaseTypeEnum::INTEGER:
-      return GetOrCreateString("%lld");
+      return GetOrCreateString("%ld");
+    case BaseTypeEnum::RATIONAL:
+      return GetOrCreateString("%ld/%ld");
     case BaseTypeEnum::STRING:
       return GetOrCreateString("%s");
 

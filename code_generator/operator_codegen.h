@@ -11,11 +11,11 @@ namespace operator_codegen {
 llvm::Value *AssignmentCodegen(CodeGenerationVisitor &codegen_visitor,
                                OperatorNode &operator_node);
 
-// ---- NOP --------------------------------------------------------------------
+//===- NOP ----------------------------------------------------------------===//
 llvm::Value *UnaryNop(CodeGenerationVisitor &codegen_visitor,
                       OperatorNode &operator_node);
 
-// ---- Booleans ---------------------------------------------------------------
+//===- Booleans -----------------------------------------------------------===//
 llvm::Value *BooleanNegationCodegen(CodeGenerationVisitor &codegen_visitor,
                                     OperatorNode &operator_node);
 llvm::Value *BooleanCmpEQCodegen(CodeGenerationVisitor &codegen_visitor,
@@ -27,7 +27,7 @@ llvm::Value *BooleanAndCodegen(CodeGenerationVisitor &codegen_visitor,
 llvm::Value *BooleanOrCodegen(CodeGenerationVisitor &codegen_visitor,
                               OperatorNode &operator_node);
 
-// ---- Characters -------------------------------------------------------------
+//===- Characters ---------------------------------------------------------===//
 llvm::Value *CharacterCmpEQCodegen(CodeGenerationVisitor &codegen_visitor,
                                    OperatorNode &operator_node);
 llvm::Value *CharacterCmpNEQCodegen(CodeGenerationVisitor &codegen_visitor,
@@ -41,7 +41,7 @@ llvm::Value *CharacterCmpGEQCodegen(CodeGenerationVisitor &codegen_visitor,
 llvm::Value *CharacterCmpLEQCodegen(CodeGenerationVisitor &codegen_visitor,
                                     OperatorNode &operator_node);
 
-// ---- Integers ---------------------------------------------------------------
+//===- Integers -----------------------------------------------------------===//
 llvm::Value *IntegerNegationCodegen(CodeGenerationVisitor &codegen_visitor,
                                     OperatorNode &operator_node);
 llvm::Value *IntegerAddCodegen(CodeGenerationVisitor &codegen_visitor,
@@ -67,7 +67,15 @@ llvm::Value *IntegerCmpGEQCodegen(CodeGenerationVisitor &codegen_visitor,
 llvm::Value *IntegerCmpLEQCodegen(CodeGenerationVisitor &codegen_visitor,
                                   OperatorNode &operator_node);
 
-// ---- Arrays -----------------------------------------------------------------
+//===- Rationals ----------------------------------------------------------===//
+llvm::Value *OverOperatorCodegen(CodeGenerationVisitor &codegen_visitor,
+                                 OperatorNode &operator_node);
+llvm::Value *RationalMultiplyCodegen(CodeGenerationVisitor &codegen_visitor,
+                                     OperatorNode &operator_node);
+llvm::Value *RationalCmpEQCodegen(CodeGenerationVisitor &codegen_visitor,
+                                  OperatorNode &operator_node);
+
+//===- Arrays -------------------------------------------------------------===//
 llvm::Value *ArrayIndexingCodegen(CodeGenerationVisitor &codegen_visitor,
                                   OperatorNode &operator_node);
 llvm::Value *ArraySizeofCodegen(CodeGenerationVisitor &codegen_visitor,

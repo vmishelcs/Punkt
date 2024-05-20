@@ -29,6 +29,9 @@ static const std::unique_ptr<BaseType> kBaseTypeCharacter =
 // Integer type.
 static const std::unique_ptr<BaseType> kBaseTypeInteger =
     BaseType::CreateIntegerType();
+// Rational type.
+static const std::unique_ptr<BaseType> kBaseTypeRational =
+    BaseType::CreateRationalType();
 // String type.
 static const std::unique_ptr<BaseType> kBaseTypeString =
     BaseType::CreateStringType();
@@ -55,7 +58,10 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
     {Operator::MUL,
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
-                operator_codegen::IntegerMultiplyCodegen)}},
+                operator_codegen::IntegerMultiplyCodegen),
+      Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
+                kBaseTypeRational.get(),
+                operator_codegen::RationalMultiplyCodegen)}},
     // /
     {Operator::DIV,
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
@@ -66,19 +72,23 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
                 operator_codegen::IntegerModuloCodegen)}},
+    // //
+    {Operator::OVER,
+     {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
+                kBaseTypeRational.get(),
+                operator_codegen::OverOperatorCodegen)}},
     // ==
     {Operator::CMP_EQ,
-     {
-         Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
-                   kBaseTypeBoolean.get(),
-                   operator_codegen::BooleanCmpEQCodegen),
-         Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
-                   kBaseTypeBoolean.get(),
-                   operator_codegen::CharacterCmpEQCodegen),
-         Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
-                   kBaseTypeBoolean.get(),
-                   operator_codegen::IntegerCmpEQCodegen),
-     }},
+     {Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
+                kBaseTypeBoolean.get(), operator_codegen::BooleanCmpEQCodegen),
+      Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
+                kBaseTypeBoolean.get(),
+                operator_codegen::CharacterCmpEQCodegen),
+      Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
+                kBaseTypeBoolean.get(), operator_codegen::IntegerCmpEQCodegen),
+      Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
+                kBaseTypeBoolean.get(),
+                operator_codegen::RationalCmpEQCodegen)}},
     // !=
     {Operator::CMP_NEQ,
      {
