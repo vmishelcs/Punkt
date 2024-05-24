@@ -80,7 +80,6 @@ unsigned BaseType::GetSizeInBytes() const {
     default:
       PunktLogger::LogFatalInternalError(
           "unimplemented BaseType in BaseType::GetSizeInBytes");
-      return 0;
   }
 }
 
@@ -94,16 +93,16 @@ llvm::Type *BaseType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
       return llvm::Type::getInt8Ty(llvm_context);
     case BaseTypeEnum::INTEGER:
       return llvm::Type::getInt64Ty(llvm_context);
+    case BaseTypeEnum::RATIONAL:
+      return llvm::Type::getInt128Ty(llvm_context);
     case BaseTypeEnum::STRING:
       return llvm::PointerType::getUnqual(llvm_context);
     case BaseTypeEnum::ERROR:
       PunktLogger::LogFatalInternalError(
           "error type has no corresponding LLVM type");
-      return nullptr;
     default:
       PunktLogger::LogFatalInternalError(
-          "unimplemented BaseType in BaseType::GetSizeInBytes");
-      return nullptr;
+          "unimplemented BaseType in BaseType::GetLLVMType");
   }
 }
 

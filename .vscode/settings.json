@@ -1,12 +1,9 @@
 {
-    "editor.rulers": [
-        75,
-        80
-    ],
     "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.default.compilerPath": "/usr/bin/g++",
     "C_Cpp.clang_format_style": "file:${workspaceRoot}/.clang-format",
     "C_Cpp.clang_format_path": "/usr/bin/clang-format",
+    "editor.formatOnSave": true,
     "python.testing.pytestArgs": [
         "tests"
     ],

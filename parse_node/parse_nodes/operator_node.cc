@@ -35,6 +35,11 @@ bool OperatorNode::IsAssignmentTarget() const {
   return false;
 }
 
+bool OperatorNode::IsArithmeticOperation() const {
+  return op == Operator::PLUS || op == Operator::MINUS || op == Operator::DIV ||
+         op == Operator::MUL;
+}
+
 void OperatorNode::Accept(ParseNodeVisitor &visitor) {
   visitor.VisitEnter(*this);
   VisitChildren(visitor);

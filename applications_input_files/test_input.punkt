@@ -1,5 +1,6 @@
 main {
-	var r = 1 // 2.
-  var s = 2 // 3.
-  var t = r * s.
+	var x = -841 // 304.
+	var y = 1 // 6.
+
+	println x + y.
 }

@@ -3,6 +3,7 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Intrinsics.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
@@ -11,6 +12,17 @@
 
 #include "code_generation_visitor.h"
 #include "codegen_context.h"
+
+/// @brief Simplify the specified rational number such that the numerator and
+/// denominator are co-prime. Additionally, make sure that if the rational
+/// number is positive, it has the form `a/b`. If it is negative, it has the
+/// form `-a/b`.
+/// @param numerator Numerator of the rational number specified as a 64-bit
+/// integer.
+/// @param denominator Denominator of the rational number specified as a 64-bit
+/// integer.
+static void SimplifyRational(llvm::Value *&numerator,
+                             llvm::Value *&denominator);
 
 /// @brief Generate LLVM IR that computes the GCD of the provided arguments.
 /// @param a `llvm::Value` pointer to a 64-bit integer.
@@ -22,14 +34,14 @@ static llvm::Value *GenerateGCD(llvm::Value *a, llvm::Value *b);
 //===----------------------------------------------------------------------===//
 // Assignment
 //===----------------------------------------------------------------------===//
-llvm::Value *operator_codegen::AssignmentCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::AssignmentCodegen(CodeGenerationVisitor &cv,
+                                                 OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *target = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *new_value = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *target = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *new_value = node.GetChild(1)->GenerateCode(cv);
 
   Type *new_value_type = node.GetChild(1)->GetType();
   if (!(dynamic_cast<BaseType *>(new_value_type)
@@ -64,22 +76,22 @@ llvm::Value *operator_codegen::AssignmentCodegen(
 //===----------------------------------------------------------------------===//
 // NOP
 //===----------------------------------------------------------------------===//
-llvm::Value *operator_codegen::UnaryNop(CodeGenerationVisitor &codegen_visitor,
+llvm::Value *operator_codegen::UnaryNop(CodeGenerationVisitor &cv,
                                         OperatorNode &node) {
-  llvm::Value *operand = node.GetChild(0)->GenerateCode(codegen_visitor);
+  llvm::Value *operand = node.GetChild(0)->GenerateCode(cv);
   return operand;
 }
 
 /******************************************************************************
  *                                  Booleans                                  *
  ******************************************************************************/
-llvm::Value *operator_codegen::BooleanNegationCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::BooleanNegationCodegen(CodeGenerationVisitor &cv,
+                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *operand = node.GetChild(0)->GenerateCode(codegen_visitor);
+  llvm::Value *operand = node.GetChild(0)->GenerateCode(cv);
 
   auto operand_trunc = builder->CreateTrunc(
       operand, llvm::Type::getInt1Ty(*context), "trunctmp");
@@ -93,14 +105,14 @@ llvm::Value *operator_codegen::BooleanNegationCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::BooleanCmpEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::BooleanCmpEQCodegen(CodeGenerationVisitor &cv,
+                                                   OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_trunc =
       builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
@@ -118,14 +130,14 @@ llvm::Value *operator_codegen::BooleanCmpEQCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::BooleanCmpNEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::BooleanCmpNEQCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_trunc =
       builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
@@ -143,14 +155,14 @@ llvm::Value *operator_codegen::BooleanCmpNEQCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::BooleanAndCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::BooleanAndCodegen(CodeGenerationVisitor &cv,
+                                                 OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_trunc =
       builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
@@ -163,14 +175,14 @@ llvm::Value *operator_codegen::BooleanAndCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::BooleanOrCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::BooleanOrCodegen(CodeGenerationVisitor &cv,
+                                                OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_trunc =
       builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
@@ -186,14 +198,14 @@ llvm::Value *operator_codegen::BooleanOrCodegen(
 /******************************************************************************
  *                                 Characters                                 *
  ******************************************************************************/
-llvm::Value *operator_codegen::CharacterCmpEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::CharacterCmpEQCodegen(CodeGenerationVisitor &cv,
+                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_sext =
       builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
@@ -206,14 +218,14 @@ llvm::Value *operator_codegen::CharacterCmpEQCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::CharacterCmpNEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::CharacterCmpNEQCodegen(CodeGenerationVisitor &cv,
+                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_sext =
       builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
@@ -226,14 +238,14 @@ llvm::Value *operator_codegen::CharacterCmpNEQCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::CharacterCmpGTCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::CharacterCmpGTCodegen(CodeGenerationVisitor &cv,
+                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_sext =
       builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
@@ -246,14 +258,14 @@ llvm::Value *operator_codegen::CharacterCmpGTCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::CharacterCmpLTCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::CharacterCmpLTCodegen(CodeGenerationVisitor &cv,
+                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_sext =
       builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
@@ -266,14 +278,14 @@ llvm::Value *operator_codegen::CharacterCmpLTCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::CharacterCmpGEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::CharacterCmpGEQCodegen(CodeGenerationVisitor &cv,
+                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_sext =
       builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
@@ -286,14 +298,14 @@ llvm::Value *operator_codegen::CharacterCmpGEQCodegen(
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::CharacterCmpLEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::CharacterCmpLEQCodegen(CodeGenerationVisitor &cv,
+                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto lhs_sext =
       builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
@@ -309,152 +321,152 @@ llvm::Value *operator_codegen::CharacterCmpLEQCodegen(
 /******************************************************************************
  *                                  Integers                                  *
  ******************************************************************************/
-llvm::Value *operator_codegen::IntegerNegationCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerNegationCodegen(CodeGenerationVisitor &cv,
+                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *operand = node.GetChild(0)->GenerateCode(codegen_visitor);
+  llvm::Value *operand = node.GetChild(0)->GenerateCode(cv);
 
   return builder->CreateSub(
       llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0), operand,
       "negtmp");
 }
 
-llvm::Value *operator_codegen::IntegerAddCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerAddCodegen(CodeGenerationVisitor &cv,
+                                                 OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   return builder->CreateAdd(lhs, rhs, "addtmp");
 }
 
-llvm::Value *operator_codegen::IntegerSubtractCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerSubtractCodegen(CodeGenerationVisitor &cv,
+                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   return builder->CreateSub(lhs, rhs, "subtmp");
 }
 
-llvm::Value *operator_codegen::IntegerMultiplyCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerMultiplyCodegen(CodeGenerationVisitor &cv,
+                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   return builder->CreateMul(lhs, rhs, "multmp");
 }
 
-llvm::Value *operator_codegen::IntegerDivideCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerDivideCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   return builder->CreateSDiv(lhs, rhs, "divtmp");
 }
 
-llvm::Value *operator_codegen::IntegerModuloCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerModuloCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   return builder->CreateSRem(lhs, rhs, "modtmp");
 }
 
-llvm::Value *operator_codegen::IntegerCmpEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerCmpEQCodegen(CodeGenerationVisitor &cv,
+                                                   OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpEQ(lhs, rhs, "cmptmp");
   return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::IntegerCmpNEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerCmpNEQCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpNE(lhs, rhs, "cmptmp");
   return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::IntegerCmpGTCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerCmpGTCodegen(CodeGenerationVisitor &cv,
+                                                   OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpSGT(lhs, rhs, "cmptmp");
   return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::IntegerCmpLTCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerCmpLTCodegen(CodeGenerationVisitor &cv,
+                                                   OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpSLT(lhs, rhs, "cmptmp");
   return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::IntegerCmpGEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerCmpGEQCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpSGE(lhs, rhs, "cmptmp");
   return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
                              "zexttmp");
 }
 
-llvm::Value *operator_codegen::IntegerCmpLEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::IntegerCmpLEQCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpSLE(lhs, rhs, "cmptmp");
   return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
@@ -464,96 +476,222 @@ llvm::Value *operator_codegen::IntegerCmpLEQCodegen(
 //===----------------------------------------------------------------------===//
 // Rationals
 //===----------------------------------------------------------------------===//
-llvm::Value *operator_codegen::OverOperatorCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::OverOperatorCodegen(CodeGenerationVisitor &cv,
+                                                   OperatorNode &node) {
   // Rational numbers are stored in a 128-bit integer. First 64-bits are
   // represent the numerator, last 64-bits represent the denominator.
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *num = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *denom = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *num = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *denom = node.GetChild(1)->GenerateCode(cv);
 
-  // TODO: Before storing the values, check for negatives and store the values
-  // such that if the rational number is negative we store -a/b and if the
-  // rational number is positive we store a/b.
+  auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
+  if (!next_op || !next_op->IsArithmeticOperation()) {
+    // If the parent is not another arithmetic operation, simplify the rational
+    // number now.
+    SimplifyRational(num, denom);
+  }
 
-  llvm::Value *result =
-      llvm::ConstantInt::get(llvm::Type::getInt128Ty(*llvm_context), 0);
+  // Zero-extend numerator and denominator to 128-bit integers.
+  num = builder->CreateZExt(num, llvm::Type::getInt128Ty(*llvm_context));
+  denom = builder->CreateZExt(denom, llvm::Type::getInt128Ty(*llvm_context));
+  denom = builder->CreateShl(denom, 64);
 
-  // Store the numerator.
-  num = builder->CreateZExt(num, llvm::Type::getInt128Ty(*llvm_context),
-                            "zexttmp");
-  result = builder->CreateOr(result, num, "ortmp");
+  llvm::Value *result = builder->CreateOr(num, denom);
 
-  // Store the denominator by first zero-extending the denominator value to 128
-  // bits and shifting left by 64 bits such that the last 64 bits represent the
-  // denominator value. Store this value by setting those bits in the result
-  // value.
-  denom = builder->CreateZExt(denom, llvm::Type::getInt128Ty(*llvm_context),
-                              "zexttmp");
+  return result;
+}
 
-  denom = builder->CreateShl(denom, 64, "shltmp");
-  result = builder->CreateOr(result, denom, "ortmp");
+llvm::Value *operator_codegen::RationalAddCodegen(CodeGenerationVisitor &cv,
+                                                  OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+  llvm::Type *int128_type = llvm::Type::getInt128Ty(*llvm_context);
+
+  // We need to extract the numerator and denominator out of the left-hand side
+  // as 64-bit integers.
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
+  lhs_num = builder->CreateLShr(lhs_num, 64);
+  lhs_num = builder->CreateTrunc(lhs_num, int64_type);
+  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+  lhs_denom = builder->CreateTrunc(lhs_denom, int64_type);
+
+  // Now extract the numerator and denominator out of the right-hand side as
+  // 64-bit integers.
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
+  rhs_num = builder->CreateLShr(rhs_num, 64);
+  rhs_num = builder->CreateTrunc(rhs_num, int64_type);
+  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+  rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
+
+  // a/b + c/d = (a*d + c*b) / b*d
+  // Multiply LHS numerator by RHS denominator.
+  lhs_num = builder->CreateMul(lhs_num, rhs_denom);
+
+  // Multiply RHS numerator by LHS denominator.
+  rhs_num = builder->CreateMul(rhs_num, lhs_denom);
+
+  llvm::Value *result_num = builder->CreateAdd(lhs_num, rhs_num);
+  llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_denom);
+
+  auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
+  if (next_op && !next_op->IsArithmeticOperation()) {
+    SimplifyRational(result_num, result_denom);
+  }
+
+  result_num = builder->CreateZExt(result_num, int128_type);
+  result_denom = builder->CreateZExt(result_denom, int128_type);
+
+  // Shift denominator left by 64 bits in preparation for storage.
+  result_denom = builder->CreateShl(result_denom, 64);
+
+  llvm::Value *result = builder->CreateOr(result_num, result_denom);
+
+  return result;
+}
+
+llvm::Value *operator_codegen::RationalSubtractCodegen(
+    CodeGenerationVisitor &cv, OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  // We need to extract the numerator and denominator out of the left-hand side.
+  llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
+  lhs_num = builder->CreateLShr(lhs_num, 64);
+  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  // Now extract the numerator and denominator out of the right-hand side.
+  llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
+  rhs_num = builder->CreateLShr(rhs_num, 64);
+  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+
+  // a/b - c/d = (a*d - c*b) / b*d
+  // Multiply LHS numerator by RHS denominator.
+  lhs_num = builder->CreateMul(lhs_num, rhs_denom);
+
+  // Multiply RHS numerator by LHS denominator.
+  rhs_num = builder->CreateMul(rhs_num, lhs_denom);
+
+  llvm::Value *result_num = builder->CreateSub(lhs_num, rhs_num);
+  llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_denom);
+
+  auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
+  if (next_op && !next_op->IsArithmeticOperation()) {
+    SimplifyRational(result_num, result_denom);
+  }
+
+  // Shift denominator left by 64 bits in preparation for storage.
+  result_denom = builder->CreateShl(result_denom, 64);
+
+  llvm::Value *result = builder->CreateOr(result_num, result_denom);
 
   return result;
 }
 
 llvm::Value *operator_codegen::RationalMultiplyCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+    CodeGenerationVisitor &cv, OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
   // We need to extract the numerator and denominator out of the left-hand side.
-  llvm::Value *lhs_num = builder->CreateShl(lhs, 64, "lhsnum");
-  lhs_num = builder->CreateLShr(lhs_num, 64, "lhsnum");
-  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64, "lhsdenom");
+  llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
+  lhs_num = builder->CreateLShr(lhs_num, 64);
+  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
 
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
   // Now extract the numerator and denominator out of the right-hand side.
-  llvm::Value *rhs_num = builder->CreateShl(rhs, 64, "rhsnum");
-  rhs_num = builder->CreateLShr(rhs_num, 64, "rhsnum");
-  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64, "rhsdenom");
+  llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
+  rhs_num = builder->CreateLShr(rhs_num, 64);
+  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
 
-  llvm::Value *result_num = builder->CreateMul(lhs_num, rhs_num, "num");
-  llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_denom, "denom");
+  // Multiply numerators and denominators.
+  llvm::Value *result_num = builder->CreateMul(lhs_num, rhs_num);
+  llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_denom);
 
-  result_denom = builder->CreateShl(result_denom, 64, "shltmp");
+  auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
+  if (next_op && !next_op->IsArithmeticOperation()) {
+    SimplifyRational(result_num, result_denom);
+  }
 
-  llvm::Value *result = builder->CreateOr(result_num, result_denom, "ortmp");
+  // Shift denominator left by 64 bits in preparation for storage.
+  result_denom = builder->CreateShl(result_denom, 64);
+
+  llvm::Value *result = builder->CreateOr(result_num, result_denom);
 
   return result;
 }
 
-llvm::Value *operator_codegen::RationalCmpEQCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::RationalDivideCodegen(CodeGenerationVisitor &cv,
+                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  llvm::Value *lhs = node.GetChild(0)->GenerateCode(codegen_visitor);
-  llvm::Value *rhs = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  // We need to extract the numerator and denominator out of the left-hand side.
+  llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
+  lhs_num = builder->CreateLShr(lhs_num, 64);
+  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  // Now extract the numerator and denominator out of the right-hand side.
+  llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
+  rhs_num = builder->CreateLShr(rhs_num, 64);
+  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+
+  // Perform rational number division by computing
+  // (LHS_numerator * RHS_denominator) / (LHS_denominator * RHS_numerator).
+  llvm::Value *result_num = builder->CreateMul(lhs_num, rhs_denom);
+  llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_num);
+
+  auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
+  if (next_op && !next_op->IsArithmeticOperation()) {
+    SimplifyRational(result_num, result_denom);
+  }
+
+  // Shift denominator left by 64 bits in preparation for storage.
+  result_denom = builder->CreateShl(result_denom, 64);
+
+  llvm::Value *result = builder->CreateOr(result_num, result_denom);
+
+  return result;
+}
+
+llvm::Value *operator_codegen::RationalCmpEQCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
   return builder->CreateICmpEQ(lhs, rhs, "cmptmp");
 }
 
 /******************************************************************************
  *                                   Arrays *
  ******************************************************************************/
-llvm::Value *operator_codegen::ArrayIndexingCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::ArrayIndexingCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   // Find Punkt array struct type.
-  const std::string &PunktArray_struct_name =
-      codegen_visitor.GetPunktArrayStructName();
+  const std::string &PunktArray_struct_name = cv.GetPunktArrayStructName();
   llvm::StructType *PunktArray_struct =
       llvm::StructType::getTypeByName(*llvm_context, PunktArray_struct_name);
 
   // Load the data portion of the Punkt array object.
-  llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(codegen_visitor);
+  llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *PunktArray_data_ptr = builder->CreateGEP(
       PunktArray_struct, PunktArray_ptr,
       {llvm::ConstantInt::get(llvm::Type::getInt32Ty(*llvm_context), 0),
@@ -566,7 +704,7 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(
   ArrayType *array_type = static_cast<ArrayType *>(node.GetChild(0)->GetType());
   Type *subtype = array_type->GetSubtype();
   llvm::Type *llvm_subtype = subtype->GetLLVMType(*llvm_context);
-  llvm::Value *idx = node.GetChild(1)->GenerateCode(codegen_visitor);
+  llvm::Value *idx = node.GetChild(1)->GenerateCode(cv);
 
   // Issue a runtime error if index is negative.
   llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
@@ -581,7 +719,7 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(
                         negative_index_false);
 
   builder->SetInsertPoint(negative_index_true);
-  codegen_visitor.GenerateRuntimeErrorWithMessage("negative array index");
+  cv.GenerateRuntimeErrorWithMessage("negative array index");
 
   builder->SetInsertPoint(negative_index_false);
 
@@ -597,7 +735,7 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(
   builder->CreateCondBr(array_ooo_check, array_ooo_true, array_ooo_false);
 
   builder->SetInsertPoint(array_ooo_true);
-  codegen_visitor.GenerateRuntimeErrorWithMessage("array index out of bounds");
+  cv.GenerateRuntimeErrorWithMessage("array index out of bounds");
 
   builder->SetInsertPoint(array_ooo_false);
 
@@ -613,14 +751,14 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(
   return builder->CreateLoad(llvm_subtype, elem_addr, "elemval");
 }
 
-llvm::Value *operator_codegen::ArraySizeofCodegen(
-    CodeGenerationVisitor &codegen_visitor, OperatorNode &node) {
+llvm::Value *operator_codegen::ArraySizeofCodegen(CodeGenerationVisitor &cv,
+                                                  OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   // Size of array is the first field of the PunktArray struct.
-  llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(codegen_visitor);
+  llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(cv);
   return builder->CreateLoad(llvm::Type::getInt64Ty(*context), PunktArray_ptr,
                              "PunktArray_size");
 }
@@ -628,6 +766,51 @@ llvm::Value *operator_codegen::ArraySizeofCodegen(
 //===----------------------------------------------------------------------===//
 // Helper functions
 //===----------------------------------------------------------------------===//
+void SimplifyRational(llvm::Value *&numerator, llvm::Value *&denominator) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::Module *module = codegen_context->GetModule();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Type *int1_type = llvm::Type::getInt1Ty(*llvm_context);
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+  llvm::Value *int64_zero = llvm::ConstantInt::get(int64_type, 0);
+  llvm::Value *i1_zero = llvm::ConstantInt::get(int1_type, 0);
+
+  // Format rational number:
+  //    a/b  ->  a/b (no change needed in this case)
+  //   -a/-b ->  a/b
+  //   -a/b  -> -a/b (no change needed in this case)
+  //    a/-b -> -a/b
+
+  // Check denominator sign.
+  llvm::Value *denom_negative_check =
+      builder->CreateICmpSLT(denominator, int64_zero, "cmptmp");
+
+  // Create a value holding the numerator with flipped sign.
+  llvm::Value *numerator_flipped_sign =
+      builder->CreateSub(int64_zero, numerator, "subtmp");
+
+  // Select instruction to flip the sign of the denominator.
+  numerator = builder->CreateSelect(denom_negative_check,
+                                    numerator_flipped_sign, numerator);
+
+  // Set denominator to abs(denominator).
+  llvm::Function *abs_intrinsic = llvm::Intrinsic::getDeclaration(
+      module, llvm::Intrinsic::abs, {int64_type});
+  denominator =
+      builder->CreateCall(abs_intrinsic, {denominator, i1_zero}, "calltmp");
+
+  // Get GCD(numerator, denominator). Use abs(numerator) to compute the GCD.
+  llvm::Value *abs_numerator =
+      builder->CreateCall(abs_intrinsic, {numerator, i1_zero}, "calltmp");
+  llvm::Value *gcd = GenerateGCD(abs_numerator, denominator);
+
+  // Divide numerator and denominator by GCD.
+  numerator = builder->CreateSDiv(numerator, gcd, "divtmp");
+  denominator = builder->CreateSDiv(denominator, gcd, "divtmp");
+}
+
 llvm::Value *GenerateGCD(llvm::Value *a, llvm::Value *b) {
   // The LLVM IR in this function implements the GCD algorithm below.
   // gcd(a, b):

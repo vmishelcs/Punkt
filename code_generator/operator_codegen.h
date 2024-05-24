@@ -70,8 +70,14 @@ llvm::Value *IntegerCmpLEQCodegen(CodeGenerationVisitor &codegen_visitor,
 //===- Rationals ----------------------------------------------------------===//
 llvm::Value *OverOperatorCodegen(CodeGenerationVisitor &codegen_visitor,
                                  OperatorNode &operator_node);
+llvm::Value *RationalAddCodegen(CodeGenerationVisitor &codegen_visitor,
+                                OperatorNode &operator_node);
+llvm::Value *RationalSubtractCodegen(CodeGenerationVisitor &codegen_visitor,
+                                     OperatorNode &operator_node);
 llvm::Value *RationalMultiplyCodegen(CodeGenerationVisitor &codegen_visitor,
                                      OperatorNode &operator_node);
+llvm::Value *RationalDivideCodegen(CodeGenerationVisitor &codegen_visitor,
+                                   OperatorNode &operator_node);
 llvm::Value *RationalCmpEQCodegen(CodeGenerationVisitor &codegen_visitor,
                                   OperatorNode &operator_node);
 
