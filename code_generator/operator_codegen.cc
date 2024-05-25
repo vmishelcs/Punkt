@@ -153,121 +153,103 @@ llvm::Value *operator_codegen::BooleanOrCodegen(CodeGenerationVisitor &cv,
 llvm::Value *operator_codegen::CharacterCmpEQCodegen(CodeGenerationVisitor &cv,
                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*llvm_context));
 
-  auto lhs_sext =
-      builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
-  auto rhs_sext =
-      builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+  llvm::Value *i1_result = builder->CreateICmpEQ(lhs, rhs);
 
-  auto i1_result = builder->CreateICmpEQ(lhs_sext, rhs_sext, "cmptmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::CharacterCmpNEQCodegen(CodeGenerationVisitor &cv,
                                                       OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*llvm_context));
 
-  auto lhs_sext =
-      builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
-  auto rhs_sext =
-      builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+  llvm::Value *i1_result = builder->CreateICmpNE(lhs, rhs);
 
-  auto i1_result = builder->CreateICmpNE(lhs_sext, rhs_sext, "cmptmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::CharacterCmpGTCodegen(CodeGenerationVisitor &cv,
                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*llvm_context));
 
-  auto lhs_sext =
-      builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
-  auto rhs_sext =
-      builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+  llvm::Value *i1_result = builder->CreateICmpSGT(lhs, rhs);
 
-  auto i1_result = builder->CreateICmpSGT(lhs_sext, rhs_sext, "cmptmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::CharacterCmpLTCodegen(CodeGenerationVisitor &cv,
                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*llvm_context));
 
-  auto lhs_sext =
-      builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
-  auto rhs_sext =
-      builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+  llvm::Value *i1_result = builder->CreateICmpSLT(lhs, rhs);
 
-  auto i1_result = builder->CreateICmpSLT(lhs_sext, rhs_sext, "cmptmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::CharacterCmpGEQCodegen(CodeGenerationVisitor &cv,
                                                       OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*llvm_context));
 
-  auto lhs_sext =
-      builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
-  auto rhs_sext =
-      builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+  llvm::Value *i1_result = builder->CreateICmpSGE(lhs, rhs);
 
-  auto i1_result = builder->CreateICmpSGE(lhs_sext, rhs_sext, "cmptmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::CharacterCmpLEQCodegen(CodeGenerationVisitor &cv,
                                                       OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*llvm_context));
 
-  auto lhs_sext =
-      builder->CreateSExt(lhs, llvm::Type::getInt32Ty(*context), "sexttmp");
-  auto rhs_sext =
-      builder->CreateSExt(rhs, llvm::Type::getInt32Ty(*context), "sexttmp");
+  llvm::Value *i1_result = builder->CreateICmpSLE(lhs, rhs);
 
-  auto i1_result = builder->CreateICmpSLE(lhs_sext, rhs_sext, "cmptmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 //===----------------------------------------------------------------------===//
