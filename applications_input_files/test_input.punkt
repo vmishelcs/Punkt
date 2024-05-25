@@ -1,6 +1,24 @@
 main {
-	var x = -841 // 304.
-	var y = 1 // 6.
+	const n = 2.
+	
+	const M = alloc [[int]] (n).
 
-	println x + y.
+	const V1 = alloc [int] (n).
+	V1[0] = 1.
+	V1[1] = 2.
+
+	M[0] = V1.
+
+	const V2 = alloc [int] (n).
+	V2[0] = 3.
+	V2[1] = 4.
+
+	M[1] = V2.
+
+	for var i = 0, i < n, i += 1 {
+		for var j = 0, j < n, j += 1 {
+			print M[i][j], ' '.
+		}
+		print '\n'.
+	}
 }

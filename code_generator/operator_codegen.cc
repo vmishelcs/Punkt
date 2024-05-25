@@ -37,40 +37,13 @@ static llvm::Value *GenerateGCD(llvm::Value *a, llvm::Value *b);
 llvm::Value *operator_codegen::AssignmentCodegen(CodeGenerationVisitor &cv,
                                                  OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *target = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *new_value = node.GetChild(1)->GenerateCode(cv);
 
-  Type *new_value_type = node.GetChild(1)->GetType();
-  if (!(dynamic_cast<BaseType *>(new_value_type)
-            ->IsEquivalentTo(BaseTypeEnum::RATIONAL))) {
-    // If the new value does not have rational type, just store it and return.
-    builder->CreateStore(new_value, target);
-    return new_value;
-  }
-
-  // Otherwise, we need to simplify the rational number.
-  llvm::Value *num = builder->CreateShl(new_value, 64, "lhsnum");
-  num = builder->CreateLShr(num, 64, "lhsnum");
-  num = builder->CreateTrunc(num, llvm::Type::getInt64Ty(*llvm_context),
-                             "trunctmp");
-  llvm::Value *denom = builder->CreateLShr(new_value, 64, "lhsdenom");
-  denom = builder->CreateTrunc(denom, llvm::Type::getInt64Ty(*llvm_context),
-                               "trunctmp");
-
-  // Compute GCD of the numerator and denominator.
-  llvm::Value *gcd = GenerateGCD(num, denom);
-
-  num = builder->CreateSDiv(num, gcd, "divtmp");
-  num = builder->CreateZExt(num, llvm::Type::getInt128Ty(*llvm_context),
-                            "zexttmp");
-  denom = builder->CreateSDiv(denom, gcd, "divtmp");
-  denom = builder->CreateZExt(denom, llvm::Type::getInt128Ty(*llvm_context),
-                              "zexttmp");
-  denom = builder->CreateShl(denom, 64, "shltmp");
-  return builder->CreateOr(num, denom, "ortmp");
+  builder->CreateStore(new_value, target);
+  return new_value;
 }
 
 //===----------------------------------------------------------------------===//
