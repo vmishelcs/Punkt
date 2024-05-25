@@ -731,6 +731,134 @@ llvm::Value *operator_codegen::RationalCmpNEQCodegen(CodeGenerationVisitor &cv,
   return builder->CreateICmpNE(lhs, rhs);
 }
 
+llvm::Value *operator_codegen::RationalCmpGTCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+
+  // We need to extract the numerator and denominator out of the left-hand side
+  // as 64-bit integers.
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
+  lhs_num = builder->CreateLShr(lhs_num, 64);
+  lhs_num = builder->CreateTrunc(lhs_num, int64_type);
+  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+  lhs_denom = builder->CreateTrunc(lhs_denom, int64_type);
+
+  // Now extract the numerator and denominator out of the right-hand side as
+  // 64-bit integers.
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
+  rhs_num = builder->CreateLShr(rhs_num, 64);
+  rhs_num = builder->CreateTrunc(rhs_num, int64_type);
+  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+  rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
+
+  // Given rational numbers a/b and c/d, compare ad > cb.
+  llvm::Value *cmp_op1 = builder->CreateMul(lhs_num, rhs_denom);
+  llvm::Value *cmp_op2 = builder->CreateMul(rhs_num, lhs_denom);
+  return builder->CreateICmpSGT(cmp_op1, cmp_op2);
+}
+
+llvm::Value *operator_codegen::RationalCmpLTCodegen(CodeGenerationVisitor &cv,
+                                                    OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+
+  // We need to extract the numerator and denominator out of the left-hand side
+  // as 64-bit integers.
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
+  lhs_num = builder->CreateLShr(lhs_num, 64);
+  lhs_num = builder->CreateTrunc(lhs_num, int64_type);
+  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+  lhs_denom = builder->CreateTrunc(lhs_denom, int64_type);
+
+  // Now extract the numerator and denominator out of the right-hand side as
+  // 64-bit integers.
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
+  rhs_num = builder->CreateLShr(rhs_num, 64);
+  rhs_num = builder->CreateTrunc(rhs_num, int64_type);
+  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+  rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
+
+  // Given rational numbers a/b and c/d, compare ad < cb.
+  llvm::Value *cmp_op1 = builder->CreateMul(lhs_num, rhs_denom);
+  llvm::Value *cmp_op2 = builder->CreateMul(rhs_num, lhs_denom);
+  return builder->CreateICmpSLT(cmp_op1, cmp_op2);
+}
+
+llvm::Value *operator_codegen::RationalCmpGEQCodegen(CodeGenerationVisitor &cv,
+                                                     OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+
+  // We need to extract the numerator and denominator out of the left-hand side
+  // as 64-bit integers.
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
+  lhs_num = builder->CreateLShr(lhs_num, 64);
+  lhs_num = builder->CreateTrunc(lhs_num, int64_type);
+  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+  lhs_denom = builder->CreateTrunc(lhs_denom, int64_type);
+
+  // Now extract the numerator and denominator out of the right-hand side as
+  // 64-bit integers.
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
+  rhs_num = builder->CreateLShr(rhs_num, 64);
+  rhs_num = builder->CreateTrunc(rhs_num, int64_type);
+  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+  rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
+
+  // Given rational numbers a/b and c/d, compare ad >= cb.
+  llvm::Value *cmp_op1 = builder->CreateMul(lhs_num, rhs_denom);
+  llvm::Value *cmp_op2 = builder->CreateMul(rhs_num, lhs_denom);
+  return builder->CreateICmpSGE(cmp_op1, cmp_op2);
+}
+
+llvm::Value *operator_codegen::RationalCmpLEQCodegen(CodeGenerationVisitor &cv,
+                                                     OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+
+  // We need to extract the numerator and denominator out of the left-hand side
+  // as 64-bit integers.
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
+  lhs_num = builder->CreateLShr(lhs_num, 64);
+  lhs_num = builder->CreateTrunc(lhs_num, int64_type);
+  llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+  lhs_denom = builder->CreateTrunc(lhs_denom, int64_type);
+
+  // Now extract the numerator and denominator out of the right-hand side as
+  // 64-bit integers.
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
+  rhs_num = builder->CreateLShr(rhs_num, 64);
+  rhs_num = builder->CreateTrunc(rhs_num, int64_type);
+  llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+  rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
+
+  // Given rational numbers a/b and c/d, compare ad =< cb.
+  llvm::Value *cmp_op1 = builder->CreateMul(lhs_num, rhs_denom);
+  llvm::Value *cmp_op2 = builder->CreateMul(rhs_num, lhs_denom);
+  return builder->CreateICmpSLE(cmp_op1, cmp_op2);
+}
+
 /******************************************************************************
  *                                   Arrays *
  ******************************************************************************/
