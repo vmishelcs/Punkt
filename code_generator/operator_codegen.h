@@ -1,6 +1,7 @@
 #ifndef OPERATOR_CODEGEN_H_
 #define OPERATOR_CODEGEN_H_
 
+#include <llvm/IR/Value.h>
 #include <parse_node/parse_nodes/operator_node.h>
 
 #include "code_generation_visitor.h"
