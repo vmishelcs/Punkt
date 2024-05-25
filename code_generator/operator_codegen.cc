@@ -61,111 +61,90 @@ llvm::Value *operator_codegen::UnaryNop(CodeGenerationVisitor &cv,
 llvm::Value *operator_codegen::BooleanNegationCodegen(CodeGenerationVisitor &cv,
                                                       OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *operand = node.GetChild(0)->GenerateCode(cv);
-
-  auto operand_trunc = builder->CreateTrunc(
-      operand, llvm::Type::getInt1Ty(*context), "trunctmp");
+  operand = builder->CreateTrunc(operand, llvm::Type::getInt1Ty(*llvm_context));
 
   // XOR the operand with 1.
-  auto i1_result = builder->CreateXor(
-      operand_trunc,
-      llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), true), "xortmp");
+  llvm::Value *i1_true =
+      llvm::ConstantInt::get(llvm::Type::getInt1Ty(*llvm_context), true);
+  llvm::Value *i1_result = builder->CreateXor(operand, i1_true);
 
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::BooleanCmpEQCodegen(CodeGenerationVisitor &cv,
                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*llvm_context));
+  lhs = builder->CreateZExt(lhs, llvm::Type::getInt32Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*llvm_context));
+  rhs = builder->CreateZExt(rhs, llvm::Type::getInt32Ty(*llvm_context));
 
-  auto lhs_trunc =
-      builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
-  auto lhs_zext = builder->CreateZExt(
-      lhs_trunc, llvm::Type::getInt32Ty(*context), "zexttmp");
+  llvm::Value *i1_result = builder->CreateICmpEQ(lhs, rhs);
 
-  auto rhs_trunc =
-      builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*context), "trunctmp");
-  auto rhs_zext = builder->CreateZExt(
-      rhs_trunc, llvm::Type::getInt32Ty(*context), "zexttmp");
-
-  auto i1_result = builder->CreateICmpEQ(lhs_zext, rhs_zext, "cmptmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::BooleanCmpNEQCodegen(CodeGenerationVisitor &cv,
                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*llvm_context));
+  lhs = builder->CreateZExt(lhs, llvm::Type::getInt32Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*llvm_context));
+  rhs = builder->CreateZExt(rhs, llvm::Type::getInt32Ty(*llvm_context));
 
-  auto lhs_trunc =
-      builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
-  auto lhs_zext = builder->CreateZExt(
-      lhs_trunc, llvm::Type::getInt32Ty(*context), "zexttmp");
+  llvm::Value *i1_result = builder->CreateICmpNE(lhs, rhs, "cmptmp");
 
-  auto rhs_trunc =
-      builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*context), "trunctmp");
-  auto rhs_zext = builder->CreateZExt(
-      rhs_trunc, llvm::Type::getInt32Ty(*context), "zexttmp");
-
-  auto i1_result = builder->CreateICmpNE(lhs_zext, rhs_zext, "cmptmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::BooleanAndCodegen(CodeGenerationVisitor &cv,
                                                  OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*llvm_context));
 
-  auto lhs_trunc =
-      builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
-  auto rhs_trunc =
-      builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*context), "trunctmp");
+  llvm::Value *i1_result = builder->CreateAnd(lhs, rhs);
 
-  auto i1_result = builder->CreateAnd(lhs_trunc, rhs_trunc, "andtmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::BooleanOrCodegen(CodeGenerationVisitor &cv,
                                                 OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  lhs = builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*llvm_context));
+
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  rhs = builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*llvm_context));
 
-  auto lhs_trunc =
-      builder->CreateTrunc(lhs, llvm::Type::getInt1Ty(*context), "trunctmp");
-  auto rhs_trunc =
-      builder->CreateTrunc(rhs, llvm::Type::getInt1Ty(*context), "trunctmp");
+  llvm::Value *i1_result = builder->CreateOr(lhs, rhs);
 
-  auto i1_result = builder->CreateOr(lhs_trunc, rhs_trunc, "ortmp");
-
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context),
-                             "zexttmp");
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 //===----------------------------------------------------------------------===//
