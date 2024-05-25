@@ -36,6 +36,7 @@ static const std::unique_ptr<BaseType> kBaseTypeRational =
 static const std::unique_ptr<BaseType> kBaseTypeString =
     BaseType::CreateStringType();
 
+// TODO: Add unary `+` and `-` for rational types
 static std::map<Operator, std::vector<Signature> > signature_map = {
     // =
     {Operator::ASSIGN,
