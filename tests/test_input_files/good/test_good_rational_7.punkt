@@ -1,0 +1,8 @@
+main {
+  const r1 = 1 // 2.
+  const r2 = -1 // -2.
+  const r3 = -1 // 2.
+  const r4 = 1 // -2.
+
+  println r1, ' ', r2, ' ', r3, ' ', r4.
+}

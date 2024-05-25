@@ -99,17 +99,16 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
                 operator_codegen::RationalCmpEQCodegen)}},
     // !=
     {Operator::CMP_NEQ,
-     {
-         Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
-                   kBaseTypeBoolean.get(),
-                   operator_codegen::BooleanCmpNEQCodegen),
-         Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
-                   kBaseTypeBoolean.get(),
-                   operator_codegen::CharacterCmpNEQCodegen),
-         Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
-                   kBaseTypeBoolean.get(),
-                   operator_codegen::IntegerCmpNEQCodegen),
-     }},
+     {Signature({kBaseTypeBoolean.get(), kBaseTypeBoolean.get()},
+                kBaseTypeBoolean.get(), operator_codegen::BooleanCmpNEQCodegen),
+      Signature({kBaseTypeCharacter.get(), kBaseTypeCharacter.get()},
+                kBaseTypeBoolean.get(),
+                operator_codegen::CharacterCmpNEQCodegen),
+      Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
+                kBaseTypeBoolean.get(), operator_codegen::IntegerCmpNEQCodegen),
+      Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
+                kBaseTypeBoolean.get(),
+                operator_codegen::RationalCmpNEQCodegen)}},
     // >
     {Operator::CMP_GT,
      {

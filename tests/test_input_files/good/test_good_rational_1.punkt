@@ -17,4 +17,14 @@ main {
   println 132 // 231 == 4 // 7.
   println 472 // 96 == 59 // 12.
   println 320 // 256 == 5 // 4.
+  println 1 // 2 == 6 // 12.
+  println 2 // 3 == 8 // 12.
+  println 4 // 7 == 12 // 21.
+  println 10 // 25 == 70 // 175.
+  println 2 // 4 == 20 // 40.
+  println 1 // 10 == 3 // 30.
+  println 2 // 6 == 6 // 18.
+  println 2 // 9 == 20 // 90.
+  println 3 // 4 == 27 // 36.
+  println 1 // 6 == 10 // 60.
 }

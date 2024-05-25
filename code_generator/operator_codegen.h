@@ -68,18 +68,13 @@ llvm::Value *IntegerCmpLEQCodegen(CodeGenerationVisitor &codegen_visitor,
                                   OperatorNode &operator_node);
 
 //===- Rationals ----------------------------------------------------------===//
-llvm::Value *OverOperatorCodegen(CodeGenerationVisitor &codegen_visitor,
-                                 OperatorNode &operator_node);
-llvm::Value *RationalAddCodegen(CodeGenerationVisitor &codegen_visitor,
-                                OperatorNode &operator_node);
-llvm::Value *RationalSubtractCodegen(CodeGenerationVisitor &codegen_visitor,
-                                     OperatorNode &operator_node);
-llvm::Value *RationalMultiplyCodegen(CodeGenerationVisitor &codegen_visitor,
-                                     OperatorNode &operator_node);
-llvm::Value *RationalDivideCodegen(CodeGenerationVisitor &codegen_visitor,
-                                   OperatorNode &operator_node);
-llvm::Value *RationalCmpEQCodegen(CodeGenerationVisitor &codegen_visitor,
-                                  OperatorNode &operator_node);
+llvm::Value *OverOperatorCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *RationalAddCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *RationalSubtractCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *RationalMultiplyCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *RationalDivideCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *RationalCmpEQCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *RationalCmpNEQCodegen(CodeGenerationVisitor &, OperatorNode &);
 
 //===- Arrays -------------------------------------------------------------===//
 llvm::Value *ArrayIndexingCodegen(CodeGenerationVisitor &codegen_visitor,

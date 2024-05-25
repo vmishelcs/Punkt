@@ -82,9 +82,9 @@ llvm::Value *operator_codegen::UnaryNop(CodeGenerationVisitor &cv,
   return operand;
 }
 
-/******************************************************************************
- *                                  Booleans                                  *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Booleans
+//===----------------------------------------------------------------------===//
 llvm::Value *operator_codegen::BooleanNegationCodegen(CodeGenerationVisitor &cv,
                                                       OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
@@ -195,9 +195,9 @@ llvm::Value *operator_codegen::BooleanOrCodegen(CodeGenerationVisitor &cv,
                              "zexttmp");
 }
 
-/******************************************************************************
- *                                 Characters                                 *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Characters
+//===----------------------------------------------------------------------===//
 llvm::Value *operator_codegen::CharacterCmpEQCodegen(CodeGenerationVisitor &cv,
                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
@@ -318,9 +318,9 @@ llvm::Value *operator_codegen::CharacterCmpLEQCodegen(CodeGenerationVisitor &cv,
                              "zexttmp");
 }
 
-/******************************************************************************
- *                                  Integers                                  *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Integers
+//===----------------------------------------------------------------------===//
 llvm::Value *operator_codegen::IntegerNegationCodegen(CodeGenerationVisitor &cv,
                                                       OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
@@ -531,18 +531,20 @@ llvm::Value *operator_codegen::RationalAddCodegen(CodeGenerationVisitor &cv,
   llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
   rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
 
-  // a/b + c/d = (a*d + c*b) / b*d
   // Multiply LHS numerator by RHS denominator.
   lhs_num = builder->CreateMul(lhs_num, rhs_denom);
 
   // Multiply RHS numerator by LHS denominator.
   rhs_num = builder->CreateMul(rhs_num, lhs_denom);
 
+  // a/b + c/d = (ad + cb) / (bd)
   llvm::Value *result_num = builder->CreateAdd(lhs_num, rhs_num);
   llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_denom);
 
   auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
-  if (next_op && !next_op->IsArithmeticOperation()) {
+  if (!next_op || !next_op->IsArithmeticOperation()) {
+    // If the parent is not another arithmetic operation, simplify the rational
+    // number now.
     SimplifyRational(result_num, result_denom);
   }
 
@@ -560,68 +562,97 @@ llvm::Value *operator_codegen::RationalAddCodegen(CodeGenerationVisitor &cv,
 llvm::Value *operator_codegen::RationalSubtractCodegen(
     CodeGenerationVisitor &cv, OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+  llvm::Type *int128_type = llvm::Type::getInt128Ty(*llvm_context);
+
+  // We need to extract the numerator and denominator out of the left-hand side
+  // as 64-bit integers.
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
-  // We need to extract the numerator and denominator out of the left-hand side.
   llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
   lhs_num = builder->CreateLShr(lhs_num, 64);
+  lhs_num = builder->CreateTrunc(lhs_num, int64_type);
   llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+  lhs_denom = builder->CreateTrunc(lhs_denom, int64_type);
 
+  // Now extract the numerator and denominator out of the right-hand side as
+  // 64-bit integers.
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
-  // Now extract the numerator and denominator out of the right-hand side.
   llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
   rhs_num = builder->CreateLShr(rhs_num, 64);
+  rhs_num = builder->CreateTrunc(rhs_num, int64_type);
   llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+  rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
 
-  // a/b - c/d = (a*d - c*b) / b*d
   // Multiply LHS numerator by RHS denominator.
   lhs_num = builder->CreateMul(lhs_num, rhs_denom);
 
   // Multiply RHS numerator by LHS denominator.
   rhs_num = builder->CreateMul(rhs_num, lhs_denom);
 
+  // a/b - c/d = (ad - cb) / (bd)
   llvm::Value *result_num = builder->CreateSub(lhs_num, rhs_num);
   llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_denom);
 
   auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
-  if (next_op && !next_op->IsArithmeticOperation()) {
+  if (!next_op || !next_op->IsArithmeticOperation()) {
+    // If the parent is not another arithmetic operation, simplify the rational
+    // number now.
     SimplifyRational(result_num, result_denom);
   }
+
+  result_num = builder->CreateZExt(result_num, int128_type);
+  result_denom = builder->CreateZExt(result_denom, int128_type);
 
   // Shift denominator left by 64 bits in preparation for storage.
   result_denom = builder->CreateShl(result_denom, 64);
 
   llvm::Value *result = builder->CreateOr(result_num, result_denom);
-
   return result;
 }
 
 llvm::Value *operator_codegen::RationalMultiplyCodegen(
     CodeGenerationVisitor &cv, OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+  llvm::Type *int128_type = llvm::Type::getInt128Ty(*llvm_context);
+
+  // We need to extract the numerator and denominator out of the left-hand side
+  // as 64-bit integers.
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
-  // We need to extract the numerator and denominator out of the left-hand side.
   llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
   lhs_num = builder->CreateLShr(lhs_num, 64);
+  lhs_num = builder->CreateTrunc(lhs_num, int64_type);
   llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+  lhs_denom = builder->CreateTrunc(lhs_denom, int64_type);
 
+  // Now extract the numerator and denominator out of the right-hand side as
+  // 64-bit integers.
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
-  // Now extract the numerator and denominator out of the right-hand side.
   llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
   rhs_num = builder->CreateLShr(rhs_num, 64);
+  rhs_num = builder->CreateTrunc(rhs_num, int64_type);
   llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+  rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
 
-  // Multiply numerators and denominators.
+  // (a/b) * (c/d) = (ac)/(bd)
   llvm::Value *result_num = builder->CreateMul(lhs_num, rhs_num);
   llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_denom);
 
   auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
-  if (next_op && !next_op->IsArithmeticOperation()) {
+  if (!next_op || !next_op->IsArithmeticOperation()) {
+    // If the parent is not another arithmetic operation, simplify the rational
+    // number now.
     SimplifyRational(result_num, result_denom);
   }
+
+  result_num = builder->CreateZExt(result_num, int128_type);
+  result_denom = builder->CreateZExt(result_denom, int128_type);
 
   // Shift denominator left by 64 bits in preparation for storage.
   result_denom = builder->CreateShl(result_denom, 64);
@@ -634,29 +665,43 @@ llvm::Value *operator_codegen::RationalMultiplyCodegen(
 llvm::Value *operator_codegen::RationalDivideCodegen(CodeGenerationVisitor &cv,
                                                      OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+  llvm::Type *int128_type = llvm::Type::getInt128Ty(*llvm_context);
+
+  // We need to extract the numerator and denominator out of the left-hand side
+  // as 64-bit integers.
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
-  // We need to extract the numerator and denominator out of the left-hand side.
   llvm::Value *lhs_num = builder->CreateShl(lhs, 64);
   lhs_num = builder->CreateLShr(lhs_num, 64);
+  lhs_num = builder->CreateTrunc(lhs_num, int64_type);
   llvm::Value *lhs_denom = builder->CreateLShr(lhs, 64);
+  lhs_denom = builder->CreateTrunc(lhs_denom, int64_type);
 
+  // Now extract the numerator and denominator out of the right-hand side as
+  // 64-bit integers.
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
-  // Now extract the numerator and denominator out of the right-hand side.
   llvm::Value *rhs_num = builder->CreateShl(rhs, 64);
   rhs_num = builder->CreateLShr(rhs_num, 64);
+  rhs_num = builder->CreateTrunc(rhs_num, int64_type);
   llvm::Value *rhs_denom = builder->CreateLShr(rhs, 64);
+  rhs_denom = builder->CreateTrunc(rhs_denom, int64_type);
 
-  // Perform rational number division by computing
-  // (LHS_numerator * RHS_denominator) / (LHS_denominator * RHS_numerator).
+  // (a/b) / (c/d) = (ad) / (bc)
   llvm::Value *result_num = builder->CreateMul(lhs_num, rhs_denom);
   llvm::Value *result_denom = builder->CreateMul(lhs_denom, rhs_num);
 
   auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
-  if (next_op && !next_op->IsArithmeticOperation()) {
+  if (!next_op || !next_op->IsArithmeticOperation()) {
+    // If the parent is not another arithmetic operation, simplify the rational
+    // number now.
     SimplifyRational(result_num, result_denom);
   }
+
+  result_num = builder->CreateZExt(result_num, int128_type);
+  result_denom = builder->CreateZExt(result_denom, int128_type);
 
   // Shift denominator left by 64 bits in preparation for storage.
   result_denom = builder->CreateShl(result_denom, 64);
@@ -673,7 +718,17 @@ llvm::Value *operator_codegen::RationalCmpEQCodegen(CodeGenerationVisitor &cv,
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
-  return builder->CreateICmpEQ(lhs, rhs, "cmptmp");
+  return builder->CreateICmpEQ(lhs, rhs);
+}
+
+llvm::Value *operator_codegen::RationalCmpNEQCodegen(CodeGenerationVisitor &cv,
+                                                     OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+  return builder->CreateICmpNE(lhs, rhs);
 }
 
 /******************************************************************************
@@ -785,11 +840,11 @@ void SimplifyRational(llvm::Value *&numerator, llvm::Value *&denominator) {
 
   // Check denominator sign.
   llvm::Value *denom_negative_check =
-      builder->CreateICmpSLT(denominator, int64_zero, "cmptmp");
+      builder->CreateICmpSLT(denominator, int64_zero);
 
   // Create a value holding the numerator with flipped sign.
   llvm::Value *numerator_flipped_sign =
-      builder->CreateSub(int64_zero, numerator, "subtmp");
+      builder->CreateSub(int64_zero, numerator);
 
   // Select instruction to flip the sign of the denominator.
   numerator = builder->CreateSelect(denom_negative_check,
@@ -798,133 +853,90 @@ void SimplifyRational(llvm::Value *&numerator, llvm::Value *&denominator) {
   // Set denominator to abs(denominator).
   llvm::Function *abs_intrinsic = llvm::Intrinsic::getDeclaration(
       module, llvm::Intrinsic::abs, {int64_type});
-  denominator =
-      builder->CreateCall(abs_intrinsic, {denominator, i1_zero}, "calltmp");
+  denominator = builder->CreateCall(abs_intrinsic, {denominator, i1_zero});
 
   // Get GCD(numerator, denominator). Use abs(numerator) to compute the GCD.
   llvm::Value *abs_numerator =
-      builder->CreateCall(abs_intrinsic, {numerator, i1_zero}, "calltmp");
+      builder->CreateCall(abs_intrinsic, {numerator, i1_zero});
   llvm::Value *gcd = GenerateGCD(abs_numerator, denominator);
 
   // Divide numerator and denominator by GCD.
-  numerator = builder->CreateSDiv(numerator, gcd, "divtmp");
-  denominator = builder->CreateSDiv(denominator, gcd, "divtmp");
+  numerator = builder->CreateSDiv(numerator, gcd);
+  denominator = builder->CreateSDiv(denominator, gcd);
 }
 
 llvm::Value *GenerateGCD(llvm::Value *a, llvm::Value *b) {
-  // The LLVM IR in this function implements the GCD algorithm below.
+  // The LLVM IR generated by this function implements the GCD algorithm below.
+  // Source: https://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
+  //
   // gcd(a, b):
-  //   while (a != b):
-  //     if (a > b):
-  //       a = a - b
-  //     else:
-  //       b = b - a
+  //   while (b != 0):
+  //     t = b
+  //     b = a % b
+  //     a = t
   //   return a
   //
-  // GCD algorithm LLVM IR outline:
+  //
+  // Pseudo-IR for the GCD algorithm:
   //
   // gcd_before:
   //   ...
-  //   %gcdarg1 = add 0, arg1
-  //   %gcdarg2 = add 0, arg2
+  //   gcdarg1 = add 0, arg1
+  //   gcdarg2 = add 0, arg2
   //   br label %gcd_loop_cond
   //
   // gcd_loop_cond:
-  //   %gcda = [%gcdarg1, %gcd_before], [%nexta, %gcd_if_merge]
-  //   %gcdb = [%gcdarg2, %gcd_before], [%nextb, %gcd_if_merge]
-  //   %condcheck = icmp ne %gcda, %gcdb
-  //   %br %condcheck, label %gcd_loop_body, %gcd_loop_end
+  //   %gcda = phi [%gcdarg1, %gcd_before], [%nexta, %gcd_loop_body]
+  //   %gcdb = phi [%gcdarg2, %gcd_before], [%nextb, %gcd_loop_body]
+  //   %condcheck = icmp ne %gcdb, 0
+  //   br %condcheck, label %gcd_loop_body, label %gcd_loop_end
   //
   // gcd_loop_body:
-  //   %ifcheck = %icmp sgt %gcda, %gcdb
-  //   br %ifcheck, label %gcd_then, %gcd_else
-  //
-  // gcd_then:
-  //   %reducea = sub %gcda, %gcdb
-  //   br label %gcd_if_merge
-  //
-  // gcd_else:
-  //   %reduceb = sub %gcdb, %gcda
-  //   br label %gcd_if_merge
-  //
-  // gcd_if_merge:
-  //   %nexta = phi [%reducea, %gcd_then], [%gcda, %gcd_else]
-  //   %nextb = phi [%reduceb, %gcd_else], [%gcdb, %gcd_then]
+  //   %gcdt = add 0, %gcdb
+  //   %nextb = urem %gcda, %gcdb
+  //   %nexta = add 0, %gcdt
   //   br label %gcd_loop_cond
   //
   // gcd_loop_end:
-  //   ; Here, `gcda` is the GCD.
+  //   ; Here, %gcda is the GCD.
 
   CodegenContext *codegen_context = CodegenContext::Get();
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
-  // Create necessary basic blocks.
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+  llvm::Value *int64_zero = llvm::ConstantInt::get(int64_type, 0);
+
+  // Create the necessary basic blocks.
   llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
   llvm::BasicBlock *gcd_before = builder->GetInsertBlock();
-  llvm::BasicBlock *gcd_loop_cond =
-      llvm::BasicBlock::Create(*llvm_context, "gcd_loop_cond");
-  llvm::BasicBlock *gcd_loop_body =
-      llvm::BasicBlock::Create(*llvm_context, "gcd_loop_body");
-  llvm::BasicBlock *gcd_then =
-      llvm::BasicBlock::Create(*llvm_context, "gcd_then");
-  llvm::BasicBlock *gcd_else =
-      llvm::BasicBlock::Create(*llvm_context, "gcd_else");
-  llvm::BasicBlock *gcd_if_merge =
-      llvm::BasicBlock::Create(*llvm_context, "gcd_if_merge");
-  llvm::BasicBlock *gcd_loop_end =
-      llvm::BasicBlock::Create(*llvm_context, "gcd_loop_end");
+  llvm::BasicBlock *gcd_loop_cond = llvm::BasicBlock::Create(*llvm_context);
+  llvm::BasicBlock *gcd_loop_body = llvm::BasicBlock::Create(*llvm_context);
+  llvm::BasicBlock *gcd_loop_end = llvm::BasicBlock::Create(*llvm_context);
 
   // gcd_before:
-  llvm::Value *int64_zero =
-      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0);
-  llvm::Value *gcdarg1 = builder->CreateAdd(int64_zero, a, "gcdarg1");
-  llvm::Value *gcdarg2 = builder->CreateAdd(int64_zero, b, "gcdarg2");
+  llvm::Value *gcdarg1 = builder->CreateAdd(a, int64_zero);
+  llvm::Value *gcdarg2 = builder->CreateAdd(b, int64_zero);
   builder->CreateBr(gcd_loop_cond);
 
   // gcd_loop_cond:
   parent_function->insert(parent_function->end(), gcd_loop_cond);
   builder->SetInsertPoint(gcd_loop_cond);
-  llvm::PHINode *gcda =
-      builder->CreatePHI(llvm::Type::getInt64Ty(*llvm_context), 2, "gcda");
+  llvm::PHINode *gcda = builder->CreatePHI(int64_type, 2);
+  llvm::PHINode *gcdb = builder->CreatePHI(int64_type, 2);
   gcda->addIncoming(gcdarg1, gcd_before);
-  llvm::PHINode *gcdb =
-      builder->CreatePHI(llvm::Type::getInt64Ty(*llvm_context), 2, "gcdb");
   gcdb->addIncoming(gcdarg2, gcd_before);
-  llvm::Value *condcheck = builder->CreateICmpNE(gcda, gcdb, "condcheck");
+  llvm::Value *condcheck = builder->CreateICmpNE(gcdb, int64_zero);
   builder->CreateCondBr(condcheck, gcd_loop_body, gcd_loop_end);
 
   // gcd_loop_body:
   parent_function->insert(parent_function->end(), gcd_loop_body);
   builder->SetInsertPoint(gcd_loop_body);
-  llvm::Value *ifcheck = builder->CreateICmpSGT(gcda, gcdb, "ifcheck");
-  builder->CreateCondBr(ifcheck, gcd_then, gcd_else);
-
-  // gcd_then:
-  parent_function->insert(parent_function->end(), gcd_then);
-  builder->SetInsertPoint(gcd_then);
-  llvm::Value *reducea = builder->CreateSub(gcda, gcdb, "reducea");
-  builder->CreateBr(gcd_if_merge);
-
-  // gcd_else:
-  parent_function->insert(parent_function->end(), gcd_else);
-  builder->SetInsertPoint(gcd_else);
-  llvm::Value *reduceb = builder->CreateSub(gcdb, gcda, "reduceb");
-  builder->CreateBr(gcd_if_merge);
-
-  // gcd_if_merge:
-  parent_function->insert(parent_function->end(), gcd_if_merge);
-  builder->SetInsertPoint(gcd_if_merge);
-  llvm::PHINode *nexta =
-      builder->CreatePHI(llvm::Type::getInt64Ty(*llvm_context), 2, "nexta");
-  nexta->addIncoming(reducea, gcd_then);
-  nexta->addIncoming(gcda, gcd_else);
-  gcda->addIncoming(nexta, gcd_if_merge);
-  llvm::PHINode *nextb =
-      builder->CreatePHI(llvm::Type::getInt64Ty(*llvm_context), 2, "nextb");
-  nextb->addIncoming(reduceb, gcd_else);
-  nextb->addIncoming(gcdb, gcd_then);
-  gcdb->addIncoming(nextb, gcd_if_merge);
+  llvm::Value *gcdt = builder->CreateAdd(gcdb, int64_zero);
+  llvm::Value *nextb = builder->CreateURem(gcda, gcdb);
+  llvm::Value *nexta = builder->CreateAdd(gcdt, int64_zero);
+  gcda->addIncoming(nexta, gcd_loop_body);
+  gcdb->addIncoming(nextb, gcd_loop_body);
   builder->CreateBr(gcd_loop_cond);
 
   // gcd_loop_end:
