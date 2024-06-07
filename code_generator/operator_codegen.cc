@@ -431,6 +431,84 @@ llvm::Value *operator_codegen::OverOperatorCodegen(CodeGenerationVisitor &cv,
   return result;
 }
 
+llvm::Value *operator_codegen::RationalNopCodegen(CodeGenerationVisitor &cv,
+                                                  OperatorNode &node) {
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+  llvm::Type *int128_type = llvm::Type::getInt128Ty(*llvm_context);
+
+  // We need to extract the operand numerator and denominator as 64-bit
+  // integers.
+  llvm::Value *operand = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *num = builder->CreateShl(operand, 64);
+  num = builder->CreateLShr(num, 64);
+  num = builder->CreateTrunc(num, int64_type);
+  llvm::Value *denom = builder->CreateLShr(operand, 64);
+  denom = builder->CreateTrunc(denom, int64_type);
+
+  auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
+  if (!next_op || !next_op->IsArithmeticOperation()) {
+    // If the parent is not another arithmetic operation, simplify the rational
+    // number now.
+    SimplifyRational(num, denom);
+  }
+
+  num = builder->CreateZExt(num, int128_type);
+  denom = builder->CreateZExt(denom, int128_type);
+
+  // Shift denominator left by 64 bits in preparation for storage.
+  denom = builder->CreateShl(denom, 64);
+
+  llvm::Value *result = builder->CreateOr(num, denom);
+
+  return result;
+}
+
+llvm::Value *operator_codegen::RationalNegationCodegen(
+    CodeGenerationVisitor &cv, OperatorNode &node) {
+  // Rational numbers are stored in a 128-bit integer. First 64-bits are
+  // represent the numerator, last 64-bits represent the denominator.
+  CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+  llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
+
+  llvm::Type *int64_type = llvm::Type::getInt64Ty(*llvm_context);
+  llvm::Type *int128_type = llvm::Type::getInt128Ty(*llvm_context);
+
+  // We need to extract the operand numerator and denominator as 64-bit
+  // integers.
+  llvm::Value *operand = node.GetChild(0)->GenerateCode(cv);
+  llvm::Value *num = builder->CreateShl(operand, 64);
+  num = builder->CreateLShr(num, 64);
+  num = builder->CreateTrunc(num, int64_type);
+  llvm::Value *denom = builder->CreateLShr(operand, 64);
+  denom = builder->CreateTrunc(denom, int64_type);
+
+  // Negate the numerator.
+  num = builder->CreateSub(
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0), num);
+
+  auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
+  if (!next_op || !next_op->IsArithmeticOperation()) {
+    // If the parent is not another arithmetic operation, simplify the rational
+    // number now.
+    SimplifyRational(num, denom);
+  }
+
+  num = builder->CreateZExt(num, int128_type);
+  denom = builder->CreateZExt(denom, int128_type);
+
+  // Shift denominator left by 64 bits in preparation for storage.
+  denom = builder->CreateShl(denom, 64);
+
+  llvm::Value *result = builder->CreateOr(num, denom);
+
+  return result;
+}
+
 llvm::Value *operator_codegen::RationalAddCodegen(CodeGenerationVisitor &cv,
                                                   OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
