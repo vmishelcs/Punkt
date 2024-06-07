@@ -1162,7 +1162,7 @@ std::unique_ptr<ParseNode> Parser::ParseType() {
 bool Parser::StartsBaseType(Token &token) {
   return KeywordToken::IsTokenKeyword(
       &token, {Keyword::VOID, Keyword::BOOL, Keyword::CHAR, Keyword::INT,
-               Keyword::STRING});
+               Keyword::RAT, Keyword::STRING});
 }
 std::unique_ptr<ParseNode> Parser::ParseBaseType() {
   if (!StartsBaseType(*now_reading)) {

@@ -19,6 +19,7 @@ enum class Keyword {
   MAIN,
   PRINT,
   PRINTLN,
+  RAT,
   RETURN,
   SIZEOF,
   STRING,

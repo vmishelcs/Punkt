@@ -1,13 +1,13 @@
 function f <rat r> -> void {
-	println r.
+  println r.
 }
 
 function g <[rat] A> -> void {
-	println A.
+  println A.
 }
 
 main {
-	f(1 // 2).
+  f(1 // 2).
 
-	g([1]).
+  g([1 // 2]).
 }
