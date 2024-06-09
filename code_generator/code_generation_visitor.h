@@ -27,40 +27,40 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   //===- Statements -------------------------------------------------------===//
   virtual llvm::Value *GenerateCode(DeclarationStatementNode &) override;
   virtual llvm::Value *GenerateCode(ExpressionStatementNode &) override;
-  virtual llvm::Value *GenerateCode(IfStatementNode &node) override;
-  virtual llvm::Value *GenerateCode(WhileStatementNode &node) override;
-  virtual llvm::Value *GenerateCode(ForStatementNode &node) override;
-  virtual llvm::Value *GenerateCode(DeallocStatementNode &node) override;
-  virtual llvm::Value *GenerateCode(ReturnStatementNode &node) override;
-  virtual llvm::Value *GenerateCode(PrintStatementNode &node) override;
+  virtual llvm::Value *GenerateCode(IfStatementNode &) override;
+  virtual llvm::Value *GenerateCode(WhileStatementNode &) override;
+  virtual llvm::Value *GenerateCode(ForStatementNode &) override;
+  virtual llvm::Value *GenerateCode(DeallocStatementNode &) override;
+  virtual llvm::Value *GenerateCode(ReturnStatementNode &) override;
+  virtual llvm::Value *GenerateCode(PrintStatementNode &) override;
 
-  virtual llvm::Value *GenerateCode(CodeBlockNode &node) override;
-  virtual llvm::Value *GenerateCode(FunctionDefinitionNode &node) override;
-  virtual llvm::Value *GenerateCode(LambdaInvocationNode &node) override;
-  virtual llvm::Value *GenerateCode(LambdaNode &node) override;
-  virtual llvm::Value *GenerateCode(LambdaParameterNode &node) override;
-  virtual llvm::Value *GenerateCode(MainNode &node) override;
-  virtual llvm::Value *GenerateCode(OperatorNode &node) override;
-  virtual llvm::Value *GenerateCode(ProgramNode &node) override;
+  virtual llvm::Value *GenerateCode(CodeBlockNode &) override;
+  virtual llvm::Value *GenerateCode(FunctionDefinitionNode &) override;
+  virtual llvm::Value *GenerateCode(LambdaInvocationNode &) override;
+  virtual llvm::Value *GenerateCode(LambdaNode &) override;
+  virtual llvm::Value *GenerateCode(LambdaParameterNode &) override;
+  virtual llvm::Value *GenerateCode(MainNode &) override;
+  virtual llvm::Value *GenerateCode(OperatorNode &) override;
+  virtual llvm::Value *GenerateCode(ProgramNode &) override;
 
-  virtual llvm::Value *GenerateCode(ErrorNode &node) override;
-  virtual llvm::Value *GenerateCode(NopNode &node) override;
-  virtual llvm::Value *GenerateCode(IdentifierNode &node) override;
+  virtual llvm::Value *GenerateCode(ErrorNode &) override;
+  virtual llvm::Value *GenerateCode(NopNode &) override;
+  virtual llvm::Value *GenerateCode(IdentifierNode &) override;
 
   //===- Literals ---------------------------------------------------------===//
-  virtual llvm::Value *GenerateCode(BooleanLiteralNode &node) override;
-  virtual llvm::Value *GenerateCode(CharacterLiteralNode &node) override;
-  virtual llvm::Value *GenerateCode(IntegerLiteralNode &node) override;
-  virtual llvm::Value *GenerateCode(StringLiteralNode &node) override;
+  virtual llvm::Value *GenerateCode(BooleanLiteralNode &) override;
+  virtual llvm::Value *GenerateCode(CharacterLiteralNode &) override;
+  virtual llvm::Value *GenerateCode(IntegerLiteralNode &) override;
+  virtual llvm::Value *GenerateCode(StringLiteralNode &) override;
 
   //===- Arrays -----------------------------------------------------------===//
   virtual llvm::Value *GenerateCode(AllocExpressionNode &) override;
   virtual llvm::Value *GenerateCode(PopulatedArrayExpressionNode &) override;
 
   //===- Type nodes -------------------------------------------------------===//
-  virtual llvm::Value *GenerateCode(BaseTypeNode &node) override;
-  virtual llvm::Value *GenerateCode(ArrayTypeNode &node) override;
-  virtual llvm::Value *GenerateCode(LambdaTypeNode &node) override;
+  virtual llvm::Value *GenerateCode(BaseTypeNode &) override;
+  virtual llvm::Value *GenerateCode(ArrayTypeNode &) override;
+  virtual llvm::Value *GenerateCode(LambdaTypeNode &) override;
 
   const std::string &GetPunktArrayStructName() const;
 
