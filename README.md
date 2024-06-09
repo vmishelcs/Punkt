@@ -70,7 +70,6 @@ BaseType \rightarrow & \enspace \texttt{void} \\
 | & \enspace \texttt{char} \\
 | & \enspace \texttt{int} \\
 | & \enspace \texttt{rat} \\
-| & \enspace \texttt{rat} \\
 | & \enspace \texttt{string} \\[16pt]
 
 ArrayType \rightarrow & \enspace \texttt{[} \enspace Type \enspace \texttt{]} \\[16pt]
