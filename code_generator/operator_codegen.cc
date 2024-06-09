@@ -414,6 +414,8 @@ llvm::Value *operator_codegen::OverOperatorCodegen(CodeGenerationVisitor &cv,
   llvm::Value *num = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *denom = node.GetChild(1)->GenerateCode(cv);
 
+  // TODO: Runtime error if denominator is 0.
+
   auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
   if (!next_op || !next_op->IsArithmeticOperation()) {
     // If the parent is not another arithmetic operation, simplify the rational
