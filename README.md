@@ -27,9 +27,7 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 
 This is a description of Punkt grammar, simplified slightly for better readability. The grammar that the Punkt parser actually implements is entirely unambiguous.
 
-$$
-% ```math
-
+```math
 \begin{aligned}
 Program \rightarrow & \enspace FunctionDefinition^* \enspace \texttt{main} \enspace CodeBlock \\[16pt]
 
@@ -86,7 +84,6 @@ LambdaType \rightarrow & \enspace \texttt{<} \enspace TypeList^? \enspace \textt
 TypeList \rightarrow & \enspace Type \enspace (\texttt{,} \enspace Type)^*
 
 \end{aligned}
-
 ```
 
 <!-- Not sure if this level of detailed expression grammar is necessary.
