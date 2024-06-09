@@ -303,10 +303,30 @@ llvm::Value *operator_codegen::IntegerMultiplyCodegen(CodeGenerationVisitor &cv,
 llvm::Value *operator_codegen::IntegerDivideCodegen(CodeGenerationVisitor &cv,
                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
+
+  // Runtime error for division by 0.
+  llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
+  llvm::BasicBlock *zero_div_block = llvm::BasicBlock::Create(*llvm_context);
+  llvm::BasicBlock *nonzero_div_block = llvm::BasicBlock::Create(*llvm_context);
+
+  llvm::Value *int64_zero =
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0);
+  llvm::Value *zero_div_cmp = builder->CreateICmpEQ(rhs, int64_zero);
+  builder->CreateCondBr(zero_div_cmp, zero_div_block, nonzero_div_block);
+
+  // Zero divisor case.
+  parent_function->insert(parent_function->end(), zero_div_block);
+  builder->SetInsertPoint(zero_div_block);
+  cv.GenerateRuntimeErrorWithMessage("division by 0");
+
+  // We continue as usual for non-zero divisors.
+  parent_function->insert(parent_function->end(), nonzero_div_block);
+  builder->SetInsertPoint(nonzero_div_block);
 
   return builder->CreateSDiv(lhs, rhs);
 }
@@ -414,7 +434,25 @@ llvm::Value *operator_codegen::OverOperatorCodegen(CodeGenerationVisitor &cv,
   llvm::Value *num = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *denom = node.GetChild(1)->GenerateCode(cv);
 
-  // TODO: Runtime error if denominator is 0.
+  // Runtime error if denominator is 0.
+  llvm::Function *parent_function = builder->GetInsertBlock()->getParent();
+  llvm::BasicBlock *zero_denom_block = llvm::BasicBlock::Create(*llvm_context);
+  llvm::BasicBlock *nonzero_denom_block =
+      llvm::BasicBlock::Create(*llvm_context);
+
+  llvm::Value *int64_zero =
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0);
+  llvm::Value *zero_denom_cmp = builder->CreateICmpEQ(denom, int64_zero);
+  builder->CreateCondBr(zero_denom_cmp, zero_denom_block, nonzero_denom_block);
+
+  // Zero denominator case.
+  parent_function->insert(parent_function->end(), zero_denom_block);
+  builder->SetInsertPoint(zero_denom_block);
+  cv.GenerateRuntimeErrorWithMessage("zero denominator");
+
+  // We continue as usual for non-zero denominators.
+  parent_function->insert(parent_function->end(), nonzero_denom_block);
+  builder->SetInsertPoint(nonzero_denom_block);
 
   auto next_op = dynamic_cast<OperatorNode *>(node.GetParent());
   if (!next_op || !next_op->IsArithmeticOperation()) {
