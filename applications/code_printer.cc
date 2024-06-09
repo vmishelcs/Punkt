@@ -14,7 +14,7 @@ void GenerateIRCode(fs::path file_path) {
   assert(decorated_ast != nullptr &&
          "SemanticAnalyzer::Analyze returned nullptr");
 
-  CodeGenerator::WriteIR(std::move(decorated_ast));
+  CodeGenerator::GenerateIR(std::move(decorated_ast));
 }
 
 int main(int argc, char **argv) {

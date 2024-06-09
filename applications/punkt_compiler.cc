@@ -133,7 +133,7 @@ static void Compile(fs::path input_file_path, fs::path output_file_path,
     decorated_ast->Accept(xml_generator_visitor);
   }
 
-  CodeGenerator::WriteIR(std::move(decorated_ast), output_file_path);
+  CodeGenerator::GenerateIR(std::move(decorated_ast), output_file_path);
 }
 
 static void CheckForErrors() {

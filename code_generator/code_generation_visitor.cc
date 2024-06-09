@@ -1134,8 +1134,7 @@ void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
 }
 
 void CodeGenerationVisitor::PrintLambdaTypeValue(LambdaType *lambda_type) {
-  std::unique_ptr<BaseType> basetype_tmp =
-      BaseType::Create(BaseTypeEnum::STRING);
+  std::unique_ptr<BaseType> basetype_tmp = BaseType::CreateStringType();
   llvm::Value *lambda_type_string_value =
       GetOrCreateString(lambda_type->ToString());
 
@@ -1145,8 +1144,7 @@ void CodeGenerationVisitor::PrintLambdaTypeValue(LambdaType *lambda_type) {
 void CodeGenerationVisitor::PrintLineFeed() {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
 
-  std::unique_ptr<BaseType> basetype_tmp =
-      BaseType::Create(BaseTypeEnum::CHARACTER);
+  std::unique_ptr<BaseType> basetype_tmp = BaseType::CreateCharacterType();
   llvm::Value *line_feed_char_value = llvm::ConstantInt::get(
       llvm::Type::getInt8Ty(*llvm_context), kLineFeedChar);
 
