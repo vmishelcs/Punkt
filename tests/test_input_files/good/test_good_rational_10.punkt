@@ -1,0 +1,32 @@
+main {
+  const vals = [
+     1 // 2 > 1 // 3,  # true
+     1 // 3 > 1 // 2,  # false
+    -1 // 2 > -1 // 3, # false
+    -1 // 3 > -1 // 2, # true
+     1 // 2 > -1 // 3, # true
+    -1 // 2 > 1 // 3,  # false
+     1 // 3 > -1 // 2, # true
+    -1 // 3 > 1 // 2   # false
+  ].
+
+  const check = [
+    true,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false
+  ].
+
+  for var i = 0, i < sizeof(check), i += 1 {
+    print i + 1, ": ".
+    if (vals[i] == check[i]) {
+      println "correct".
+    } else {
+      println "wrong".
+    }
+  }
+}

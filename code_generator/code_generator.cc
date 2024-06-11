@@ -5,8 +5,8 @@
 
 #include "code_generation_visitor.h"
 
-void CodeGenerator::WriteIR(std::unique_ptr<ParseNode> decorated_ast,
-                            fs::path output_file_path) {
+void CodeGenerator::GenerateIR(std::unique_ptr<ParseNode> decorated_ast,
+                               fs::path output_file_path) {
   CodeGenerator code_generator(std::move(decorated_ast), output_file_path);
   code_generator.WriteIRToOutputFile();
 }
@@ -23,7 +23,7 @@ void CodeGenerator::WriteIRToOutputFile() {
   decorated_ast->GenerateCode(code_generation_visitor);
 
   if (output_file_path.empty()) {
-    code_generation_visitor.WriteIRToFD(STDERR_FILENO);
+    code_generation_visitor.WriteIRToFD(STDOUT_FILENO);
     return;
   }
 
@@ -33,7 +33,7 @@ void CodeGenerator::WriteIRToOutputFile() {
   if (output_fd == -1) {
     PunktLogger::LogFatal("unable to open output file " +
                           output_file_path.string() +
-                          " errno: " + strerror(errno));
+                          "\n errno: " + strerror(errno));
   }
 
   code_generation_visitor.WriteIRToFD(output_fd);

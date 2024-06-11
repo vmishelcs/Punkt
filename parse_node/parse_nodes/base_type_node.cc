@@ -26,19 +26,20 @@ std::unique_ptr<Type> BaseTypeNode::InferOwnType() const {
 
   switch (keyword_token->GetKeywordEnum()) {
     case Keyword::VOID:
-      return BaseType::Create(BaseTypeEnum::VOID);
+      return BaseType::CreateVoidType();
     case Keyword::BOOL:
-      return BaseType::Create(BaseTypeEnum::BOOLEAN);
+      return BaseType::CreateBooleanType();
     case Keyword::CHAR:
-      return BaseType::Create(BaseTypeEnum::CHARACTER);
+      return BaseType::CreateCharacterType();
     case Keyword::INT:
-      return BaseType::Create(BaseTypeEnum::INTEGER);
+      return BaseType::CreateIntegerType();
+    case Keyword::RAT:
+      return BaseType::CreateRationalType();
     case Keyword::STRING:
-      return BaseType::Create(BaseTypeEnum::STRING);
+      return BaseType::CreateStringType();
     default:
       PunktLogger::LogFatalInternalError(
           "BaseTypeNode keyword does not name a known type");
-      return nullptr;
   }
 }
 

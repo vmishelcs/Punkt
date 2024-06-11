@@ -8,6 +8,7 @@ static const int kVoidTypeSizeInBytes = 0;
 static const int kBooleanTypeSizeInBytes = 1;
 static const int kCharacterTypeSizeInBytes = 1;
 static const int kIntegerTypeSizeInBytes = 8;
+static const int kRationalTypeSizeInBytes = 16;
 static const int kStringTypeSizeInBytes = 8;
 static const int kErrorTypeSizeInBytes = 0;
 
@@ -29,6 +30,10 @@ std::unique_ptr<BaseType> BaseType::CreateCharacterType() {
 
 std::unique_ptr<BaseType> BaseType::CreateIntegerType() {
   return Create(BaseTypeEnum::INTEGER);
+}
+
+std::unique_ptr<BaseType> BaseType::CreateRationalType() {
+  return Create(BaseTypeEnum::RATIONAL);
 }
 
 std::unique_ptr<BaseType> BaseType::CreateStringType() {
@@ -66,6 +71,8 @@ unsigned BaseType::GetSizeInBytes() const {
       return kCharacterTypeSizeInBytes;
     case BaseTypeEnum::INTEGER:
       return kIntegerTypeSizeInBytes;
+    case BaseTypeEnum::RATIONAL:
+      return kRationalTypeSizeInBytes;
     case BaseTypeEnum::STRING:
       return kStringTypeSizeInBytes;
     case BaseTypeEnum::ERROR:
@@ -73,7 +80,6 @@ unsigned BaseType::GetSizeInBytes() const {
     default:
       PunktLogger::LogFatalInternalError(
           "unimplemented BaseType in BaseType::GetSizeInBytes");
-      return 0;
   }
 }
 
@@ -87,16 +93,16 @@ llvm::Type *BaseType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
       return llvm::Type::getInt8Ty(llvm_context);
     case BaseTypeEnum::INTEGER:
       return llvm::Type::getInt64Ty(llvm_context);
+    case BaseTypeEnum::RATIONAL:
+      return llvm::Type::getInt128Ty(llvm_context);
     case BaseTypeEnum::STRING:
       return llvm::PointerType::getUnqual(llvm_context);
     case BaseTypeEnum::ERROR:
       PunktLogger::LogFatalInternalError(
           "error type has no corresponding LLVM type");
-      return nullptr;
     default:
       PunktLogger::LogFatalInternalError(
-          "unimplemented BaseType in BaseType::GetSizeInBytes");
-      return nullptr;
+          "unimplemented BaseType in BaseType::GetLLVMType");
   }
 }
 
@@ -113,6 +119,8 @@ std::string BaseType::GetEnumString(BaseTypeEnum base_type_enum) {
       return "character";
     case BaseTypeEnum::INTEGER:
       return "integer";
+    case BaseTypeEnum::RATIONAL:
+      return "rational";
     case BaseTypeEnum::STRING:
       return "string";
     case BaseTypeEnum::ERROR:

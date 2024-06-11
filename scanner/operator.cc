@@ -9,15 +9,16 @@
 static std::map<std::string, Operator> dictionary = {
     {"+", Operator::PLUS},        {"-", Operator::MINUS},
     {"*", Operator::MUL},         {"/", Operator::DIV},
-    {"%", Operator::MOD},         {"==", Operator::CMP_EQ},
-    {"!=", Operator::CMP_NEQ},    {">", Operator::CMP_GT},
-    {"<", Operator::CMP_LT},      {">=", Operator::CMP_GEQ},
-    {"=>", Operator::CMP_GEQ},    {"<=", Operator::CMP_LEQ},
-    {"=<", Operator::CMP_LEQ},    {"&&", Operator::BOOL_AND},
-    {"||", Operator::BOOL_OR},    {"!", Operator::BOOL_NOT},
-    {"=", Operator::ASSIGN},      {"+=", Operator::ADD_ASSIGN},
-    {"-=", Operator::SUB_ASSIGN}, {"*=", Operator::MUL_ASSIGN},
-    {"/=", Operator::DIV_ASSIGN}, {"%=", Operator::MOD_ASSIGN},
+    {"//", Operator::OVER},       {"%", Operator::MOD},
+    {"==", Operator::CMP_EQ},     {"!=", Operator::CMP_NEQ},
+    {">", Operator::CMP_GT},      {"<", Operator::CMP_LT},
+    {">=", Operator::CMP_GEQ},    {"=>", Operator::CMP_GEQ},
+    {"<=", Operator::CMP_LEQ},    {"=<", Operator::CMP_LEQ},
+    {"&&", Operator::BOOL_AND},   {"||", Operator::BOOL_OR},
+    {"!", Operator::BOOL_NOT},    {"=", Operator::ASSIGN},
+    {"+=", Operator::ADD_ASSIGN}, {"-=", Operator::SUB_ASSIGN},
+    {"*=", Operator::MUL_ASSIGN}, {"/=", Operator::DIV_ASSIGN},
+    {"%=", Operator::MOD_ASSIGN},
 };
 
 static std::map<Operator, std::string> reverse_dictionary = []() {

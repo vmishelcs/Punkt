@@ -6,15 +6,18 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 
 |Token type|REGEX|
 |----------|-----|
-| *keyword* | `bool` `call` `char` `const` `else` `for` `function` `if` `int` `main` `print` `return` `string` `var` `void` |
-| *identifier* |[ `_` `a`-`z`  `A`-`Z` ] [ `_` `a`-`z` `A`-`Z` `0`-`9` ]<sup>*</sup> |
+| *keyword* | `alloc` `bool` `char` `const` `dealloc` `else` `false` `for` `function` `if` `int` `main` `print` `println` `rat` `return` `sizeof` `string` `true` `var` `void` `while` |
+| *identifier* |[ _ a-z A-Z ] [ _ a-z A-Z 0-9 ]<sup>*</sup> |
+| *keyword* | `alloc` `bool` `char` `const` `dealloc` `else` `false` `for` `function` `if` `int` `main` `print` `println` `rat` `return` `sizeof` `string` `true` `var` `void` `while` |
+| *identifier* |[ _ a-z A-Z ] [ _ a-z A-Z 0-9 ]<sup>*</sup> |
 | *booleanLiteral* | `true` `false` |
-| *characterLiteral* | **\'** \<printable-char\> **\'** | 
-| *integerLiteral* | [ `0`-`9` ]<sup>+</sup> |
-| *stringLiteral* | **\"**[ ^ `"` `\n` ]<sup>*</sup>**\"** |
+| *characterLiteral* | `'` *ASCII character* `'` | 
+| *integerLiteral* | [ 0-9 ]<sup>+</sup> |
+| *stringLiteral* | `"`[ ^ `"` `\n` ]<sup>*</sup>`"` |
 | Arithmetic operators | `+` `-` `*` `/` |
+| Other operators | `=` `%` `//` `!` `&&` `\|\|` `sizeof` `alloc` `[]`|
 | Comparison operators | `==` `!=` `>` `>=` `<` `<=` |
-| Punctuators | `{` `}` `(` `)` `=` `.` `,` `<` `>` `->` |
+| Punctuators | `{` `}` `(` `)` `.` `,` `<` `>` `->` |
 
 ## Grammar
 
@@ -66,6 +69,7 @@ BaseType \rightarrow & \enspace \texttt{void} \\
 | & \enspace \texttt{bool} \\
 | & \enspace \texttt{char} \\
 | & \enspace \texttt{int} \\
+| & \enspace \texttt{rat} \\
 | & \enspace \texttt{string} \\[16pt]
 
 ArrayType \rightarrow & \enspace \texttt{[} \enspace Type \enspace \texttt{]} \\[16pt]

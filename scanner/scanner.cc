@@ -132,14 +132,22 @@ std::unique_ptr<Token> Scanner::ScanOperatorOrPunctuator(
       break;
     case '+':
     case '*':
-    case '/':
     case '%':
       buffer.push_back(lc.character);
       if (input_stream->Peek().character == '=') {
         // += (add and assign) operator
         // *= (multiply and assign) operator
-        // /= (divide and assign) operator
         // %= (mod and assign) operator
+        buffer.push_back(input_stream->Next().character);
+      }
+      break;
+
+    case '/':
+      buffer.push_back(lc.character);
+      if (input_stream->Peek().character == '=' ||
+          input_stream->Peek().character == '/') {
+        // '/=' (divide and assign) operator
+        // '//' (over) operator
         buffer.push_back(input_stream->Next().character);
       }
       break;

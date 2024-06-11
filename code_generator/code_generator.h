@@ -9,17 +9,18 @@ namespace fs = std::filesystem;
 
 class CodeGenerator {
  public:
-  // Writes LLVM IR generated from the given decorated abstract syntax tree to
-  // the specified file. If the `output_file_path` argument is empty, IR is
-  // output to `stderr`.
-  static void WriteIR(std::unique_ptr<ParseNode> decorated_ast,
-                      fs::path output_file_path = fs::path());
+  /// @brief Generate LLVM IR based on the provided decorated AST.
+  /// @param decorated_ast Decorated abstract syntax tree representing the
+  /// program.
+  /// @param output_file_path Optional parameter for IR output file. If no file
+  /// path is specified, IR is written to `STDOUT`.
+  static void GenerateIR(std::unique_ptr<ParseNode> decorated_ast,
+                         fs::path output_file_path = fs::path());
 
  private:
   CodeGenerator(std::unique_ptr<ParseNode> decorated_ast,
                 fs::path output_file_path);
 
-  void WriteIRToSTDOUT();
   void WriteIRToOutputFile();
 
   std::unique_ptr<ParseNode> decorated_ast;

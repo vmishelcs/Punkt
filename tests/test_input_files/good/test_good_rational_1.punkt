@@ -1,0 +1,30 @@
+main {
+  println 112 // 16 == 7 // 1.
+  println 76 // 24 == 19 // 6.
+  println 78 // 39 == 2 // 1.
+  println 115 // 46 == 5 // 2.
+  println 132 // 48 == 11 // 4.
+  println 160 // 25 == 32 // 5.
+  println 56 // 160 == 7 // 20.
+  println 64 // 148 == 16 // 37.
+  println 114 // 228 == 1 // 2.
+  println 96 // 135 == 32 // 45.
+  println 320 // 40 == 8 // 1.
+  println 136 // 28 == 34 // 7.
+  println 64 // 216 == 8 // 27.
+  println 84 // 126 == 2 // 3.
+  println 230 // 85 == 46 // 17.
+  println 132 // 231 == 4 // 7.
+  println 472 // 96 == 59 // 12.
+  println 320 // 256 == 5 // 4.
+  println 1 // 2 == 6 // 12.
+  println 2 // 3 == 8 // 12.
+  println 4 // 7 == 12 // 21.
+  println 10 // 25 == 70 // 175.
+  println 2 // 4 == 20 // 40.
+  println 1 // 10 == 3 // 30.
+  println 2 // 6 == 6 // 18.
+  println 2 // 9 == 20 // 90.
+  println 3 // 4 == 27 // 36.
+  println 1 // 6 == 10 // 60.
+}

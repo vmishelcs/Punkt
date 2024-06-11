@@ -35,6 +35,11 @@ class OperatorNode : public ParseNode {
   /// `false` otherwise.
   bool IsAssignmentTarget() const;
 
+  /// @brief Checks if this `OperatorNode` represents an arithmetic operation.
+  /// @return `true` if this `OperatorNode` represents an arithmetic operation
+  /// (`+`, `-`, `*`, `-`), `false` otherwise.
+  bool IsArithmeticOperation() const;
+
   virtual std::string ToString() const override { return "OPERATOR NODE"; }
 
   virtual void Accept(ParseNodeVisitor &visitor) override;

@@ -771,7 +771,8 @@ std::unique_ptr<ParseNode> Parser::ParseMultiplicativeExpression() {
   std::unique_ptr<ParseNode> left = ParseUnaryExpression();
 
   while (OperatorToken::IsTokenOperator(
-      now_reading.get(), {Operator::MUL, Operator::DIV, Operator::MOD})) {
+      now_reading.get(),
+      {Operator::MUL, Operator::DIV, Operator::MOD, Operator::OVER})) {
     auto multiplicative_operator =
         std::make_unique<OperatorNode>(std::move(now_reading));
 
@@ -1161,7 +1162,7 @@ std::unique_ptr<ParseNode> Parser::ParseType() {
 bool Parser::StartsBaseType(Token &token) {
   return KeywordToken::IsTokenKeyword(
       &token, {Keyword::VOID, Keyword::BOOL, Keyword::CHAR, Keyword::INT,
-               Keyword::STRING});
+               Keyword::RAT, Keyword::STRING});
 }
 std::unique_ptr<ParseNode> Parser::ParseBaseType() {
   if (!StartsBaseType(*now_reading)) {

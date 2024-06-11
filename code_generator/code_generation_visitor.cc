@@ -193,8 +193,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(ForStatementNode &node) {
     CodeGenerationInternalError(
         "failed generating end condition for for-statement");
   }
-  end_condition = builder->CreateTrunc(
-      end_condition, llvm::Type::getInt1Ty(*llvm_context), "trunctmp");
+  end_condition =
+      builder->CreateTrunc(end_condition, llvm::Type::getInt1Ty(*llvm_context));
   builder->CreateCondBr(end_condition, loop_block, afterloop_block);
 
   // Append the 'loop' block after the 'condition' block.
@@ -257,8 +257,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IfStatementNode &node) {
     CodeGenerationInternalError("failed generating condition for if-statement");
   }
   // Truncate condition to make sure it has LLVM type `i1`.
-  condition = builder->CreateTrunc(
-      condition, llvm::Type::getInt1Ty(*llvm_context), "trunctmp");
+  condition =
+      builder->CreateTrunc(condition, llvm::Type::getInt1Ty(*llvm_context));
 
   auto parent_function = builder->GetInsertBlock()->getParent();
 
@@ -351,7 +351,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode &node) {
       return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
     }
 
-    return builder->CreateCall(function, arg_values, "calltmp");
+    return builder->CreateCall(function, arg_values);
   }
 
   // In order to call a function using its pointer, we need to construct the
@@ -367,8 +367,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaInvocationNode &node) {
     return llvm::Constant::getNullValue(llvm::Type::getVoidTy(*llvm_context));
   }
 
-  return builder->CreateCall(function_type, callee_value, arg_values,
-                             "calltmp");
+  return builder->CreateCall(function_type, callee_value, arg_values);
 }
 
 llvm::Value *CodeGenerationVisitor::GenerateCode(LambdaNode &node) {
@@ -656,8 +655,8 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(WhileStatementNode &node) {
         "failed generating condition for while-statement");
   }
   // Truncate condition to make sure it has type `i1`.
-  condition = builder->CreateTrunc(
-      condition, llvm::Type::getInt1Ty(*llvm_context), "trunctmp");
+  condition =
+      builder->CreateTrunc(condition, llvm::Type::getInt1Ty(*llvm_context));
   // Create a conditional jump based on the while loop condition.
   builder->CreateCondBr(condition, loop_block, afterloop_block);
 
@@ -766,7 +765,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(NopNode &node) {
 
   return builder->CreateAdd(
       llvm::ConstantInt::get(llvm::Type::getInt8Ty(*llvm_context), 0),
-      llvm::ConstantInt::get(llvm::Type::getInt8Ty(*llvm_context), 0), "nop");
+      llvm::ConstantInt::get(llvm::Type::getInt8Ty(*llvm_context), 0));
 }
 
 //===----------------------------------------------------------------------===//
@@ -889,7 +888,7 @@ void CodeGenerationVisitor::PrintValue(Type *type, llvm::Value *value) {
 
 void CodeGenerationVisitor::PrintBaseTypeValue(BaseType *base_type,
                                                llvm::Value *value) {
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::Module *module = codegen_context->GetModule();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
@@ -913,22 +912,32 @@ void CodeGenerationVisitor::PrintBaseTypeValue(BaseType *base_type,
     // When printing booleans, we first truncate to 1-bit such that only the
     // least significant bit remains. Then we extend to 32 bits and print
     // the boolean as an integer.
-    auto truncated_value = builder->CreateTrunc(
-        print_value, llvm::Type::getInt1Ty(*context), "trunctmp");
-    print_value = builder->CreateZExt(
-        truncated_value, llvm::Type::getInt32Ty(*context), "zexttmp");
+    auto truncated_value =
+        builder->CreateTrunc(print_value, llvm::Type::getInt1Ty(*llvm_context));
+    print_value = builder->CreateZExt(truncated_value,
+                                      llvm::Type::getInt32Ty(*llvm_context));
+    printf_args.push_back(print_value);
   } else if (base_type->IsEquivalentTo(BaseTypeEnum::CHARACTER)) {
     // When printing characters, we sign-extend to 32 bits.
-    print_value = builder->CreateSExt(
-        print_value, llvm::Type::getInt32Ty(*context), "sexttmp");
+    print_value =
+        builder->CreateSExt(print_value, llvm::Type::getInt32Ty(*llvm_context));
+    printf_args.push_back(print_value);
+  } else if (base_type->IsEquivalentTo(BaseTypeEnum::RATIONAL)) {
+    // Load numerator.
+    llvm::Value *num = builder->CreateShl(print_value, 64);
+    num = builder->CreateLShr(num, 64);
+    num = builder->CreateTrunc(num, llvm::Type::getInt64Ty(*llvm_context));
+    printf_args.push_back(num);
+
+    // Load denominator.
+    llvm::Value *denom = builder->CreateLShr(print_value, 64);
+    num = builder->CreateTrunc(denom, llvm::Type::getInt64Ty(*llvm_context));
+    printf_args.push_back(denom);
+  } else {
+    printf_args.push_back(print_value);
   }
 
-  printf_args.push_back(print_value);
-  if (printf_args.back() == nullptr) {
-    CodeGenerationInternalError("failed to generate argument for printf");
-  }
-
-  builder->CreateCall(printf_func, printf_args, "printf_ret");
+  builder->CreateCall(printf_func, printf_args);
 }
 
 void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
@@ -1125,8 +1134,7 @@ void CodeGenerationVisitor::PrintArrayTypeValue(ArrayType *array_type,
 }
 
 void CodeGenerationVisitor::PrintLambdaTypeValue(LambdaType *lambda_type) {
-  std::unique_ptr<BaseType> basetype_tmp =
-      BaseType::Create(BaseTypeEnum::STRING);
+  std::unique_ptr<BaseType> basetype_tmp = BaseType::CreateStringType();
   llvm::Value *lambda_type_string_value =
       GetOrCreateString(lambda_type->ToString());
 
@@ -1136,8 +1144,7 @@ void CodeGenerationVisitor::PrintLambdaTypeValue(LambdaType *lambda_type) {
 void CodeGenerationVisitor::PrintLineFeed() {
   llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
 
-  std::unique_ptr<BaseType> basetype_tmp =
-      BaseType::Create(BaseTypeEnum::CHARACTER);
+  std::unique_ptr<BaseType> basetype_tmp = BaseType::CreateCharacterType();
   llvm::Value *line_feed_char_value = llvm::ConstantInt::get(
       llvm::Type::getInt8Ty(*llvm_context), kLineFeedChar);
 
@@ -1153,7 +1160,9 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
     case BaseTypeEnum::CHARACTER:
       return GetOrCreateString("%c");
     case BaseTypeEnum::INTEGER:
-      return GetOrCreateString("%lld");
+      return GetOrCreateString("%ld");
+    case BaseTypeEnum::RATIONAL:
+      return GetOrCreateString("%ld/%ld");
     case BaseTypeEnum::STRING:
       return GetOrCreateString("%s");
 
