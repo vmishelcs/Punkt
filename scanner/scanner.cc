@@ -4,6 +4,7 @@
 #include <logging/punkt_logger.h>
 #include <token/all_tokens.h>
 
+#include <cerrno>
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -99,6 +100,7 @@ std::unique_ptr<Token> Scanner::ScanKeywordOrIdentifier(
 }
 
 std::unique_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
+  // Append any subsequent digits to the buffer.
   std::string buffer;
   buffer.push_back(first_char.character);
   LocatedChar ch = input_stream->Peek();
@@ -108,8 +110,86 @@ std::unique_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
     ch = input_stream->Peek();
   }
 
-  char *buffer_end{};
-  int64_t value = strtoll(buffer.c_str(), &buffer_end, 10);
+  LocatedChar next = input_stream->Next();
+  LocatedChar second_next = input_stream->Peek();
+  input_stream->PutBack(next);
+
+  // Check if we are scanning a floating point number.
+  if (next.character == '.' && second_next.IsDigit()) {
+    // Scan the decimal part of the floating point number.
+    next = input_stream->Next();
+    buffer.push_back(next.character);
+    next = input_stream->Peek();
+    while (next.IsDigit()) {
+      next = input_stream->Next();
+      buffer.push_back(next.character);
+      next = input_stream->Peek();
+    }
+
+    next = input_stream->Next();
+    second_next = input_stream->Peek();
+
+    // Check for scientific notation.
+    if (next.character == 'e' || next.character == 'E') {
+      // Next character following 'E' must be either a digit or a numeric sign.
+      if (second_next.character != '+' && second_next.character != '-' &&
+          !second_next.IsDigit()) {
+        UnexpectedCharacterError(second_next.location, second_next.character);
+        return GetNextToken();
+      }
+
+      // Append 'E' to the buffer.
+      buffer.push_back(next.character);
+
+      // Check for numeric sign.
+      if (second_next.character == '+' || second_next.character == '-') {
+        // Make sure there are digits after the numeric sign.
+        next = input_stream->Next();
+        second_next = input_stream->Peek();
+        if (!second_next.IsDigit()) {
+          UnexpectedCharacterError(second_next.location, second_next.character);
+          return GetNextToken();
+        }
+
+        // Append the numeric sign.
+        buffer.push_back(next.character);
+      }
+
+      // Append any subsequent digits.
+      next = input_stream->Peek();
+      while (next.IsDigit()) {
+        next = input_stream->Next();
+        buffer.push_back(next.character);
+        next = input_stream->Peek();
+      }
+    } else {
+      // If we did not find 'e' or 'E', put whatever character was in `next`
+      // back into the input stream.
+      input_stream->PutBack(next);
+    }
+
+    double value = strtod(buffer.c_str(), nullptr);
+    // Check for underflow/overflow.
+    if (errno == ERANGE) {
+      PunktLogger::LogCompileError(first_char.location,
+                                   "floating point literal cannot be "
+                                   "represented as a double-precision float");
+      errno = 0;  // Reset `errno`.
+      return GetNextToken();
+    }
+    return std::make_unique<FloatLiteralToken>(buffer, first_char.location,
+                                               value);
+  }
+
+  int64_t value = strtoll(buffer.c_str(), nullptr, 10);
+  // Check for overflow.
+  if (errno == ERANGE) {
+    PunktLogger::LogCompileError(
+        first_char.location,
+        "integer literal is too large to be represented as a 64-bit integer");
+    errno = 0;  // Reset `errno`.
+    return GetNextToken();
+  }
   return std::make_unique<IntegerLiteralToken>(buffer, first_char.location,
                                                value);
 }
