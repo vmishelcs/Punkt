@@ -1,0 +1,33 @@
+main {
+  var x1 = 1.0.
+  var x2 = +1.0.
+  var x3 = -1.0.
+  var x4 = .1.
+  var x5 = +.1.
+  var x6 = -.1.
+  var x7 = 1.0E1.
+  var x8 = 1.0e1.
+  var x9 = 1.0E+1.
+  var x10 = 1.0E-1.
+  var x11 = 1.0e+1.
+  var x12 = 1.0e-1.
+  var x13 = 1.0e0.
+  var x14 = 1.0e+0.
+  var x15 = 1.0e-0.
+
+  println x1.
+  println x2.
+  println x3.
+  println x4.
+  println x5.
+  println x6.
+  println x7.
+  println x8.
+  println x9.
+  println x10.
+  println x11.
+  println x12.
+  println x13.
+  println x14.
+  println x15.
+}

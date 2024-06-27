@@ -21,7 +21,7 @@ struct LocatedChar {
 
   bool IsWhitespace() const { return isspace(character); }
   bool IsCommentStart() const { return character == '#'; }
-  bool IsIdentifierStart() const {
+  bool IsKeywordOrIdentifierStart() const {
     return isalpha(character) || (character == '_');
   }
   bool IsIdentifierChar() const {
