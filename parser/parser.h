@@ -151,6 +151,9 @@ class Parser {
   bool StartsIntegerLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseIntegerLiteral();
 
+  bool StartsFloatLiteral(Token &token);
+  std::unique_ptr<ParseNode> ParseFloatLiteral();
+
   bool StartsStringLiteral(Token &token);
   std::unique_ptr<ParseNode> ParseStringLiteral();
 

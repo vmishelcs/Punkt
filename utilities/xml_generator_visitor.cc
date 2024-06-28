@@ -429,6 +429,15 @@ void XMLGeneratorVisitor::Visit(IntegerLiteralNode &node) {
 
   OutputTag(*tag);
 }
+void XMLGeneratorVisitor::Visit(FloatLiteralNode &node) {
+  std::unique_ptr<XMLTag> tag =
+      XMLTag::CreateSelfClosingTag("FloatLiteralNode");
+
+  AddBasicParseNodeAttributes(*tag, node);
+  tag->AddAttribute("value", std::to_string(node.GetValue()));
+
+  OutputTag(*tag);
+}
 void XMLGeneratorVisitor::Visit(StringLiteralNode &node) {
   std::unique_ptr<XMLTag> tag =
       XMLTag::CreateSelfClosingTag("StringLiteralNode");

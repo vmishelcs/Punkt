@@ -108,6 +108,7 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
   virtual void Visit(BooleanLiteralNode &node) override;
   virtual void Visit(CharacterLiteralNode &node) override;
   virtual void Visit(IntegerLiteralNode &node) override;
+  virtual void Visit(FloatLiteralNode &node) override;
   virtual void Visit(StringLiteralNode &node) override;
   virtual void Visit(BaseTypeNode &node) override;
 

@@ -34,6 +34,7 @@ class ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(BooleanLiteralNode &node) = 0;
   virtual llvm::Value *GenerateCode(CharacterLiteralNode &node) = 0;
   virtual llvm::Value *GenerateCode(IntegerLiteralNode &node) = 0;
+  virtual llvm::Value *GenerateCode(FloatLiteralNode &node) = 0;
   virtual llvm::Value *GenerateCode(StringLiteralNode &node) = 0;
   virtual llvm::Value *GenerateCode(BaseTypeNode &node) = 0;
 };

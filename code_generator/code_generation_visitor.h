@@ -51,6 +51,7 @@ class CodeGenerationVisitor : public ParseNodeIRVisitor {
   virtual llvm::Value *GenerateCode(BooleanLiteralNode &) override;
   virtual llvm::Value *GenerateCode(CharacterLiteralNode &) override;
   virtual llvm::Value *GenerateCode(IntegerLiteralNode &) override;
+  virtual llvm::Value *GenerateCode(FloatLiteralNode &) override;
   virtual llvm::Value *GenerateCode(StringLiteralNode &) override;
 
   //===- Arrays -----------------------------------------------------------===//

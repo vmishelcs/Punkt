@@ -11,6 +11,7 @@
 #include "declaration_statement_node.h"
 #include "error_node.h"
 #include "expression_statement_node.h"
+#include "float_literal_node.h"
 #include "for_statement_node.h"
 #include "function_definition_node.h"
 #include "identifier_node.h"

@@ -747,6 +747,12 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IntegerLiteralNode &node) {
                                       node.GetValue());
 }
 
+llvm::Value *CodeGenerationVisitor::GenerateCode(FloatLiteralNode &node) {
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
+
+  return llvm::ConstantFP::get(*llvm_context, llvm::APFloat(node.GetValue()));
+}
+
 llvm::Value *CodeGenerationVisitor::GenerateCode(StringLiteralNode &node) {
   return GetOrCreateString(node.GetValue());
 }

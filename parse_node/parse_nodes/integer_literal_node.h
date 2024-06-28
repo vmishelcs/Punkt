@@ -3,7 +3,7 @@
 
 #include <llvm/IR/Value.h>
 #include <parse_node/parse_node.h>
-#include <token/token.h>
+#include <token/integer_literal_token.h>
 
 #include <cstdint>
 #include <memory>
@@ -11,7 +11,12 @@
 
 class IntegerLiteralNode : public ParseNode {
  public:
-  IntegerLiteralNode(std::unique_ptr<Token> token);
+  IntegerLiteralNode(std::unique_ptr<Token> token)
+      : ParseNode(ParseNodeType::INTEGER_LITERAL_NODE, std::move(token)) {
+    auto int_literal_token =
+        static_cast<IntegerLiteralToken *>(this->token.get());
+    this->value = int_literal_token->GetValue();
+  }
 
   virtual std::unique_ptr<ParseNode> CreateCopy() const override;
 
