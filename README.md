@@ -11,7 +11,7 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 | *booleanLiteral* | `true` `false` |
 | *characterLiteral* | `'` *ASCII character* `'` | 
 | *integerLiteral* | [ 0-9 ]<sup>+</sup> |
-| *floatLiteral* | [ 0-9 ]<sup>*</sup> `.` [ 0-9 ] ((`e` \| `E` ) (`+` \| `-`)<sup>?</sup> [ 0-9 ]<sup>+</sup>)<sup>?</sup> |
+| *floatLiteral* | [ 0-9 ]<sup>*</sup> `.` [ 0-9 ]<sup>+</sup> ((`e` \| `E` ) (`+` \| `-`)<sup>?</sup> [ 0-9 ]<sup>+</sup>)<sup>?</sup> |
 | *stringLiteral* | `"`[ ^ `"` `\n` ]<sup>*</sup>`"` |
 | Arithmetic operators | `+` `-` `*` `/` |
 | Other operators | `=` `%` `//` `!` `&&` `\|\|` `sizeof` `alloc` `[]`|
