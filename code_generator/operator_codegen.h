@@ -43,6 +43,19 @@ llvm::Value *IntegerCmpLTCodegen(CodeGenerationVisitor &, OperatorNode &);
 llvm::Value *IntegerCmpGEQCodegen(CodeGenerationVisitor &, OperatorNode &);
 llvm::Value *IntegerCmpLEQCodegen(CodeGenerationVisitor &, OperatorNode &);
 
+//===- Floating point -----------------------------------------------------===//
+llvm::Value *FloatNegationCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatAddCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatSubtractCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatMultiplyCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatDivideCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatCmpEQCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatCmpNEQCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatCmpGTCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatCmpLTCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatCmpGEQCodegen(CodeGenerationVisitor &, OperatorNode &);
+llvm::Value *FloatCmpLEQCodegen(CodeGenerationVisitor &, OperatorNode &);
+
 //===- Rationals ----------------------------------------------------------===//
 llvm::Value *OverOperatorCodegen(CodeGenerationVisitor &, OperatorNode &);
 llvm::Value *RationalNopCodegen(CodeGenerationVisitor &, OperatorNode &);

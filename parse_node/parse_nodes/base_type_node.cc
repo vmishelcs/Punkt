@@ -33,6 +33,8 @@ std::unique_ptr<Type> BaseTypeNode::InferOwnType() const {
       return BaseType::CreateCharacterType();
     case Keyword::INT:
       return BaseType::CreateIntegerType();
+    case Keyword::FLOAT:
+      return BaseType::CreateFloatType();
     case Keyword::RAT:
       return BaseType::CreateRationalType();
     case Keyword::STRING:

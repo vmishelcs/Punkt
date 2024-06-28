@@ -12,6 +12,7 @@ enum class Keyword {
   DEALLOC,
   ELSE,
   FALSE,
+  FLOAT,
   FOR,
   FUNCTION,
   IF,

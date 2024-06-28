@@ -1,0 +1,4 @@
+main {
+  const A = alloc [float] (5).
+  println A.
+}

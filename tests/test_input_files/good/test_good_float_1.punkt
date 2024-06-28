@@ -1,33 +1,46 @@
 main {
   var x1 = 1.0.
-  var x2 = +2.0.
-  var x3 = -3.0.
-  var x4 = .4.
-  var x5 = +.5.
-  var x6 = -.6.
-  var x7 = 7.0E1.
-  var x8 = 8.0e1.
-  var x9 = 9.0E+1.
-  var x10 = 11.0E-1.
-  var x11 = 12.0e+1.
-  var x12 = 13.0e-1.
-  var x13 = 14.0e0.
-  var x14 = 15.0e+0.
-  var x15 = 16.0e-0.
-
   println x1.
+
+  var x2 = +2.0.
   println x2.
+
+  var x3 = -3.0.
   println x3.
+
+  var x4 = .4.
   println x4.
+
+  var x5 = +.5.
   println x5.
+
+  var x6 = -.6.
   println x6.
+
+  var x7 = 7.0E1.
   println x7.
+
+  var x8 = 8.0e1.
   println x8.
+
+  var x9 = 9.0E+1.
   println x9.
-  println x10.
+
+  var x10 = 11.0E-1.
+  println x10. 
+
+  var x11 = 12.0e+1.
   println x11.
+
+  var x12 = 13.0e-1.
   println x12.
+
+  var x13 = 14.0e0.
   println x13.
+
+  var x14 = 15.0e+0.
   println x14.
+
+  var x15 = 16.0e-0.
   println x15.
 }

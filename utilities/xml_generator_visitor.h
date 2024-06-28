@@ -38,8 +38,7 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
  public:
   XMLGeneratorVisitor(std::ostream &output_stream);
 
-  // ---- Non-leaf nodes
-  // -------------------------------------------------------------------
+  // ---- Non-leaf nodes -------------------------------------------------------
   virtual void VisitEnter(AllocExpressionNode &node) override;
   virtual void VisitLeave(AllocExpressionNode &node) override;
 
@@ -100,8 +99,7 @@ class XMLGeneratorVisitor : public ParseNodeVisitor {
   virtual void VisitEnter(WhileStatementNode &node) override;
   virtual void VisitLeave(WhileStatementNode &node) override;
 
-  // ---- Leaf nodes
-  // -----------------------------------------------------------------------
+  // ---- Leaf nodes -----------------------------------------------------------
   virtual void Visit(ErrorNode &node) override;
   virtual void Visit(NopNode &node) override;
   virtual void Visit(IdentifierNode &node) override;

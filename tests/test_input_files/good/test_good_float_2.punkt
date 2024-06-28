@@ -1,0 +1,32 @@
+main {
+  println "Simple FP ops with".
+  println "pi = 3.1415, e = 2.7183 \n".
+
+  const pi = 3.1415.
+  const e = 2.7183.
+
+  println "+pi = ", +pi.
+  println "+e = ", +e.
+
+  println "-pi = ", -pi.
+  println "-e = ", -e.
+
+  println "pi + e = ", pi + e.
+  println "pi - e = ", pi - e.
+
+  println "pi * e = ", pi * e.
+  println "pi / e = ", pi / e.
+
+  println "pi == pi = ", pi == pi.
+  println "pi == e = ", pi == e.
+  println "pi != pi = ", pi != pi.
+  println "pi != e = ", pi != e.
+
+  println "pi > e = ", pi > e.
+  println "pi < e = ", pi < e.
+
+  println "pi >= pi = ", pi >= pi.
+  println "pi >= e = ", pi >= e.
+  println "e <= e = ", e <= e.
+  println "pi <= e = ", pi <= e.
+}

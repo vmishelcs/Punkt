@@ -1,0 +1,7 @@
+main {
+  const FMul = <float x, float y> -> float { return x * y. }.
+  const FDiv = <float x, float y> -> float { return x / y. }.
+
+  println FMul(0.5, 0.5).
+  println FDiv(1.0, 3.0).
+}

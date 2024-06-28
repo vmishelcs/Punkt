@@ -13,6 +13,7 @@ enum class BaseTypeEnum {
   BOOLEAN,
   CHARACTER,
   INTEGER,
+  FLOAT,
   RATIONAL,
   STRING,
   ERROR,
@@ -46,6 +47,11 @@ class BaseType : public Type {
   /// that represents an integer type.
   /// @return `unique_ptr<BaseType>` representing integer type.
   static std::unique_ptr<BaseType> CreateIntegerType();
+
+  /// @brief Create a `unique_ptr<BaseType>` pointing to a `BaseType` object
+  /// that represents a float type.
+  /// @return `unique_ptr<BaseType>` representing float type.
+  static std::unique_ptr<BaseType> CreateFloatType();
 
   /// @brief Create a `unique_ptr<BaseType>` pointing to a `BaseType` object
   /// that represents an rational type.

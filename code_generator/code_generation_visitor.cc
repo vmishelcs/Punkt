@@ -718,7 +718,7 @@ llvm::Value *CodeGenerationVisitor::GenerateCode(IdentifierNode &node) {
     return alloca_inst;
   }
 
-  // Return identifier value otherwise.
+  // Return variable value otherwise.
   return builder->CreateLoad(alloca_inst->getAllocatedType(), alloca_inst,
                              node.GetName());
 }
@@ -1167,6 +1167,8 @@ llvm::Value *CodeGenerationVisitor::GetPrintfFormatStringForBaseType(
       return GetOrCreateString("%c");
     case BaseTypeEnum::INTEGER:
       return GetOrCreateString("%ld");
+    case BaseTypeEnum::FLOAT:
+      return GetOrCreateString("%g");
     case BaseTypeEnum::RATIONAL:
       return GetOrCreateString("%ld/%ld");
     case BaseTypeEnum::STRING:

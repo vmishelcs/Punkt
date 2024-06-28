@@ -29,6 +29,9 @@ static const std::unique_ptr<BaseType> kBaseTypeCharacter =
 // Integer type.
 static const std::unique_ptr<BaseType> kBaseTypeInteger =
     BaseType::CreateIntegerType();
+// Floating point type.
+static const std::unique_ptr<BaseType> kBaseTypeFloat =
+    BaseType::CreateFloatType();
 // Rational type.
 static const std::unique_ptr<BaseType> kBaseTypeRational =
     BaseType::CreateRationalType();
@@ -47,6 +50,10 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
                 operator_codegen::UnaryNop),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(), operator_codegen::IntegerAddCodegen),
+      Signature({kBaseTypeFloat.get()}, kBaseTypeFloat.get(),
+                operator_codegen::UnaryNop),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeFloat.get(), operator_codegen::FloatAddCodegen),
       Signature({kBaseTypeRational.get()}, kBaseTypeRational.get(),
                 operator_codegen::RationalNopCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
@@ -59,6 +66,10 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
                 operator_codegen::IntegerSubtractCodegen),
+      Signature({kBaseTypeFloat.get()}, kBaseTypeFloat.get(),
+                operator_codegen::FloatNegationCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeFloat.get(), operator_codegen::FloatSubtractCodegen),
       Signature({kBaseTypeRational.get()}, kBaseTypeRational.get(),
                 operator_codegen::RationalNegationCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
@@ -69,6 +80,8 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(),
                 operator_codegen::IntegerMultiplyCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeFloat.get(), operator_codegen::FloatMultiplyCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
                 kBaseTypeRational.get(),
                 operator_codegen::RationalMultiplyCodegen)}},
@@ -76,6 +89,8 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
     {Operator::DIV,
      {Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeInteger.get(), operator_codegen::IntegerDivideCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeFloat.get(), operator_codegen::FloatDivideCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
                 kBaseTypeRational.get(),
                 operator_codegen::RationalDivideCodegen)}},
@@ -98,6 +113,8 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
                 operator_codegen::CharacterCmpEQCodegen),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeBoolean.get(), operator_codegen::IntegerCmpEQCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeBoolean.get(), operator_codegen::FloatCmpEQCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
                 kBaseTypeBoolean.get(),
                 operator_codegen::RationalCmpEQCodegen)}},
@@ -110,6 +127,8 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
                 operator_codegen::CharacterCmpNEQCodegen),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeBoolean.get(), operator_codegen::IntegerCmpNEQCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeBoolean.get(), operator_codegen::FloatCmpNEQCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
                 kBaseTypeBoolean.get(),
                 operator_codegen::RationalCmpNEQCodegen)}},
@@ -120,6 +139,8 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
                 operator_codegen::CharacterCmpGTCodegen),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeBoolean.get(), operator_codegen::IntegerCmpGTCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeBoolean.get(), operator_codegen::FloatCmpGTCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
                 kBaseTypeBoolean.get(),
                 operator_codegen::RationalCmpGTCodegen)}},
@@ -130,6 +151,8 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
                 operator_codegen::CharacterCmpLTCodegen),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeBoolean.get(), operator_codegen::IntegerCmpLTCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeBoolean.get(), operator_codegen::FloatCmpLTCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
                 kBaseTypeBoolean.get(),
                 operator_codegen::RationalCmpLTCodegen)}},
@@ -140,6 +163,8 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
                 operator_codegen::CharacterCmpGEQCodegen),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeBoolean.get(), operator_codegen::IntegerCmpGEQCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeBoolean.get(), operator_codegen::FloatCmpGEQCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
                 kBaseTypeBoolean.get(),
                 operator_codegen::RationalCmpGEQCodegen)}},
@@ -150,6 +175,8 @@ static std::map<Operator, std::vector<Signature> > signature_map = {
                 operator_codegen::CharacterCmpLEQCodegen),
       Signature({kBaseTypeInteger.get(), kBaseTypeInteger.get()},
                 kBaseTypeBoolean.get(), operator_codegen::IntegerCmpLEQCodegen),
+      Signature({kBaseTypeFloat.get(), kBaseTypeFloat.get()},
+                kBaseTypeBoolean.get(), operator_codegen::FloatCmpLEQCodegen),
       Signature({kBaseTypeRational.get(), kBaseTypeRational.get()},
                 kBaseTypeBoolean.get(),
                 operator_codegen::RationalCmpLEQCodegen)}},

@@ -65,9 +65,9 @@ XMLGeneratorVisitor::XMLGeneratorVisitor(std::ostream &output_stream)
   this->depth = 0;
 }
 
-/******************************************************************************
- *                               Non-leaf nodes                               *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Non-leaf nodes
+//===----------------------------------------------------------------------===//
 void XMLGeneratorVisitor::VisitEnter(AllocExpressionNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateStartTag("AllocExpressionNode");
 
@@ -377,9 +377,9 @@ void XMLGeneratorVisitor::VisitLeave(WhileStatementNode &node) {
   OutputTag(*tag);
 }
 
-/******************************************************************************
- *                                 Leaf nodes                                 *
- ******************************************************************************/
+//===----------------------------------------------------------------------===//
+// Leaf nodes
+//===----------------------------------------------------------------------===//
 void XMLGeneratorVisitor::Visit(ErrorNode &node) {
   std::unique_ptr<XMLTag> tag = XMLTag::CreateSelfClosingTag("ErrorNode");
 
