@@ -6,13 +6,12 @@ Punkt (pronounced p&upsilon;&eta;kt) means dot, point or period in German.
 
 |Token type|REGEX|
 |----------|-----|
-| *keyword* | `alloc` `bool` `char` `const` `dealloc` `else` `false` `for` `function` `if` `int` `main` `print` `println` `rat` `return` `sizeof` `string` `true` `var` `void` `while` |
-| *identifier* |[ _ a-z A-Z ] [ _ a-z A-Z 0-9 ]<sup>*</sup> |
-| *keyword* | `alloc` `bool` `char` `const` `dealloc` `else` `false` `for` `function` `if` `int` `main` `print` `println` `rat` `return` `sizeof` `string` `true` `var` `void` `while` |
+| *keyword* | `alloc` `bool` `char` `const` `dealloc` `else` `false` `float` `for` `function` `if` `int` `main` `print` `println` `rat` `return` `sizeof` `string` `true` `var` `void` `while` |
 | *identifier* |[ _ a-z A-Z ] [ _ a-z A-Z 0-9 ]<sup>*</sup> |
 | *booleanLiteral* | `true` `false` |
 | *characterLiteral* | `'` *ASCII character* `'` | 
 | *integerLiteral* | [ 0-9 ]<sup>+</sup> |
+| *floatLiteral* | [ 0-9 ]<sup>*</sup> `.` [ 0-9 ] ((`e` \| `E` ) (`+` \| `-`)<sup>?</sup> [ 0-9 ]<sup>+</sup>)<sup>?</sup> |
 | *stringLiteral* | `"`[ ^ `"` `\n` ]<sup>*</sup>`"` |
 | Arithmetic operators | `+` `-` `*` `/` |
 | Other operators | `=` `%` `//` `!` `&&` `\|\|` `sizeof` `alloc` `[]`|
@@ -69,6 +68,7 @@ BaseType \rightarrow & \enspace \texttt{void} \\
 | & \enspace \texttt{bool} \\
 | & \enspace \texttt{char} \\
 | & \enspace \texttt{int} \\
+| & \enspace \texttt{float} \\
 | & \enspace \texttt{rat} \\
 | & \enspace \texttt{string} \\[16pt]
 
