@@ -258,13 +258,14 @@ llvm::Value *operator_codegen::CharacterCmpLEQCodegen(CodeGenerationVisitor &cv,
 llvm::Value *operator_codegen::IntegerNegationCodegen(CodeGenerationVisitor &cv,
                                                       OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *operand = node.GetChild(0)->GenerateCode(cv);
 
   return builder->CreateSub(
-      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0), operand);
+      llvm::ConstantInt::get(llvm::Type::getInt64Ty(*llvm_context), 0),
+      operand);
 }
 
 llvm::Value *operator_codegen::IntegerAddCodegen(CodeGenerationVisitor &cv,
@@ -358,66 +359,66 @@ llvm::Value *operator_codegen::IntegerCmpEQCodegen(CodeGenerationVisitor &cv,
 llvm::Value *operator_codegen::IntegerCmpNEQCodegen(CodeGenerationVisitor &cv,
                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpNE(lhs, rhs);
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context));
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::IntegerCmpGTCodegen(CodeGenerationVisitor &cv,
                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpSGT(lhs, rhs);
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context));
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::IntegerCmpLTCodegen(CodeGenerationVisitor &cv,
                                                    OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpSLT(lhs, rhs);
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context));
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::IntegerCmpGEQCodegen(CodeGenerationVisitor &cv,
                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpSGE(lhs, rhs);
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context));
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 llvm::Value *operator_codegen::IntegerCmpLEQCodegen(CodeGenerationVisitor &cv,
                                                     OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   llvm::Value *lhs = node.GetChild(0)->GenerateCode(cv);
   llvm::Value *rhs = node.GetChild(1)->GenerateCode(cv);
 
   auto i1_result = builder->CreateICmpSLE(lhs, rhs);
-  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*context));
+  return builder->CreateZExt(i1_result, llvm::Type::getInt8Ty(*llvm_context));
 }
 
 //===----------------------------------------------------------------------===//
@@ -1137,13 +1138,13 @@ llvm::Value *operator_codegen::ArrayIndexingCodegen(CodeGenerationVisitor &cv,
 llvm::Value *operator_codegen::ArraySizeofCodegen(CodeGenerationVisitor &cv,
                                                   OperatorNode &node) {
   CodegenContext *codegen_context = CodegenContext::Get();
-  llvm::LLVMContext *context = codegen_context->GetLLVMContext();
+  llvm::LLVMContext *llvm_context = codegen_context->GetLLVMContext();
   llvm::IRBuilder<> *builder = codegen_context->GetIRBuilder();
 
   // Size of array is the first field of the PunktArray struct.
   llvm::Value *PunktArray_ptr = node.GetChild(0)->GenerateCode(cv);
-  return builder->CreateLoad(llvm::Type::getInt64Ty(*context), PunktArray_ptr,
-                             "PunktArray_size");
+  return builder->CreateLoad(llvm::Type::getInt64Ty(*llvm_context),
+                             PunktArray_ptr, "PunktArray_size");
 }
 
 //===----------------------------------------------------------------------===//
