@@ -1,0 +1,19 @@
+function f <bool a1,
+            char a2,
+            int a3,
+            float a4,
+            rat a5,
+            string a6,
+            <int, int> -> int g> -> void {
+  println a1.
+  println a2.
+  println a3.
+  println a4.
+  println a5.
+  println a6.
+  println g.
+}
+
+main {
+  f(true, 'x', 5, 3.14, 125 // 25, "Hello World!", <int x, int y> -> int { return x + y. }).
+}

@@ -1,0 +1,18 @@
+function simple_sqrt < float x > -> float {
+  const error = 0.001.
+
+  var approx = x.
+
+  while ((approx - x / approx) > error) {
+    approx = (approx + x / approx) / 2.0.
+  }
+
+  return approx.
+}
+
+main {
+  println simple_sqrt(2.0).
+  println simple_sqrt(3.0).
+  println simple_sqrt(4.0).
+  println simple_sqrt(169.0).
+}
