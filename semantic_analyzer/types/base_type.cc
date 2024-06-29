@@ -115,9 +115,6 @@ llvm::Type *BaseType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
   }
 }
 
-BaseType::BaseType(BaseTypeEnum base_type_enum)
-    : Type(TypeEnum::BASE_TYPE), base_type_enum(base_type_enum) {}
-
 std::string BaseType::GetEnumString(BaseTypeEnum base_type_enum) {
   switch (base_type_enum) {
     case BaseTypeEnum::VOID:
