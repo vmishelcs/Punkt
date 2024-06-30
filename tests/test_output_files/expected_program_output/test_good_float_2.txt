@@ -1,0 +1,21 @@
+Simple FP ops with
+pi = 3.1415, e = 2.7183 
+
++pi = 3.1415
++e = 2.7183
+-pi = -3.1415
+-e = -2.7183
+pi + e = 5.8598
+pi - e = 0.4232
+pi * e = 8.53954
+pi / e = 1.15569
+pi == pi = 1
+pi == e = 0
+pi != pi = 0
+pi != e = 1
+pi > e = 1
+pi < e = 0
+pi >= pi = 1
+pi >= e = 1
+e <= e = 1
+pi <= e = 0

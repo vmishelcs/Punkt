@@ -4,6 +4,7 @@
 #include <logging/punkt_logger.h>
 #include <token/all_tokens.h>
 
+#include <cerrno>
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -34,9 +35,10 @@ bool Scanner::HasNext() const {
 std::unique_ptr<Token> Scanner::GetNextToken() {
   LocatedChar ch = this->input_stream->NextNonwhitespaceChar();
 
-  if (ch.IsIdentifierStart()) {
+  if (ch.IsKeywordOrIdentifierStart()) {
     return ScanKeywordOrIdentifier(ch);
-  } else if (ch.IsNumberStart()) {
+  } else if ((ch.IsNumberStart()) ||
+             (ch.character == '.' && input_stream->Peek().IsNumberStart())) {
     return ScanNumber(ch);
   } else if (ch.IsOperatorOrPunctuatorStart()) {
     return ScanOperatorOrPunctuator(ch);
@@ -100,16 +102,114 @@ std::unique_ptr<Token> Scanner::ScanKeywordOrIdentifier(
 
 std::unique_ptr<Token> Scanner::ScanNumber(LocatedChar first_char) {
   std::string buffer;
-  buffer.push_back(first_char.character);
-  LocatedChar ch = input_stream->Peek();
-  while (ch.IsDigit()) {
-    ch = input_stream->Next();
-    buffer.push_back(ch.character);
-    ch = input_stream->Peek();
+  LocatedChar next = first_char;
+
+  if (first_char.IsDigit()) {
+    buffer.push_back(first_char.character);
+
+    // Append any subsequent digits to the buffer. At this point, we are
+    // scanning a whole number (i.e. integer).
+    LocatedChar ch = input_stream->Peek();
+    while (ch.IsDigit()) {
+      ch = input_stream->Next();
+      buffer.push_back(ch.character);
+      ch = input_stream->Peek();
+    }
+
+    // Get the next character after we have finished scanning the sequence of
+    // digits.
+    next = input_stream->Next();
   }
 
-  char *buffer_end{};
-  int64_t value = strtoll(buffer.c_str(), &buffer_end, 10);
+  LocatedChar second_next = input_stream->Peek();
+
+  if (next.character == '.' && second_next.IsDigit()) {
+    // If the next characters are a period followed by digits, then we must be
+    // scanning a floating point number.
+    // The fractional part of a floating point number is represented by the
+    // following regular expression:
+    // [0-9]+ ([e|E] [-|+]?)? [0-9]+
+
+    // Append the decimal point to the input buffer.
+    buffer.push_back(next.character);
+
+    // Scan digits after the decimal point.
+    next = input_stream->Peek();
+    while (next.IsDigit()) {
+      next = input_stream->Next();
+      buffer.push_back(next.character);
+      next = input_stream->Peek();
+    }
+
+    next = input_stream->Next();
+    second_next = input_stream->Peek();
+
+    // Check for scientific notation.
+    if (next.character == 'e' || next.character == 'E') {
+      // Next character following 'E' must be either a digit or a numeric sign.
+      if (second_next.character != '+' && second_next.character != '-' &&
+          !second_next.IsDigit()) {
+        UnexpectedCharacterError(second_next.location, second_next.character);
+        return GetNextToken();
+      }
+
+      // Append 'E' to the buffer.
+      buffer.push_back(next.character);
+
+      // Check for numeric sign.
+      if (second_next.character == '+' || second_next.character == '-') {
+        // Make sure there are digits after the numeric sign.
+        next = input_stream->Next();
+        second_next = input_stream->Peek();
+        if (!second_next.IsDigit()) {
+          UnexpectedCharacterError(second_next.location, second_next.character);
+          return GetNextToken();
+        }
+
+        // Append the numeric sign.
+        buffer.push_back(next.character);
+      }
+
+      // Append any subsequent digits.
+      next = input_stream->Peek();
+      while (next.IsDigit()) {
+        next = input_stream->Next();
+        buffer.push_back(next.character);
+        next = input_stream->Peek();
+      }
+    } else {
+      // If we did not find 'e' or 'E', put whatever character was in `next`
+      // back into the input stream.
+      input_stream->PutBack(next);
+    }
+
+    // Create a floating point literal token.
+    double value = strtod(buffer.c_str(), nullptr);
+    // Check for underflow/overflow.
+    if (errno == ERANGE) {
+      PunktLogger::LogCompileError(first_char.location,
+                                   "floating point literal cannot be "
+                                   "represented as a double-precision float");
+      errno = 0;  // Reset `errno`.
+      return GetNextToken();
+    }
+    return std::make_unique<FloatLiteralToken>(buffer, first_char.location,
+                                               value);
+  } else {
+    // Otherwise, the period is the terminator punctuator. Put it back into the
+    // input stream and let the punctuator scanning logic handle it.
+    input_stream->PutBack(next);
+  }
+
+  int64_t value = strtoll(buffer.c_str(), nullptr, 10);
+  // Check for overflow.
+  if (errno == ERANGE) {
+    PunktLogger::LogCompileError(
+        first_char.location,
+        "integer literal is too large to be represented as a 64-bit integer");
+    errno = 0;  // Reset `errno`.
+    return GetNextToken();
+  }
   return std::make_unique<IntegerLiteralToken>(buffer, first_char.location,
                                                value);
 }
@@ -252,7 +352,7 @@ std::unique_ptr<Token> Scanner::ScanCharacter(LocatedChar first_char) {
 
 std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char) {
   std::string buffer;
-  ReadStringLiteral(buffer);
+  ScanStringLiteral(buffer);
 
   LocatedChar next_char = input_stream->Peek();
   if (next_char.character != '\"') {
@@ -266,7 +366,7 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char) {
   // Strings can span multiple lines, so continue reading if we can
   next_char = input_stream->NextNonwhitespaceChar();
   while (next_char.character == '\"') {
-    ReadStringLiteral(buffer);
+    ScanStringLiteral(buffer);
     next_char = input_stream->Peek();
     if (next_char.character != '\"') {
       ExpectedDifferentCharacterError(next_char.location, next_char.character);
@@ -284,7 +384,7 @@ std::unique_ptr<Token> Scanner::ScanString(LocatedChar first_char) {
                                               buffer);
 }
 
-void Scanner::ReadStringLiteral(std::string &buffer) {
+void Scanner::ScanStringLiteral(std::string &buffer) {
   // Take a peek at the next character after double-quotes (")
   LocatedChar ch = input_stream->Peek();
 

@@ -1,13 +1,6 @@
-function f <rat r> -> void {
-	println r.
-}
-
-function g <[rat] A> -> void {
-	println A.
-}
-
 main {
-	f(1 // 2).
+  var x1 = 1.0.
+  println x1.
 
-	g([1]).
+	
 }

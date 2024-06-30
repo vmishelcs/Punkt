@@ -1,0 +1,4 @@
+main {
+  const A = [3.1415, 2.7183].
+  println A.
+}

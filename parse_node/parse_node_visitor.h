@@ -75,6 +75,7 @@ class ParseNodeVisitor {
   virtual void Visit(BooleanLiteralNode &node) = 0;
   virtual void Visit(CharacterLiteralNode &node) = 0;
   virtual void Visit(IntegerLiteralNode &node) = 0;
+  virtual void Visit(FloatLiteralNode &node) = 0;
   virtual void Visit(StringLiteralNode &node) = 0;
   virtual void Visit(BaseTypeNode &node) = 0;
 };
@@ -206,6 +207,7 @@ class DefaultParseNodeVisitor : public ParseNodeVisitor {
     DefaultVisit(node);
   }
   virtual void Visit(IntegerLiteralNode &node) override { DefaultVisit(node); }
+  virtual void Visit(FloatLiteralNode &node) override { DefaultVisit(node); }
   virtual void Visit(StringLiteralNode &node) override { DefaultVisit(node); }
   virtual void Visit(BaseTypeNode &node) override { DefaultVisit(node); }
 

@@ -823,7 +823,8 @@ bool Parser::StartsAtomicExpression(Token &token) {
   return StartsParenthesizedExpression(token) ||
          StartsIdentifierAtomic(token) || StartsBooleanLiteral(token) ||
          StartsCharacterLiteral(token) || StartsIntegerLiteral(token) ||
-         StartsStringLiteral(token) || StartsAllocExpression(token) ||
+         StartsFloatLiteral(token) || StartsStringLiteral(token) ||
+         StartsAllocExpression(token) ||
          StartsPopulatedArrayExpression(token) || StartsLambda(token);
 }
 std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
@@ -841,6 +842,9 @@ std::unique_ptr<ParseNode> Parser::ParseAtomicExpression() {
   }
   if (StartsIntegerLiteral(*now_reading)) {
     return ParseIntegerLiteral();
+  }
+  if (StartsFloatLiteral(*now_reading)) {
+    return ParseFloatLiteral();
   }
   if (StartsStringLiteral(*now_reading)) {
     return ParseStringLiteral();
@@ -1032,6 +1036,20 @@ std::unique_ptr<ParseNode> Parser::ParseIntegerLiteral() {
   return integer_literal;
 }
 
+bool Parser::StartsFloatLiteral(Token &token) {
+  return token.GetTokenType() == TokenType::FLOAT_LITERAL;
+}
+std::unique_ptr<ParseNode> Parser::ParseFloatLiteral() {
+  if (!StartsFloatLiteral(*now_reading)) {
+    return SyntaxErrorUnexpectedToken("float literal");
+  }
+
+  auto float_literal =
+      std::make_unique<FloatLiteralNode>(std::move(now_reading));
+  ReadToken();
+  return float_literal;
+}
+
 bool Parser::StartsStringLiteral(Token &token) {
   return token.GetTokenType() == TokenType::STRING_LITERAL;
 }
@@ -1162,7 +1180,7 @@ std::unique_ptr<ParseNode> Parser::ParseType() {
 bool Parser::StartsBaseType(Token &token) {
   return KeywordToken::IsTokenKeyword(
       &token, {Keyword::VOID, Keyword::BOOL, Keyword::CHAR, Keyword::INT,
-               Keyword::RAT, Keyword::STRING});
+               Keyword::FLOAT, Keyword::RAT, Keyword::STRING});
 }
 std::unique_ptr<ParseNode> Parser::ParseBaseType() {
   if (!StartsBaseType(*now_reading)) {

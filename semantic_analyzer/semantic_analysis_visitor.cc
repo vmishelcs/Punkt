@@ -390,6 +390,9 @@ void SemanticAnalysisVisitor::Visit(CharacterLiteralNode &node) {
 void SemanticAnalysisVisitor::Visit(IntegerLiteralNode &node) {
   node.SetType(BaseType::CreateIntegerType());
 }
+void SemanticAnalysisVisitor::Visit(FloatLiteralNode &node) {
+  node.SetType(BaseType::CreateFloatType());
+}
 void SemanticAnalysisVisitor::Visit(StringLiteralNode &node) {
   node.SetType(BaseType::CreateStringType());
 }

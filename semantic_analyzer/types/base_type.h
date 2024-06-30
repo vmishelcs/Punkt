@@ -13,6 +13,7 @@ enum class BaseTypeEnum {
   BOOLEAN,
   CHARACTER,
   INTEGER,
+  FLOAT,
   RATIONAL,
   STRING,
   ERROR,
@@ -46,6 +47,11 @@ class BaseType : public Type {
   /// that represents an integer type.
   /// @return `unique_ptr<BaseType>` representing integer type.
   static std::unique_ptr<BaseType> CreateIntegerType();
+
+  /// @brief Create a `unique_ptr<BaseType>` pointing to a `BaseType` object
+  /// that represents a float type.
+  /// @return `unique_ptr<BaseType>` representing float type.
+  static std::unique_ptr<BaseType> CreateFloatType();
 
   /// @brief Create a `unique_ptr<BaseType>` pointing to a `BaseType` object
   /// that represents an rational type.
@@ -91,21 +97,22 @@ class BaseType : public Type {
 
   virtual std::string ToString() const override {
     return GetEnumString(base_type_enum);
-  };
+  }
 
   virtual bool IsErrorType() const override {
     return base_type_enum == BaseTypeEnum::ERROR;
-  };
+  }
 
   /// @brief This method should do nothing for BaseTypes.
   virtual void ResetArbitraryTypes() override {}
 
   virtual unsigned GetSizeInBytes() const override;
-  virtual llvm::Type *GetLLVMType(
-      llvm::LLVMContext &llvm_context) const override;
+  virtual llvm::Type *GetLLVMType(llvm::LLVMContext &) const override;
 
-  BaseType(BaseTypeEnum base_type_enum);
   static std::string GetEnumString(BaseTypeEnum base_type_enum);
+
+  BaseType(BaseTypeEnum base_type_enum)
+      : Type(TypeEnum::BASE_TYPE), base_type_enum(base_type_enum) {}
 
  private:
   BaseTypeEnum base_type_enum;

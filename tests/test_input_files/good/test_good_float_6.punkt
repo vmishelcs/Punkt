@@ -1,0 +1,12 @@
+function FAdd <float x, float y> -> float {
+  return x + y.
+}
+
+function FSub <float x, float y> -> float {
+  return x - y.
+}
+
+main {
+  println FAdd(2.0, 3.0).
+  println FSub(2.0, 3.0).
+}

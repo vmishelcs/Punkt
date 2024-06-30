@@ -4,6 +4,7 @@
 #include "boolean_literal_token.h"
 #include "character_literal_token.h"
 #include "eof_token.h"
+#include "float_literal_token.h"
 #include "identifier_token.h"
 #include "integer_literal_token.h"
 #include "keyword_token.h"

@@ -4,13 +4,14 @@
 #include <llvm/IR/Type.h>
 #include <logging/punkt_logger.h>
 
-static const int kVoidTypeSizeInBytes = 0;
-static const int kBooleanTypeSizeInBytes = 1;
-static const int kCharacterTypeSizeInBytes = 1;
-static const int kIntegerTypeSizeInBytes = 8;
-static const int kRationalTypeSizeInBytes = 16;
-static const int kStringTypeSizeInBytes = 8;
-static const int kErrorTypeSizeInBytes = 0;
+static const unsigned kVoidTypeSizeInBytes = 0;
+static const unsigned kBooleanTypeSizeInBytes = 1;
+static const unsigned kCharacterTypeSizeInBytes = 1;
+static const unsigned kIntegerTypeSizeInBytes = 8;
+static const unsigned kFloatTypeSizeInBytes = 8;
+static const unsigned kRationalTypeSizeInBytes = 16;
+static const unsigned kStringTypeSizeInBytes = 8;
+static const unsigned kErrorTypeSizeInBytes = 0;
 
 std::unique_ptr<BaseType> BaseType::Create(BaseTypeEnum base_type_enum) {
   return std::make_unique<BaseType>(base_type_enum);
@@ -30,6 +31,10 @@ std::unique_ptr<BaseType> BaseType::CreateCharacterType() {
 
 std::unique_ptr<BaseType> BaseType::CreateIntegerType() {
   return Create(BaseTypeEnum::INTEGER);
+}
+
+std::unique_ptr<BaseType> BaseType::CreateFloatType() {
+  return Create(BaseTypeEnum::FLOAT);
 }
 
 std::unique_ptr<BaseType> BaseType::CreateRationalType() {
@@ -71,6 +76,8 @@ unsigned BaseType::GetSizeInBytes() const {
       return kCharacterTypeSizeInBytes;
     case BaseTypeEnum::INTEGER:
       return kIntegerTypeSizeInBytes;
+    case BaseTypeEnum::FLOAT:
+      return kFloatTypeSizeInBytes;
     case BaseTypeEnum::RATIONAL:
       return kRationalTypeSizeInBytes;
     case BaseTypeEnum::STRING:
@@ -93,6 +100,8 @@ llvm::Type *BaseType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
       return llvm::Type::getInt8Ty(llvm_context);
     case BaseTypeEnum::INTEGER:
       return llvm::Type::getInt64Ty(llvm_context);
+    case BaseTypeEnum::FLOAT:
+      return llvm::Type::getDoubleTy(llvm_context);
     case BaseTypeEnum::RATIONAL:
       return llvm::Type::getInt128Ty(llvm_context);
     case BaseTypeEnum::STRING:
@@ -106,9 +115,6 @@ llvm::Type *BaseType::GetLLVMType(llvm::LLVMContext &llvm_context) const {
   }
 }
 
-BaseType::BaseType(BaseTypeEnum base_type_enum)
-    : Type(TypeEnum::BASE_TYPE), base_type_enum(base_type_enum) {}
-
 std::string BaseType::GetEnumString(BaseTypeEnum base_type_enum) {
   switch (base_type_enum) {
     case BaseTypeEnum::VOID:
@@ -119,6 +125,8 @@ std::string BaseType::GetEnumString(BaseTypeEnum base_type_enum) {
       return "character";
     case BaseTypeEnum::INTEGER:
       return "integer";
+    case BaseTypeEnum::FLOAT:
+      return "float";
     case BaseTypeEnum::RATIONAL:
       return "rational";
     case BaseTypeEnum::STRING:
